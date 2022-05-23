@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
 )
 
@@ -52,8 +53,10 @@ func GetOrgDatasource() *schema.Resource {
 				DefaultFunc: schema.EnvDefaultFunc("SERVICE_TOKEN", ""),
 			},
 			usersVar: {
+				ConfigMode:  schema.SchemaConfigModeAttr,
 				Type:        schema.TypeSet,
 				Elem:        GetUserDatasource(),
+				Optional:    true,
 				Computed:    true,
 				Description: "List of ID of users in organization",
 			},
@@ -88,8 +91,14 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 		"name": name,
 	})
 
-	users := make([]*schema.ResourceData, 0)
-	respUsers, err := client.ListUsers(ctx, &management2.ListUsersRequest{})
+	clientOrg, err := getManagementClient(clientinfo, resp.GetOrg().GetId())
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	users := d.Get(usersVar).(*schema.Set)
+	//users := make([]*schema.ResourceData, 0)
+	respUsers, err := clientOrg.ListUsers(ctx, &management2.ListUsersRequest{})
 	if err != nil {
 		return diag.Errorf("failed to get list of users: %v", err)
 	}
@@ -97,13 +106,13 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 	for i := range respUsers.Result {
 		user := respUsers.Result[i]
 
-		userdata := &schema.ResourceData{}
+		userdata := GetUserDatasource().Data(&terraform.InstanceState{})
 		userdata.SetId(user.GetId())
-		if errDiag := readUser(ctx, userdata, m, clientinfo); errDiag != nil {
+		if errDiag := readUser(ctx, userdata, m, clientinfo, resp.GetOrg().GetId()); errDiag != nil {
 			return errDiag
 		}
-
-		users = append(users, userdata)
+		data := getUserValueMap(userdata)
+		users.Add(data)
 	}
 	if err := d.Set(usersVar, users); err != nil {
 		return diag.Errorf("failed to set list of users: %v", err)

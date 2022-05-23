@@ -7,10 +7,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	v2 "github.com/zitadel/terraform-provider-zitadel/zitadel/v2"
 	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
-	"strconv"
 )
 
 const (
+	idVar                 = "id"
 	resourceOwnerVar      = "resource_owner"
 	userStateVar          = "state"
 	userNameVar           = "user_name"
@@ -38,6 +38,12 @@ const (
 func GetUserDatasource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
+			idVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "ID of the user",
+			},
 			resourceOwnerVar: {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -140,10 +146,10 @@ func GetUserDatasource() *schema.Resource {
 	}
 }
 
-func readUser(ctx context.Context, d *schema.ResourceData, m interface{}, info *ClientInfo) diag.Diagnostics {
+func readUser(ctx context.Context, d *schema.ResourceData, m interface{}, info *ClientInfo, org string) diag.Diagnostics {
 	tflog.Info(ctx, "started read")
 
-	client, err := getManagementClient(info, d.Id())
+	client, err := getManagementClient(info, org)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -160,8 +166,9 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}, info *
 		loginNames = append(loginNames, v)
 	}
 	set := map[string]interface{}{
+		idVar:                 user.GetId(),
 		resourceOwnerVar:      user.GetDetails().GetResourceOwner(),
-		userStateVar:          user.GetState(),
+		userStateVar:          user.GetState().String(),
 		userNameVar:           user.GetUserName(),
 		loginNamesVar:         loginNames,
 		preferredLoginNameVar: user.GetPreferredLoginName(),
@@ -175,12 +182,8 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}, info *
 			set[displayNameVar] = profile.GetDisplayName()
 			set[nickNameVar] = profile.GetNickName()
 			set[preferredLanguageVar] = profile.GetPreferredLanguage()
-			if gender := profile.GetGender().String(); gender != "" {
-				genderInt, err := strconv.Atoi(gender)
-				if err != nil {
-					return diag.Errorf("failed to parse gender: %v", err)
-				}
-				set[genderVar] = genderInt
+			if gender := profile.GetGender().Number(); gender != 0 {
+				set[genderVar] = gender
 			}
 		}
 		if email := human.GetEmail(); email != nil {
@@ -196,7 +199,6 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}, info *
 		set[machineNameVar] = machine.GetName()
 		set[descriptionVar] = machine.GetDescription()
 	}
-
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of user: %v", k, err)
@@ -204,4 +206,14 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}, info *
 	}
 	d.SetId(user.GetId())
 	return nil
+}
+
+func getUserValueMap(d *schema.ResourceData) map[string]interface{} {
+	res := GetUserDatasource()
+
+	values := make(map[string]interface{}, 0)
+	for key := range res.Schema {
+		values[key] = d.Get(key)
+	}
+	return values
 }
