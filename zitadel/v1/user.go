@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	v2 "github.com/zitadel/terraform-provider-zitadel/zitadel/v2"
 	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
 )
@@ -146,6 +147,32 @@ func GetUserDatasource() *schema.Resource {
 	}
 }
 
+func readUsersOfOrg(ctx context.Context, users *schema.Set, m interface{}, clientinfo *ClientInfo, org string) diag.Diagnostics {
+	client, err := getManagementClient(clientinfo, org)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	resp, err := client.ListUsers(ctx, &management2.ListUsersRequest{})
+	if err != nil {
+		return diag.Errorf("failed to get list of users: %v", err)
+	}
+
+	userResource := GetUserDatasource()
+	for i := range resp.Result {
+		user := resp.Result[i]
+
+		userdata := userResource.Data(&terraform.InstanceState{})
+		userdata.SetId(user.GetId())
+		if errDiag := readUser(ctx, userdata, m, clientinfo, org); errDiag != nil {
+			return errDiag
+		}
+		data := resourceToValueMap(userResource, userdata)
+		users.Add(data)
+	}
+	return nil
+}
+
 func readUser(ctx context.Context, d *schema.ResourceData, m interface{}, info *ClientInfo, org string) diag.Diagnostics {
 	tflog.Info(ctx, "started read")
 
@@ -206,14 +233,4 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}, info *
 	}
 	d.SetId(user.GetId())
 	return nil
-}
-
-func getUserValueMap(d *schema.ResourceData) map[string]interface{} {
-	res := GetUserDatasource()
-
-	values := make(map[string]interface{}, 0)
-	for key := range res.Schema {
-		values[key] = d.Get(key)
-	}
-	return values
 }

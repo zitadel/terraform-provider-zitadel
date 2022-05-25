@@ -5,7 +5,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
 )
 
@@ -16,7 +15,17 @@ const (
 	addressVar = "address"
 	projectVar = "project"
 	tokenVar   = "token"
-	usersVar   = "users"
+
+	passwordComplexityPolicyVar = "password_complexity_policy"
+	lockoutPolicyVar            = "lockout_policy"
+	loginPolicyVar              = "login_policy"
+	iamPolicyVar                = "iam_policy"
+	labelPolicyVar              = "label_policy"
+	privacyPolicyVar            = "privacy_policy"
+
+	usersVar    = "users"
+	projectsVar = "projects"
+	domainsVar  = "domains"
 )
 
 func GetOrgDatasource() *schema.Resource {
@@ -52,13 +61,70 @@ func GetOrgDatasource() *schema.Resource {
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SERVICE_TOKEN", ""),
 			},
+
+			passwordComplexityPolicyVar: {
+				Type:        schema.TypeSet,
+				Elem:        GetPasswordComplexityPolicyDatasource(),
+				Optional:    true,
+				Computed:    true,
+				Description: "List of password complexity policies in organization",
+			},
+			lockoutPolicyVar: {
+				Type:        schema.TypeSet,
+				Elem:        GetLockoutPolicyDatasource(),
+				Optional:    true,
+				Computed:    true,
+				Description: "List of lockout policies in organization",
+			},
+			loginPolicyVar: {
+				Type:        schema.TypeSet,
+				Elem:        GetLoginPolicyDatasource(),
+				Optional:    true,
+				Computed:    true,
+				Description: "List of login policies in organization",
+			},
+			labelPolicyVar: {
+				Type:        schema.TypeSet,
+				Elem:        GetLabelPolicyDatasource(),
+				Optional:    true,
+				Computed:    true,
+				Description: "List of label policies in organization",
+			},
+			iamPolicyVar: {
+				Type:        schema.TypeSet,
+				Elem:        GetIAMPolicyDatasource(),
+				Optional:    true,
+				Computed:    true,
+				Description: "List of domain policies in organization",
+			},
+			privacyPolicyVar: {
+				Type:        schema.TypeSet,
+				Elem:        GetPrivacyPolicyDatasource(),
+				Optional:    true,
+				Computed:    true,
+				Description: "List of privacy policies in organization",
+			},
+
 			usersVar: {
-				ConfigMode:  schema.SchemaConfigModeAttr,
 				Type:        schema.TypeSet,
 				Elem:        GetUserDatasource(),
 				Optional:    true,
 				Computed:    true,
-				Description: "List of ID of users in organization",
+				Description: "List of users in organization",
+			},
+			projectsVar: {
+				Type:        schema.TypeSet,
+				Elem:        GetProjectDatasource(),
+				Optional:    true,
+				Computed:    true,
+				Description: "List of projects in organization",
+			},
+			domainsVar: {
+				Type:        schema.TypeSet,
+				Elem:        GetDomainDatasource(),
+				Optional:    true,
+				Computed:    true,
+				Description: "List of domains in organization",
 			},
 		},
 		ReadContext: readOrg,
@@ -91,33 +157,6 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 		"name": name,
 	})
 
-	clientOrg, err := getManagementClient(clientinfo, resp.GetOrg().GetId())
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	users := d.Get(usersVar).(*schema.Set)
-	//users := make([]*schema.ResourceData, 0)
-	respUsers, err := clientOrg.ListUsers(ctx, &management2.ListUsersRequest{})
-	if err != nil {
-		return diag.Errorf("failed to get list of users: %v", err)
-	}
-
-	for i := range respUsers.Result {
-		user := respUsers.Result[i]
-
-		userdata := GetUserDatasource().Data(&terraform.InstanceState{})
-		userdata.SetId(user.GetId())
-		if errDiag := readUser(ctx, userdata, m, clientinfo, resp.GetOrg().GetId()); errDiag != nil {
-			return errDiag
-		}
-		data := getUserValueMap(userdata)
-		users.Add(data)
-	}
-	if err := d.Set(usersVar, users); err != nil {
-		return diag.Errorf("failed to set list of users: %v", err)
-	}
-
 	if err := d.Set(nameVar, name); err != nil {
 		return diag.Errorf("failed to set org name: %v", err)
 	}
@@ -125,5 +164,57 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 		return diag.Errorf("failed to set org: %v", err)
 	}
 	d.SetId(id)
+
+	/****************************************************************************************
+	Users
+	*/
+	users := d.Get(usersVar).(*schema.Set)
+	if err := readUsersOfOrg(ctx, users, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(usersVar, users); err != nil {
+		return diag.Errorf("failed to set list of users: %v", err)
+	}
+
+	/****************************************************************************************
+	Projects
+	*/
+	projects := d.Get(projectsVar).(*schema.Set)
+	if err := readProjectsOfOrg(ctx, projects, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(projectsVar, projects); err != nil {
+		return diag.Errorf("failed to set list of projects: %v", err)
+	}
+	/****************************************************************************************
+	Domains
+	*/
+	domains := d.Get(domainsVar).(*schema.Set)
+	if err := readDomainsOfOrg(ctx, domains, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(domainsVar, domains); err != nil {
+		return diag.Errorf("failed to set list of projects: %v", err)
+	}
+
+	/****************************************************************************************
+	iam policy
+	*/
+	iamPolicy := d.Get(iamPolicyVar).(*schema.Set)
+	if err := readIAMPolicyOfOrg(ctx, domains, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(iamPolicyVar, iamPolicy); err != nil {
+		return diag.Errorf("failed to set list of projects: %v", err)
+	}
+
 	return nil
+}
+
+func resourceToValueMap(r *schema.Resource, d *schema.ResourceData) map[string]interface{} {
+	values := make(map[string]interface{}, 0)
+	for key := range r.Schema {
+		values[key] = d.Get(key)
+	}
+	return values
 }

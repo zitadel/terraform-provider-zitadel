@@ -37,8 +37,16 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"org":  v2.OrgResource(),
-			"user": v2.GetUser(),
+			"org":                        v2.OrgResource(),
+			"user":                       v2.GetUser(),
+			"project":                    v2.GetProject(),
+			"domain":                     v2.GetDomain(),
+			"domain_policy":              v2.GetDomainPolicy(),
+			"label_policy":               v2.GetLabelPolicy(),
+			"lockout_policy":             v2.GetLockoutPolicy(),
+			"login_policy":               v2.GetLoginPolicy(),
+			"password_complexity_policy": v2.GetPasswordComplexityPolicy(),
+			"privacy_policy":             v2.GetPrivacyPolicy(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	idVar    = "id"
 	oldIDVar = "old_id"
 
 	resourceOwnerVar      = "resource_owner"
@@ -42,6 +43,12 @@ const (
 func GetUser() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
+			idVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "ID of the user",
+				ForceNew:    true,
+			},
 			oldIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -165,7 +172,7 @@ func deleteUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	client, err := getManagementClient(clientinfo, d.Get(resourceOwnerVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -190,14 +197,6 @@ func createUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 	client, err := getManagementClient(clientinfo, d.Id())
 	if err != nil {
 		return diag.FromErr(err)
-	}
-
-	_, err = client.UpdateUserName(ctx, &management2.UpdateUserNameRequest{
-		UserId:   d.Id(),
-		UserName: d.Get(userNameVar).(string),
-	})
-	if err != nil {
-		return diag.Errorf("failed to update username: %v", err)
 	}
 
 	userType := d.Get(typeVar).(string)
@@ -228,14 +227,15 @@ func createUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		}
 		d.SetId(respUser.UserId)
 	case MachineUser:
-		_, err := client.UpdateMachine(ctx, &management2.UpdateMachineRequest{
-			UserId:      d.Id(),
+		respUser, err := client.AddMachineUser(ctx, &management2.AddMachineUserRequest{
+			UserName:    d.Get(userNameVar).(string),
 			Name:        d.Get(machineNameVar).(string),
 			Description: d.Get(descriptionVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to create machine user: %v", err)
 		}
+		d.SetId(respUser.UserId)
 	}
 	return nil
 }
@@ -251,6 +251,14 @@ func updateUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 	client, err := getManagementClient(clientinfo, d.Id())
 	if err != nil {
 		return diag.FromErr(err)
+	}
+
+	_, err = client.UpdateUserName(ctx, &management2.UpdateUserNameRequest{
+		UserId:   d.Id(),
+		UserName: d.Get(userNameVar).(string),
+	})
+	if err != nil {
+		return diag.Errorf("failed to update username: %v", err)
 	}
 
 	userType := d.Get(typeVar).(string)
@@ -287,15 +295,14 @@ func updateUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 			return diag.Errorf("failed to update human phone: %v", err)
 		}
 	case MachineUser:
-		respUser, err := client.AddMachineUser(ctx, &management2.AddMachineUserRequest{
-			UserName:    d.Get(userNameVar).(string),
+		_, err := client.UpdateMachine(ctx, &management2.UpdateMachineRequest{
+			UserId:      d.Id(),
 			Name:        d.Get(machineNameVar).(string),
 			Description: d.Get(descriptionVar).(string),
 		})
 		if err != nil {
-			return diag.Errorf("failed to create machine user: %v", err)
+			return diag.Errorf("failed to update machine user: %v", err)
 		}
-		d.SetId(respUser.UserId)
 	}
 	return nil
 }
@@ -320,6 +327,7 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.D
 
 	user := respUser.GetUser()
 	set := map[string]interface{}{
+		idVar:                 user.GetId(),
 		resourceOwnerVar:      user.GetDetails().GetResourceOwner(),
 		userStateVar:          user.GetState(),
 		userNameVar:           user.GetUserName(),
@@ -327,7 +335,31 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.D
 		preferredLoginNameVar: user.GetPreferredLoginName(),
 		typeVar:               user.GetType(),
 	}
-
+	if human := user.GetHuman(); human != nil {
+		set[typeVar] = HumanUser
+		if profile := human.GetProfile(); profile != nil {
+			set[firstNameVar] = profile.GetFirstName()
+			set[lastNameVar] = profile.GetLastName()
+			set[displayNameVar] = profile.GetDisplayName()
+			set[nickNameVar] = profile.GetNickName()
+			set[preferredLanguageVar] = profile.GetPreferredLanguage()
+			if gender := profile.GetGender().Number(); gender != 0 {
+				set[genderVar] = gender
+			}
+		}
+		if email := human.GetEmail(); email != nil {
+			set[emailVar] = email.GetEmail()
+			set[isEmailVerifiedVar] = email.GetIsEmailVerified()
+		}
+		if phone := human.GetPhone(); phone != nil {
+			set[phoneVar] = phone.GetPhone()
+			set[isPhoneVerifiedVar] = phone.GetIsPhoneVerified()
+		}
+	} else if machine := user.GetMachine(); machine != nil {
+		set[typeVar] = MachineUser
+		set[machineNameVar] = machine.GetName()
+		set[descriptionVar] = machine.GetDescription()
+	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of user: %v", k, err)
