@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	admin2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/admin"
 	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
 )
 
@@ -13,6 +14,7 @@ const (
 	domainPolicyUserLoginMustBeDomain = "user_login_must_be_domain"
 	domainPolicyIsDefault             = "is_default"
 	domainPolicyValidateOrgDomain     = "validate_org_domains"
+	domainPolicySmtpSender            = "smtp_sender_address_matches_instance_domain"
 )
 
 func GetDomainPolicy() *schema.Resource {
@@ -20,13 +22,13 @@ func GetDomainPolicy() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			domainPolicyOrgIdVar: {
 				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
+				Required:    true,
 				Description: "Id for the organization",
+				ForceNew:    true,
 			},
 			domainPolicyUserLoginMustBeDomain: {
 				Type:        schema.TypeBool,
-				Computed:    true,
+				Required:    true,
 				Description: "User login must be domain",
 			},
 			domainPolicyIsDefault: {
@@ -36,12 +38,98 @@ func GetDomainPolicy() *schema.Resource {
 			},
 			domainPolicyValidateOrgDomain: {
 				Type:        schema.TypeBool,
-				Computed:    true,
+				Required:    true,
 				Description: "Validate organization domains",
 			},
+			domainPolicySmtpSender: {
+				Type:        schema.TypeBool,
+				Required:    true,
+				Description: "",
+			},
 		},
-		ReadContext: readDomainPolicy,
+		ReadContext:   readDomainPolicy,
+		CreateContext: createDomainPolicy,
+		DeleteContext: deleteDomainPolicy,
+		UpdateContext: updateDomainPolicy,
 	}
+}
+
+func deleteDomainPolicy(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started create")
+
+	clientinfo, ok := m.(*ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := getAdminClient(clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	org := d.Get(domainPolicyOrgIdVar).(string)
+
+	_, err = client.ResetCustomDomainPolicyToDefault(ctx, &admin2.ResetCustomDomainPolicyToDefaultRequest{
+		OrgId: org,
+	})
+	if err != nil {
+		return diag.Errorf("failed to reset domain policy: %v", err)
+	}
+	d.SetId(org)
+	return nil
+}
+
+func updateDomainPolicy(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started update")
+
+	clientinfo, ok := m.(*ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := getAdminClient(clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	org := d.Get(domainPolicyOrgIdVar).(string)
+
+	_, err = client.UpdateCustomDomainPolicy(ctx, &admin2.UpdateCustomDomainPolicyRequest{
+		OrgId:                                  org,
+		UserLoginMustBeDomain:                  d.Get(domainPolicyUserLoginMustBeDomain).(bool),
+		ValidateOrgDomains:                     d.Get(domainPolicyValidateOrgDomain).(bool),
+		SmtpSenderAddressMatchesInstanceDomain: d.Get(domainPolicySmtpSender).(bool),
+	})
+	if err != nil {
+		return diag.Errorf("failed to update domain policy: %v", err)
+	}
+	d.SetId(org)
+	return nil
+}
+
+func createDomainPolicy(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started create")
+
+	clientinfo, ok := m.(*ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := getAdminClient(clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	org := d.Get(domainPolicyOrgIdVar).(string)
+
+	_, err = client.AddCustomDomainPolicy(ctx, &admin2.AddCustomDomainPolicyRequest{
+		OrgId:                                  org,
+		UserLoginMustBeDomain:                  d.Get(domainPolicyUserLoginMustBeDomain).(bool),
+		ValidateOrgDomains:                     d.Get(domainPolicyValidateOrgDomain).(bool),
+		SmtpSenderAddressMatchesInstanceDomain: d.Get(domainPolicySmtpSender).(bool),
+	})
+	if err != nil {
+		return diag.Errorf("failed to create domain policy: %v", err)
+	}
+	d.SetId(org)
+	return nil
 }
 
 func readDomainPolicy(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -52,7 +140,8 @@ func readDomainPolicy(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	org := d.Get(domainPolicyOrgIdVar).(string)
+	client, err := getManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -26,6 +26,7 @@ const (
 	usersVar    = "users"
 	projectsVar = "projects"
 	domainsVar  = "domains"
+	actionsVar  = "actions"
 )
 
 func GetOrgDatasource() *schema.Resource {
@@ -126,6 +127,13 @@ func GetOrgDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "List of domains in organization",
 			},
+			actionsVar: {
+				Type:        schema.TypeSet,
+				Elem:        GetActionDatasource(),
+				Optional:    true,
+				Computed:    true,
+				Description: "List of actions in organization",
+			},
 		},
 		ReadContext: readOrg,
 	}
@@ -194,7 +202,7 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 		return err
 	}
 	if err := d.Set(domainsVar, domains); err != nil {
-		return diag.Errorf("failed to set list of projects: %v", err)
+		return diag.Errorf("failed to set list of domains: %v", err)
 	}
 
 	/****************************************************************************************
@@ -205,7 +213,73 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 		return err
 	}
 	if err := d.Set(iamPolicyVar, iamPolicy); err != nil {
-		return diag.Errorf("failed to set list of projects: %v", err)
+		return diag.Errorf("failed to set list of iam policies: %v", err)
+	}
+
+	/****************************************************************************************
+	label policy
+	*/
+	labelPolicy := d.Get(labelPolicyVar).(*schema.Set)
+	if err := readLabelPolicyOfOrg(ctx, domains, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(labelPolicyVar, labelPolicy); err != nil {
+		return diag.Errorf("failed to set list of label policies: %v", err)
+	}
+
+	/****************************************************************************************
+	lockout policy
+	*/
+	lockoutPolicy := d.Get(lockoutPolicyVar).(*schema.Set)
+	if err := readLockoutPolicyOfOrg(ctx, domains, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(lockoutPolicyVar, lockoutPolicy); err != nil {
+		return diag.Errorf("failed to set list of lockout policies: %v", err)
+	}
+
+	/****************************************************************************************
+	login policy
+	*/
+	loginPolicy := d.Get(loginPolicyVar).(*schema.Set)
+	if err := readLoginPolicyOfOrg(ctx, domains, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(loginPolicyVar, loginPolicy); err != nil {
+		return diag.Errorf("failed to set list of login policies: %v", err)
+	}
+
+	/****************************************************************************************
+	password complexity policy
+	*/
+	passwordComplexityPolicy := d.Get(passwordComplexityPolicyVar).(*schema.Set)
+	if err := readPasswordComplexityPolicyPolicyOfOrg(ctx, domains, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(passwordComplexityPolicyVar, passwordComplexityPolicy); err != nil {
+		return diag.Errorf("failed to set list of password complexity policies: %v", err)
+	}
+
+	/****************************************************************************************
+	privacy policy
+	*/
+	privacyPolicy := d.Get(privacyPolicyVar).(*schema.Set)
+	if err := readPrivacyPolicyOfOrg(ctx, domains, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(privacyPolicyVar, privacyPolicy); err != nil {
+		return diag.Errorf("failed to set list of privacy policies: %v", err)
+	}
+
+	/****************************************************************************************
+	actions
+	*/
+	actions := d.Get(actionsVar).(*schema.Set)
+	if err := readActionsOfOrg(ctx, domains, m, clientinfo, resp.GetOrg().GetId()); err != nil {
+		return err
+	}
+	if err := d.Set(actionsVar, actions); err != nil {
+		return diag.Errorf("failed to set list of actions: %v", err)
 	}
 
 	return nil

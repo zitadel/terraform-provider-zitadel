@@ -12,7 +12,6 @@ func Provider() *schema.Provider {
 	return &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
 			"zitadelV1Org": v1.GetOrgDatasource(),
-			//		"zitadelV1User": v1.GetUserDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			v2.IssuerVar: {
@@ -47,6 +46,7 @@ func Provider() *schema.Provider {
 			"login_policy":               v2.GetLoginPolicy(),
 			"password_complexity_policy": v2.GetPasswordComplexityPolicy(),
 			"privacy_policy":             v2.GetPrivacyPolicy(),
+			"action":                     v2.GetAction(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
