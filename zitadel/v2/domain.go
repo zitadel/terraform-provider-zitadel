@@ -5,7 +5,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
+	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 )
 
 const (
@@ -61,7 +61,7 @@ func deleteDomain(ctx context.Context, d *schema.ResourceData, m interface{}) di
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectResourceOwner).(string))
+	client, err := getManagementClient(clientinfo, d.Get(domainOrgIdVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -83,7 +83,7 @@ func createDomain(ctx context.Context, d *schema.ResourceData, m interface{}) di
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	client, err := getManagementClient(clientinfo, d.Get(domainOrgIdVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -107,7 +107,7 @@ func readDomain(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	client, err := getManagementClient(clientinfo, d.Get(domainOrgIdVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}

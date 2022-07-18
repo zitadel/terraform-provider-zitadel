@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/pkg/oidc"
-	"github.com/zitadel/zitadel-go/pkg/client/admin"
-	"github.com/zitadel/zitadel-go/pkg/client/auth"
-	"github.com/zitadel/zitadel-go/pkg/client/management"
-	"github.com/zitadel/zitadel-go/pkg/client/middleware"
-	"github.com/zitadel/zitadel-go/pkg/client/zitadel"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/auth"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/middleware"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
 )
 
 type ClientInfo struct {
@@ -34,6 +34,7 @@ func GetClientInfo(d *schema.ResourceData) (*ClientInfo, error) {
 
 func getAuthClient(info *ClientInfo) (*auth.Client, error) {
 	client, err := auth.NewClient(
+		info.Issuer, info.Address,
 		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
 		zitadel.WithCustomURL(info.Issuer, info.Address),
 		zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token)),
@@ -47,6 +48,7 @@ func getAuthClient(info *ClientInfo) (*auth.Client, error) {
 
 func getAdminClient(info *ClientInfo) (*admin.Client, error) {
 	client, err := admin.NewClient(
+		info.Issuer, info.Address,
 		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
 		zitadel.WithCustomURL(info.Issuer, info.Address),
 		zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token)),
@@ -68,6 +70,7 @@ func getManagementClient(info *ClientInfo, orgID string) (*management.Client, er
 	}
 
 	client, err := management.NewClient(
+		info.Issuer, info.Address,
 		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
 		opts...,
 	)

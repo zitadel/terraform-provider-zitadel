@@ -5,20 +5,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/pkg/client/zitadel/project"
+	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/project"
+	"strconv"
 )
 
 const (
-	projectIdVar              = "id"
-	projectOldIdVar           = "old_id"
-	projectNameVar            = "name"
-	projectState              = "state"
-	projectResourceOwner      = "resource_owner"
-	projectRoleAssertionVar   = "project_role_assertion"
-	projectRoleCheckVar       = "project_role_check"
-	hasProjectCheckVar        = "has_project_check"
-	privateLabelingSettingVar = "private_labeling_setting"
+	projectIdVar                     = "id"
+	projectNameVar                   = "name"
+	projectState                     = "state"
+	projectResourceOwner             = "resource_owner"
+	projectRoleAssertionVar          = "project_role_assertion"
+	projectRoleCheckVar              = "project_role_check"
+	projectHasProjectCheckVar        = "has_project_check"
+	projectPrivateLabelingSettingVar = "private_labeling_setting"
+	projectRoles                     = "roles"
+	projectRoleKey                   = "role_key"
+	projectRoleDisplayName           = "display_name"
+	projectRoleGroup                 = "group"
 )
 
 func GetProject() *schema.Resource {
@@ -28,11 +32,6 @@ func GetProject() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "ID of the project",
-			},
-			projectOldIdVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Old ID of the project",
 				ForceNew:    true,
 			},
 			projectNameVar: {
@@ -60,13 +59,37 @@ func GetProject() *schema.Resource {
 				Optional:    true,
 				Description: "ZITADEL checks if the user has at least one on this project",
 			},
-			hasProjectCheckVar: {
+			projectHasProjectCheckVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "ZITADEL checks if the org of the user has permission to this project",
 			},
-			privateLabelingSettingVar: {
+			projectPrivateLabelingSettingVar: {
 				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Defines from where the private labeling should be triggered",
+			},
+			projectRoles: {
+				Type: schema.TypeSet,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						projectRoleKey: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Key used for project role",
+						},
+						projectRoleDisplayName: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Name used for project role",
+						},
+						projectRoleGroup: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Group used for project role",
+						},
+					},
+				},
 				Optional:    true,
 				Description: "Defines from where the private labeling should be triggered",
 			},
@@ -108,7 +131,7 @@ func updateProject(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	client, err := getManagementClient(clientinfo, d.Get(projectResourceOwner).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -118,8 +141,8 @@ func updateProject(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		Name:                   d.Get(projectNameVar).(string),
 		ProjectRoleCheck:       d.Get(projectRoleCheckVar).(bool),
 		ProjectRoleAssertion:   d.Get(projectRoleAssertionVar).(bool),
-		HasProjectCheck:        d.Get(hasProjectCheckVar).(bool),
-		PrivateLabelingSetting: d.Get(privateLabelingSettingVar).(project.PrivateLabelingSetting),
+		HasProjectCheck:        d.Get(projectHasProjectCheckVar).(bool),
+		PrivateLabelingSetting: d.Get(projectPrivateLabelingSettingVar).(project.PrivateLabelingSetting),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update project: %v", err)
@@ -135,7 +158,7 @@ func createProject(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	client, err := getManagementClient(clientinfo, d.Get(projectResourceOwner).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -144,8 +167,8 @@ func createProject(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		Name:                   d.Get(projectNameVar).(string),
 		ProjectRoleAssertion:   d.Get(projectRoleAssertionVar).(bool),
 		ProjectRoleCheck:       d.Get(projectRoleCheckVar).(bool),
-		HasProjectCheck:        d.Get(hasProjectCheckVar).(bool),
-		PrivateLabelingSetting: d.Get(privateLabelingSettingVar).(project.PrivateLabelingSetting),
+		HasProjectCheck:        d.Get(projectHasProjectCheckVar).(bool),
+		PrivateLabelingSetting: d.Get(projectPrivateLabelingSettingVar).(project.PrivateLabelingSetting),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create project: %v", err)
@@ -162,7 +185,7 @@ func readProject(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	client, err := getManagementClient(clientinfo, d.Get(projectResourceOwner).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -174,13 +197,13 @@ func readProject(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 
 	project := resp.GetProject()
 	set := map[string]interface{}{
-		projectIdVar:            project.GetId(),
-		projectResourceOwner:    project.GetDetails().GetResourceOwner(),
-		projectState:            project.GetState(),
-		projectNameVar:          project.GetName(),
-		projectRoleAssertionVar: project.GetProjectRoleAssertion(),
-		projectRoleCheckVar:     project.GetProjectRoleCheck(),
-		hasProjectCheckVar:      project.GetHasProjectCheck(),
+		projectIdVar:              project.GetId(),
+		projectResourceOwner:      project.GetDetails().GetResourceOwner(),
+		projectState:              project.GetState(),
+		projectNameVar:            project.GetName(),
+		projectRoleAssertionVar:   project.GetProjectRoleAssertion(),
+		projectRoleCheckVar:       project.GetProjectRoleCheck(),
+		projectHasProjectCheckVar: project.GetHasProjectCheck(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
@@ -188,5 +211,25 @@ func readProject(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		}
 	}
 	d.SetId(project.GetId())
+
+	respRoles, err := client.ListProjectRoles(ctx, &management2.ListProjectRolesRequest{
+		ProjectId: project.GetId(),
+	})
+
+	schemaFunc := func(elem interface{}) int {
+		elemMap := elem.(map[string]string)
+		i, _ := strconv.Atoi(elemMap[projectRoleKey])
+		return schema.HashString(i)
+	}
+	roles := schema.NewSet(schemaFunc, []interface{}{})
+	for _, role := range respRoles.Result {
+		roleData := map[string]string{
+			projectRoleKey:         role.GetKey(),
+			projectRoleDisplayName: role.GetDisplayName(),
+			projectRoleGroup:       role.GetGroup(),
+		}
+		roles.Add(roleData)
+	}
+
 	return nil
 }

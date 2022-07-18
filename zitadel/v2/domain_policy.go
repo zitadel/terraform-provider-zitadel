@@ -5,8 +5,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	admin2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/admin"
-	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
+	admin2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
+	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 )
 
 const (

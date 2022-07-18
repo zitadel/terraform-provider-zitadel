@@ -5,13 +5,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/pkg/client/zitadel/user"
+	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/user"
 )
 
 const (
-	idVar    = "id"
-	oldIDVar = "old_id"
+	idVar = "id"
 
 	resourceOwnerVar      = "resource_owner"
 	userStateVar          = "state"
@@ -47,12 +46,6 @@ func GetUser() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "ID of the user",
-				ForceNew:    true,
-			},
-			oldIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Old ID of the user",
 				ForceNew:    true,
 			},
 			resourceOwnerVar: {
@@ -194,7 +187,7 @@ func createUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	client, err := getManagementClient(clientinfo, d.Get(resourceOwnerVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -248,7 +241,7 @@ func updateUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	client, err := getManagementClient(clientinfo, d.Get(resourceOwnerVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -315,7 +308,7 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.D
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Id())
+	client, err := getManagementClient(clientinfo, d.Get(resourceOwnerVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}

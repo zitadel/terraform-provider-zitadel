@@ -5,7 +5,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	management2 "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
+	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"time"
 )
@@ -153,8 +153,7 @@ func readAction(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(actionOrgId).(string)
-	client, err := getManagementClient(clientinfo, org)
+	client, err := getManagementClient(clientinfo, d.Get(actionOrgId).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
