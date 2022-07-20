@@ -146,7 +146,9 @@ func readUserGrant(ctx context.Context, d *schema.ResourceData, m interface{}) d
 
 	resp, err := client.GetUserGrantByID(ctx, &management2.GetUserGrantByIDRequest{UserId: d.Get(userGrantUserIDVar).(string), GrantId: d.Id()})
 	if err != nil {
-		return diag.Errorf("failed to read usergrant: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to read usergrant: %v", err)
 	}
 
 	grant := resp.GetUserGrant()

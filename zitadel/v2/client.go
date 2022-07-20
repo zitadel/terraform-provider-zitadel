@@ -50,7 +50,7 @@ func getAdminClient(info *ClientInfo) (*admin.Client, error) {
 	client, err := admin.NewClient(
 		info.Issuer, info.Address,
 		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
-		zitadel.WithCustomURL(info.Issuer, info.Address),
+		//zitadel.WithCustomURL(info.Issuer, info.Address),
 		zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token)),
 		zitadel.WithInsecure(),
 	)
@@ -62,7 +62,8 @@ func getAdminClient(info *ClientInfo) (*admin.Client, error) {
 
 func getManagementClient(info *ClientInfo, orgID string) (*management.Client, error) {
 	opts := []zitadel.Option{
-		zitadel.WithCustomURL(info.Issuer, info.Address),
+		zitadel.WithInsecure(),
+		//zitadel.WithCustomURL(info.Issuer, info.Address),
 		zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token)),
 	}
 	if orgID != "" {

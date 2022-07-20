@@ -173,7 +173,7 @@ func readAction(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 			set[actionName] = action.GetName()
 			set[actionState] = action.GetState()
 			set[actionScript] = action.GetScript()
-			set[actionTimeout] = action.GetTimeout().String()
+			set[actionTimeout] = action.GetTimeout().AsDuration().String()
 			set[actionAllowedToFail] = action.GetAllowedToFail()
 		}
 	}

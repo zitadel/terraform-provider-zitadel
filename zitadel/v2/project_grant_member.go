@@ -125,11 +125,15 @@ func createProjectGrantMember(ctx context.Context, d *schema.ResourceData, m int
 	userID := d.Get(projectGrantMemberUserIDVar).(string)
 	projectID := d.Get(projectGrantMemberProjectIDVar).(string)
 	grantID := d.Get(projectGrantMemberGrantIDVar).(string)
+	roles := make([]string, 0)
+	for _, role := range d.Get(projectGrantMemberRolesVar).(*schema.Set).List() {
+		roles = append(roles, role.(string))
+	}
 	_, err = client.AddProjectGrantMember(ctx, &management2.AddProjectGrantMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 		GrantId:   grantID,
-		Roles:     d.Get(projectGrantMemberRolesVar).([]string),
+		Roles:     roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to create projectgrantmember: %v", err)

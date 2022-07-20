@@ -111,10 +111,15 @@ func createProjectGrant(ctx context.Context, d *schema.ResourceData, m interface
 		return diag.FromErr(err)
 	}
 
+	roles := make([]string, 0)
+	for _, role := range d.Get(projectGrantRoleKeysVar).(*schema.Set).List() {
+		roles = append(roles, role.(string))
+	}
+
 	resp, err := client.AddProjectGrant(ctx, &management2.AddProjectGrantRequest{
-		GrantedOrgId: d.Id(),
+		GrantedOrgId: d.Get(projectGrantGrantedOrgIDVar).(string),
 		ProjectId:    d.Get(projectGrantProjectIDVar).(string),
-		RoleKeys:     d.Get(projectGrantRoleKeysVar).([]string),
+		RoleKeys:     roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to create projectgrant: %v", err)
@@ -136,9 +141,11 @@ func readProjectGrant(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetProjectGrantByID(ctx, &management2.GetProjectGrantByIDRequest{GrantId: d.Id()})
+	resp, err := client.GetProjectGrantByID(ctx, &management2.GetProjectGrantByIDRequest{ProjectId: d.Get(projectGrantProjectIDVar).(string), GrantId: d.Id()})
 	if err != nil {
-		return diag.Errorf("failed to read projectgrant: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to read projectgrant: %v", err)
 	}
 
 	projectGrant := resp.GetProjectGrant()

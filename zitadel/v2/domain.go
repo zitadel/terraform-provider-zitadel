@@ -6,6 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/object"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/org"
 )
 
 const (
@@ -112,30 +114,39 @@ func readDomain(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.ListOrgDomains(ctx, &management2.ListOrgDomainsRequest{})
+	resp, err := client.ListOrgDomains(ctx, &management2.ListOrgDomainsRequest{
+		Queries: []*org.DomainSearchQuery{
+			{Query: &org.DomainSearchQuery_DomainNameQuery{
+				DomainNameQuery: &org.DomainNameQuery{
+					Name:   d.Id(),
+					Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
+				},
+			},
+			},
+		},
+	})
 	if err != nil {
 		return diag.Errorf("failed to read domain: %v", err)
 	}
 
-	set := map[string]interface{}{}
-	domainStr := ""
-	for i := range resp.Result {
-		domain := resp.Result[i]
-		if domain.GetDomainName() == d.Id() {
-			domainStr = d.Id()
-			set[domainNameVar] = domain.GetDomainName()
-			set[domainOrgIdVar] = domain.GetOrgId()
-			set[domainIsVerified] = domain.GetIsVerified()
-			set[domainIsPrimary] = domain.GetIsPrimary()
-			set[domainValidationType] = domain.GetValidationType().Number()
+	if len(resp.Result) == 1 {
+		domain := resp.Result[0]
+		set := map[string]interface{}{
+			domainNameVar:        domain.GetDomainName(),
+			domainOrgIdVar:       domain.GetOrgId(),
+			domainIsVerified:     domain.GetIsVerified(),
+			domainIsPrimary:      domain.GetIsPrimary(),
+			domainValidationType: domain.GetValidationType().Number(),
 		}
+		for k, v := range set {
+			if err := d.Set(k, v); err != nil {
+				return diag.Errorf("failed to set %s of domain: %v", k, err)
+			}
+		}
+		d.SetId(domain.GetDomainName())
+		return nil
 	}
 
-	for k, v := range set {
-		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of domain: %v", k, err)
-		}
-	}
-	d.SetId(domainStr)
+	d.SetId("")
 	return nil
 }

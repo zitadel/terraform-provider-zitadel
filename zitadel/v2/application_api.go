@@ -2,9 +2,11 @@ package v2
 
 import (
 	"context"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 )
@@ -14,7 +16,7 @@ func GetApplicationAPI() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			applicationOrgIdVar: {
 				Type:        schema.TypeString,
-				Computed:    true,
+				Required:    true,
 				Description: "orgID of the application",
 				ForceNew:    true,
 			},
@@ -60,7 +62,7 @@ func deleteApplicationAPI(ctx context.Context, d *schema.ResourceData, m interfa
 		AppId:     d.Id(),
 	})
 	if err != nil {
-		return diag.Errorf("failed to delete applicationOIDC: %v", err)
+		return diag.Errorf("failed to delete applicationAPI: %v", err)
 	}
 	return nil
 }
@@ -78,21 +80,33 @@ func updateApplicationAPI(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateApp(ctx, &management2.UpdateAppRequest{
-		ProjectId: d.Get(applicationProjectIDVar).(string),
-		AppId:     d.Id(),
-		Name:      d.Get(applicationNameVar).(string),
-	})
-	if err != nil {
-		return diag.Errorf("failed to update application: %v", err)
+	projectID := d.Get(applicationProjectIDVar).(string)
+	appID := d.Id()
+	apiApp, err := getApp(ctx, client, projectID, appID)
+
+	appName := d.Get(applicationNameVar).(string)
+	if apiApp.GetName() != appName {
+		_, err = client.UpdateApp(ctx, &management2.UpdateAppRequest{
+			ProjectId: projectID,
+			AppId:     d.Id(),
+			Name:      appName,
+		})
+		if err != nil {
+			return diag.Errorf("failed to update application: %v", err)
+		}
 	}
-	_, err = client.UpdateAPIAppConfig(ctx, &management2.UpdateAPIAppConfigRequest{
-		ProjectId:      d.Get(applicationProjectIDVar).(string),
-		AppId:          d.Id(),
-		AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[(d.Get(applicationAuthMethodTypeVar).(string))]),
-	})
-	if err != nil {
-		return diag.Errorf("failed to update applicationOIDC: %v", err)
+
+	apiConfig := apiApp.GetApiConfig()
+	authMethod := d.Get(applicationAuthMethodTypeVar).(string)
+	if apiConfig.GetAuthMethodType().String() != authMethod {
+		_, err = client.UpdateAPIAppConfig(ctx, &management2.UpdateAPIAppConfigRequest{
+			ProjectId:      d.Get(applicationProjectIDVar).(string),
+			AppId:          d.Id(),
+			AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[authMethod]),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update applicationAPI: %v", err)
+		}
 	}
 	return nil
 }
@@ -117,7 +131,7 @@ func createApplicationAPI(ctx context.Context, d *schema.ResourceData, m interfa
 	})
 
 	if err != nil {
-		return diag.Errorf("failed to create applicationOIDC: %v", err)
+		return diag.Errorf("failed to create applicationAPI: %v", err)
 	}
 	d.SetId(resp.GetAppId())
 	return nil
@@ -133,39 +147,36 @@ func readApplicationAPI(ctx context.Context, d *schema.ResourceData, m interface
 
 	client, err := getManagementClient(clientinfo, d.Get(applicationOrgIdVar).(string))
 	if err != nil {
-		return diag.FromErr(err)
+		d.SetId("")
+		return nil
+		//return diag.FromErr(err)
 	}
 
-	resp, err := client.GetAppByID(ctx, &management2.GetAppByIDRequest{ProjectId: d.Get(applicationProjectIDVar).(string), AppId: d.Id()})
+	app, err := getApp(ctx, client, d.Get(applicationProjectIDVar).(string), d.Id())
 	if err != nil {
 		return diag.Errorf("failed to read project: %v", err)
 	}
 
-	app := resp.GetApp()
-	oidc := app.GetOidcConfig()
+	api := app.GetApiConfig()
 	set := map[string]interface{}{
-		applicationProjectIDVar:                app.GetDetails().GetResourceOwner(),
-		applicationNameVar:                     app.GetName(),
-		applicationRedirectURIsVar:             oidc.GetRedirectUris(),
-		applicationResponseTypesVar:            oidc.GetResponseTypes(),
-		applicationGrantTypesVar:               oidc.GetGrantTypes(),
-		applicationAppTypeVar:                  oidc.GetAppType(),
-		applicationAuthMethodTypeVar:           oidc.GetAuthMethodType(),
-		applicationPostLogoutRedirectURIsVar:   oidc.GetPostLogoutRedirectUris(),
-		applicationVersionVar:                  oidc.GetVersion(),
-		applicationDevModeVar:                  oidc.GetDevMode(),
-		applicationAccessTokenTypeVar:          oidc.GetAccessTokenType(),
-		applicationAccessTokenRoleAssertionVar: oidc.GetAccessTokenRoleAssertion(),
-		applicationIdTokenRoleAssertionVar:     oidc.GetIdTokenRoleAssertion(),
-		applicationIdTokenUserinfoAssertionVar: oidc.GetIdTokenUserinfoAssertion(),
-		applicationClockSkewVar:                oidc.GetClockSkew(),
-		applicationAdditionalOriginsVar:        oidc.GetAdditionalOrigins(),
+		applicationOrgIdVar:          app.GetDetails().GetResourceOwner(),
+		applicationNameVar:           app.GetName(),
+		applicationAuthMethodTypeVar: api.GetAuthMethodType().String(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of applicationOIDC: %v", k, err)
+			return diag.Errorf("failed to set %s of applicationAPI: %v", k, err)
 		}
 	}
 	d.SetId(app.GetId())
 	return nil
+}
+
+func getApp(ctx context.Context, client *management.Client, projectID string, appID string) (*app.App, error) {
+	resp, err := client.GetAppByID(ctx, &management2.GetAppByIDRequest{ProjectId: projectID, AppId: appID})
+	if err != nil {
+		return nil, fmt.Errorf("failed to read project: %v", err)
+	}
+
+	return resp.GetApp(), err
 }

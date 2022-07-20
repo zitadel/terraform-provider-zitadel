@@ -63,12 +63,13 @@ func createOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.
 	}
 
 	if d.Id() == "" {
-		_, err = client.AddOrg(ctx, &management2.AddOrgRequest{
+		resp, err := client.AddOrg(ctx, &management2.AddOrgRequest{
 			Name: d.Get(nameVar).(string),
 		})
 		if err != nil {
 			return diag.FromErr(err)
 		}
+		d.SetId(resp.GetId())
 	}
 
 	return nil
@@ -93,10 +94,10 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 		"orglist": resp.Result,
 	})
 
-	id := d.Get("id")
+	//id := d.Get("id").(string)
 	name := d.Get(nameVar).(string)
 	tflog.Debug(ctx, "check if org is existing", map[string]interface{}{
-		"id":  id,
+		//	"id":  id,
 		"org": name,
 	})
 
@@ -114,6 +115,7 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 		}
 	}
 
+	d.SetId("")
 	tflog.Debug(ctx, "org not found", map[string]interface{}{
 		"org": name,
 	})

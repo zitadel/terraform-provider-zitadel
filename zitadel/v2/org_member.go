@@ -35,7 +35,7 @@ func GetOrgMember() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Optional:    true,
+				Required:    true,
 				Description: "List of roles granted",
 			},
 		},
@@ -106,9 +106,14 @@ func createOrgMember(ctx context.Context, d *schema.ResourceData, m interface{})
 	}
 
 	userID := d.Get(orgMemberUserIDVar).(string)
+	roles := make([]string, 0)
+	for _, role := range d.Get(orgMemberRolesVar).(*schema.Set).List() {
+		roles = append(roles, role.(string))
+	}
+
 	_, err = client.AddOrgMember(ctx, &management2.AddOrgMemberRequest{
 		UserId: userID,
-		Roles:  d.Get(orgMemberRolesVar).([]string),
+		Roles:  roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to create orgmember: %v", err)

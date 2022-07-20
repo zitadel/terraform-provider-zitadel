@@ -115,10 +115,15 @@ func createProjectMember(ctx context.Context, d *schema.ResourceData, m interfac
 
 	userID := d.Get(projectMemberUserIDVar).(string)
 	projectID := d.Get(projectMemberProjectIDVar).(string)
+	roles := make([]string, 0)
+	for _, role := range d.Get(projectMemberRolesVar).(*schema.Set).List() {
+		roles = append(roles, role.(string))
+	}
+
 	_, err = client.AddProjectMember(ctx, &management2.AddProjectMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
-		Roles:     d.Get(projectMemberRolesVar).([]string),
+		Roles:     roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to create projectmember: %v", err)
