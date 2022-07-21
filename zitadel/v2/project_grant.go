@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	projectGrantResourceOwnerVar = "resource_owner"
-	projectGrantProjectIDVar     = "project_id"
-	projectGrantGrantedOrgIDVar  = "granted_org_id"
-	projectGrantRoleKeysVar      = "role_keys"
+	projectGrantOrgIDVar        = "org_id"
+	projectGrantProjectIDVar    = "project_id"
+	projectGrantGrantedOrgIDVar = "granted_org_id"
+	projectGrantRoleKeysVar     = "role_keys"
 )
 
 func GetProjectGrant() *schema.Resource {
@@ -38,7 +38,7 @@ func GetProjectGrant() *schema.Resource {
 				Optional:    true,
 				Description: "List of roles granted",
 			},
-			projectGrantResourceOwnerVar: {
+			projectGrantOrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization which owns the resource",
@@ -59,7 +59,7 @@ func deleteProjectGrant(ctx context.Context, d *schema.ResourceData, m interface
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectGrantResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(projectGrantOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -82,7 +82,7 @@ func updateProjectGrant(ctx context.Context, d *schema.ResourceData, m interface
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectGrantResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(projectGrantOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -106,7 +106,7 @@ func createProjectGrant(ctx context.Context, d *schema.ResourceData, m interface
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectGrantResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(projectGrantOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -136,7 +136,7 @@ func readProjectGrant(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectGrantResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(projectGrantOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -150,10 +150,10 @@ func readProjectGrant(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	projectGrant := resp.GetProjectGrant()
 	set := map[string]interface{}{
-		projectGrantProjectIDVar:     projectGrant.GetProjectId(),
-		projectGrantGrantedOrgIDVar:  projectGrant.GetGrantedOrgId(),
-		projectGrantRoleKeysVar:      projectGrant.GetGrantedRoleKeys(),
-		projectGrantResourceOwnerVar: projectGrant.GetDetails().GetResourceOwner(),
+		projectGrantProjectIDVar:    projectGrant.GetProjectId(),
+		projectGrantGrantedOrgIDVar: projectGrant.GetGrantedOrgId(),
+		projectGrantRoleKeysVar:     projectGrant.GetGrantedRoleKeys(),
+		projectGrantOrgIDVar:        projectGrant.GetDetails().GetResourceOwner(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

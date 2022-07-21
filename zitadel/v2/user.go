@@ -10,14 +10,11 @@ import (
 )
 
 const (
-	idVar = "id"
-
-	resourceOwnerVar      = "resource_owner"
+	orgIDVar              = "org_id"
 	userStateVar          = "state"
 	userNameVar           = "user_name"
 	loginNamesVar         = "login_names"
 	preferredLoginNameVar = "preferred_login_name"
-	typeVar               = "type"
 
 	firstNameVar         = "first_name"
 	lastNameVar          = "last_name"
@@ -35,20 +32,16 @@ const (
 	machineNameVar = "name"
 	descriptionVar = "description"
 
+	initialPasswordVar = "initial_password"
+
 	HumanUser   = "human"
 	MachineUser = "machine"
 )
 
-func GetUser() *schema.Resource {
+func GetHumanUser() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			idVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "ID of the user",
-				ForceNew:    true,
-			},
-			resourceOwnerVar: {
+			orgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization",
@@ -79,12 +72,6 @@ func GetUser() *schema.Resource {
 				Description: "Preferred login name",
 				ForceNew:    true,
 			},
-			typeVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Type of the user",
-				ForceNew:    true,
-			},
 
 			firstNameVar: {
 				Type:        schema.TypeString,
@@ -112,11 +99,10 @@ func GetUser() *schema.Resource {
 				Description: "Preferred language of the user",
 			},
 			genderVar: {
-				Type:        schema.TypeInt,
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Gender of the user",
 			},
-
 			emailVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -127,7 +113,6 @@ func GetUser() *schema.Resource {
 				Optional:    true,
 				Description: "Is the email verified of the user",
 			},
-
 			phoneVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -137,6 +122,51 @@ func GetUser() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Is the phone verified of the user",
+			},
+			initialPasswordVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Initially set password for the user",
+			},
+		},
+		ReadContext:   readHumanUser,
+		CreateContext: createHumanUser,
+		DeleteContext: deleteUser,
+		UpdateContext: updateHumanUser,
+	}
+}
+
+func GetMachineUser() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			orgIDVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "ID of the organization",
+				ForceNew:    true,
+			},
+			userStateVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "State of the user",
+			},
+			userNameVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Username",
+			},
+			loginNamesVar: {
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Computed:    true,
+				Description: "Loginnames",
+			},
+			preferredLoginNameVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Preferred login name",
 			},
 
 			machineNameVar: {
@@ -150,10 +180,10 @@ func GetUser() *schema.Resource {
 				Description: "Description of the user",
 			},
 		},
-		ReadContext:   readUser,
-		CreateContext: createUser,
+		ReadContext:   readMachineUser,
+		CreateContext: createMachineUser,
 		DeleteContext: deleteUser,
-		UpdateContext: updateUser,
+		UpdateContext: updateMachineUser,
 	}
 }
 
@@ -165,7 +195,7 @@ func deleteUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(resourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -179,7 +209,7 @@ func deleteUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 	return nil
 }
 
-func createUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func createHumanUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started read")
 
 	clientinfo, ok := m.(*ClientInfo)
@@ -187,53 +217,40 @@ func createUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(resourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	userType := d.Get(typeVar).(string)
-	switch userType {
-	case HumanUser:
-		gender := d.Get(genderVar).(int)
-		respUser, err := client.AddHumanUser(ctx, &management2.AddHumanUserRequest{
-			UserName: d.Get(userNameVar).(string),
-			Profile: &management2.AddHumanUserRequest_Profile{
-				FirstName:         d.Get(firstNameVar).(string),
-				LastName:          d.Get(lastNameVar).(string),
-				NickName:          d.Get(nickNameVar).(string),
-				DisplayName:       d.Get(displayNameVar).(string),
-				PreferredLanguage: d.Get(preferredLanguageVar).(string),
-				Gender:            user.Gender(gender),
-			},
-			Email: &management2.AddHumanUserRequest_Email{
-				Email:           d.Get(emailVar).(string),
-				IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
-			},
-			Phone: &management2.AddHumanUserRequest_Phone{
-				Phone:           d.Get(phoneVar).(string),
-				IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
-			},
-		})
-		if err != nil {
-			return diag.Errorf("failed to create human user: %v", err)
-		}
-		d.SetId(respUser.UserId)
-	case MachineUser:
-		respUser, err := client.AddMachineUser(ctx, &management2.AddMachineUserRequest{
-			UserName:    d.Get(userNameVar).(string),
-			Name:        d.Get(machineNameVar).(string),
-			Description: d.Get(descriptionVar).(string),
-		})
-		if err != nil {
-			return diag.Errorf("failed to create machine user: %v", err)
-		}
-		d.SetId(respUser.UserId)
+	gender := d.Get(genderVar).(string)
+	respUser, err := client.AddHumanUser(ctx, &management2.AddHumanUserRequest{
+		UserName: d.Get(userNameVar).(string),
+		Profile: &management2.AddHumanUserRequest_Profile{
+			FirstName:         d.Get(firstNameVar).(string),
+			LastName:          d.Get(lastNameVar).(string),
+			NickName:          d.Get(nickNameVar).(string),
+			DisplayName:       d.Get(displayNameVar).(string),
+			PreferredLanguage: d.Get(preferredLanguageVar).(string),
+			Gender:            user.Gender(user.Gender_value[gender]),
+		},
+		Email: &management2.AddHumanUserRequest_Email{
+			Email:           d.Get(emailVar).(string),
+			IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
+		},
+		Phone: &management2.AddHumanUserRequest_Phone{
+			Phone:           d.Get(phoneVar).(string),
+			IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
+		},
+	})
+	if err != nil {
+		return diag.Errorf("failed to create human user: %v", err)
 	}
+	d.SetId(respUser.UserId)
+
 	return nil
 }
 
-func updateUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func createMachineUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started read")
 
 	clientinfo, ok := m.(*ClientInfo)
@@ -241,7 +258,33 @@ func updateUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(resourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	respUser, err := client.AddMachineUser(ctx, &management2.AddMachineUserRequest{
+		UserName:    d.Get(userNameVar).(string),
+		Name:        d.Get(machineNameVar).(string),
+		Description: d.Get(descriptionVar).(string),
+	})
+	if err != nil {
+		return diag.Errorf("failed to create machine user: %v", err)
+	}
+	d.SetId(respUser.UserId)
+
+	return nil
+}
+
+func updateHumanUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started read")
+
+	clientinfo, ok := m.(*ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := getManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -262,69 +305,52 @@ func updateUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		}
 	}
 
-	userType := d.Get(typeVar).(string)
-	switch userType {
-	case HumanUser:
-		currentHuman := currentUser.GetUser().GetHuman()
-		if currentHuman.GetProfile().GetFirstName() != d.Get(firstNameVar).(string) ||
-			currentHuman.GetProfile().GetLastName() != d.Get(lastNameVar).(string) ||
-			currentHuman.GetProfile().GetNickName() != d.Get(nickNameVar).(string) ||
-			currentHuman.GetProfile().GetDisplayName() != d.Get(displayNameVar).(string) ||
-			currentHuman.GetProfile().GetPreferredLanguage() != d.Get(preferredLanguageVar).(string) {
-			gender := d.Get(genderVar).(int)
-			_, err := client.UpdateHumanProfile(ctx, &management2.UpdateHumanProfileRequest{
-				UserId:            d.Id(),
-				FirstName:         d.Get(firstNameVar).(string),
-				LastName:          d.Get(lastNameVar).(string),
-				NickName:          d.Get(nickNameVar).(string),
-				DisplayName:       d.Get(displayNameVar).(string),
-				PreferredLanguage: d.Get(preferredLanguageVar).(string),
-				Gender:            user.Gender(gender),
-			})
-			if err != nil {
-				return diag.Errorf("failed to update human profile: %v", err)
-			}
+	currentHuman := currentUser.GetUser().GetHuman()
+	if currentHuman.GetProfile().GetFirstName() != d.Get(firstNameVar).(string) ||
+		currentHuman.GetProfile().GetLastName() != d.Get(lastNameVar).(string) ||
+		currentHuman.GetProfile().GetNickName() != d.Get(nickNameVar).(string) ||
+		currentHuman.GetProfile().GetDisplayName() != d.Get(displayNameVar).(string) ||
+		currentHuman.GetProfile().GetPreferredLanguage() != d.Get(preferredLanguageVar).(string) {
+		gender := d.Get(genderVar).(string)
+		_, err := client.UpdateHumanProfile(ctx, &management2.UpdateHumanProfileRequest{
+			UserId:            d.Id(),
+			FirstName:         d.Get(firstNameVar).(string),
+			LastName:          d.Get(lastNameVar).(string),
+			NickName:          d.Get(nickNameVar).(string),
+			DisplayName:       d.Get(displayNameVar).(string),
+			PreferredLanguage: d.Get(preferredLanguageVar).(string),
+			Gender:            user.Gender(user.Gender_value[gender]),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update human profile: %v", err)
 		}
-		if currentHuman.GetEmail().GetEmail() != d.Get(emailVar).(string) || currentHuman.GetEmail().GetIsEmailVerified() != d.Get(isEmailVerifiedVar).(bool) {
-			_, err = client.UpdateHumanEmail(ctx, &management2.UpdateHumanEmailRequest{
-				UserId:          d.Id(),
-				Email:           d.Get(emailVar).(string),
-				IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
-			})
-			if err != nil {
-				return diag.Errorf("failed to update human email: %v", err)
-			}
-		}
-
-		if currentHuman.GetPhone().GetPhone() != d.Get(phoneVar).(string) || currentHuman.GetPhone().GetIsPhoneVerified() != d.Get(isPhoneVerifiedVar).(bool) {
-			_, err = client.UpdateHumanPhone(ctx, &management2.UpdateHumanPhoneRequest{
-				UserId:          d.Id(),
-				Phone:           d.Get(phoneVar).(string),
-				IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
-			})
-			if err != nil {
-				return diag.Errorf("failed to update human phone: %v", err)
-			}
-		}
-	case MachineUser:
-		currentMachine := currentUser.GetUser().GetMachine()
-		if currentMachine.GetName() != d.Get(machineNameVar).(string) || currentMachine.GetDescription() != d.Get(descriptionVar).(string) {
-			_, err := client.UpdateMachine(ctx, &management2.UpdateMachineRequest{
-				UserId:      d.Id(),
-				Name:        d.Get(machineNameVar).(string),
-				Description: d.Get(descriptionVar).(string),
-			})
-			if err != nil {
-				return diag.Errorf("failed to update machine user: %v", err)
-			}
-		}
-	default:
-		return diag.Errorf("failed to create user as no supported type is used")
 	}
+	if currentHuman.GetEmail().GetEmail() != d.Get(emailVar).(string) || currentHuman.GetEmail().GetIsEmailVerified() != d.Get(isEmailVerifiedVar).(bool) {
+		_, err = client.UpdateHumanEmail(ctx, &management2.UpdateHumanEmailRequest{
+			UserId:          d.Id(),
+			Email:           d.Get(emailVar).(string),
+			IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update human email: %v", err)
+		}
+	}
+
+	if currentHuman.GetPhone().GetPhone() != d.Get(phoneVar).(string) || currentHuman.GetPhone().GetIsPhoneVerified() != d.Get(isPhoneVerifiedVar).(bool) {
+		_, err = client.UpdateHumanPhone(ctx, &management2.UpdateHumanPhoneRequest{
+			UserId:          d.Id(),
+			Phone:           d.Get(phoneVar).(string),
+			IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update human phone: %v", err)
+		}
+	}
+
 	return nil
 }
 
-func readUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func updateMachineUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started read")
 
 	clientinfo, ok := m.(*ClientInfo)
@@ -332,35 +358,79 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.D
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(resourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	currentUser, err := client.GetUserByID(ctx, &management2.GetUserByIDRequest{Id: d.Id()})
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	username := d.Get(userNameVar).(string)
+	if currentUser.GetUser().GetUserName() != username {
+		_, err = client.UpdateUserName(ctx, &management2.UpdateUserNameRequest{
+			UserId:   d.Id(),
+			UserName: username,
+		})
+		if err != nil {
+			return diag.Errorf("failed to update username: %v", err)
+		}
+	}
+
+	currentMachine := currentUser.GetUser().GetMachine()
+	if currentMachine.GetName() != d.Get(machineNameVar).(string) || currentMachine.GetDescription() != d.Get(descriptionVar).(string) {
+		_, err := client.UpdateMachine(ctx, &management2.UpdateMachineRequest{
+			UserId:      d.Id(),
+			Name:        d.Get(machineNameVar).(string),
+			Description: d.Get(descriptionVar).(string),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update machine user: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func readHumanUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started read")
+
+	clientinfo, ok := m.(*ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := getManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	respUser, err := client.GetUserByID(ctx, &management2.GetUserByIDRequest{Id: d.Id()})
 	if err != nil {
-		return diag.Errorf("failed to get list of users: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to get list of users: %v", err)
 	}
 
 	user := respUser.GetUser()
 	set := map[string]interface{}{
-		idVar:                 user.GetId(),
-		resourceOwnerVar:      user.GetDetails().GetResourceOwner(),
+		orgIDVar:              user.GetDetails().GetResourceOwner(),
 		userStateVar:          user.GetState().String(),
 		userNameVar:           user.GetUserName(),
 		loginNamesVar:         user.GetLoginNames(),
 		preferredLoginNameVar: user.GetPreferredLoginName(),
-		typeVar:               user.GetType(),
 	}
+
 	if human := user.GetHuman(); human != nil {
-		set[typeVar] = HumanUser
 		if profile := human.GetProfile(); profile != nil {
 			set[firstNameVar] = profile.GetFirstName()
 			set[lastNameVar] = profile.GetLastName()
 			set[displayNameVar] = profile.GetDisplayName()
 			set[nickNameVar] = profile.GetNickName()
 			set[preferredLanguageVar] = profile.GetPreferredLanguage()
-			if gender := profile.GetGender().Number(); gender != 0 {
+			if gender := profile.GetGender().String(); gender != "" {
 				set[genderVar] = gender
 			}
 		}
@@ -372,8 +442,45 @@ func readUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.D
 			set[phoneVar] = phone.GetPhone()
 			set[isPhoneVerifiedVar] = phone.GetIsPhoneVerified()
 		}
-	} else if machine := user.GetMachine(); machine != nil {
-		set[typeVar] = MachineUser
+	}
+	for k, v := range set {
+		if err := d.Set(k, v); err != nil {
+			return diag.Errorf("failed to set %s of user: %v", k, err)
+		}
+	}
+	d.SetId(user.GetId())
+	return nil
+}
+
+func readMachineUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started read")
+
+	clientinfo, ok := m.(*ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := getManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	respUser, err := client.GetUserByID(ctx, &management2.GetUserByIDRequest{Id: d.Id()})
+	if err != nil {
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to get list of users: %v", err)
+	}
+
+	user := respUser.GetUser()
+	set := map[string]interface{}{
+		orgIDVar:              user.GetDetails().GetResourceOwner(),
+		userStateVar:          user.GetState().String(),
+		userNameVar:           user.GetUserName(),
+		loginNamesVar:         user.GetLoginNames(),
+		preferredLoginNameVar: user.GetPreferredLoginName(),
+	}
+	if machine := user.GetMachine(); machine != nil {
 		set[machineNameVar] = machine.GetName()
 		set[descriptionVar] = machine.GetDescription()
 	}

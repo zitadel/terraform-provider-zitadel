@@ -9,17 +9,17 @@ import (
 )
 
 const (
-	projectGrantMemberResourceOwnerVar = "resource_owner"
-	projectGrantMemberProjectIDVar     = "project_id"
-	projectGrantMemberGrantIDVar       = "grant_id"
-	projectGrantMemberUserIDVar        = "user_id"
-	projectGrantMemberRolesVar         = "roles"
+	projectGrantMemberOrgIDVar     = "org_id"
+	projectGrantMemberProjectIDVar = "project_id"
+	projectGrantMemberGrantIDVar   = "grant_id"
+	projectGrantMemberUserIDVar    = "user_id"
+	projectGrantMemberRolesVar     = "roles"
 )
 
 func GetProjectGrantMember() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			projectGrantMemberResourceOwnerVar: {
+			projectGrantMemberOrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization which owns the resource",
@@ -67,7 +67,7 @@ func deleteProjectGrantMember(ctx context.Context, d *schema.ResourceData, m int
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectGrantMemberResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(projectGrantMemberOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -91,7 +91,7 @@ func updateProjectGrantMember(ctx context.Context, d *schema.ResourceData, m int
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectGrantMemberResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(projectGrantMemberOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -116,7 +116,7 @@ func createProjectGrantMember(ctx context.Context, d *schema.ResourceData, m int
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(projectGrantMemberResourceOwnerVar).(string)
+	org := d.Get(projectGrantMemberOrgIDVar).(string)
 	client, err := getManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -149,7 +149,7 @@ func readProjectGrantMember(ctx context.Context, d *schema.ResourceData, m inter
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := d.Get(projectGrantMemberResourceOwnerVar).(string)
+	org := d.Get(projectGrantMemberOrgIDVar).(string)
 	client, err := getManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -166,11 +166,11 @@ func readProjectGrantMember(ctx context.Context, d *schema.ResourceData, m inter
 	for _, member := range resp.Result {
 		if member.UserId == userID {
 			set := map[string]interface{}{
-				projectGrantMemberUserIDVar:        member.GetUserId(),
-				projectGrantMemberResourceOwnerVar: member.GetDetails().GetResourceOwner(),
-				projectGrantMemberProjectIDVar:     projectID,
-				projectGrantMemberRolesVar:         member.GetRoles(),
-				projectGrantMemberGrantIDVar:       grantID,
+				projectGrantMemberUserIDVar:    member.GetUserId(),
+				projectGrantMemberOrgIDVar:     member.GetDetails().GetResourceOwner(),
+				projectGrantMemberProjectIDVar: projectID,
+				projectGrantMemberRolesVar:     member.GetRoles(),
+				projectGrantMemberGrantIDVar:   grantID,
 			}
 			for k, v := range set {
 				if err := d.Set(k, v); err != nil {

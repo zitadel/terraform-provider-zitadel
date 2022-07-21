@@ -10,19 +10,19 @@ import (
 )
 
 const (
-	orgMemberResourceOwnerVar = "resource_owner"
-	orgMemberUserIDVar        = "user_id"
-	orgMemberRolesVar         = "roles"
+	orgMemberOrgIDVar  = "org_id"
+	orgMemberUserIDVar = "user_id"
+	orgMemberRolesVar  = "roles"
 )
 
 func GetOrgMember() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			orgMemberResourceOwnerVar: {
+			orgMemberOrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "ID of the organization which owns the resource",
+				Description: "ID of the organization",
 			},
 			orgMemberUserIDVar: {
 				Type:        schema.TypeString,
@@ -54,7 +54,7 @@ func deleteOrgMember(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(orgMemberResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(orgMemberOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -76,7 +76,7 @@ func updateOrgMember(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(orgMemberResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(orgMemberOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -99,7 +99,7 @@ func createOrgMember(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(orgMemberResourceOwnerVar).(string)
+	org := d.Get(orgMemberOrgIDVar).(string)
 	client, err := getManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -129,7 +129,7 @@ func readOrgMember(ctx context.Context, d *schema.ResourceData, m interface{}) d
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := d.Get(orgMemberResourceOwnerVar).(string)
+	org := d.Get(orgMemberOrgIDVar).(string)
 	client, err := getManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -144,9 +144,9 @@ func readOrgMember(ctx context.Context, d *schema.ResourceData, m interface{}) d
 	for _, orgMember := range resp.Result {
 		if orgMember.UserId == userID {
 			set := map[string]interface{}{
-				orgMemberUserIDVar:        orgMember.GetUserId(),
-				orgMemberResourceOwnerVar: orgMember.GetDetails().GetResourceOwner(),
-				orgMemberRolesVar:         orgMember.GetRoles(),
+				orgMemberUserIDVar: orgMember.GetUserId(),
+				orgMemberOrgIDVar:  orgMember.GetDetails().GetResourceOwner(),
+				orgMemberRolesVar:  orgMember.GetRoles(),
 			}
 			for k, v := range set {
 				if err := d.Set(k, v); err != nil {

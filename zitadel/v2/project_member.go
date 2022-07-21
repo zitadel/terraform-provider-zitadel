@@ -9,16 +9,16 @@ import (
 )
 
 const (
-	projectMemberResourceOwnerVar = "resource_owner"
-	projectMemberProjectIDVar     = "project_id"
-	projectMemberUserIDVar        = "user_id"
-	projectMemberRolesVar         = "roles"
+	projectMemberOrgIDVar     = "org_id"
+	projectMemberProjectIDVar = "project_id"
+	projectMemberUserIDVar    = "user_id"
+	projectMemberRolesVar     = "roles"
 )
 
 func GetProjectMember() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			projectMemberResourceOwnerVar: {
+			projectMemberOrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization which owns the resource",
@@ -60,7 +60,7 @@ func deleteProjectMember(ctx context.Context, d *schema.ResourceData, m interfac
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectMemberResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(projectMemberOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -83,7 +83,7 @@ func updateProjectMember(ctx context.Context, d *schema.ResourceData, m interfac
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectMemberResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(projectMemberOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -107,7 +107,7 @@ func createProjectMember(ctx context.Context, d *schema.ResourceData, m interfac
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(projectMemberResourceOwnerVar).(string)
+	org := d.Get(projectMemberOrgIDVar).(string)
 	client, err := getManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -139,7 +139,7 @@ func readProjectMember(ctx context.Context, d *schema.ResourceData, m interface{
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := d.Get(projectMemberResourceOwnerVar).(string)
+	org := d.Get(projectMemberOrgIDVar).(string)
 	client, err := getManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -155,10 +155,10 @@ func readProjectMember(ctx context.Context, d *schema.ResourceData, m interface{
 	for _, member := range resp.Result {
 		if member.UserId == userID {
 			set := map[string]interface{}{
-				projectMemberUserIDVar:        member.GetUserId(),
-				projectMemberResourceOwnerVar: member.GetDetails().GetResourceOwner(),
-				projectMemberProjectIDVar:     projectID,
-				projectMemberRolesVar:         member.GetRoles(),
+				projectMemberUserIDVar:    member.GetUserId(),
+				projectMemberOrgIDVar:     member.GetDetails().GetResourceOwner(),
+				projectMemberProjectIDVar: projectID,
+				projectMemberRolesVar:     member.GetRoles(),
 			}
 			for k, v := range set {
 				if err := d.Set(k, v); err != nil {

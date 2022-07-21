@@ -11,6 +11,13 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
 )
 
+const (
+	IssuerVar  = "issuer"
+	AddressVar = "address"
+	ProjectVar = "project"
+	TokenVar   = "token"
+)
+
 type ClientInfo struct {
 	Issuer  string
 	Address string

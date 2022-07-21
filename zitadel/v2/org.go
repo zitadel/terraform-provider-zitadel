@@ -11,11 +11,7 @@ import (
 )
 
 const (
-	IssuerVar  = "issuer"
-	AddressVar = "address"
-	ProjectVar = "project"
-	TokenVar   = "token"
-	nameVar    = "name"
+	nameVar = "name"
 )
 
 func OrgResource() *schema.Resource {
