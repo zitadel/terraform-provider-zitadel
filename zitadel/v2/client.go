@@ -5,61 +5,48 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/pkg/oidc"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/auth"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/middleware"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
 )
 
 const (
-	IssuerVar  = "issuer"
-	AddressVar = "address"
-	ProjectVar = "project"
-	TokenVar   = "token"
+	DomainVar   = "domain"
+	InsecureVar = "insecure"
+	ProjectVar  = "project"
+	TokenVar    = "token"
 )
 
 type ClientInfo struct {
-	Issuer  string
-	Address string
-	Project string
-	Token   string
+	Domain   string
+	Insecure bool
+	Project  string
+	Token    string
 }
 
 func GetClientInfo(d *schema.ResourceData) (*ClientInfo, error) {
-	issuer := d.Get(IssuerVar).(string)
-	address := d.Get(AddressVar).(string)
-	projectID := d.Get(ProjectVar).(string)
-	token := d.Get(TokenVar).(string)
-
 	return &ClientInfo{
-		issuer,
-		address,
-		projectID,
-		token,
+		d.Get(DomainVar).(string),
+		d.Get(InsecureVar).(bool),
+		d.Get(ProjectVar).(string),
+		d.Get(TokenVar).(string),
 	}, nil
 }
 
-func getAuthClient(info *ClientInfo) (*auth.Client, error) {
-	client, err := auth.NewClient(
-		info.Issuer, info.Address,
-		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
-		zitadel.WithCustomURL(info.Issuer, info.Address),
-		zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token)),
-		zitadel.WithInsecure(),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to start zitadel client: %v", err)
-	}
-	return client, nil
-}
-
 func getAdminClient(info *ClientInfo) (*admin.Client, error) {
+	options := []zitadel.Option{zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token))}
+	issuer := info.Domain
+	if info.Insecure {
+		options = append(options, zitadel.WithInsecure())
+		issuer = "http://" + issuer
+	} else {
+		issuer = "https://" + issuer
+	}
+
 	client, err := admin.NewClient(
-		info.Issuer, info.Address,
+		issuer, info.Domain,
 		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
-		//zitadel.WithCustomURL(info.Issuer, info.Address),
-		zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token)),
-		zitadel.WithInsecure(),
+		options...,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to start zitadel client: %v", err)
@@ -68,19 +55,22 @@ func getAdminClient(info *ClientInfo) (*admin.Client, error) {
 }
 
 func getManagementClient(info *ClientInfo, orgID string) (*management.Client, error) {
-	opts := []zitadel.Option{
-		zitadel.WithInsecure(),
-		//zitadel.WithCustomURL(info.Issuer, info.Address),
-		zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token)),
+	options := []zitadel.Option{zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token))}
+	issuer := info.Domain
+	if info.Insecure {
+		options = append(options, zitadel.WithInsecure())
+		issuer = "http://" + issuer
+	} else {
+		issuer = "https://" + issuer
 	}
 	if orgID != "" {
-		opts = append(opts, zitadel.WithOrgID(orgID))
+		options = append(options, zitadel.WithOrgID(orgID))
 	}
 
 	client, err := management.NewClient(
-		info.Issuer, info.Address,
+		issuer, info.Domain,
 		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
-		opts...,
+		options...,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to start zitadel client: %v", err)

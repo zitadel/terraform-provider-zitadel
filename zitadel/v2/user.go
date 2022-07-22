@@ -272,7 +272,6 @@ func createMachineUser(ctx context.Context, d *schema.ResourceData, m interface{
 		return diag.Errorf("failed to create machine user: %v", err)
 	}
 	d.SetId(respUser.UserId)
-
 	return nil
 }
 

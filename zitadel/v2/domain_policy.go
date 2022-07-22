@@ -148,7 +148,9 @@ func readDomainPolicy(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	resp, err := client.GetDomainPolicy(ctx, &management2.GetDomainPolicyRequest{})
 	if err != nil {
-		return diag.Errorf("failed to get domain policy: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to get domain policy: %v", err)
 	}
 
 	policy := resp.Policy

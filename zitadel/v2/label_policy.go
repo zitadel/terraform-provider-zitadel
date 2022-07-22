@@ -90,7 +90,7 @@ func GetLabelPolicy() *schema.Resource {
 			labelPolicyDisableWatermark: {
 				Type:        schema.TypeBool,
 				Required:    true,
-				Description: "",
+				Description: "disable watermark",
 			},
 			labelPolicyLogoURL: {
 				Type:        schema.TypeString,
@@ -229,7 +229,9 @@ func readLabelPolicy(ctx context.Context, d *schema.ResourceData, m interface{})
 
 	resp, err := client.GetLabelPolicy(ctx, &management2.GetLabelPolicyRequest{})
 	if err != nil {
-		return diag.Errorf("failed to get domain policy: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to get domain policy: %v", err)
 	}
 
 	policy := resp.Policy

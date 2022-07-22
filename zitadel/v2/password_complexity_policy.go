@@ -102,7 +102,7 @@ func updatePasswordComplexityPolicy(ctx context.Context, d *schema.ResourceData,
 	}
 
 	_, err = client.UpdateCustomPasswordComplexityPolicy(ctx, &management2.UpdateCustomPasswordComplexityPolicyRequest{
-		MinLength:    d.Get(passwordCompPolicyMinLength).(uint64),
+		MinLength:    uint64(d.Get(passwordCompPolicyMinLength).(int)),
 		HasUppercase: d.Get(passwordCompPolicyHasUppercase).(bool),
 		HasLowercase: d.Get(passwordCompPolicyHasLowercase).(bool),
 		HasNumber:    d.Get(passwordCompPolicyHasNumber).(bool),
@@ -130,7 +130,7 @@ func createPasswordComplexityPolicy(ctx context.Context, d *schema.ResourceData,
 	}
 
 	_, err = client.AddCustomPasswordComplexityPolicy(ctx, &management2.AddCustomPasswordComplexityPolicyRequest{
-		MinLength:    d.Get(passwordCompPolicyMinLength).(uint64),
+		MinLength:    uint64(d.Get(passwordCompPolicyMinLength).(int)),
 		HasUppercase: d.Get(passwordCompPolicyHasUppercase).(bool),
 		HasLowercase: d.Get(passwordCompPolicyHasLowercase).(bool),
 		HasNumber:    d.Get(passwordCompPolicyHasNumber).(bool),
@@ -159,7 +159,9 @@ func readPasswordComplexityPolicy(ctx context.Context, d *schema.ResourceData, m
 
 	resp, err := client.GetPasswordComplexityPolicy(ctx, &management2.GetPasswordComplexityPolicyRequest{})
 	if err != nil {
-		return diag.Errorf("failed to get password complexity policy: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to get password complexity policy: %v", err)
 	}
 
 	policy := resp.Policy

@@ -59,7 +59,7 @@ func GetLoginPolicy() *schema.Resource {
 				Description: "defines if a user MUST use a multi factor to log in",
 			},
 			loginPolicyPasswordlessType: {
-				Type:        schema.TypeInt,
+				Type:        schema.TypeString,
 				Required:    true,
 				Description: "defines if passwordless is allowed for users",
 			},
@@ -178,7 +178,7 @@ func updateLoginPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 		AllowRegister:              d.Get(loginPolicyAllowRegister).(bool),
 		AllowExternalIdp:           d.Get(loginPolicyAllowExternalIDP).(bool),
 		ForceMfa:                   d.Get(loginPolicyForceMFA).(bool),
-		PasswordlessType:           d.Get(loginPolicyPasswordlessType).(policy.PasswordlessType),
+		PasswordlessType:           policy.PasswordlessType(policy.PasswordlessType_value[d.Get(loginPolicyPasswordlessType).(string)]),
 		HidePasswordReset:          d.Get(loginPolicyHidePasswordReset).(bool),
 		IgnoreUnknownUsernames:     d.Get(loginPolicyIgnoreUnknownUsernames).(bool),
 		DefaultRedirectUri:         d.Get(loginPolicyDefaultRedirectURI).(string),
@@ -235,7 +235,7 @@ func createLoginPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 		AllowRegister:              d.Get(loginPolicyAllowRegister).(bool),
 		AllowExternalIdp:           d.Get(loginPolicyAllowExternalIDP).(bool),
 		ForceMfa:                   d.Get(loginPolicyForceMFA).(bool),
-		PasswordlessType:           d.Get(loginPolicyPasswordlessType).(policy.PasswordlessType),
+		PasswordlessType:           policy.PasswordlessType(policy.PasswordlessType_value[d.Get(loginPolicyPasswordlessType).(string)]),
 		HidePasswordReset:          d.Get(loginPolicyHidePasswordReset).(bool),
 		IgnoreUnknownUsernames:     d.Get(loginPolicyIgnoreUnknownUsernames).(bool),
 		DefaultRedirectUri:         d.Get(loginPolicyDefaultRedirectURI).(string),
@@ -268,7 +268,9 @@ func readLoginPolicy(ctx context.Context, d *schema.ResourceData, m interface{})
 
 	resp, err := client.GetLoginPolicy(ctx, &management2.GetLoginPolicyRequest{})
 	if err != nil {
-		return diag.Errorf("failed to get login policy: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to get login policy: %v", err)
 	}
 
 	policy := resp.Policy
@@ -279,13 +281,13 @@ func readLoginPolicy(ctx context.Context, d *schema.ResourceData, m interface{})
 		loginPolicyAllowRegister:              policy.GetAllowRegister(),
 		loginPolicyAllowExternalIDP:           policy.GetAllowExternalIdp(),
 		loginPolicyForceMFA:                   policy.GetForceMfa(),
-		loginPolicyPasswordlessType:           policy.GetPasswordlessType(),
+		loginPolicyPasswordlessType:           policy.GetPasswordlessType().String(),
 		loginPolicyHidePasswordReset:          policy.GetHidePasswordReset(),
-		loginPolicyPasswordCheckLifetime:      policy.GetPasswordCheckLifetime(),
-		loginPolicyExternalLoginCheckLifetime: policy.GetExternalLoginCheckLifetime(),
-		loginPolicyMFAInitSkipLifetime:        policy.GetMfaInitSkipLifetime(),
-		loginPolicySecondFactorCheckLifetime:  policy.GetSecondFactorCheckLifetime(),
-		loginPolicyMultiFactorCheckLifetime:   policy.GetMultiFactorCheckLifetime(),
+		loginPolicyPasswordCheckLifetime:      policy.GetPasswordCheckLifetime().AsDuration().String(),
+		loginPolicyExternalLoginCheckLifetime: policy.GetExternalLoginCheckLifetime().AsDuration().String(),
+		loginPolicyMFAInitSkipLifetime:        policy.GetMfaInitSkipLifetime().AsDuration().String(),
+		loginPolicySecondFactorCheckLifetime:  policy.GetSecondFactorCheckLifetime().AsDuration().String(),
+		loginPolicyMultiFactorCheckLifetime:   policy.GetMultiFactorCheckLifetime().AsDuration().String(),
 	}
 
 	for k, v := range set {

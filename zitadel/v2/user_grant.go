@@ -13,7 +13,7 @@ const (
 	userGrantProjectGrantIDVar = "project_grant_id"
 	userGrantUserIDVar         = "user_id"
 	userGrantRoleKeysVar       = "role_keys"
-	userGrantResourceOwnerVar  = "resource_owner"
+	userGrantOrgIDVar          = "org_id"
 )
 
 func GetUserGrant() *schema.Resource {
@@ -45,7 +45,7 @@ func GetUserGrant() *schema.Resource {
 				Required:    true,
 				Description: "List of roles granted",
 			},
-			userGrantResourceOwnerVar: {
+			userGrantOrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization which owns the resource",
@@ -66,7 +66,7 @@ func deleteUserGrant(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(userGrantResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(userGrantOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -89,7 +89,7 @@ func updateUserGrant(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(userGrantResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(userGrantOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -113,7 +113,7 @@ func createUserGrant(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(userGrantResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(userGrantOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -139,7 +139,7 @@ func readUserGrant(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(userGrantResourceOwnerVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(userGrantOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -157,7 +157,7 @@ func readUserGrant(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		userGrantProjectIDVar:      grant.GetProjectId(),
 		userGrantProjectGrantIDVar: grant.GetProjectGrantId(),
 		userGrantRoleKeysVar:       grant.GetRoleKeys(),
-		userGrantResourceOwnerVar:  grant.GetDetails().GetResourceOwner(),
+		userGrantOrgIDVar:          grant.GetDetails().GetResourceOwner(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
