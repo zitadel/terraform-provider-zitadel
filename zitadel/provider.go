@@ -14,20 +14,29 @@ func Provider() *schema.Provider {
 		},
 		Schema: map[string]*schema.Schema{
 			v2.DomainVar: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Domain used to connect to the ZITADEL instance",
 			},
 			v2.InsecureVar: {
-				Type:     schema.TypeBool,
-				Required: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Use insecure connection",
 			},
 			v2.ProjectVar: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "ID of the ZITADEL project on your ZITADEL instance, for the audience-scope",
 			},
 			v2.TokenVar: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Path to the file containing credentials to connect to ZITADEL",
+			},
+			v2.PortVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Used port if not the default ports 80 or 443 are configured",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{

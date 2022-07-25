@@ -1,5 +1,3 @@
- 20 lines (13 sloc)  472 Bytes
-
 ---
 page_title: "zitadel_org Resource - terraform-provider-zitadel"
 subcategory: ""

@@ -15,38 +15,60 @@ const (
 	InsecureVar = "insecure"
 	ProjectVar  = "project"
 	TokenVar    = "token"
+	PortVar     = "port"
 )
 
 type ClientInfo struct {
-	Domain   string
-	Insecure bool
-	Project  string
-	Token    string
+	Domain  string
+	Issuer  string
+	Options []zitadel.Option
+	Project string
 }
 
 func GetClientInfo(d *schema.ResourceData) (*ClientInfo, error) {
-	return &ClientInfo{
-		d.Get(DomainVar).(string),
-		d.Get(InsecureVar).(bool),
-		d.Get(ProjectVar).(string),
-		d.Get(TokenVar).(string),
-	}, nil
-}
+	insecure := d.Get(InsecureVar).(bool)
+	domain := d.Get(DomainVar).(string)
+	options := []zitadel.Option{zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(d.Get(TokenVar).(string)))}
 
-func getAdminClient(info *ClientInfo) (*admin.Client, error) {
-	options := []zitadel.Option{zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token))}
-	issuer := info.Domain
-	if info.Insecure {
+	portStr := ""
+	port := d.Get(PortVar)
+	if port != nil {
+		portStr = port.(string)
+	}
+
+	issuer := ""
+	if portStr != "" {
+		domain = domain + ":" + portStr
+		issuer = domain
+	} else {
+		issuer = domain
+		if insecure {
+			domain = domain + ":80"
+		} else {
+			domain = domain + ":443"
+		}
+	}
+
+	if insecure {
 		options = append(options, zitadel.WithInsecure())
 		issuer = "http://" + issuer
 	} else {
 		issuer = "https://" + issuer
 	}
 
+	return &ClientInfo{
+		domain,
+		issuer,
+		options,
+		d.Get(ProjectVar).(string),
+	}, nil
+}
+
+func getAdminClient(info *ClientInfo) (*admin.Client, error) {
 	client, err := admin.NewClient(
-		issuer, info.Domain,
+		info.Issuer, info.Domain,
 		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
-		options...,
+		info.Options...,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to start zitadel client: %v", err)
@@ -55,20 +77,13 @@ func getAdminClient(info *ClientInfo) (*admin.Client, error) {
 }
 
 func getManagementClient(info *ClientInfo, orgID string) (*management.Client, error) {
-	options := []zitadel.Option{zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(info.Token))}
-	issuer := info.Domain
-	if info.Insecure {
-		options = append(options, zitadel.WithInsecure())
-		issuer = "http://" + issuer
-	} else {
-		issuer = "https://" + issuer
-	}
+	options := info.Options
 	if orgID != "" {
 		options = append(options, zitadel.WithOrgID(orgID))
 	}
 
 	client, err := management.NewClient(
-		issuer, info.Domain,
+		info.Issuer, info.Domain,
 		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
 		options...,
 	)

@@ -84,7 +84,7 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 
 	resp, err := client.ListOrgs(ctx, &admin2.ListOrgsRequest{})
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("error while listing orgs: %v", err)
 	}
 	tflog.Debug(ctx, "found orgs", map[string]interface{}{
 		"orglist": resp.Result,
