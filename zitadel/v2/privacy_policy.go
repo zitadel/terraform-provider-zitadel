@@ -18,6 +18,7 @@ const (
 
 func GetPrivacyPolicy() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the custom privacy policy of an organization.",
 		Schema: map[string]*schema.Schema{
 			privacyPolicyOrgIdVar: {
 				Type:        schema.TypeString,

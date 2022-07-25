@@ -40,6 +40,7 @@ const (
 
 func GetHumanUser() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
 			orgIDVar: {
 				Type:        schema.TypeString,
@@ -75,12 +76,12 @@ func GetHumanUser() *schema.Resource {
 
 			firstNameVar: {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
 				Description: "First name of the user",
 			},
 			lastNameVar: {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
 				Description: "Last name of the user",
 			},
 			nickNameVar: {
@@ -138,6 +139,7 @@ func GetHumanUser() *schema.Resource {
 
 func GetMachineUser() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
 			orgIDVar: {
 				Type:        schema.TypeString,
@@ -222,26 +224,58 @@ func createHumanUser(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.FromErr(err)
 	}
 
-	gender := d.Get(genderVar).(string)
-	respUser, err := client.AddHumanUser(ctx, &management2.AddHumanUserRequest{
+	addUser := &management2.AddHumanUserRequest{
 		UserName: d.Get(userNameVar).(string),
 		Profile: &management2.AddHumanUserRequest_Profile{
-			FirstName:         d.Get(firstNameVar).(string),
-			LastName:          d.Get(lastNameVar).(string),
-			NickName:          d.Get(nickNameVar).(string),
-			DisplayName:       d.Get(displayNameVar).(string),
-			PreferredLanguage: d.Get(preferredLanguageVar).(string),
-			Gender:            user.Gender(user.Gender_value[gender]),
+			FirstName: d.Get(firstNameVar).(string),
+			LastName:  d.Get(lastNameVar).(string),
 		},
-		Email: &management2.AddHumanUserRequest_Email{
-			Email:           d.Get(emailVar).(string),
-			IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
-		},
-		Phone: &management2.AddHumanUserRequest_Phone{
-			Phone:           d.Get(phoneVar).(string),
-			IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
-		},
-	})
+	}
+
+	nickname := d.Get(nickNameVar).(string)
+	if nickname != "" {
+		addUser.Profile.NickName = nickname
+	}
+	displayname := d.Get(displayNameVar).(string)
+	if displayname != "" {
+		addUser.Profile.DisplayName = displayname
+	}
+
+	prefLang := d.Get(preferredLanguageVar).(string)
+	if prefLang != "" {
+		addUser.Profile.PreferredLanguage = prefLang
+	}
+
+	gender := d.Get(genderVar).(string)
+	if gender != "" {
+		addUser.Profile.Gender = user.Gender(user.Gender_value[gender])
+	}
+
+	email := d.Get(emailVar).(string)
+	if email != "" {
+		isVerified := d.Get(isEmailVerifiedVar)
+		addUser.Email = &management2.AddHumanUserRequest_Email{
+			Email:           email,
+			IsEmailVerified: false,
+		}
+		if isVerified != nil {
+			addUser.Email.IsEmailVerified = isVerified.(bool)
+		}
+	}
+
+	phone := d.Get(phoneVar).(string)
+	if phone != "" {
+		isVerified := d.Get(isPhoneVerifiedVar)
+		addUser.Phone = &management2.AddHumanUserRequest_Phone{
+			Phone:           phone,
+			IsPhoneVerified: false,
+		}
+		if isVerified != nil {
+			addUser.Email.IsEmailVerified = isVerified.(bool)
+		}
+	}
+
+	respUser, err := client.AddHumanUser(ctx, addUser)
 	if err != nil {
 		return diag.Errorf("failed to create human user: %v", err)
 	}
@@ -304,13 +338,23 @@ func updateHumanUser(ctx context.Context, d *schema.ResourceData, m interface{})
 		}
 	}
 
+	nickname := d.Get(nickNameVar)
+	displayname := d.Get(displayNameVar)
+	prefLang := d.Get(preferredLanguageVar)
+	gender := d.Get(genderVar)
+	email := d.Get(emailVar)
+	emailVerfied := d.Get(isEmailVerifiedVar)
+	phone := d.Get(phoneVar)
+	phoneVerified := d.Get(isPhoneVerifiedVar)
+
 	currentHuman := currentUser.GetUser().GetHuman()
 	if currentHuman.GetProfile().GetFirstName() != d.Get(firstNameVar).(string) ||
 		currentHuman.GetProfile().GetLastName() != d.Get(lastNameVar).(string) ||
-		currentHuman.GetProfile().GetNickName() != d.Get(nickNameVar).(string) ||
-		currentHuman.GetProfile().GetDisplayName() != d.Get(displayNameVar).(string) ||
-		currentHuman.GetProfile().GetPreferredLanguage() != d.Get(preferredLanguageVar).(string) {
-		gender := d.Get(genderVar).(string)
+		(nickname != nil && currentHuman.GetProfile().GetNickName() != nickname.(string)) ||
+		(displayname != nil && currentHuman.GetProfile().GetDisplayName() != displayname.(string)) ||
+		(prefLang != nil && currentHuman.GetProfile().GetPreferredLanguage() != prefLang.(string)) ||
+		(gender != nil && currentHuman.GetProfile().GetGender().String() != gender.(string)) {
+
 		_, err := client.UpdateHumanProfile(ctx, &management2.UpdateHumanProfileRequest{
 			UserId:            d.Id(),
 			FirstName:         d.Get(firstNameVar).(string),
@@ -318,34 +362,34 @@ func updateHumanUser(ctx context.Context, d *schema.ResourceData, m interface{})
 			NickName:          d.Get(nickNameVar).(string),
 			DisplayName:       d.Get(displayNameVar).(string),
 			PreferredLanguage: d.Get(preferredLanguageVar).(string),
-			Gender:            user.Gender(user.Gender_value[gender]),
+			Gender:            user.Gender(user.Gender_value[gender.(string)]),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update human profile: %v", err)
 		}
 	}
-	if currentHuman.GetEmail().GetEmail() != d.Get(emailVar).(string) || currentHuman.GetEmail().GetIsEmailVerified() != d.Get(isEmailVerifiedVar).(bool) {
+
+	if currentHuman.GetEmail().GetEmail() != email.(string) || currentHuman.GetEmail().GetIsEmailVerified() != emailVerfied.(bool) {
 		_, err = client.UpdateHumanEmail(ctx, &management2.UpdateHumanEmailRequest{
 			UserId:          d.Id(),
-			Email:           d.Get(emailVar).(string),
-			IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
+			Email:           email.(string),
+			IsEmailVerified: emailVerfied.(bool),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update human email: %v", err)
 		}
 	}
 
-	if currentHuman.GetPhone().GetPhone() != d.Get(phoneVar).(string) || currentHuman.GetPhone().GetIsPhoneVerified() != d.Get(isPhoneVerifiedVar).(bool) {
+	if currentHuman.GetPhone().GetPhone() != phone.(string) || currentHuman.GetPhone().GetIsPhoneVerified() != phoneVerified.(bool) {
 		_, err = client.UpdateHumanPhone(ctx, &management2.UpdateHumanPhoneRequest{
 			UserId:          d.Id(),
-			Phone:           d.Get(phoneVar).(string),
-			IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
+			Phone:           phone.(string),
+			IsPhoneVerified: phoneVerified.(bool),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update human phone: %v", err)
 		}
 	}
-
 	return nil
 }
 

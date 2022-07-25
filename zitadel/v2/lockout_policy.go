@@ -16,6 +16,7 @@ const (
 
 func GetLockoutPolicy() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the custom lockout policy of an organization.",
 		Schema: map[string]*schema.Schema{
 			lockoutPolicyOrgIdVar: {
 				Type:        schema.TypeString,

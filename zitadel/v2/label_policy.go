@@ -30,6 +30,7 @@ const (
 
 func GetLabelPolicy() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the custom label policy of an organization.",
 		Schema: map[string]*schema.Schema{
 			labelPolicyOrgIdVar: {
 				Type:        schema.TypeString,

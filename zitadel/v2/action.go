@@ -21,6 +21,7 @@ const (
 
 func GetAction() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing an action belonging to an organization.",
 		Schema: map[string]*schema.Schema{
 			actionOrgId: {
 				Type:        schema.TypeString,

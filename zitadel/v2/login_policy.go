@@ -31,6 +31,7 @@ const (
 
 func GetLoginPolicy() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the custom login policy of an organization.",
 		Schema: map[string]*schema.Schema{
 			loginPolicyOrgIdVar: {
 				Type:        schema.TypeString,

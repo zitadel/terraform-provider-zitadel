@@ -19,6 +19,7 @@ const (
 
 func GetDomainPolicy() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the custom domain policy of an organization.",
 		Schema: map[string]*schema.Schema{
 			domainPolicyOrgIdVar: {
 				Type:        schema.TypeString,

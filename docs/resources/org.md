@@ -2,12 +2,12 @@
 page_title: "zitadel_org Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  
+  Resource representing an organization in ZITADEL, which is the highest level after the instance and contains several other resource including policies if the configuration differs to the default policies on the instance.
 ---
 
 # zitadel_org (Resource)
 
-
+Resource representing an organization in ZITADEL, which is the highest level after the instance and contains several other resource including policies if the configuration differs to the default policies on the instance.
 
 ## Example Usage
 

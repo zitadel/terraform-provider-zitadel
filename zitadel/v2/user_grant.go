@@ -18,6 +18,7 @@ const (
 
 func GetUserGrant() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the authorization given to a user directly, including the given roles.",
 		Schema: map[string]*schema.Schema{
 			userGrantProjectIDVar: {
 				Type:        schema.TypeString,

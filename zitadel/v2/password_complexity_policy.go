@@ -20,6 +20,7 @@ const (
 
 func GetPasswordComplexityPolicy() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the custom password complexity policy of an organization.",
 		Schema: map[string]*schema.Schema{
 			passwordCompPolicyOrgIdVar: {
 				Type:        schema.TypeString,

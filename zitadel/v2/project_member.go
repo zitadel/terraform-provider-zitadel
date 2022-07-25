@@ -17,6 +17,7 @@ const (
 
 func GetProjectMember() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the membership of a user on an project, defined with the given role.",
 		Schema: map[string]*schema.Schema{
 			projectMemberOrgIDVar: {
 				Type:        schema.TypeString,
