@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	projectIdVar              = "id"
 	projectNameVar            = "name"
 	projectState              = "state"
 	projectResourceOwner      = "resource_owner"
@@ -23,11 +22,6 @@ const (
 func GetProjectDatasource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			projectIdVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "ID of the project",
-			},
 			projectNameVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -108,7 +102,6 @@ func readProject(ctx context.Context, d *schema.ResourceData, m interface{}, inf
 
 	project := resp.GetProject()
 	set := map[string]interface{}{
-		projectIdVar:            project.GetId(),
 		projectResourceOwner:    project.GetDetails().GetResourceOwner(),
 		projectState:            project.GetState().Number(),
 		projectNameVar:          project.GetName(),

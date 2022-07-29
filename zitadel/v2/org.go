@@ -105,7 +105,7 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 			d.SetId(org.GetId())
 
 			tflog.Debug(ctx, "found org", map[string]interface{}{
-				"id":  d.Get("id"),
+				"id":  d.Id(),
 				"org": name,
 			})
 			return nil

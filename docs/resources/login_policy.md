@@ -13,7 +13,7 @@ Resource representing the custom login policy of an organization.
 
 ```terraform
 resource zitadel_login_policy login_policy {
-  depends_on = [zitadel_org.org]
+  depends_on = [zitadel_org.org, zitadel_org_jwt_idp.jwt_idp, zitadel_org_oidc_idp.oidc_idp]
 
   org_id                        = zitadel_org.org.id
   user_login                    = "true"
@@ -25,10 +25,13 @@ resource zitadel_login_policy login_policy {
   password_check_lifetime       = "240h"
   external_login_check_lifetime = "240h"
   multi_factor_check_lifetime   = "720h"
-  mfa_init_skip_lifetime = "24h"
-  second_factor_check_lifetime = "24h"
+  mfa_init_skip_lifetime        = "24h"
+  second_factor_check_lifetime  = "24h"
   ignore_unknown_usernames      = "true"
   default_redirect_uri          = "localhost:8080"
+  second_factors                = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
+  multi_factors                 = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
+  idps                          = [zitadel_org_oidc_idp.oidc_idp.id, zitadel_org_jwt_idp.jwt_idp.id]
 }
 ```
 
@@ -43,13 +46,16 @@ resource zitadel_login_policy login_policy {
 - `external_login_check_lifetime` (String)
 - `force_mfa` (Boolean) defines if a user MUST use a multi factor to log in
 - `hide_password_reset` (Boolean) defines if password reset link should be shown in the login screen
+- `idps` (Set of String) allowed idps to login or register
 - `ignore_unknown_usernames` (Boolean) defines if unknown username on login screen directly return an error or always display the password screen
 - `mfa_init_skip_lifetime` (String)
 - `multi_factor_check_lifetime` (String)
+- `multi_factors` (Set of String) allowed multi factors
 - `org_id` (String) Id for the organization
 - `password_check_lifetime` (String)
 - `passwordless_type` (String) defines if passwordless is allowed for users
 - `second_factor_check_lifetime` (String)
+- `second_factors` (Set of String) allowed second factors
 - `user_login` (Boolean) defines if a user is allowed to login with his username and password
 
 ### Read-Only

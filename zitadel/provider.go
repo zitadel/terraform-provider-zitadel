@@ -60,6 +60,11 @@ func Provider() *schema.Provider {
 			"zitadel_login_policy":               v2.GetLoginPolicy(),
 			"zitadel_password_complexity_policy": v2.GetPasswordComplexityPolicy(),
 			"zitadel_privacy_policy":             v2.GetPrivacyPolicy(),
+			"zitadel_trigger_actions":            v2.GetTriggerActions(),
+			"zitadel_personal_access_token":      v2.GetPAT(),
+			"zitadel_machine_key":                v2.GetMachineKey(),
+			"zitadel_org_jwt_idp":                v2.GetOrgJWTIDP(),
+			"zitadel_org_oidc_idp":               v2.GetOrgOIDCIDP(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
