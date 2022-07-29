@@ -18,6 +18,7 @@ const (
 
 func GetPrivacyPolicy() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the custom privacy policy of an organization.",
 		Schema: map[string]*schema.Schema{
 			privacyPolicyOrgIdVar: {
 				Type:        schema.TypeString,
@@ -143,7 +144,9 @@ func readPrivacyPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 
 	resp, err := client.GetPrivacyPolicy(ctx, &management2.GetPrivacyPolicyRequest{})
 	if err != nil {
-		return diag.Errorf("failed to get privacy policy: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to get privacy policy: %v", err)
 	}
 
 	policy := resp.Policy

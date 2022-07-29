@@ -16,6 +16,7 @@ const (
 
 func OrgResource() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing an organization in ZITADEL, which is the highest level after the instance and contains several other resource including policies if the configuration differs to the default policies on the instance.",
 		Schema: map[string]*schema.Schema{
 			nameVar: {
 				Type:        schema.TypeString,
@@ -84,7 +85,7 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 
 	resp, err := client.ListOrgs(ctx, &admin2.ListOrgsRequest{})
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("error while listing orgs: %v", err)
 	}
 	tflog.Debug(ctx, "found orgs", map[string]interface{}{
 		"orglist": resp.Result,
@@ -104,7 +105,7 @@ func readOrg(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 			d.SetId(org.GetId())
 
 			tflog.Debug(ctx, "found org", map[string]interface{}{
-				"id":  d.Get("id"),
+				"id":  d.Id(),
 				"org": name,
 			})
 			return nil

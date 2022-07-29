@@ -16,6 +16,7 @@ const (
 
 func GetLockoutPolicy() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the custom lockout policy of an organization.",
 		Schema: map[string]*schema.Schema{
 			lockoutPolicyOrgIdVar: {
 				Type:        schema.TypeString,
@@ -79,7 +80,7 @@ func updateLockoutPolicy(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	_, err = client.UpdateCustomLockoutPolicy(ctx, &management2.UpdateCustomLockoutPolicyRequest{
-		MaxPasswordAttempts: d.Get(lockoutPolicyMaxPasswordAttempts).(uint32),
+		MaxPasswordAttempts: uint32(d.Get(lockoutPolicyMaxPasswordAttempts).(int)),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update lockout policy: %v", err)
@@ -103,7 +104,7 @@ func createLockoutPolicy(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	_, err = client.AddCustomLockoutPolicy(ctx, &management2.AddCustomLockoutPolicyRequest{
-		MaxPasswordAttempts: d.Get(lockoutPolicyMaxPasswordAttempts).(uint32),
+		MaxPasswordAttempts: uint32(d.Get(lockoutPolicyMaxPasswordAttempts).(int)),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create lockout policy: %v", err)
@@ -128,7 +129,9 @@ func readLockoutPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 
 	resp, err := client.GetLockoutPolicy(ctx, &management2.GetLockoutPolicyRequest{})
 	if err != nil {
-		return diag.Errorf("failed to get lockout policy: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to get lockout policy: %v", err)
 	}
 
 	policy := resp.Policy

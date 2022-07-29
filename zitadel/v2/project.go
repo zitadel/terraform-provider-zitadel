@@ -22,6 +22,7 @@ const (
 
 func GetProject() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
 		Schema: map[string]*schema.Schema{
 			projectIdVar: {
 				Type:        schema.TypeString,

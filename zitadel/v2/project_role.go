@@ -20,6 +20,7 @@ const (
 
 func GetProjectRole() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the project roles, which can be given as authorizations to users.",
 		Schema: map[string]*schema.Schema{
 			projectRoleProjectID: {
 				Type:        schema.TypeString,

@@ -34,6 +34,7 @@ const (
 
 func GetApplicationOIDC() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing an OIDC application belonging to a project, with all configuration possibilities.",
 		Schema: map[string]*schema.Schema{
 			applicationOrgIdVar: {
 				Type:        schema.TypeString,

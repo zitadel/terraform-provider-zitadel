@@ -18,6 +18,7 @@ const (
 
 func GetProjectGrantMember() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the membership of a user on an granted project, defined with the given role.",
 		Schema: map[string]*schema.Schema{
 			projectGrantMemberOrgIDVar: {
 				Type:        schema.TypeString,

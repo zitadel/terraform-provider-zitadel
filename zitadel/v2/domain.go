@@ -20,6 +20,7 @@ const (
 
 func GetDomain() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing a domain of the organization.",
 		Schema: map[string]*schema.Schema{
 			domainNameVar: {
 				Type:        schema.TypeString,

@@ -17,6 +17,7 @@ const (
 
 func GetProjectGrant() *schema.Resource {
 	return &schema.Resource{
+		Description: "Resource representing the grant of a project to a different organization, also containing the available roles which can be given to the members of the projectgrant.",
 		Schema: map[string]*schema.Schema{
 			projectGrantProjectIDVar: {
 				Type:        schema.TypeString,
