@@ -37,6 +37,18 @@ func GetApplicationAPI() *schema.Resource {
 				Required:    true,
 				Description: "Auth method type",
 			},
+			applicationClientID: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "generated ID for this config",
+				Sensitive:   true,
+			},
+			applicationClientSecret: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "generated secret for this config",
+				Sensitive:   true,
+			},
 		},
 		DeleteContext: deleteApplicationAPI,
 		CreateContext: createApplicationAPI,
@@ -131,6 +143,15 @@ func createApplicationAPI(ctx context.Context, d *schema.ResourceData, m interfa
 		AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[(d.Get(applicationAuthMethodTypeVar).(string))]),
 	})
 
+	set := map[string]interface{}{
+		applicationClientID:     resp.GetClientId(),
+		applicationClientSecret: resp.GetClientSecret(),
+	}
+	for k, v := range set {
+		if err := d.Set(k, v); err != nil {
+			return diag.Errorf("failed to set %s of applicationAPI: %v", k, err)
+		}
+	}
 	if err != nil {
 		return diag.Errorf("failed to create applicationAPI: %v", err)
 	}

@@ -34,4 +34,6 @@ resource zitadel_application_api application_api {
 
 ### Read-Only
 
+- `client_id` (String, Sensitive) generated ID for this config
+- `client_secret` (String, Sensitive) generated secret for this config
 - `id` (String) The ID of this resource.

@@ -30,6 +30,8 @@ const (
 	applicationIdTokenUserinfoAssertionVar = "id_token_userinfo_assertion"
 	applicationClockSkewVar                = "clock_skew"
 	applicationAdditionalOriginsVar        = "additional_origins"
+	applicationClientID                    = "client_id"
+	applicationClientSecret                = "client_secret"
 )
 
 func GetApplicationOIDC() *schema.Resource {
@@ -137,6 +139,18 @@ func GetApplicationOIDC() *schema.Resource {
 				},
 				Optional:    true,
 				Description: "Additional origins",
+			},
+			applicationClientID: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "generated ID for this config",
+				Sensitive:   true,
+			},
+			applicationClientSecret: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "generated secret for this config",
+				Sensitive:   true,
 			},
 		},
 		DeleteContext: deleteApplicationOIDC,
@@ -303,6 +317,16 @@ func createApplicationOIDC(ctx context.Context, d *schema.ResourceData, m interf
 		ClockSkew:                durationpb.New(dur),
 		AdditionalOrigins:        interfaceToStringSlice(d.Get(applicationAdditionalOriginsVar)),
 	})
+
+	set := map[string]interface{}{
+		applicationClientID:     resp.GetClientId(),
+		applicationClientSecret: resp.GetClientSecret(),
+	}
+	for k, v := range set {
+		if err := d.Set(k, v); err != nil {
+			return diag.Errorf("failed to set %s of applicationOIDC: %v", k, err)
+		}
+	}
 
 	if err != nil {
 		return diag.Errorf("failed to create applicationOIDC: %v", err)
