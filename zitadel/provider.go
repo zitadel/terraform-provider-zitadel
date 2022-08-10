@@ -2,16 +2,16 @@ package zitadel
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	v2 "github.com/zitadel/terraform-provider-zitadel/zitadel/v2"
 )
 
 func Provider() *schema.Provider {
 	return &schema.Provider{
-		DataSourcesMap: map[string]*schema.Resource{
-			//		"zitadelV1Org": v1.GetOrgDatasource(),
-		},
+		DataSourcesMap: map[string]*schema.Resource{},
 		Schema: map[string]*schema.Schema{
 			v2.DomainVar: {
 				Type:        schema.TypeString,
@@ -22,11 +22,6 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Use insecure connection",
-			},
-			v2.ProjectVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the ZITADEL project on your ZITADEL instance, for the audience-scope",
 			},
 			v2.TokenVar: {
 				Type:        schema.TypeString,

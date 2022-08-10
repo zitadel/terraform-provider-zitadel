@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -11,7 +12,6 @@ import (
 const (
 	labelPolicyOrgIdVar            = "org_id"
 	labelPolicyPrimaryColor        = "primary_color"
-	labelPolicyIsDefault           = "is_default"
 	labelPolicyHideLoginNameSuffix = "hide_login_name_suffix"
 	labelPolicyWarnColor           = "warn_color"
 	labelPolicyBackgroundColor     = "background_color"
@@ -26,6 +26,7 @@ const (
 	labelPolicyLogoURLDark         = "logo_url_dark"
 	labelPolicyIconURLDark         = "icon_url_dark"
 	labelPolicyFontURL             = "font_url"
+	labelPolicySetActive           = "set_active"
 )
 
 func GetLabelPolicy() *schema.Resource {
@@ -42,11 +43,6 @@ func GetLabelPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "hex value for primary color",
-			},
-			labelPolicyIsDefault: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "defines if the organisation's admin changed the policy",
 			},
 			labelPolicyHideLoginNameSuffix: {
 				Type:        schema.TypeBool,
@@ -118,6 +114,11 @@ func GetLabelPolicy() *schema.Resource {
 				Computed:    true,
 				Description: "",
 			},
+			labelPolicySetActive: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "set the label policy active after creating/updating",
+			},
 		},
 		ReadContext:   readLabelPolicy,
 		CreateContext: createLabelPolicy,
@@ -144,7 +145,6 @@ func deleteLabelPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		return diag.Errorf("failed to reset label policy: %v", err)
 	}
-	d.SetId(org)
 	return nil
 }
 
@@ -178,6 +178,16 @@ func updateLabelPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 		return diag.Errorf("failed to update label policy: %v", err)
 	}
 	d.SetId(org)
+
+	active := d.Get(labelPolicySetActive)
+	if active != nil {
+		activeBool := active.(bool)
+		if activeBool {
+			if _, err := client.ActivateCustomLabelPolicy(ctx, &management2.ActivateCustomLabelPolicyRequest{}); err != nil {
+				return diag.Errorf("failed to activate label policy: %v", err)
+			}
+		}
+	}
 	return nil
 }
 
@@ -211,6 +221,16 @@ func createLabelPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 		return diag.Errorf("failed to create label policy: %v", err)
 	}
 	d.SetId(org)
+
+	active := d.Get(labelPolicySetActive)
+	if active != nil {
+		activeBool := active.(bool)
+		if activeBool {
+			if _, err := client.ActivateCustomLabelPolicy(ctx, &management2.ActivateCustomLabelPolicyRequest{}); err != nil {
+				return diag.Errorf("failed to activate label policy: %v", err)
+			}
+		}
+	}
 	return nil
 }
 
@@ -228,7 +248,7 @@ func readLabelPolicy(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetLabelPolicy(ctx, &management2.GetLabelPolicyRequest{})
+	resp, err := client.GetPreviewLabelPolicy(ctx, &management2.GetPreviewLabelPolicyRequest{})
 	if err != nil {
 		d.SetId("")
 		return nil
@@ -236,9 +256,11 @@ func readLabelPolicy(ctx context.Context, d *schema.ResourceData, m interface{})
 	}
 
 	policy := resp.Policy
+	if policy.GetIsDefault() == true {
+		d.SetId("")
+		return nil
+	}
 	set := map[string]interface{}{
-		labelPolicyOrgIdVar:            policy.GetDetails().GetResourceOwner(),
-		labelPolicyIsDefault:           policy.GetIsDefault(),
 		labelPolicyPrimaryColor:        policy.GetPrimaryColor(),
 		labelPolicyHideLoginNameSuffix: policy.GetHideLoginNameSuffix(),
 		labelPolicyWarnColor:           policy.GetWarnColor(),

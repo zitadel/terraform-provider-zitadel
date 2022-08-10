@@ -11,6 +11,19 @@ This provider allows the management of different resources on a ZITADEL instance
 
 Through this provider it is possible to interact with the [ZITADEL API](https://docs.zitadel.com/docs/apis/introduction) to configure different aspects of the instance.
 
+Currently does not contain, but could be included in the future if demand exists:
+
+- instance as resource
+- policies and settings on instance level as resource
+- custom text resources
+
+Not planned to include as resources, as more administration task as a resource:
+
+- Import and export of organizations
+- (re-)setting of password for human user
+- initializing of OTP setup for human user
+- initializing of passwordless setup for human user
+
 ## Configuring the provider
 
 ```terraform
@@ -18,7 +31,7 @@ terraform {
   required_providers {
     zitadel = {
       source  = "zitadel/zitadel"
-      version = "1.0.0-alpha.4"
+      version = "1.0.0-alpha.5"
     }
   }
 }
@@ -38,7 +51,6 @@ provider zitadel {
 ### Required
 
 - `domain` (String) Domain used to connect to the ZITADEL instance
-- `project` (String) ID of the ZITADEL project on your ZITADEL instance, for the audience-scope
 - `token` (String) Path to the file containing credentials to connect to ZITADEL
 
 ### Optional

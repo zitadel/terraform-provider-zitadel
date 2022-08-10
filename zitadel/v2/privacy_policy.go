@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -12,7 +13,6 @@ const (
 	privacyPolicyOrgIdVar    = "org_id"
 	privacyPolicyTOSLink     = "tos_link"
 	privacyPolicyPrivacyLink = "privacy_link"
-	privacyPolicyIsDefault   = "is_default"
 	privacyPolicyHelpLink    = "help_link"
 )
 
@@ -34,11 +34,6 @@ func GetPrivacyPolicy() *schema.Resource {
 			privacyPolicyPrivacyLink: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "",
-			},
-			privacyPolicyIsDefault: {
-				Type:        schema.TypeBool,
-				Computed:    true,
 				Description: "",
 			},
 			privacyPolicyHelpLink: {
@@ -72,7 +67,6 @@ func deletePrivacyPolicy(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		return diag.Errorf("failed to reset privacy policy: %v", err)
 	}
-	d.SetId(org)
 	return nil
 }
 
@@ -150,9 +144,12 @@ func readPrivacyPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 
 	policy := resp.Policy
+	if policy.GetIsDefault() == true {
+		d.SetId("")
+		return nil
+	}
 	set := map[string]interface{}{
 		privacyPolicyOrgIdVar:    policy.GetDetails().GetResourceOwner(),
-		privacyPolicyIsDefault:   policy.GetIsDefault(),
 		privacyPolicyTOSLink:     policy.GetTosLink(),
 		privacyPolicyPrivacyLink: policy.GetPrivacyLink(),
 		privacyPolicyHelpLink:    policy.GetHelpLink(),

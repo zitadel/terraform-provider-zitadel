@@ -1,4 +1,3 @@
-
 resource zitadel_label_policy label_policy {
   depends_on = [zitadel_org.org]
 
@@ -13,4 +12,5 @@ resource zitadel_label_policy label_policy {
   warn_color_dark        = "#ff3b5b"
   font_color_dark        = "#ffffff"
   disable_watermark      = "false"
+  set_active             = "true"
 }

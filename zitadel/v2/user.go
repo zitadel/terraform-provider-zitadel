@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -23,19 +24,16 @@ const (
 	preferredLanguageVar = "preferred_language"
 	genderVar            = "gender"
 
-	isPhoneVerifiedVar = "is_phone_verified"
+	isEmailVerifiedVar = "is_email_verified"
 	emailVar           = "email"
 
-	isEmailVerifiedVar = "is_email_verified"
+	isPhoneVerifiedVar = "is_phone_verified"
 	phoneVar           = "phone"
 
 	machineNameVar = "name"
 	descriptionVar = "description"
 
 	initialPasswordVar = "initial_password"
-
-	HumanUser   = "human"
-	MachineUser = "machine"
 )
 
 func GetHumanUser() *schema.Resource {
@@ -271,7 +269,7 @@ func createHumanUser(ctx context.Context, d *schema.ResourceData, m interface{})
 			IsPhoneVerified: false,
 		}
 		if isVerified != nil {
-			addUser.Email.IsEmailVerified = isVerified.(bool)
+			addUser.Phone.IsPhoneVerified = isVerified.(bool)
 		}
 	}
 
@@ -285,7 +283,7 @@ func createHumanUser(ctx context.Context, d *schema.ResourceData, m interface{})
 }
 
 func createMachineUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started read")
+	tflog.Info(ctx, "started create")
 
 	clientinfo, ok := m.(*ClientInfo)
 	if !ok {
@@ -310,7 +308,7 @@ func createMachineUser(ctx context.Context, d *schema.ResourceData, m interface{
 }
 
 func updateHumanUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started read")
+	tflog.Info(ctx, "started update")
 
 	clientinfo, ok := m.(*ClientInfo)
 	if !ok {
@@ -394,7 +392,7 @@ func updateHumanUser(ctx context.Context, d *schema.ResourceData, m interface{})
 }
 
 func updateMachineUser(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started read")
+	tflog.Info(ctx, "started update")
 
 	clientinfo, ok := m.(*ClientInfo)
 	if !ok {

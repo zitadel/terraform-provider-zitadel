@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -149,7 +150,9 @@ func readProjectMember(ctx context.Context, d *schema.ResourceData, m interface{
 	projectID := d.Get(projectMemberProjectIDVar).(string)
 	resp, err := client.ListProjectMembers(ctx, &management2.ListProjectMembersRequest{ProjectId: projectID})
 	if err != nil {
-		return diag.Errorf("failed to read projectmember: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to read projectmember: %v", err)
 	}
 
 	userID := d.Get(projectMemberUserIDVar).(string)
@@ -170,6 +173,7 @@ func readProjectMember(ctx context.Context, d *schema.ResourceData, m interface{
 			return nil
 		}
 	}
+	d.SetId("")
 	return nil
 }
 

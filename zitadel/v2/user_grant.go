@@ -2,10 +2,12 @@ package v2
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/user"
 )
 
 const (
@@ -50,6 +52,7 @@ func GetUserGrant() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization which owns the resource",
+				ForceNew:    true,
 			},
 		},
 		DeleteContext: deleteUserGrant,
@@ -95,10 +98,14 @@ func updateUserGrant(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.FromErr(err)
 	}
 
+	roles := make([]string, 0)
+	for _, role := range d.Get(userGrantRoleKeysVar).(*schema.Set).List() {
+		roles = append(roles, role.(string))
+	}
 	_, err = client.UpdateUserGrant(ctx, &management2.UpdateUserGrantRequest{
 		GrantId:  d.Id(),
 		UserId:   d.Get(userGrantUserIDVar).(string),
-		RoleKeys: d.Get(userGrantRoleKeysVar).([]string),
+		RoleKeys: roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to update usergrant: %v", err)
@@ -119,11 +126,16 @@ func createUserGrant(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.FromErr(err)
 	}
 
+	roles := make([]string, 0)
+	for _, role := range d.Get(userGrantRoleKeysVar).(*schema.Set).List() {
+		roles = append(roles, role.(string))
+	}
+
 	resp, err := client.AddUserGrant(ctx, &management2.AddUserGrantRequest{
 		UserId:         d.Get(userGrantUserIDVar).(string),
 		ProjectGrantId: d.Get(userGrantProjectGrantIDVar).(string),
 		ProjectId:      d.Get(userGrantProjectIDVar).(string),
-		RoleKeys:       d.Get(userGrantRoleKeysVar).([]string),
+		RoleKeys:       roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to create usergrant: %v", err)
@@ -144,27 +156,58 @@ func readUserGrant(ctx context.Context, d *schema.ResourceData, m interface{}) d
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	projectID := d.Get(userGrantProjectIDVar)
+	projectGrantID := d.Get(userGrantProjectGrantIDVar)
 
-	resp, err := client.GetUserGrantByID(ctx, &management2.GetUserGrantByIDRequest{UserId: d.Get(userGrantUserIDVar).(string), GrantId: d.Id()})
+	queries := []*user.UserGrantQuery{
+		{Query: &user.UserGrantQuery_UserIdQuery{
+			UserIdQuery: &user.UserGrantUserIDQuery{
+				UserId: d.Get(userGrantUserIDVar).(string),
+			},
+		}},
+	}
+	if projectID != nil {
+		queries = append(queries, &user.UserGrantQuery{Query: &user.UserGrantQuery_ProjectIdQuery{
+			ProjectIdQuery: &user.UserGrantProjectIDQuery{
+				ProjectId: projectID.(string),
+			},
+		}},
+		)
+	}
+	if projectGrantID != nil {
+		queries = append(queries, &user.UserGrantQuery{Query: &user.UserGrantQuery_ProjectGrantIdQuery{
+			ProjectGrantIdQuery: &user.UserGrantProjectGrantIDQuery{
+				ProjectGrantId: projectGrantID.(string),
+			},
+		}},
+		)
+	}
+	grants, err := client.ListUserGrants(ctx, &management2.ListUserGrantRequest{
+		Queries: queries,
+	})
 	if err != nil {
 		d.SetId("")
 		return nil
 		//return diag.Errorf("failed to read usergrant: %v", err)
 	}
 
-	grant := resp.GetUserGrant()
-	set := map[string]interface{}{
-		userGrantUserIDVar:         grant.GetProjectId(),
-		userGrantProjectIDVar:      grant.GetProjectId(),
-		userGrantProjectGrantIDVar: grant.GetProjectGrantId(),
-		userGrantRoleKeysVar:       grant.GetRoleKeys(),
-		userGrantOrgIDVar:          grant.GetDetails().GetResourceOwner(),
-	}
-	for k, v := range set {
-		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of projectgrant: %v", k, err)
+	if len(grants.GetResult()) == 1 {
+		grant := grants.GetResult()[0]
+		set := map[string]interface{}{
+			userGrantUserIDVar:         grant.GetUserId(),
+			userGrantProjectIDVar:      grant.GetProjectId(),
+			userGrantProjectGrantIDVar: grant.GetProjectGrantId(),
+			userGrantRoleKeysVar:       grant.GetRoleKeys(),
+			userGrantOrgIDVar:          grant.GetDetails().GetResourceOwner(),
 		}
+		for k, v := range set {
+			if err := d.Set(k, v); err != nil {
+				return diag.Errorf("failed to set %s of usergrant: %v", k, err)
+			}
+		}
+		d.SetId(grant.GetId())
 	}
-	d.SetId(grant.GetId())
+
+	d.SetId("")
 	return nil
 }

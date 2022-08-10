@@ -34,4 +34,3 @@ resource zitadel_lockout_policy lockout_policy {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `is_default` (Boolean) defines if the organisation's admin changed the policy

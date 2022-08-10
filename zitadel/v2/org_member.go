@@ -2,11 +2,12 @@ package v2
 
 import (
 	"context"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	"strings"
 )
 
 const (
@@ -138,7 +139,9 @@ func readOrgMember(ctx context.Context, d *schema.ResourceData, m interface{}) d
 
 	resp, err := client.ListOrgMembers(ctx, &management2.ListOrgMembersRequest{})
 	if err != nil {
-		return diag.Errorf("failed to read orgmember: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to read orgmember: %v", err)
 	}
 
 	userID := d.Get(orgMemberUserIDVar).(string)
@@ -158,6 +161,7 @@ func readOrgMember(ctx context.Context, d *schema.ResourceData, m interface{}) d
 			return nil
 		}
 	}
+	d.SetId("")
 	return nil
 }
 

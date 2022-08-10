@@ -2,12 +2,13 @@ package v2
 
 import (
 	"context"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/protobuf/types/known/durationpb"
-	"time"
 )
 
 const (
@@ -161,29 +162,32 @@ func readAction(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 
 	resp, err := client.ListActions(ctx, &management2.ListActionsRequest{})
 	if err != nil {
-		return diag.Errorf("failed to read action: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to read action: %v", err)
 	}
 
-	set := map[string]interface{}{}
-	actionIDStr := ""
 	for i := range resp.Result {
 		action := resp.Result[i]
 		if action.GetId() == d.Id() {
-			actionIDStr = d.Id()
-			set[actionOrgId] = action.GetDetails().GetResourceOwner()
-			set[actionName] = action.GetName()
-			set[actionState] = action.GetState()
-			set[actionScript] = action.GetScript()
-			set[actionTimeout] = action.GetTimeout().AsDuration().String()
-			set[actionAllowedToFail] = action.GetAllowedToFail()
+			set := map[string]interface{}{
+				actionOrgId:         action.GetDetails().GetResourceOwner(),
+				actionName:          action.GetName(),
+				actionState:         action.GetState(),
+				actionScript:        action.GetScript(),
+				actionTimeout:       action.GetTimeout().AsDuration().String(),
+				actionAllowedToFail: action.GetAllowedToFail(),
+			}
+			for k, v := range set {
+				if err := d.Set(k, v); err != nil {
+					return diag.Errorf("failed to set %s of action: %v", k, err)
+				}
+			}
+			d.SetId(action.GetId())
+			return nil
 		}
 	}
 
-	for k, v := range set {
-		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of action: %v", k, err)
-		}
-	}
-	d.SetId(actionIDStr)
+	d.SetId("")
 	return nil
 }

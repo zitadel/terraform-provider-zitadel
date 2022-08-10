@@ -2,13 +2,14 @@ package v2
 
 import (
 	"context"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/authn"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"time"
 )
 
 const (
@@ -97,9 +98,9 @@ func createMachineKey(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diag.FromErr(err)
 	}
 
-	t, err := time.Parse(timeFormat, d.Get(machineKeyExpirationDateVar).(string))
+	t, err := time.Parse(time.RFC3339, d.Get(machineKeyExpirationDateVar).(string))
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("failed to parse time: %v", err)
 	}
 
 	keyType := d.Get(machineKeyKeyTypeVar).(string)
@@ -135,9 +136,14 @@ func readMachineKey(ctx context.Context, d *schema.ResourceData, m interface{}) 
 		UserId: userID,
 		KeyId:  d.Id(),
 	})
+	if err != nil {
+		d.SetId("")
+		return nil
+	}
 	d.SetId(resp.GetKey().GetId())
+
 	set := map[string]interface{}{
-		machineKeyExpirationDateVar: resp.GetKey().GetExpirationDate().String(),
+		machineKeyExpirationDateVar: resp.GetKey().GetExpirationDate().AsTime().Format(time.RFC3339),
 		machineKeyUserIDVar:         userID,
 		machineKeyOrgIDVar:          orgID,
 	}

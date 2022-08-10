@@ -35,4 +35,3 @@ resource zitadel_domain_policy domain_policy {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `is_default` (Boolean) Is this policy the default

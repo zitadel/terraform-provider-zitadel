@@ -39,4 +39,3 @@ resource zitadel_password_complexity_policy password_complexity_policy {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `is_default` (Boolean) defines if the organisation's admin changed the policy

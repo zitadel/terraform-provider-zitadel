@@ -2,12 +2,13 @@ package v2
 
 import (
 	"context"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"time"
 )
 
 const (
@@ -15,7 +16,6 @@ const (
 	patUserIDVar         = "user_id"
 	patTokenVar          = "token"
 	patExpirationDateVar = "expiration_date"
-	timeFormat           = "2519-04-01T08:45:00.000000Z"
 )
 
 func GetPAT() *schema.Resource {
@@ -90,20 +90,20 @@ func createPAT(ctx context.Context, d *schema.ResourceData, m interface{}) diag.
 		return diag.FromErr(err)
 	}
 
-	t, err := time.Parse(timeFormat, d.Get(patExpirationDateVar).(string))
+	t, err := time.Parse(time.RFC3339, d.Get(patExpirationDateVar).(string))
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("failed to parse time: %v", err)
 	}
 
 	resp, err := client.AddPersonalAccessToken(ctx, &management2.AddPersonalAccessTokenRequest{
 		UserId:         d.Get(patUserIDVar).(string),
 		ExpirationDate: timestamppb.New(t),
 	})
-	d.SetId(resp.GetTokenId())
+
 	if err := d.Set(patTokenVar, resp.GetToken()); err != nil {
 		return diag.FromErr(err)
 	}
-
+	d.SetId(resp.GetTokenId())
 	return nil
 }
 
@@ -125,9 +125,13 @@ func readPAT(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 		UserId:  userID,
 		TokenId: d.Id(),
 	})
-	d.SetId(resp.GetToken().GetId())
+	if err != nil {
+		d.SetId("")
+		return nil
+	}
+
 	set := map[string]interface{}{
-		patExpirationDateVar: resp.GetToken().GetExpirationDate().String(),
+		patExpirationDateVar: resp.GetToken().GetExpirationDate().AsTime().Format(time.RFC3339),
 		patUserIDVar:         userID,
 		patOrgIDVar:          orgID,
 	}
@@ -136,8 +140,6 @@ func readPAT(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 			return diag.Errorf("failed to set %s of project: %v", k, err)
 		}
 	}
-	if err := d.Set(patTokenVar, resp.GetToken()); err != nil {
-		return diag.FromErr(err)
-	}
+	d.SetId(resp.GetToken().GetId())
 	return nil
 }

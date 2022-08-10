@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -12,7 +13,6 @@ import (
 const (
 	domainPolicyOrgIdVar              = "org_id"
 	domainPolicyUserLoginMustBeDomain = "user_login_must_be_domain"
-	domainPolicyIsDefault             = "is_default"
 	domainPolicyValidateOrgDomain     = "validate_org_domains"
 	domainPolicySmtpSender            = "smtp_sender_address_matches_instance_domain"
 )
@@ -31,11 +31,6 @@ func GetDomainPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Required:    true,
 				Description: "User login must be domain",
-			},
-			domainPolicyIsDefault: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "Is this policy the default",
 			},
 			domainPolicyValidateOrgDomain: {
 				Type:        schema.TypeBool,
@@ -75,7 +70,6 @@ func deleteDomainPolicy(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		return diag.Errorf("failed to reset domain policy: %v", err)
 	}
-	d.SetId(org)
 	return nil
 }
 
@@ -155,9 +149,12 @@ func readDomainPolicy(ctx context.Context, d *schema.ResourceData, m interface{}
 	}
 
 	policy := resp.Policy
+	if policy.GetIsDefault() == true {
+		d.SetId("")
+		return nil
+	}
 	set := map[string]interface{}{
 		domainPolicyOrgIdVar:              policy.GetDetails().GetResourceOwner(),
-		domainPolicyIsDefault:             policy.GetIsDefault(),
 		domainPolicyUserLoginMustBeDomain: policy.GetUserLoginMustBeDomain(),
 		domainPolicyValidateOrgDomain:     policy.GetValidateOrgDomains(),
 	}

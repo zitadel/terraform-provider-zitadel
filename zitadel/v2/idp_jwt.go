@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -75,7 +76,7 @@ func createOrgJWTIDP(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(domainOrgIdVar).(string))
+	client, err := getManagementClient(clientinfo, d.Get(idpOrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -197,6 +198,5 @@ func readOrgJWTIDP(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		}
 	}
 	d.SetId(idp.Id)
-
 	return nil
 }

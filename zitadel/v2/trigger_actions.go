@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -39,8 +40,10 @@ func GetTriggerActions() *schema.Resource {
 				ForceNew:    true,
 			},
 			triggerActionsActionsVar: {
-				Type:        schema.TypeSet,
-				Elem:        schema.TypeString,
+				Type: schema.TypeSet,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 				Required:    true,
 				Description: "IDs of the triggered actions",
 			},
@@ -140,7 +143,10 @@ func createTriggerActions(ctx context.Context, d *schema.ResourceData, m interfa
 func readTriggerActions(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started read")
 
-	d.SetId("")
+	orgID := d.Get(triggerActionsOrgIDVar).(string)
+	flowType := d.Get(triggerActionsFlowTypeVar).(string)
+	triggerType := d.Get(triggerActionsTriggerTypeVar).(string)
+	d.SetId(getTriggerActionsID(orgID, flowType, triggerType))
 	return nil
 }
 

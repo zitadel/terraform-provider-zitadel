@@ -26,6 +26,7 @@ resource zitadel_label_policy label_policy {
   warn_color_dark        = "#ff3b5b"
   font_color_dark        = "#ffffff"
   disable_watermark      = "false"
+  set_active             = "true"
 }
 ```
 
@@ -46,12 +47,15 @@ resource zitadel_label_policy label_policy {
 - `warn_color` (String) hex value for warn color
 - `warn_color_dark` (String) hex value for warn color dark theme
 
+### Optional
+
+- `set_active` (Boolean) set the label policy active after creating/updating
+
 ### Read-Only
 
 - `font_url` (String)
 - `icon_url` (String)
 - `icon_url_dark` (String)
 - `id` (String) The ID of this resource.
-- `is_default` (Boolean) defines if the organisation's admin changed the policy
 - `logo_url` (String)
 - `logo_url_dark` (String)

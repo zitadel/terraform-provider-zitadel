@@ -2,6 +2,8 @@ package v2
 
 import (
 	"context"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -9,7 +11,6 @@ import (
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/policy"
 	"google.golang.org/protobuf/types/known/durationpb"
-	"time"
 )
 
 const (
@@ -19,7 +20,6 @@ const (
 	loginPolicyAllowExternalIDP           = "allow_external_idp"
 	loginPolicyForceMFA                   = "force_mfa"
 	loginPolicyPasswordlessType           = "passwordless_type"
-	loginPolicyIsDefault                  = "is_default"
 	loginPolicyHidePasswordReset          = "hide_password_reset"
 	loginPolicyPasswordCheckLifetime      = "password_check_lifetime"
 	loginPolicyExternalLoginCheckLifetime = "external_login_check_lifetime"
@@ -67,11 +67,6 @@ func GetLoginPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "defines if passwordless is allowed for users",
-			},
-			loginPolicyIsDefault: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "defines if the organisation's admin changed the policy",
 			},
 			loginPolicyHidePasswordReset: {
 				Type:        schema.TypeBool,
@@ -163,7 +158,6 @@ func deleteLoginPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		return diag.Errorf("failed to reset login policy: %v", err)
 	}
-	d.SetId(org)
 	return nil
 }
 
@@ -208,23 +202,42 @@ func updateLoginPolicy(ctx context.Context, d *schema.ResourceData, m interface{
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateCustomLoginPolicy(ctx, &management2.UpdateCustomLoginPolicyRequest{
-		AllowUsernamePassword:      d.Get(loginPolicyAllowUsernamePassword).(bool),
-		AllowRegister:              d.Get(loginPolicyAllowRegister).(bool),
-		AllowExternalIdp:           d.Get(loginPolicyAllowExternalIDP).(bool),
-		ForceMfa:                   d.Get(loginPolicyForceMFA).(bool),
-		PasswordlessType:           policy.PasswordlessType(policy.PasswordlessType_value[d.Get(loginPolicyPasswordlessType).(string)]),
-		HidePasswordReset:          d.Get(loginPolicyHidePasswordReset).(bool),
-		IgnoreUnknownUsernames:     d.Get(loginPolicyIgnoreUnknownUsernames).(bool),
-		DefaultRedirectUri:         d.Get(loginPolicyDefaultRedirectURI).(string),
-		PasswordCheckLifetime:      durationpb.New(passwordCheckLT),
-		ExternalLoginCheckLifetime: durationpb.New(externalLoginCheckLT),
-		MfaInitSkipLifetime:        durationpb.New(mfaInitSkipLT),
-		SecondFactorCheckLifetime:  durationpb.New(secondFactorCheckLT),
-		MultiFactorCheckLifetime:   durationpb.New(multiFactorCheckLT),
-	})
-	if err != nil {
-		return diag.Errorf("failed to update login policy: %v", err)
+	allowUsernamePassword := d.Get(loginPolicyAllowUsernamePassword).(bool)
+	allowRegister := d.Get(loginPolicyAllowRegister).(bool)
+	allowExternalIdp := d.Get(loginPolicyAllowExternalIDP).(bool)
+	forceMfa := d.Get(loginPolicyForceMFA).(bool)
+	passwordlessType := policy.PasswordlessType(policy.PasswordlessType_value[d.Get(loginPolicyPasswordlessType).(string)])
+	hidePasswordReset := d.Get(loginPolicyHidePasswordReset).(bool)
+	ignoreUnkownUsernames := d.Get(loginPolicyIgnoreUnknownUsernames).(bool)
+	defaultRedirectUri := d.Get(loginPolicyDefaultRedirectURI).(string)
+	currentPolicy := current.GetPolicy()
+	if currentPolicy.GetAllowUsernamePassword() != allowUsernamePassword ||
+		currentPolicy.GetAllowRegister() != allowRegister ||
+		currentPolicy.GetAllowExternalIdp() != allowExternalIdp ||
+		currentPolicy.GetForceMfa() != forceMfa ||
+		currentPolicy.GetPasswordlessType() != passwordlessType ||
+		currentPolicy.GetHidePasswordReset() != hidePasswordReset ||
+		currentPolicy.GetIgnoreUnknownUsernames() != ignoreUnkownUsernames ||
+		currentPolicy.GetDefaultRedirectUri() != defaultRedirectUri {
+
+		_, err = client.UpdateCustomLoginPolicy(ctx, &management2.UpdateCustomLoginPolicyRequest{
+			AllowUsernamePassword:      allowUsernamePassword,
+			AllowRegister:              allowRegister,
+			AllowExternalIdp:           allowExternalIdp,
+			ForceMfa:                   forceMfa,
+			PasswordlessType:           passwordlessType,
+			HidePasswordReset:          hidePasswordReset,
+			IgnoreUnknownUsernames:     ignoreUnkownUsernames,
+			DefaultRedirectUri:         defaultRedirectUri,
+			PasswordCheckLifetime:      durationpb.New(passwordCheckLT),
+			ExternalLoginCheckLifetime: durationpb.New(externalLoginCheckLT),
+			MfaInitSkipLifetime:        durationpb.New(mfaInitSkipLT),
+			SecondFactorCheckLifetime:  durationpb.New(secondFactorCheckLT),
+			MultiFactorCheckLifetime:   durationpb.New(multiFactorCheckLT),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update login policy: %v", err)
+		}
 	}
 	d.SetId(org)
 
@@ -389,9 +402,12 @@ func readLoginPolicy(ctx context.Context, d *schema.ResourceData, m interface{})
 	}
 
 	policy := resp.Policy
+	if policy.GetIsDefault() == true {
+		d.SetId("")
+		return nil
+	}
 	set := map[string]interface{}{
 		loginPolicyOrgIdVar:                   policy.GetDetails().GetResourceOwner(),
-		loginPolicyIsDefault:                  policy.GetIsDefault(),
 		loginPolicyAllowUsernamePassword:      policy.GetAllowUsernamePassword(),
 		loginPolicyAllowRegister:              policy.GetAllowRegister(),
 		loginPolicyAllowExternalIDP:           policy.GetAllowExternalIdp(),

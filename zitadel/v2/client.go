@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/pkg/oidc"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
@@ -13,7 +14,6 @@ import (
 const (
 	DomainVar   = "domain"
 	InsecureVar = "insecure"
-	ProjectVar  = "project"
 	TokenVar    = "token"
 	PortVar     = "port"
 )
@@ -22,7 +22,6 @@ type ClientInfo struct {
 	Domain  string
 	Issuer  string
 	Options []zitadel.Option
-	Project string
 }
 
 func GetClientInfo(d *schema.ResourceData) (*ClientInfo, error) {
@@ -60,19 +59,19 @@ func GetClientInfo(d *schema.ResourceData) (*ClientInfo, error) {
 		domain,
 		issuer,
 		options,
-		d.Get(ProjectVar).(string),
 	}, nil
 }
 
 func getAdminClient(info *ClientInfo) (*admin.Client, error) {
 	client, err := admin.NewClient(
 		info.Issuer, info.Domain,
-		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
+		[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 		info.Options...,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to start zitadel client: %v", err)
 	}
+
 	return client, nil
 }
 
@@ -84,7 +83,7 @@ func getManagementClient(info *ClientInfo, orgID string) (*management.Client, er
 
 	client, err := management.NewClient(
 		info.Issuer, info.Domain,
-		[]string{oidc.ScopeOpenID, zitadel.ScopeProjectID(info.Project)},
+		[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 		options...,
 	)
 	if err != nil {
