@@ -24,7 +24,7 @@ func GetUserGrant() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			userGrantProjectIDVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "ID of the project",
 				ForceNew:    true,
 			},
@@ -45,7 +45,7 @@ func GetUserGrant() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Required:    true,
+				Optional:    true,
 				Description: "List of roles granted",
 			},
 			userGrantOrgIDVar: {
@@ -194,11 +194,15 @@ func readUserGrant(ctx context.Context, d *schema.ResourceData, m interface{}) d
 	if len(grants.GetResult()) == 1 {
 		grant := grants.GetResult()[0]
 		set := map[string]interface{}{
-			userGrantUserIDVar:         grant.GetUserId(),
-			userGrantProjectIDVar:      grant.GetProjectId(),
-			userGrantProjectGrantIDVar: grant.GetProjectGrantId(),
-			userGrantRoleKeysVar:       grant.GetRoleKeys(),
-			userGrantOrgIDVar:          grant.GetDetails().GetResourceOwner(),
+			userGrantUserIDVar:   grant.GetUserId(),
+			userGrantRoleKeysVar: grant.GetRoleKeys(),
+			userGrantOrgIDVar:    grant.GetDetails().GetResourceOwner(),
+		}
+		if grant.GetProjectId() != "" {
+			set[userGrantProjectIDVar] = grant.GetProjectId()
+		}
+		if grant.GetProjectGrantId() != "" {
+			set[userGrantProjectGrantIDVar] = grant.GetProjectGrantId()
 		}
 		for k, v := range set {
 			if err := d.Set(k, v); err != nil {
@@ -206,6 +210,7 @@ func readUserGrant(ctx context.Context, d *schema.ResourceData, m interface{}) d
 			}
 		}
 		d.SetId(grant.GetId())
+		return nil
 	}
 
 	d.SetId("")

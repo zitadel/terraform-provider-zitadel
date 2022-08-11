@@ -28,13 +28,13 @@ resource zitadel_user_grant user_grant{
 ### Required
 
 - `org_id` (String) ID of the organization which owns the resource
-- `project_id` (String) ID of the project
-- `role_keys` (Set of String) List of roles granted
 - `user_id` (String) ID of the user
 
 ### Optional
 
 - `project_grant_id` (String) ID of the granted project
+- `project_id` (String) ID of the project
+- `role_keys` (Set of String) List of roles granted
 
 ### Read-Only
 
