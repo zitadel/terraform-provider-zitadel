@@ -55,6 +55,7 @@ func GetProjectRole() *schema.Resource {
 		CreateContext: createProjectRole,
 		UpdateContext: updateProjectRole,
 		ReadContext:   readProjectRole,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 
@@ -145,13 +146,15 @@ func readProjectRole(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := getManagementClient(clientinfo, d.Get(projectRoleOrgID).(string))
+	orgID := d.Get(projectRoleOrgID).(string)
+	client, err := getManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
+	projectID := d.Get(projectRoleProjectID).(string)
 	resp, err := client.ListProjectRoles(ctx, &management2.ListProjectRolesRequest{
-		ProjectId: d.Get(projectRoleProjectID).(string),
+		ProjectId: projectID,
 		Queries: []*project2.RoleQuery{
 			{Query: &project2.RoleQuery_KeyQuery{
 				KeyQuery: &project2.RoleKeyQuery{
@@ -168,8 +171,6 @@ func readProjectRole(ctx context.Context, d *schema.ResourceData, m interface{})
 	}
 
 	if len(resp.Result) == 1 {
-		projectID := d.Get(projectRoleProjectID).(string)
-		orgID := d.Get(projectRoleOrgID).(string)
 		projectRole := resp.GetResult()[0]
 		roleKey := projectRole.GetKey()
 		set := map[string]interface{}{

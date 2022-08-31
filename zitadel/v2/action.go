@@ -7,7 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/action"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
@@ -60,6 +61,7 @@ func GetAction() *schema.Resource {
 		DeleteContext: deleteAction,
 		ReadContext:   readAction,
 		UpdateContext: updateAction,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 
@@ -81,7 +83,7 @@ func updateAction(ctx context.Context, d *schema.ResourceData, m interface{}) di
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateAction(ctx, &management2.UpdateActionRequest{
+	_, err = client.UpdateAction(ctx, &management.UpdateActionRequest{
 		Id:            d.Id(),
 		Name:          d.Get(actionName).(string),
 		Script:        d.Get(actionScript).(string),
@@ -107,7 +109,7 @@ func deleteAction(ctx context.Context, d *schema.ResourceData, m interface{}) di
 		return diag.FromErr(err)
 	}
 
-	_, err = client.DeleteAction(ctx, &management2.DeleteActionRequest{
+	_, err = client.DeleteAction(ctx, &management.DeleteActionRequest{
 		Id: d.Id(),
 	})
 	if err != nil {
@@ -134,7 +136,7 @@ func createAction(ctx context.Context, d *schema.ResourceData, m interface{}) di
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.CreateAction(ctx, &management2.CreateActionRequest{
+	resp, err := client.CreateAction(ctx, &management.CreateActionRequest{
 		Name:          d.Get(actionName).(string),
 		Script:        d.Get(actionScript).(string),
 		Timeout:       durationpb.New(timeout),
@@ -160,32 +162,38 @@ func readAction(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.ListActions(ctx, &management2.ListActionsRequest{})
+	resp, err := client.ListActions(ctx, &management.ListActionsRequest{
+		Queries: []*management.ActionQuery{
+			{Query: &management.ActionQuery_ActionIdQuery{
+				ActionIdQuery: &action.ActionIDQuery{
+					Id: d.Id(),
+				},
+			}},
+		},
+	})
 	if err != nil {
 		d.SetId("")
 		return nil
 		//return diag.Errorf("failed to read action: %v", err)
 	}
 
-	for i := range resp.Result {
-		action := resp.Result[i]
-		if action.GetId() == d.Id() {
-			set := map[string]interface{}{
-				actionOrgId:         action.GetDetails().GetResourceOwner(),
-				actionName:          action.GetName(),
-				actionState:         action.GetState(),
-				actionScript:        action.GetScript(),
-				actionTimeout:       action.GetTimeout().AsDuration().String(),
-				actionAllowedToFail: action.GetAllowedToFail(),
-			}
-			for k, v := range set {
-				if err := d.Set(k, v); err != nil {
-					return diag.Errorf("failed to set %s of action: %v", k, err)
-				}
-			}
-			d.SetId(action.GetId())
-			return nil
+	if len(resp.Result) == 1 {
+		action := resp.Result[0]
+		set := map[string]interface{}{
+			actionOrgId:         action.GetDetails().GetResourceOwner(),
+			actionName:          action.GetName(),
+			actionState:         action.GetState(),
+			actionScript:        action.GetScript(),
+			actionTimeout:       action.GetTimeout().AsDuration().String(),
+			actionAllowedToFail: action.GetAllowedToFail(),
 		}
+		for k, v := range set {
+			if err := d.Set(k, v); err != nil {
+				return diag.Errorf("failed to set %s of action: %v", k, err)
+			}
+		}
+		d.SetId(action.GetId())
+		return nil
 	}
 
 	d.SetId("")

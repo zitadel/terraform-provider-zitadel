@@ -58,6 +58,7 @@ func GetPasswordComplexityPolicy() *schema.Resource {
 		ReadContext:   readPasswordComplexityPolicy,
 		CreateContext: createPasswordComplexityPolicy,
 		UpdateContext: updatePasswordComplexityPolicy,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

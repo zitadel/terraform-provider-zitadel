@@ -54,6 +54,7 @@ func GetDomain() *schema.Resource {
 		ReadContext:   readDomain,
 		CreateContext: createDomain,
 		DeleteContext: deleteDomain,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 
@@ -128,7 +129,9 @@ func readDomain(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 		},
 	})
 	if err != nil {
-		return diag.Errorf("failed to read domain: %v", err)
+		d.SetId("")
+		return nil
+		//return diag.Errorf("failed to read domain: %v", err)
 	}
 
 	if len(resp.Result) == 1 {

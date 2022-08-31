@@ -124,6 +124,7 @@ func GetLabelPolicy() *schema.Resource {
 		CreateContext: createLabelPolicy,
 		DeleteContext: deleteLabelPolicy,
 		UpdateContext: updateLabelPolicy,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

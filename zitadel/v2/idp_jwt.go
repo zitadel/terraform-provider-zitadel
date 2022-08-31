@@ -66,6 +66,7 @@ func GetOrgJWTIDP() *schema.Resource {
 		CreateContext: createOrgJWTIDP,
 		UpdateContext: updateOrgJWTIDP,
 		DeleteContext: deleteOrgIDP,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 func createOrgJWTIDP(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

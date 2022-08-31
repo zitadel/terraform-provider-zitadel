@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/user"
@@ -34,7 +35,14 @@ const (
 	descriptionVar = "description"
 
 	initialPasswordVar = "initial_password"
+
+	defaultGenderString      = "GENDER_UNSPECIFIED"
+	defaultPreferredLanguage = "und"
 )
+
+func defaultDisplayName(firstName, lastName string) string {
+	return firstName + " " + lastName
+}
 
 func GetHumanUser() *schema.Resource {
 	return &schema.Resource{
@@ -90,17 +98,20 @@ func GetHumanUser() *schema.Resource {
 			displayNameVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "DIsplay name of the user",
+				Description: "Display name of the user",
+				Computed:    true,
 			},
 			preferredLanguageVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Preferred language of the user",
+				Computed:    true,
 			},
 			genderVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Gender of the user",
+				Computed:    true,
 			},
 			emailVar: {
 				Type:        schema.TypeString,
@@ -110,7 +121,7 @@ func GetHumanUser() *schema.Resource {
 			isEmailVerifiedVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Is the email verified of the user",
+				Description: "Is the email verified of the user, can only be true if password of the user is set",
 			},
 			phoneVar: {
 				Type:        schema.TypeString,
@@ -125,13 +136,41 @@ func GetHumanUser() *schema.Resource {
 			initialPasswordVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Initially set password for the user",
+				Description: "Initially set password for the user, not changeable after creation",
+				Sensitive:   true,
 			},
 		},
 		ReadContext:   readHumanUser,
 		CreateContext: createHumanUser,
 		DeleteContext: deleteUser,
 		UpdateContext: updateHumanUser,
+		CustomizeDiff: customdiff.All(
+			customdiff.IfValue(displayNameVar, func(ctx context.Context, value, meta interface{}) bool {
+				if value == "" {
+					return true
+				}
+				return false
+			}, func(ctx context.Context, diff *schema.ResourceDiff, meta interface{}) error {
+				return diff.SetNew(displayNameVar, defaultDisplayName(diff.Get(firstNameVar).(string), diff.Get(lastNameVar).(string)))
+			}),
+			customdiff.IfValue(genderVar, func(ctx context.Context, value, meta interface{}) bool {
+				if value == "" {
+					return true
+				}
+				return false
+			}, func(ctx context.Context, diff *schema.ResourceDiff, meta interface{}) error {
+				return diff.SetNew(genderVar, defaultGenderString)
+			}),
+			customdiff.IfValue(preferredLanguageVar, func(ctx context.Context, value, meta interface{}) bool {
+				if value == "" {
+					return true
+				}
+				return false
+			}, func(ctx context.Context, diff *schema.ResourceDiff, meta interface{}) error {
+				return diff.SetNew(preferredLanguageVar, defaultPreferredLanguage)
+			}),
+		),
+		Importer: &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 
@@ -184,6 +223,7 @@ func GetMachineUser() *schema.Resource {
 		CreateContext: createMachineUser,
 		DeleteContext: deleteUser,
 		UpdateContext: updateMachineUser,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 
@@ -222,11 +262,13 @@ func createHumanUser(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diag.FromErr(err)
 	}
 
+	firstName := d.Get(firstNameVar).(string)
+	lastName := d.Get(lastNameVar).(string)
 	addUser := &management2.AddHumanUserRequest{
 		UserName: d.Get(userNameVar).(string),
 		Profile: &management2.AddHumanUserRequest_Profile{
-			FirstName: d.Get(firstNameVar).(string),
-			LastName:  d.Get(lastNameVar).(string),
+			FirstName: firstName,
+			LastName:  lastName,
 		},
 	}
 
@@ -234,19 +276,37 @@ func createHumanUser(ctx context.Context, d *schema.ResourceData, m interface{})
 	if nickname != "" {
 		addUser.Profile.NickName = nickname
 	}
+
 	displayname := d.Get(displayNameVar).(string)
 	if displayname != "" {
 		addUser.Profile.DisplayName = displayname
+	} else {
+		if err := d.Set(displayNameVar, defaultDisplayName(firstName, lastName)); err != nil {
+			return diag.Errorf("failed to set default display name for human user: %v", err)
+		}
 	}
 
 	prefLang := d.Get(preferredLanguageVar).(string)
 	if prefLang != "" {
 		addUser.Profile.PreferredLanguage = prefLang
+	} else {
+		if err := d.Set(preferredLanguageVar, defaultPreferredLanguage); err != nil {
+			return diag.Errorf("failed to set default preferred language for human user: %v", err)
+		}
 	}
 
 	gender := d.Get(genderVar).(string)
 	if gender != "" {
 		addUser.Profile.Gender = user.Gender(user.Gender_value[gender])
+	} else {
+		if err := d.Set(genderVar, defaultGenderString); err != nil {
+			return diag.Errorf("failed to set default gender for human user: %v", err)
+		}
+	}
+
+	pwd := d.Get(initialPasswordVar).(string)
+	if pwd != "" {
+		addUser.InitialPassword = pwd
 	}
 
 	email := d.Get(emailVar).(string)

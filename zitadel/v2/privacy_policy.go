@@ -46,6 +46,7 @@ func GetPrivacyPolicy() *schema.Resource {
 		DeleteContext: deletePrivacyPolicy,
 		ReadContext:   readPrivacyPolicy,
 		UpdateContext: updatePrivacyPolicy,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

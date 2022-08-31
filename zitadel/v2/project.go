@@ -71,6 +71,7 @@ func GetProject() *schema.Resource {
 		CreateContext: createProject,
 		UpdateContext: updateProject,
 		ReadContext:   readProject,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

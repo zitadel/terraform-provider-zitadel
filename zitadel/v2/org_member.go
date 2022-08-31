@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
 )
 
 const (
@@ -45,6 +46,7 @@ func GetOrgMember() *schema.Resource {
 		CreateContext: createOrgMember,
 		UpdateContext: updateOrgMember,
 		ReadContext:   readOrgMember,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 
@@ -137,30 +139,38 @@ func readOrgMember(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.ListOrgMembers(ctx, &management2.ListOrgMembersRequest{})
+	userID := d.Get(orgMemberUserIDVar).(string)
+	resp, err := client.ListOrgMembers(ctx, &management2.ListOrgMembersRequest{
+		Queries: []*member.SearchQuery{{
+			Query: &member.SearchQuery_UserIdQuery{
+				UserIdQuery: &member.UserIDQuery{
+					UserId: userID,
+				},
+			},
+		}},
+	})
 	if err != nil {
 		d.SetId("")
 		return nil
 		//return diag.Errorf("failed to read orgmember: %v", err)
 	}
 
-	userID := d.Get(orgMemberUserIDVar).(string)
-	for _, orgMember := range resp.Result {
-		if orgMember.UserId == userID {
-			set := map[string]interface{}{
-				orgMemberUserIDVar: orgMember.GetUserId(),
-				orgMemberOrgIDVar:  orgMember.GetDetails().GetResourceOwner(),
-				orgMemberRolesVar:  orgMember.GetRoles(),
-			}
-			for k, v := range set {
-				if err := d.Set(k, v); err != nil {
-					return diag.Errorf("failed to set %s of orgmember: %v", k, err)
-				}
-			}
-			d.SetId(getOrgMemberID(org, userID))
-			return nil
+	if len(resp.Result) == 1 {
+		orgMember := resp.Result[0]
+		set := map[string]interface{}{
+			orgMemberUserIDVar: orgMember.GetUserId(),
+			orgMemberOrgIDVar:  orgMember.GetDetails().GetResourceOwner(),
+			orgMemberRolesVar:  orgMember.GetRoles(),
 		}
+		for k, v := range set {
+			if err := d.Set(k, v); err != nil {
+				return diag.Errorf("failed to set %s of orgmember: %v", k, err)
+			}
+		}
+		d.SetId(getOrgMemberID(org, userID))
+		return nil
 	}
+
 	d.SetId("")
 	return nil
 }

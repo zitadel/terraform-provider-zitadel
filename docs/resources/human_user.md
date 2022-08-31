@@ -7,6 +7,8 @@ description: |-
 
 # zitadel_human_user (Resource)
 
+**Caution: Email can only be set verified if a password is set for the user, either with initial_password or during runtime**
+
 Resource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.
 
 ## Example Usage
@@ -16,7 +18,7 @@ resource zitadel_human_user human_user {
   depends_on = [zitadel_org.org]
 
   org_id             = zitadel_org.org.id
-  user_name          = "human"
+  user_name          = "human@localhost.com"
   first_name         = "firstname"
   last_name          = "lastname"
   nick_name          = "nickname"
@@ -26,7 +28,8 @@ resource zitadel_human_user human_user {
   phone              = "+41799999999"
   is_phone_verified  = "true"
   email              = "test@zitadel.com"
-  is_email_verified  = "false"
+  is_email_verified  = "true"
+  initial_password = "Password1!"
 }
 ```
 
@@ -42,11 +45,11 @@ resource zitadel_human_user human_user {
 
 ### Optional
 
-- `display_name` (String) DIsplay name of the user
+- `display_name` (String) Display name of the user
 - `email` (String) Email of the user
 - `gender` (String) Gender of the user
-- `initial_password` (String) Initially set password for the user
-- `is_email_verified` (Boolean) Is the email verified of the user
+- `initial_password` (String, Sensitive) Initially set password for the user, not changeable after creation
+- `is_email_verified` (Boolean) Is the email verified of the user, can only be true if password of the user is set
 - `is_phone_verified` (Boolean) Is the phone verified of the user
 - `nick_name` (String) Nick name of the user
 - `phone` (String) Phone of the user

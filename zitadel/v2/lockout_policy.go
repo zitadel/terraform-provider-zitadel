@@ -35,6 +35,7 @@ func GetLockoutPolicy() *schema.Resource {
 		CreateContext: createLockoutPolicy,
 		UpdateContext: updateLockoutPolicy,
 		ReadContext:   readLockoutPolicy,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

@@ -55,6 +55,7 @@ func GetApplicationAPI() *schema.Resource {
 		CreateContext: createApplicationAPI,
 		UpdateContext: updateApplicationAPI,
 		ReadContext:   readApplicationAPI,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

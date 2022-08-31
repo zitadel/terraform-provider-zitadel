@@ -52,6 +52,7 @@ func GetTriggerActions() *schema.Resource {
 		CreateContext: createTriggerActions,
 		UpdateContext: updateTriggerActions,
 		ReadContext:   readTriggerActions,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

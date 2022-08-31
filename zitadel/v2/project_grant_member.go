@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
 )
 
 const (
@@ -58,6 +59,7 @@ func GetProjectGrantMember() *schema.Resource {
 		CreateContext: createProjectGrantMember,
 		UpdateContext: updateProjectGrantMember,
 		ReadContext:   readProjectGrantMember,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 
@@ -159,32 +161,42 @@ func readProjectGrantMember(ctx context.Context, d *schema.ResourceData, m inter
 
 	projectID := d.Get(projectGrantMemberProjectIDVar).(string)
 	grantID := d.Get(projectGrantMemberGrantIDVar).(string)
-	resp, err := client.ListProjectGrantMembers(ctx, &management2.ListProjectGrantMembersRequest{ProjectId: projectID, GrantId: grantID})
+	userID := d.Get(projectGrantMemberUserIDVar).(string)
+	resp, err := client.ListProjectGrantMembers(ctx, &management2.ListProjectGrantMembersRequest{
+		ProjectId: projectID,
+		GrantId:   grantID,
+		Queries: []*member.SearchQuery{{
+			Query: &member.SearchQuery_UserIdQuery{
+				UserIdQuery: &member.UserIDQuery{
+					UserId: userID,
+				},
+			},
+		}},
+	})
 	if err != nil {
 		d.SetId("")
 		return nil
 		//return diag.Errorf("failed to read projectgrantmember: %v", err)
 	}
 
-	userID := d.Get(projectGrantMemberUserIDVar).(string)
-	for _, member := range resp.Result {
-		if member.UserId == userID {
-			set := map[string]interface{}{
-				projectGrantMemberUserIDVar:    member.GetUserId(),
-				projectGrantMemberOrgIDVar:     member.GetDetails().GetResourceOwner(),
-				projectGrantMemberProjectIDVar: projectID,
-				projectGrantMemberRolesVar:     member.GetRoles(),
-				projectGrantMemberGrantIDVar:   grantID,
-			}
-			for k, v := range set {
-				if err := d.Set(k, v); err != nil {
-					return diag.Errorf("failed to set %s of projectgrantmember: %v", k, err)
-				}
-			}
-			d.SetId(getProjectGrantMemberID(org, projectID, grantID, userID))
-			return nil
+	if len(resp.Result) == 1 {
+		memberRes := resp.Result[0]
+		set := map[string]interface{}{
+			projectGrantMemberUserIDVar:    userID,
+			projectGrantMemberOrgIDVar:     memberRes.GetDetails().GetResourceOwner(),
+			projectGrantMemberProjectIDVar: projectID,
+			projectGrantMemberRolesVar:     memberRes.GetRoles(),
+			projectGrantMemberGrantIDVar:   grantID,
 		}
+		for k, v := range set {
+			if err := d.Set(k, v); err != nil {
+				return diag.Errorf("failed to set %s of projectgrantmember: %v", k, err)
+			}
+		}
+		d.SetId(getProjectGrantMemberID(org, projectID, grantID, userID))
+		return nil
 	}
+
 	d.SetId("")
 	return nil
 }

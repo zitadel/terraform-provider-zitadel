@@ -158,6 +158,7 @@ func GetApplicationOIDC() *schema.Resource {
 		CreateContext: createApplicationOIDC,
 		UpdateContext: updateApplicationOIDC,
 		ReadContext:   readApplicationOIDC,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

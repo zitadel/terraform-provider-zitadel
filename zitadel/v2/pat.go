@@ -50,6 +50,7 @@ func GetPAT() *schema.Resource {
 		DeleteContext: deletePAT,
 		CreateContext: createPAT,
 		ReadContext:   readPAT,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

@@ -137,6 +137,7 @@ func GetLoginPolicy() *schema.Resource {
 		UpdateContext: updateLoginPolicy,
 		DeleteContext: deleteLoginPolicy,
 		ReadContext:   readLoginPolicy,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

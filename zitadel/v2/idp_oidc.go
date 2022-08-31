@@ -87,6 +87,7 @@ func GetOrgOIDCIDP() *schema.Resource {
 		UpdateContext: updateOrgOIDCIDP,
 		CreateContext: createOrgOIDCIDP,
 		DeleteContext: deleteOrgIDP,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

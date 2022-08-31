@@ -59,6 +59,7 @@ func GetUserGrant() *schema.Resource {
 		CreateContext: createUserGrant,
 		UpdateContext: updateUserGrant,
 		ReadContext:   readUserGrant,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

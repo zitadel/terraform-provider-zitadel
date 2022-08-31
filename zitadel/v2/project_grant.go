@@ -50,6 +50,7 @@ func GetProjectGrant() *schema.Resource {
 		CreateContext: createProjectGrant,
 		UpdateContext: updateProjectGrant,
 		ReadContext:   readProjectGrant,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

@@ -44,6 +44,7 @@ func Provider() *schema.Provider {
 			"zitadel_action":                     v2.GetAction(),
 			"zitadel_application_oidc":           v2.GetApplicationOIDC(),
 			"zitadel_application_api":            v2.GetApplicationAPI(),
+			"zitadel_application_key":            v2.GetAppKey(),
 			"zitadel_project_grant":              v2.GetProjectGrant(),
 			"zitadel_user_grant":                 v2.GetUserGrant(),
 			"zitadel_org_member":                 v2.GetOrgMember(),

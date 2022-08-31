@@ -47,6 +47,7 @@ func GetDomainPolicy() *schema.Resource {
 		CreateContext: createDomainPolicy,
 		DeleteContext: deleteDomainPolicy,
 		UpdateContext: updateDomainPolicy,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 

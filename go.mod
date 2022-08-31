@@ -1,6 +1,6 @@
 module github.com/zitadel/terraform-provider-zitadel
 
-go 1.17
+go 1.19
 
 require (
 	github.com/hashicorp/terraform-plugin-log v0.4.0

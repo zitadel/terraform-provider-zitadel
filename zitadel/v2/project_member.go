@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
 )
 
 const (
@@ -51,6 +52,7 @@ func GetProjectMember() *schema.Resource {
 		CreateContext: createProjectMember,
 		UpdateContext: updateProjectMember,
 		ReadContext:   readProjectMember,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 
@@ -148,31 +150,40 @@ func readProjectMember(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 
 	projectID := d.Get(projectMemberProjectIDVar).(string)
-	resp, err := client.ListProjectMembers(ctx, &management2.ListProjectMembersRequest{ProjectId: projectID})
+	userID := d.Get(projectMemberUserIDVar).(string)
+	resp, err := client.ListProjectMembers(ctx, &management2.ListProjectMembersRequest{
+		ProjectId: projectID,
+		Queries: []*member.SearchQuery{{
+			Query: &member.SearchQuery_UserIdQuery{
+				UserIdQuery: &member.UserIDQuery{
+					UserId: userID,
+				},
+			},
+		}},
+	})
 	if err != nil {
 		d.SetId("")
 		return nil
 		//return diag.Errorf("failed to read projectmember: %v", err)
 	}
 
-	userID := d.Get(projectMemberUserIDVar).(string)
-	for _, member := range resp.Result {
-		if member.UserId == userID {
-			set := map[string]interface{}{
-				projectMemberUserIDVar:    member.GetUserId(),
-				projectMemberOrgIDVar:     member.GetDetails().GetResourceOwner(),
-				projectMemberProjectIDVar: projectID,
-				projectMemberRolesVar:     member.GetRoles(),
-			}
-			for k, v := range set {
-				if err := d.Set(k, v); err != nil {
-					return diag.Errorf("failed to set %s of projectmember: %v", k, err)
-				}
-			}
-			d.SetId(getProjectMemberID(org, projectID, userID))
-			return nil
+	if len(resp.Result) == 1 {
+		memberRes := resp.Result[0]
+		set := map[string]interface{}{
+			projectMemberUserIDVar:    memberRes.GetUserId(),
+			projectMemberOrgIDVar:     memberRes.GetDetails().GetResourceOwner(),
+			projectMemberProjectIDVar: projectID,
+			projectMemberRolesVar:     memberRes.GetRoles(),
 		}
+		for k, v := range set {
+			if err := d.Set(k, v); err != nil {
+				return diag.Errorf("failed to set %s of projectmember: %v", k, err)
+			}
+		}
+		d.SetId(getProjectMemberID(org, projectID, userID))
+		return nil
 	}
+
 	d.SetId("")
 	return nil
 }

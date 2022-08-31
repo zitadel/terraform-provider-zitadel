@@ -58,6 +58,7 @@ func GetMachineKey() *schema.Resource {
 		DeleteContext: deleteMachineKey,
 		CreateContext: createMachineKey,
 		ReadContext:   readMachineKey,
+		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
 
