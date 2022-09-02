@@ -38,6 +38,7 @@ resource zitadel_human_user human_user {
 
 ### Required
 
+- `email` (String) Email of the user
 - `first_name` (String) First name of the user
 - `last_name` (String) Last name of the user
 - `org_id` (String) ID of the organization
@@ -46,7 +47,6 @@ resource zitadel_human_user human_user {
 ### Optional
 
 - `display_name` (String) Display name of the user
-- `email` (String) Email of the user
 - `gender` (String) Gender of the user
 - `initial_password` (String, Sensitive) Initially set password for the user, not changeable after creation
 - `is_email_verified` (Boolean) Is the email verified of the user, can only be true if password of the user is set

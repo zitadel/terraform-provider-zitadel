@@ -41,5 +41,5 @@ resource zitadel_project project {
 
 ### Read-Only
 
-- `id` (String) ID of the project
+- `id` (String) The ID of this resource.
 - `state` (String) State of the project
