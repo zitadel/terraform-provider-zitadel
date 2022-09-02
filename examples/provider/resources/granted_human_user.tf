@@ -11,7 +11,7 @@ resource zitadel_human_user granted_human_user {
   preferred_language = "de"
   gender             = "GENDER_MALE"
   phone              = "+41799999999"
-  is_phone_verified  = "true"
+  is_phone_verified  = true
   email              = "test@zitadel.com"
-  is_email_verified  = "false"
+  is_email_verified  = false
 }

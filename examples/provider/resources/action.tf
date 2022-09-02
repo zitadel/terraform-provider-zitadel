@@ -6,5 +6,5 @@ resource zitadel_action action {
   name            = "actionname"
   script          = "testscript"
   timeout         = "10s"
-  allowed_to_fail = "true"
+  allowed_to_fail = true
 }

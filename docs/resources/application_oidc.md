@@ -27,11 +27,11 @@ resource zitadel_application_oidc application_oidc {
   auth_method_type            = "OIDC_AUTH_METHOD_TYPE_BASIC"
   version                     = "OIDC_VERSION_1_0"
   clock_skew                  = "0s"
-  dev_mode                    = "true"
+  dev_mode                    = true
   access_token_type           = "OIDC_TOKEN_TYPE_BEARER"
-  access_token_role_assertion = "false"
-  id_token_role_assertion     = "false"
-  id_token_userinfo_assertion = "false"
+  access_token_role_assertion = false
+  id_token_role_assertion     = false
+  id_token_userinfo_assertion = false
   additional_origins          = []
 }
 ```

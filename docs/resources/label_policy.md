@@ -17,7 +17,7 @@ resource zitadel_label_policy label_policy {
 
   org_id                 = zitadel_org.org.id
   primary_color          = "#5469d4"
-  hide_login_name_suffix = "true"
+  hide_login_name_suffix = true
   warn_color             = "#cd3d56"
   background_color       = "#fafafa"
   font_color             = "#000000"
@@ -25,8 +25,8 @@ resource zitadel_label_policy label_policy {
   background_color_dark  = "#111827"
   warn_color_dark        = "#ff3b5b"
   font_color_dark        = "#ffffff"
-  disable_watermark      = "false"
-  set_active             = "true"
+  disable_watermark      = false
+  set_active             = true
 }
 ```
 
