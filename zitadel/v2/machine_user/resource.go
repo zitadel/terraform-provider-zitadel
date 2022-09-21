@@ -44,7 +44,7 @@ func GetResource() *schema.Resource {
 
 			nameVar: {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
 				Description: "Name of the machine user",
 			},
 			descriptionVar: {

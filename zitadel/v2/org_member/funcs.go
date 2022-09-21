@@ -48,9 +48,14 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	roles := make([]string, 0)
+	for _, role := range d.Get(rolesVar).(*schema.Set).List() {
+		roles = append(roles, role.(string))
+	}
+
 	_, err = client.UpdateOrgMember(ctx, &management.UpdateOrgMemberRequest{
 		UserId: d.Get(userIDVar).(string),
-		Roles:  d.Get(rolesVar).([]string),
+		Roles:  roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to update orgmember: %v", err)
