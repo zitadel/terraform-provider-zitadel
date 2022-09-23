@@ -94,3 +94,19 @@ func GetID(d *schema.ResourceData, idVar string) string {
 	}
 	return idStr
 }
+
+func GetIfSetString(d *schema.ResourceData, variable string) string {
+	ret := ""
+	if value, ok := d.GetOk(variable); ok {
+		ret = value.(string)
+	}
+	return ret
+}
+
+func GetIfSetBool(d *schema.ResourceData, variable string) bool {
+	ret := false
+	if value, ok := d.GetOk(variable); ok {
+		ret = value.(bool)
+	}
+	return ret
+}

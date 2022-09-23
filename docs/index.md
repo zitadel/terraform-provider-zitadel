@@ -51,12 +51,14 @@ provider zitadel {
 ### Required
 
 - `domain` (String) Domain used to connect to the ZITADEL instance
-- `token` (String) Path to the file containing credentials to connect to ZITADEL
 
 ### Optional
 
 - `insecure` (Boolean) Use insecure connection
 - `port` (String) Used port if not the default ports 80 or 443 are configured
+- `systemapi_certificate` (String) Used key to connect to the systemAPI if necessary
+- `systemapi_user_id` (String) Used userID to connect to the systemAPI if necessary
+- `token` (String) Path to the file containing credentials to connect to ZITADEL management and admin API if necessary
 
 ## Limitations
 

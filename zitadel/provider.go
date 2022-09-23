@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_jwt"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_oidc"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/instance"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/login_policy"
@@ -63,13 +64,23 @@ func Provider() *schema.Provider {
 			},
 			helper.TokenVar: {
 				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Path to the file containing credentials to connect to ZITADEL",
+				Optional:    true,
+				Description: "Path to the file containing credentials to connect to ZITADEL management and admin API if necessary",
 			},
 			helper.PortVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Used port if not the default ports 80 or 443 are configured",
+			},
+			helper.SystemAPIUserID: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Used userID to connect to the systemAPI if necessary",
+			},
+			helper.SystemAPIKey: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Used key to connect to the systemAPI if necessary",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -99,6 +110,7 @@ func Provider() *schema.Provider {
 			"zitadel_machine_key":                machine_key.GetResource(),
 			"zitadel_org_jwt_idp":                idp_jwt.GetResource(),
 			"zitadel_org_oidc_idp":               idp_oidc.GetResource(),
+			"zitadel_instance":                   instance.GetResource(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

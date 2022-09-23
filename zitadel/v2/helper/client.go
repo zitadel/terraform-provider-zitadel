@@ -8,20 +8,25 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/middleware"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/system"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
 )
 
 const (
-	DomainVar   = "domain"
-	InsecureVar = "insecure"
-	TokenVar    = "token"
-	PortVar     = "port"
+	DomainVar       = "domain"
+	InsecureVar     = "insecure"
+	TokenVar        = "token"
+	PortVar         = "port"
+	SystemAPIUserID = "systemapi_user_id"
+	SystemAPIKey    = "systemapi_certificate"
 )
 
 type ClientInfo struct {
-	Domain  string
-	Issuer  string
-	Options []zitadel.Option
+	Domain          string
+	Issuer          string
+	SystemAPIUserID string
+	SystemAPIKey    string
+	Options         []zitadel.Option
 }
 
 func GetClientInfo(d *schema.ResourceData) (*ClientInfo, error) {
@@ -55,9 +60,20 @@ func GetClientInfo(d *schema.ResourceData) (*ClientInfo, error) {
 		issuer = "https://" + issuer
 	}
 
+	userID := ""
+	if userIDValue, ok := d.GetOk(SystemAPIUserID); ok {
+		userID = userIDValue.(string)
+	}
+	key := ""
+	if keyValue, ok := d.GetOk(SystemAPIKey); ok {
+		key = keyValue.(string)
+	}
+
 	return &ClientInfo{
 		domain,
 		issuer,
+		userID,
+		key,
 		options,
 	}, nil
 }
@@ -85,6 +101,20 @@ func GetManagementClient(info *ClientInfo, orgID string) (*management.Client, er
 		info.Issuer, info.Domain,
 		[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 		options...,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+	}
+	return client, nil
+}
+
+func GetSystemClient(info *ClientInfo) (*system.Client, error) {
+	if info.SystemAPIUserID == "" || info.SystemAPIKey == "" {
+		return nil, fmt.Errorf("Missing userID or key for systemAPI")
+	}
+
+	client, err := system.NewClient(
+		info.Issuer, info.Domain, system.JWTProfileFromPath(info.SystemAPIKey, info.SystemAPIUserID),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to start zitadel client: %v", err)

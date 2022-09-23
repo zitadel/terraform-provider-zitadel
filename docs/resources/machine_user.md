@@ -27,13 +27,13 @@ resource zitadel_machine_user machine_user {
 
 ### Required
 
+- `name` (String) Name of the machine user
 - `org_id` (String) ID of the organization
 - `user_name` (String) Username
 
 ### Optional
 
 - `description` (String) Description of the user
-- `name` (String) Name of the machine user
 
 ### Read-Only
 
