@@ -2,12 +2,12 @@
 page_title: "zitadel_sms_provider_twilio Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing the SMTP configuration of an instance.
+  Resource representing the SMS provider Twilio configuration of an instance.
 ---
 
 # zitadel_sms_provider_twilio (Resource)
 
-Resource representing the SMTP configuration of an instance.
+Resource representing the SMS provider Twilio configuration of an instance.
 
 ## Example Usage
 

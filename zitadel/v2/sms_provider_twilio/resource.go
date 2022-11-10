@@ -6,7 +6,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing the SMTP configuration of an instance.",
+		Description: "Resource representing the SMS provider Twilio configuration of an instance.",
 		Schema: map[string]*schema.Schema{
 			sidVar: {
 				Type:        schema.TypeString,
