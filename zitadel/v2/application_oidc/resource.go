@@ -64,19 +64,21 @@ func GetResource() *schema.Resource {
 			},
 			appTypeVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "App type",
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(appTypeVar, value, app.OIDCAppType_value)
 				},
+				Default: app.OIDCAppType_name[0],
 			},
 			authMethodTypeVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Auth method type",
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(authMethodTypeVar, value, app.OIDCAuthMethodType_value)
 				},
+				Default: app.OIDCAuthMethodType_name[0],
 			},
 			postLogoutRedirectURIsVar: {
 				Type: schema.TypeList,
@@ -103,6 +105,7 @@ func GetResource() *schema.Resource {
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(accessTokenTypeVar, value, app.OIDCTokenType_value)
 				},
+				Default: app.OIDCTokenType_name[0],
 			},
 			accessTokenRoleAssertionVar: {
 				Type:        schema.TypeBool,
