@@ -44,14 +44,25 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.AddSMTPConfig(ctx, &admin.AddSMTPConfigRequest{
+	tls, tlsOk := d.GetOk(tlsVar)
+	user, userOk := d.GetOk(userVar)
+	password, pwOk := d.GetOk(passwordVar)
+	req := &admin.AddSMTPConfigRequest{
 		SenderAddress: d.Get(senderAddressVar).(string),
 		SenderName:    d.Get(senderNameVar).(string),
-		Tls:           d.Get(tlsVar).(bool),
 		Host:          d.Get(hostVar).(string),
-		User:          d.Get(userVar).(string),
-		Password:      d.Get(passwordVar).(string),
-	})
+	}
+	if tlsOk {
+		req.Tls = tls.(bool)
+	}
+	if userOk {
+		req.User = user.(string)
+	}
+	if pwOk {
+		req.Password = password.(string)
+	}
+
+	resp, err := client.AddSMTPConfig(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to create smtp config: %v", err)
 	}
@@ -73,38 +84,52 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	smtp, err := client.GetSMTPConfig(ctx, &admin.GetSMTPConfigRequest{})
-	if err != nil {
-		return diag.FromErr(err)
+	if d.HasChanges(senderAddressVar, senderNameVar, tlsVar, hostVar, userVar) {
+		smtp, err := client.GetSMTPConfig(ctx, &admin.GetSMTPConfigRequest{})
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		senderAddress := d.Get(senderAddressVar).(string)
+		senderName := d.Get(senderNameVar).(string)
+		tls, tlsOk := d.GetOk(tlsVar)
+		host := d.Get(hostVar).(string)
+		user, userOk := d.GetOk(userVar)
+
+		if smtp.SmtpConfig.SenderName != senderName ||
+			smtp.SmtpConfig.SenderAddress != senderAddress ||
+			smtp.SmtpConfig.Tls != tls ||
+			smtp.SmtpConfig.Host != host ||
+			smtp.SmtpConfig.User != user {
+
+			req := &admin.UpdateSMTPConfigRequest{
+				SenderAddress: senderAddress,
+				SenderName:    senderName,
+				Host:          host,
+			}
+			if tlsOk {
+				req.Tls = tls.(bool)
+			}
+			if userOk {
+				req.User = user.(string)
+			}
+
+			_, err = client.UpdateSMTPConfig(ctx, req)
+			if err != nil {
+				return diag.Errorf("failed to update smtp config: %v", err)
+			}
+		}
 	}
 
-	senderAddress := d.Get(senderAddressVar).(string)
-	senderName := d.Get(senderNameVar).(string)
-	tls := d.Get(tlsVar).(bool)
-	host := d.Get(hostVar).(string)
-	user := d.Get(userVar).(string)
-	if smtp.SmtpConfig.SenderName != senderName ||
-		smtp.SmtpConfig.SenderAddress != senderAddress ||
-		smtp.SmtpConfig.Tls != tls ||
-		smtp.SmtpConfig.Host != host ||
-		smtp.SmtpConfig.User != user {
-
-		_, err = client.UpdateSMTPConfig(ctx, &admin.UpdateSMTPConfigRequest{
-			SenderAddress: senderAddress,
-			SenderName:    senderName,
-			Tls:           tls,
-			Host:          host,
-			User:          user,
-		})
-		if err != nil {
-			return diag.Errorf("failed to update smtp config: %v", err)
+	if d.HasChange(passwordVar) {
+		password, pwOk := d.GetOk(passwordVar)
+		req := &admin.UpdateSMTPConfigPasswordRequest{}
+		if pwOk {
+			req.Password = password.(string)
 		}
-	} else {
-		_, err = client.UpdateSMTPConfigPassword(ctx, &admin.UpdateSMTPConfigPasswordRequest{
-			Password: d.Get(passwordVar).(string),
-		})
+		_, err = client.UpdateSMTPConfigPassword(ctx, req)
 		if err != nil {
-			return diag.Errorf("failed to update smtp config: %v", err)
+			return diag.Errorf("failed to update smtp config password: %v", err)
 		}
 	}
 
@@ -128,7 +153,22 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("error while reading smtp config: %v", err)
+	}
+	password, pwOk := d.GetOk(passwordVar)
+	set := map[string]interface{}{
+		senderAddressVar: resp.GetSmtpConfig().GetSenderAddress(),
+		senderNameVar:    resp.GetSmtpConfig().GetSenderName(),
+		tlsVar:           resp.GetSmtpConfig().GetTls(),
+		hostVar:          resp.GetSmtpConfig().GetHost(),
+		userVar:          resp.GetSmtpConfig().GetUser(),
+	}
+	if pwOk {
+		set[passwordVar] = password.(string)
+	}
+	for k, v := range set {
+		if err := d.Set(k, v); err != nil {
+			return diag.Errorf("failed to set %s of smtp config: %v", k, err)
+		}
 	}
 	d.SetId(resp.SmtpConfig.Details.ResourceOwner)
 	return nil

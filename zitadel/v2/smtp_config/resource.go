@@ -20,7 +20,7 @@ func GetResource() *schema.Resource {
 			},
 			tlsVar: {
 				Type:        schema.TypeBool,
-				Required:    true,
+				Optional:    true,
 				Description: "TLS used to communicate with your SMTP server.",
 			},
 			hostVar: {
@@ -30,12 +30,12 @@ func GetResource() *schema.Resource {
 			},
 			userVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "User used to communicate with your SMTP server.",
 			},
 			passwordVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Password used to communicate with your SMTP server.",
 				Sensitive:   true,
 			},

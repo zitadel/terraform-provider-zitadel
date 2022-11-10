@@ -28,9 +28,12 @@ resource zitadel_smtp_config smtp {
 ### Required
 
 - `host` (String) Host address to your SMTP server.
-- `password` (String, Sensitive) Password used to communicate with your SMTP server.
 - `sender_address` (String) Address used to send emails.
 - `sender_name` (String) Sender name used to send emails.
+
+### Optional
+
+- `password` (String, Sensitive) Password used to communicate with your SMTP server.
 - `tls` (Boolean) TLS used to communicate with your SMTP server.
 - `user` (String) User used to communicate with your SMTP server.
 
