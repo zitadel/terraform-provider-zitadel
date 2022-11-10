@@ -31,6 +31,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_grant_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_role"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/sms_provider_twilio"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/smtp_config"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/trigger_actions"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/user_grant"
@@ -100,6 +101,7 @@ func Provider() *schema.Provider {
 			"zitadel_machine_key":                machine_key.GetResource(),
 			"zitadel_org_jwt_idp":                idp_jwt.GetResource(),
 			"zitadel_org_oidc_idp":               idp_oidc.GetResource(),
+			"zitadel_sms_provider_twilio":        sms_provider_twilio.GetResource(),
 			"zitadel_smtp_config":                smtp_config.GetResource(),
 		},
 		ConfigureContextFunc: providerConfigure,
