@@ -1,4 +1,4 @@
-package idp_jwt
+package org_idp_jwt
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"

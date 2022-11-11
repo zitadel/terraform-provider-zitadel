@@ -50,7 +50,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	_, err = client.UpdateProjectGrant(ctx, &management.UpdateProjectGrantRequest{
 		GrantId:   d.Id(),
 		ProjectId: d.Get(projectIDVar).(string),
-		RoleKeys:  d.Get(roleKeysVar).([]string),
+		RoleKeys:  helper.GetOkSetToStringSlice(d, roleKeysVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update projectgrant: %v", err)
@@ -71,15 +71,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	roles := make([]string, 0)
-	for _, role := range d.Get(roleKeysVar).(*schema.Set).List() {
-		roles = append(roles, role.(string))
-	}
-
 	resp, err := client.AddProjectGrant(ctx, &management.AddProjectGrantRequest{
 		GrantedOrgId: d.Get(grantedOrgIDVar).(string),
 		ProjectId:    d.Get(projectIDVar).(string),
-		RoleKeys:     roles,
+		RoleKeys:     helper.GetOkSetToStringSlice(d, roleKeysVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create projectgrant: %v", err)
@@ -105,7 +100,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read projectgrant: %v", err)
 	}
 
 	projectGrant := resp.GetProjectGrant()

@@ -119,7 +119,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to get list of users: %v", err)
 	}
 
 	user := respUser.GetUser()

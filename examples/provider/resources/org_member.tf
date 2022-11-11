@@ -1,4 +1,3 @@
-
 resource zitadel_org_member org_member {
   depends_on = [zitadel_org.org, zitadel_human_user.human_user]
 

@@ -28,7 +28,7 @@ func GetResource() *schema.Resource {
 			keyTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Type of the machine key",
+				Description: "Type of the machine key" + helper.DescriptionEnumValuesList(authn.KeyType_value),
 				ForceNew:    true,
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(keyTypeVar, value, authn.KeyType_value)
@@ -36,9 +36,10 @@ func GetResource() *schema.Resource {
 			},
 			expirationDateVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Expiration date of the machine key",
 				ForceNew:    true,
+				Computed:    true,
 			},
 			keyDetailsVar: {
 				Type:        schema.TypeString,

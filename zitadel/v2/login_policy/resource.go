@@ -84,7 +84,7 @@ func GetResource() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Required:    true,
+				Optional:    true,
 				Description: "allowed second factors",
 			},
 			multiFactorsVar: {
@@ -92,7 +92,7 @@ func GetResource() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Required:    true,
+				Optional:    true,
 				Description: "allowed multi factors",
 			},
 			idpsVar: {
@@ -100,7 +100,7 @@ func GetResource() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Required:    true,
+				Optional:    true,
 				Description: "allowed idps to login or register",
 			},
 		},

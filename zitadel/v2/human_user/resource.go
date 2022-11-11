@@ -77,16 +77,16 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Preferred language of the user",
-				Computed:    true,
+				Default:     defaultPreferredLanguage,
 			},
 			genderVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Gender of the user",
-				Computed:    true,
+				Description: "Gender of the user" + helper.DescriptionEnumValuesList(user.Gender_value),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(genderVar, value.(string), user.Gender_value)
 				},
+				Default: defaultGenderString,
 			},
 			emailVar: {
 				Type:        schema.TypeString,
@@ -113,6 +113,7 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Initially set password for the user, not changeable after creation",
 				Sensitive:   true,
+				ForceNew:    true,
 			},
 		},
 		ReadContext:   read,

@@ -1,4 +1,4 @@
-package idp_oidc
+package org_idp_oidc
 
 import (
 	"context"
@@ -48,12 +48,6 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	scopes := make([]string, 0)
-	scopesSet := d.Get(scopesVar).(*schema.Set)
-	for _, scope := range scopesSet.List() {
-		scopes = append(scopes, scope.(string))
-	}
-
 	stylingType := d.Get(stylingTypeVar)
 	displayNameMapping := d.Get(displayNameMappingVar).(string)
 	usernameMapping := d.Get(usernameMappingVar).(string)
@@ -63,7 +57,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ClientId:           d.Get(clientIDVar).(string),
 		ClientSecret:       d.Get(clientSecretVar).(string),
 		Issuer:             d.Get(issuerVar).(string),
-		Scopes:             scopes,
+		Scopes:             helper.GetOkSetToStringSlice(d, scopesVar),
 		DisplayNameMapping: idp.OIDCMappingField(idp.OIDCMappingField_value[displayNameMapping]),
 		UsernameMapping:    idp.OIDCMappingField(idp.OIDCMappingField_value[usernameMapping]),
 		AutoRegister:       d.Get(autoRegisterVar).(bool),
@@ -93,62 +87,55 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to read oidc idp: %v", err)
 	}
+	d.SetId(resp.GetIdp().GetId())
 
-	idpID := d.Id()
-	name := d.Get(nameVar).(string)
-	stylingType := d.Get(stylingTypeVar).(string)
-	autoRegister := d.Get(autoRegisterVar).(bool)
-	changed := false
-	if resp.GetIdp().GetName() != name ||
-		resp.GetIdp().GetStylingType().String() != stylingType ||
-		resp.GetIdp().GetAutoRegister() != autoRegister {
-		changed = true
-		_, err := client.UpdateOrgIDP(ctx, &management.UpdateOrgIDPRequest{
-			IdpId:        idpID,
-			Name:         name,
-			StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[stylingType]),
-			AutoRegister: autoRegister,
-		})
-		if err != nil {
-			return diag.Errorf("failed to update oidc idp: %v", err)
+	if d.HasChanges(nameVar, stylingTypeVar, autoRegisterVar) {
+		name := d.Get(nameVar).(string)
+		stylingType := d.Get(stylingTypeVar).(string)
+		autoRegister := d.Get(autoRegisterVar).(bool)
+		if resp.GetIdp().GetName() != name ||
+			resp.GetIdp().GetStylingType().String() != stylingType ||
+			resp.GetIdp().GetAutoRegister() != autoRegister {
+			_, err := client.UpdateOrgIDP(ctx, &management.UpdateOrgIDPRequest{
+				IdpId:        d.Id(),
+				Name:         name,
+				StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[stylingType]),
+				AutoRegister: autoRegister,
+			})
+			if err != nil {
+				return diag.Errorf("failed to update oidc idp: %v", err)
+			}
 		}
 	}
 
-	oidc := resp.GetIdp().GetOidcConfig()
-	clientID := d.Get(clientIDVar).(string)
-	clientSecret := d.Get(clientSecretVar).(string)
-	issuer := d.Get(issuerVar).(string)
-	scopesSet := d.Get(scopesVar).(*schema.Set)
-	displayNameMapping := d.Get(displayNameMappingVar).(string)
-	usernameMapping := d.Get(usernameMappingVar).(string)
+	if d.HasChanges(clientIDVar, clientSecretVar, issuerVar, displayNameMappingVar, usernameMappingVar, scopesVar) {
+		oidc := resp.GetIdp().GetOidcConfig()
+		clientID := d.Get(clientIDVar).(string)
+		clientSecret := d.Get(clientSecretVar).(string)
+		issuer := d.Get(issuerVar).(string)
+		displayNameMapping := d.Get(displayNameMappingVar).(string)
+		usernameMapping := d.Get(usernameMappingVar).(string)
+		scopes := helper.GetOkSetToStringSlice(d, scopesVar)
 
-	scopes := make([]string, 0)
-	for _, scope := range scopesSet.List() {
-		scopes = append(scopes, scope.(string))
-	}
-
-	//either nothing changed on the IDP or something besides the secret changed
-	if (oidc.GetClientId() != clientID ||
-		oidc.GetIssuer() != issuer ||
-		!reflect.DeepEqual(oidc.GetScopes(), scopes) ||
-		oidc.GetDisplayNameMapping().String() != displayNameMapping ||
-		oidc.GetUsernameMapping().String() != usernameMapping) ||
-		!changed {
-
-		_, err = client.UpdateOrgIDPOIDCConfig(ctx, &management.UpdateOrgIDPOIDCConfigRequest{
-			IdpId:              idpID,
-			ClientId:           clientID,
-			ClientSecret:       clientSecret,
-			Issuer:             issuer,
-			Scopes:             scopes,
-			DisplayNameMapping: idp.OIDCMappingField(idp.OIDCMappingField_value[displayNameMapping]),
-			UsernameMapping:    idp.OIDCMappingField(idp.OIDCMappingField_value[usernameMapping]),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update oidc idp config: %v", err)
+		if oidc.GetClientId() != clientID ||
+			oidc.GetIssuer() != issuer ||
+			!reflect.DeepEqual(oidc.GetScopes(), scopes) ||
+			oidc.GetDisplayNameMapping().String() != displayNameMapping ||
+			oidc.GetUsernameMapping().String() != usernameMapping {
+			_, err = client.UpdateOrgIDPOIDCConfig(ctx, &management.UpdateOrgIDPOIDCConfigRequest{
+				IdpId:              d.Id(),
+				ClientId:           clientID,
+				ClientSecret:       clientSecret,
+				Issuer:             issuer,
+				Scopes:             scopes,
+				DisplayNameMapping: idp.OIDCMappingField(idp.OIDCMappingField_value[displayNameMapping]),
+				UsernameMapping:    idp.OIDCMappingField(idp.OIDCMappingField_value[usernameMapping]),
+			})
+			if err != nil {
+				return diag.Errorf("failed to update oidc idp config: %v", err)
+			}
 		}
 	}
-	d.SetId(idpID)
 	return nil
 }
 
@@ -169,7 +156,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read oidc idp: %v", err)
 	}
 
 	idp := resp.GetIdp()

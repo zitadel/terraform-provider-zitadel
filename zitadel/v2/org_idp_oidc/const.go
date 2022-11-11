@@ -1,4 +1,4 @@
-package idp_oidc
+package org_idp_oidc
 
 const (
 	idpIDVar              = "idp_id"

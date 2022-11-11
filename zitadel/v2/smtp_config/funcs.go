@@ -44,22 +44,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	tls, tlsOk := d.GetOk(tlsVar)
-	user, userOk := d.GetOk(userVar)
-	password, pwOk := d.GetOk(passwordVar)
 	req := &admin.AddSMTPConfigRequest{
 		SenderAddress: d.Get(senderAddressVar).(string),
 		SenderName:    d.Get(senderNameVar).(string),
 		Host:          d.Get(hostVar).(string),
-	}
-	if tlsOk {
-		req.Tls = tls.(bool)
-	}
-	if userOk {
-		req.User = user.(string)
-	}
-	if pwOk {
-		req.Password = password.(string)
+		User:          d.Get(userVar).(string),
+		Tls:           d.Get(tlsVar).(bool),
+		Password:      d.Get(passwordVar).(string),
 	}
 
 	resp, err := client.AddSMTPConfig(ctx, req)
@@ -92,9 +83,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 		senderAddress := d.Get(senderAddressVar).(string)
 		senderName := d.Get(senderNameVar).(string)
-		tls, tlsOk := d.GetOk(tlsVar)
+		tls := d.Get(tlsVar).(bool)
 		host := d.Get(hostVar).(string)
-		user, userOk := d.GetOk(userVar)
+		user := d.Get(userVar).(string)
 
 		if smtp.SmtpConfig.SenderName != senderName ||
 			smtp.SmtpConfig.SenderAddress != senderAddress ||
@@ -106,14 +97,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 				SenderAddress: senderAddress,
 				SenderName:    senderName,
 				Host:          host,
+				Tls:           tls,
+				User:          user,
 			}
-			if tlsOk {
-				req.Tls = tls.(bool)
-			}
-			if userOk {
-				req.User = user.(string)
-			}
-
 			_, err = client.UpdateSMTPConfig(ctx, req)
 			if err != nil {
 				return diag.Errorf("failed to update smtp config: %v", err)
@@ -122,12 +108,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChange(passwordVar) {
-		password, pwOk := d.GetOk(passwordVar)
-		req := &admin.UpdateSMTPConfigPasswordRequest{}
-		if pwOk {
-			req.Password = password.(string)
-		}
-		_, err = client.UpdateSMTPConfigPassword(ctx, req)
+		_, err = client.UpdateSMTPConfigPassword(ctx, &admin.UpdateSMTPConfigPasswordRequest{
+			Password: d.Get(passwordVar).(string),
+		})
 		if err != nil {
 			return diag.Errorf("failed to update smtp config password: %v", err)
 		}
@@ -154,16 +137,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		d.SetId("")
 		return nil
 	}
-	password, pwOk := d.GetOk(passwordVar)
 	set := map[string]interface{}{
 		senderAddressVar: resp.GetSmtpConfig().GetSenderAddress(),
 		senderNameVar:    resp.GetSmtpConfig().GetSenderName(),
 		tlsVar:           resp.GetSmtpConfig().GetTls(),
 		hostVar:          resp.GetSmtpConfig().GetHost(),
 		userVar:          resp.GetSmtpConfig().GetUser(),
-	}
-	if pwOk {
-		set[passwordVar] = password.(string)
+		passwordVar:      d.Get(passwordVar).(string),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

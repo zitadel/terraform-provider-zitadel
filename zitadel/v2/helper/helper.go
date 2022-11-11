@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -15,6 +17,16 @@ func (s *Stringified) String() string {
 
 type Stringify interface {
 	String() string
+}
+
+func GetOkSetToStringSlice(d *schema.ResourceData, value string) []string {
+	var slice []string
+	if set, ok := d.GetOk(value); ok {
+		slice = SetToStringSlice(set.(*schema.Set))
+	} else {
+		slice = make([]string, 0)
+	}
+	return slice
 }
 
 func SetToStringSlice(set *schema.Set) []string {
@@ -93,4 +105,16 @@ func GetID(d *schema.ResourceData, idVar string) string {
 		idStr = d.Id()
 	}
 	return idStr
+}
+
+func DescriptionEnumValuesList(enum map[string]int32) string {
+	str := ", supported values: "
+	values := make([]string, len(enum))
+	i := 0
+	for k := range enum {
+		values[i] = k
+		i++
+	}
+	str += strings.Join(values, ", ")
+	return str
 }

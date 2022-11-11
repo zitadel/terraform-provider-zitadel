@@ -1,18 +1,18 @@
 ---
-page_title: "zitadel_org_oidc_idp Resource - terraform-provider-zitadel"
+page_title: "zitadel_org_idp_oidc Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
   Resource representing a OIDC IDP of the organization.
 ---
 
-# zitadel_org_oidc_idp (Resource)
+# zitadel_org_idp_oidc (Resource)
 
 Resource representing a OIDC IDP of the organization.
 
 ## Example Usage
 
 ```terraform
-resource zitadel_org_oidc_idp oidc_idp {
+resource zitadel_org_idp_oidc oidc_idp {
   depends_on = [zitadel_org.org]
 
   org_id               = zitadel_org.org.id
@@ -41,7 +41,7 @@ resource zitadel_org_oidc_idp oidc_idp {
 - `name` (String) Name of the IDP
 - `org_id` (String) ID of the organization
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
-- `styling_type` (String) Some identity providers specify the styling of the button to their login
+- `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_UNSPECIFIED, STYLING_TYPE_GOOGLE
 - `username_mapping` (String) definition which field is mapped to the email of the user
 
 ### Read-Only

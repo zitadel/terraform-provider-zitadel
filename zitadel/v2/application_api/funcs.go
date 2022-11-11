@@ -51,31 +51,34 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	projectID := d.Get(projectIDVar).(string)
-	appID := d.Id()
-	apiApp, err := getApp(ctx, client, projectID, appID)
+	apiApp, err := getApp(ctx, client, projectID, d.Id())
 
-	appName := d.Get(nameVar).(string)
-	if apiApp.GetName() != appName {
-		_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
-			ProjectId: projectID,
-			AppId:     d.Id(),
-			Name:      appName,
-		})
-		if err != nil {
-			return diag.Errorf("failed to update application: %v", err)
+	if d.HasChange(nameVar) {
+		appName := d.Get(nameVar).(string)
+		if apiApp.GetName() != appName {
+			_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
+				ProjectId: projectID,
+				AppId:     d.Id(),
+				Name:      appName,
+			})
+			if err != nil {
+				return diag.Errorf("failed to update application: %v", err)
+			}
 		}
 	}
 
-	apiConfig := apiApp.GetApiConfig()
-	authMethod := d.Get(authMethodTypeVar).(string)
-	if apiConfig.GetAuthMethodType().String() != authMethod {
-		_, err = client.UpdateAPIAppConfig(ctx, &management.UpdateAPIAppConfigRequest{
-			ProjectId:      d.Get(projectIDVar).(string),
-			AppId:          d.Id(),
-			AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[authMethod]),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update applicationAPI: %v", err)
+	if d.HasChanges(authMethodTypeVar) {
+		apiConfig := apiApp.GetApiConfig()
+		authMethod := d.Get(authMethodTypeVar).(string)
+		if apiConfig.GetAuthMethodType().String() != authMethod {
+			_, err = client.UpdateAPIAppConfig(ctx, &management.UpdateAPIAppConfigRequest{
+				ProjectId:      projectID,
+				AppId:          d.Id(),
+				AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[authMethod]),
+			})
+			if err != nil {
+				return diag.Errorf("failed to update applicationAPI: %v", err)
+			}
 		}
 	}
 	return nil
@@ -133,7 +136,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read api applicationAPI: %v", err)
 	}
 
 	api := app.GetApiConfig()
