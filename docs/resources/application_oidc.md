@@ -41,8 +41,6 @@ resource zitadel_application_oidc application_oidc {
 
 ### Required
 
-- `app_type` (String) App type
-- `auth_method_type` (String) Auth method type
 - `clock_skew` (String) Clockskew
 - `grant_types` (List of String) Grant types
 - `name` (String) Name of the application
@@ -56,6 +54,8 @@ resource zitadel_application_oidc application_oidc {
 - `access_token_role_assertion` (Boolean) Access token role assertion
 - `access_token_type` (String) Access token type
 - `additional_origins` (List of String) Additional origins
+- `app_type` (String) App type
+- `auth_method_type` (String) Auth method type
 - `dev_mode` (Boolean) Dev mode
 - `id_token_role_assertion` (Boolean) ID token role assertion
 - `id_token_userinfo_assertion` (Boolean) Token userinfo assertion

@@ -3,6 +3,12 @@ package zitadel
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	fdiag "github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
@@ -11,19 +17,24 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_jwt"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_oidc"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/init_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/login_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/login_texts"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/machine_key"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/machine_user"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/password_complexity_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/password_reset_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/passwordless_registration_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/pat"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/privacy_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project"
@@ -35,7 +46,96 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/smtp_config"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/trigger_actions"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/user_grant"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/verify_email_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/verify_phone_message_text"
 )
+
+var (
+	_ provider.Provider = &providerPV6{}
+)
+
+type providerPV6 struct {
+}
+
+func NewProviderPV6() provider.Provider {
+	return &providerPV6{}
+}
+
+type providerModel struct {
+	Insecure types.Bool   `tfsdk:"insecure"`
+	Domain   types.String `tfsdk:"domain"`
+	Token    types.String `tfsdk:"token"`
+	Port     types.String `tfsdk:"port"`
+}
+
+func (p *providerPV6) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "zitadel"
+}
+func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnostics) {
+	return tfsdk.Schema{
+		Attributes: map[string]tfsdk.Attribute{
+			helper.DomainVar: {
+				Type:        types.StringType,
+				Required:    true,
+				Description: "Domain used to connect to the ZITADEL instance",
+			},
+			helper.InsecureVar: {
+				Type:        types.BoolType,
+				Optional:    true,
+				Description: "Use insecure connection",
+			},
+			helper.TokenVar: {
+				Type:        types.StringType,
+				Required:    true,
+				Description: "Path to the file containing credentials to connect to ZITADEL",
+			},
+			helper.PortVar: {
+				Type:        types.StringType,
+				Optional:    true,
+				Description: "Used port if not the default ports 80 or 443 are configured",
+			},
+		},
+	}, nil
+}
+
+func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	var config providerModel
+	diags := req.Config.Get(ctx, &config)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	info, err := helper.GetClientInfo(
+		config.Insecure.ValueBool(),
+		config.Domain.ValueString(),
+		config.Token.ValueString(),
+		config.Port.ValueString(),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to handle provider config", err.Error())
+		return
+	}
+
+	resp.DataSourceData = info
+	resp.ResourceData = info
+}
+
+func (p *providerPV6) DataSources(_ context.Context) []func() datasource.DataSource {
+	return nil
+}
+
+func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
+	return []func() resource.Resource{
+		init_message_text.NewInitMessageText,
+		login_texts.NewLoginTexts,
+		password_reset_message_text.NewPasswordResetMessageText,
+		verify_email_message_text.NewVerifyEmailMessageText,
+		verify_phone_message_text.NewVerifyPhoneMessageText,
+		domain_claimed_message_text.NewDomainClaimedMessageText,
+		passwordless_registration_message_text.NewPasswordlessRegistrationMessageText,
+	}
+}
 
 func Provider() *schema.Provider {
 	return &schema.Provider{
@@ -109,7 +209,12 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	clientinfo, err := helper.GetClientInfo(d)
+	clientinfo, err := helper.GetClientInfo(
+		d.Get(helper.InsecureVar).(bool),
+		d.Get(helper.DomainVar).(string),
+		d.Get(helper.TokenVar).(string),
+		d.Get(helper.PortVar).(string),
+	)
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}

@@ -1,6 +1,9 @@
 package helper
 
 import (
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -93,4 +96,16 @@ func GetID(d *schema.ResourceData, idVar string) string {
 		idStr = d.Id()
 	}
 	return idStr
+}
+
+func GetStringFromAttr(ctx context.Context, attrs map[string]attr.Value, key string) string {
+	value, err := attrs[key].ToTerraformValue(ctx)
+	if err != nil {
+		return ""
+	}
+	var str string
+	if err := value.As(&str); err != nil {
+		return ""
+	}
+	return str
 }

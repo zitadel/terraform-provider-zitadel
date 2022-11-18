@@ -27,10 +27,13 @@ resource zitadel_application_api application_api {
 
 ### Required
 
-- `auth_method_type` (String) Auth method type
 - `name` (String) Name of the application
 - `org_id` (String) orgID of the application
 - `project_id` (String) ID of the project
+
+### Optional
+
+- `auth_method_type` (String) Auth method type
 
 ### Read-Only
 
