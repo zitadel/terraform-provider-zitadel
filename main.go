@@ -34,7 +34,13 @@ func main() {
 	}
 
 	muxServer, err := tf6muxserver.NewMuxServer(ctx, providers...)
-	err = tf6server.Serve("registry.terraform.io/providers/zitadel/zitadel", muxServer.ProviderServer)
+
+	opts := []tf6server.ServeOpt{}
+	if debug {
+		opts = append(opts, tf6server.WithManagedDebug())
+	}
+
+	err = tf6server.Serve("registry.terraform.io/zitadel/zitadel", muxServer.ProviderServer, opts...)
 
 	if err != nil {
 		log.Fatalln(err.Error())

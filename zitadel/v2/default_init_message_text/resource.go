@@ -1,8 +1,7 @@
-package verify_email_message_text
+package default_init_message_text
 
 import (
 	"context"
-	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -10,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 	"google.golang.org/protobuf/encoding/protojson"
 
 	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
@@ -20,31 +19,32 @@ import (
 )
 
 const (
-	orgIDVar    = "org_id"
 	languageVar = "language"
 )
 
 var (
-	_ resource.Resource = &verifyEmailMessageTextResource{}
+	_ resource.Resource = &defaultInitMessageTextResource{}
 )
 
 func New() resource.Resource {
-	return &verifyEmailMessageTextResource{}
+	return &defaultInitMessageTextResource{}
 }
 
-type verifyEmailMessageTextResource struct {
+type defaultInitMessageTextResource struct {
 	clientInfo *helper.ClientInfo
 }
 
-func (r *verifyEmailMessageTextResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_verify_email_message_text"
+func (r *defaultInitMessageTextResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_default_init_message_text"
 }
 
-func (r *verifyEmailMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaMessageCustomText(ctx)
+func (r *defaultInitMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+	s, d := text.GenSchemaMessageCustomText(ctx)
+	delete(s.Attributes, "org_id")
+	return s, d
 }
 
-func (r *verifyEmailMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
+func (r *defaultInitMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -52,8 +52,8 @@ func (r *verifyEmailMessageTextResource) Configure(_ context.Context, req resour
 	r.clientInfo = req.ProviderData.(*helper.ClientInfo)
 }
 
-func (r *verifyEmailMessageTextResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	orgID, language := getPlanAttrs(ctx, req.Plan, resp.Diagnostics)
+func (r *defaultInitMessageTextResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	language := getPlanAttrs(ctx, req.Plan, resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -80,30 +80,30 @@ func (r *verifyEmailMessageTextResource) Create(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("failed to marshal", err.Error())
 		return
 	}
-	zReq := &management.SetCustomVerifyEmailMessageTextRequest{}
+	zReq := &admin.SetDefaultInitMessageTextRequest{}
 	if err := jsonpb.Unmarshal(data, zReq); err != nil {
 		resp.Diagnostics.AddError("failed to unmarshal", err.Error())
 		return
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetAdminClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomVerifyEmailMessageText(ctx, zReq)
+	_, err = client.SetDefaultInitMessageText(ctx, zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create", err.Error())
 		return
 	}
 
-	setID(plan, orgID, language)
+	setID(plan, language)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
-func (r *verifyEmailMessageTextResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *defaultInitMessageTextResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state types.Object
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -111,15 +111,15 @@ func (r *verifyEmailMessageTextResource) Read(ctx context.Context, req resource.
 		return
 	}
 
-	orgID, language := getID(ctx, state)
+	language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetAdminClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	zResp, err := client.GetCustomVerifyEmailMessageText(ctx, &management.GetCustomVerifyEmailMessageTextRequest{Language: language})
+	zResp, err := client.GetCustomInitMessageText(ctx, &admin.GetCustomInitMessageTextRequest{Language: language})
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -133,12 +133,12 @@ func (r *verifyEmailMessageTextResource) Read(ctx context.Context, req resource.
 		return
 	}
 
-	setID(state, orgID, language)
+	setID(state, language)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
-func (r *verifyEmailMessageTextResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	orgID, language := getPlanAttrs(ctx, req.Plan, resp.Diagnostics)
+func (r *defaultInitMessageTextResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	language := getPlanAttrs(ctx, req.Plan, resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -165,90 +165,72 @@ func (r *verifyEmailMessageTextResource) Update(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("failed to marshal", err.Error())
 		return
 	}
-	zReq := &management.SetCustomVerifyEmailMessageTextRequest{}
+	zReq := &admin.SetDefaultInitMessageTextRequest{}
 	if err := jsonpb.Unmarshal(data, zReq); err != nil {
 		resp.Diagnostics.AddError("failed to unmarshal", err.Error())
 		return
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetAdminClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomVerifyEmailMessageText(ctx, zReq)
+	_, err = client.SetDefaultInitMessageText(ctx, zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update", err.Error())
 		return
 	}
 
-	setID(plan, orgID, language)
+	setID(plan, language)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
-func (r *verifyEmailMessageTextResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	orgID, language := getStateAttrs(ctx, req.State, resp.Diagnostics)
+func (r *defaultInitMessageTextResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	language := getStateAttrs(ctx, req.State, resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetAdminClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.ResetCustomVerifyEmailMessageTextToDefault(ctx, &management.ResetCustomVerifyEmailMessageTextToDefaultRequest{Language: language})
+	_, err = client.ResetCustomInitMessageTextToDefault(ctx, &admin.ResetCustomInitMessageTextToDefaultRequest{Language: language})
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete", err.Error())
 		return
 	}
 }
 
-func setID(obj types.Object, orgID string, language string) {
+func setID(obj types.Object, language string) {
 	attrs := obj.Attributes()
-	attrs["id"] = types.StringValue(orgID + "_" + language)
-	attrs[orgIDVar] = types.StringValue(orgID)
+	attrs["id"] = types.StringValue(language)
 	attrs[languageVar] = types.StringValue(language)
 }
 
-func getID(ctx context.Context, obj types.Object) (string, string) {
-	id := helper.GetStringFromAttr(ctx, obj.Attributes(), "id")
-	parts := strings.Split(id, "_")
-	if len(parts) == 2 {
-		return parts[0], parts[1]
-	}
-	return helper.GetStringFromAttr(ctx, obj.Attributes(), orgIDVar), helper.GetStringFromAttr(ctx, obj.Attributes(), languageVar)
+func getID(ctx context.Context, obj types.Object) string {
+	return helper.GetStringFromAttr(ctx, obj.Attributes(), "id")
 }
 
-func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) (string, string) {
-	var orgID string
-	diag.Append(plan.GetAttribute(ctx, path.Root(orgIDVar), &orgID)...)
-	if diag.HasError() {
-		return "", ""
-	}
+func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) string {
 	var language string
 	diag.Append(plan.GetAttribute(ctx, path.Root(languageVar), &language)...)
 	if diag.HasError() {
-		return "", ""
+		return ""
 	}
-
-	return orgID, language
+	return language
 }
 
-func getStateAttrs(ctx context.Context, state tfsdk.State, diag diag.Diagnostics) (string, string) {
-	var orgID string
-	diag.Append(state.GetAttribute(ctx, path.Root(orgIDVar), &orgID)...)
-	if diag.HasError() {
-		return "", ""
-	}
+func getStateAttrs(ctx context.Context, state tfsdk.State, diag diag.Diagnostics) string {
 	var language string
 	diag.Append(state.GetAttribute(ctx, path.Root(languageVar), &language)...)
 	if diag.HasError() {
-		return "", ""
+		return ""
 	}
-
-	return orgID, language
+	return language
 }

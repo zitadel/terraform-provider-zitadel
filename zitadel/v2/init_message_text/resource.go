@@ -28,7 +28,7 @@ var (
 	_ resource.Resource = &initMessageTextResource{}
 )
 
-func NewInitMessageText() resource.Resource {
+func New() resource.Resource {
 	return &initMessageTextResource{}
 }
 

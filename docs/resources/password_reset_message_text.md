@@ -12,8 +12,10 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource zitadel_password_reset_message_text password_reset {
-  org_id   = "188087895133782187"
+resource zitadel_password_reset_message_text password_reset_en {
+  depends_on = [zitadel_org.org]
+
+  org_id = zitadel_org.org.id
   language = "en"
 
   title = "title example"

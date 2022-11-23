@@ -1,21 +1,18 @@
 ---
-page_title: "zitadel_init_message_text Resource - terraform-provider-zitadel"
+page_title: "zitadel_default_domain_claimed_message_text Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
   
 ---
 
-# zitadel_init_message_text (Resource)
+# zitadel_default_domain_claimed_message_text (Resource)
 
 
 
 ## Example Usage
 
 ```terraform
-resource zitadel_init_message_text init_en {
-  depends_on = [zitadel_org.org]
-
-  org_id = zitadel_org.org.id
+resource zitadel_default_domain_claimed_message_text domain_claimed_en {
   language = "en"
 
   title = "title example"
@@ -34,7 +31,6 @@ resource zitadel_init_message_text init_en {
 ### Required
 
 - `language` (String)
-- `org_id` (String)
 
 ### Optional
 

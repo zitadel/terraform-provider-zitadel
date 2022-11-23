@@ -12,8 +12,10 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource zitadel_login_texts login_texts {
-  org_id   = "188087895133782187"
+resource zitadel_login_texts login_texts_en {
+  depends_on = [zitadel_org.org]
+
+  org_id = zitadel_org.org.id
   language = "en"
 
   email_verification_done_text = {

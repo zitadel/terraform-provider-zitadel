@@ -28,7 +28,7 @@ var (
 	_ resource.Resource = &verifyPhoneMessageTextResource{}
 )
 
-func NewVerifyPhoneMessageText() resource.Resource {
+func New() resource.Resource {
 	return &verifyPhoneMessageTextResource{}
 }
 

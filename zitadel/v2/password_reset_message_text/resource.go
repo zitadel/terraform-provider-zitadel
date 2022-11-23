@@ -28,7 +28,7 @@ var (
 	_ resource.Resource = &passwordResetMessageTextResource{}
 )
 
-func NewPasswordResetMessageText() resource.Resource {
+func New() resource.Resource {
 	return &passwordResetMessageTextResource{}
 }
 

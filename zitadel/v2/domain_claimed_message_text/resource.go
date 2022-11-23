@@ -28,7 +28,7 @@ var (
 	_ resource.Resource = &domainClaimedMessageTextResource{}
 )
 
-func NewDomainClaimedMessageText() resource.Resource {
+func New() resource.Resource {
 	return &domainClaimedMessageTextResource{}
 }
 

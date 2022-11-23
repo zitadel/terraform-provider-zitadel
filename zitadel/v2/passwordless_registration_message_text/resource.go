@@ -28,7 +28,7 @@ var (
 	_ resource.Resource = &passwordlessRegistrationMessageTextResource{}
 )
 
-func NewPasswordlessRegistrationMessageText() resource.Resource {
+func New() resource.Resource {
 	return &passwordlessRegistrationMessageTextResource{}
 }
 

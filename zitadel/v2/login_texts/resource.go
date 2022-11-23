@@ -28,7 +28,7 @@ var (
 	_ resource.Resource = &loginTextsResource{}
 )
 
-func NewLoginTexts() resource.Resource {
+func New() resource.Resource {
 	return &loginTextsResource{}
 }
 

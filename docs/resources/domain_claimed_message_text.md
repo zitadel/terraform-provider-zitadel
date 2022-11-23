@@ -12,8 +12,10 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource zitadel_domain_claimed_message_text domain_claimed {
-  org_id   = "188087895133782187"
+resource zitadel_domain_claimed_message_text domain_claimed_en {
+  depends_on = [zitadel_org.org]
+
+  org_id = zitadel_org.org.id
   language = "en"
 
   title = "title example"

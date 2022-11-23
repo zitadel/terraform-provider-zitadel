@@ -16,6 +16,12 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/app_key"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_oidc"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_domain_claimed_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_init_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_reset_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_passwordless_registration_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_verify_email_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_verify_phone_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain_policy"
@@ -127,13 +133,19 @@ func (p *providerPV6) DataSources(_ context.Context) []func() datasource.DataSou
 
 func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		init_message_text.NewInitMessageText,
-		login_texts.NewLoginTexts,
-		password_reset_message_text.NewPasswordResetMessageText,
-		verify_email_message_text.NewVerifyEmailMessageText,
-		verify_phone_message_text.NewVerifyPhoneMessageText,
-		domain_claimed_message_text.NewDomainClaimedMessageText,
-		passwordless_registration_message_text.NewPasswordlessRegistrationMessageText,
+		init_message_text.New,
+		login_texts.New,
+		password_reset_message_text.New,
+		verify_email_message_text.New,
+		verify_phone_message_text.New,
+		domain_claimed_message_text.New,
+		passwordless_registration_message_text.New,
+		default_domain_claimed_message_text.New,
+		default_init_message_text.New,
+		default_password_reset_message_text.New,
+		default_passwordless_registration_message_text.New,
+		default_verify_email_message_text.New,
+		default_verify_phone_message_text.New,
 	}
 }
 

@@ -12,8 +12,10 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource zitadel_verify_phone_message_text verify_phone {
-  org_id   = "188087895133782187"
+resource zitadel_verify_phone_message_text verify_phone_en {
+  depends_on = [zitadel_org.org]
+
+  org_id = zitadel_org.org.id
   language = "en"
 
   title = "title example"
