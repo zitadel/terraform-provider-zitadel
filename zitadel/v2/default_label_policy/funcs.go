@@ -29,27 +29,38 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.UpdateLabelPolicy(ctx, &admin.UpdateLabelPolicyRequest{
-		PrimaryColor:        d.Get(primaryColorVar).(string),
-		HideLoginNameSuffix: d.Get(hideLoginNameSuffixVar).(bool),
-		WarnColor:           d.Get(warnColorVar).(string),
-		BackgroundColor:     d.Get(backgroundColorVar).(string),
-		FontColor:           d.Get(fontColorVar).(string),
-		PrimaryColorDark:    d.Get(primaryColorDarkVar).(string),
-		BackgroundColorDark: d.Get(backgroundColorDarkVar).(string),
-		WarnColorDark:       d.Get(warnColorDarkVar).(string),
-		FontColorDark:       d.Get(fontColorDarkVar).(string),
-		DisableWatermark:    d.Get(disableWatermarkVar).(bool),
-	})
-	if err != nil {
-		return diag.Errorf("failed to update default label policy: %v", err)
+	if d.HasChanges(
+		primaryColorVar,
+		hideLoginNameSuffixVar,
+		warnColorVar,
+		backgroundColorVar,
+		fontColorVar,
+		primaryColorDarkVar,
+		backgroundColorDarkVar,
+		warnColorDarkVar,
+		fontColorDarkVar,
+		disableWatermarkVar,
+	) {
+		resp, err := client.UpdateLabelPolicy(ctx, &admin.UpdateLabelPolicyRequest{
+			PrimaryColor:        d.Get(primaryColorVar).(string),
+			HideLoginNameSuffix: d.Get(hideLoginNameSuffixVar).(bool),
+			WarnColor:           d.Get(warnColorVar).(string),
+			BackgroundColor:     d.Get(backgroundColorVar).(string),
+			FontColor:           d.Get(fontColorVar).(string),
+			PrimaryColorDark:    d.Get(primaryColorDarkVar).(string),
+			BackgroundColorDark: d.Get(backgroundColorDarkVar).(string),
+			WarnColorDark:       d.Get(warnColorDarkVar).(string),
+			FontColorDark:       d.Get(fontColorDarkVar).(string),
+			DisableWatermark:    d.Get(disableWatermarkVar).(bool),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update default label policy: %v", err)
+		}
+		d.SetId(resp.Details.ResourceOwner)
 	}
-	d.SetId(resp.Details.ResourceOwner)
 
-	active := d.Get(setActiveVar)
-	if active != nil {
-		activeBool := active.(bool)
-		if activeBool {
+	if d.HasChange(setActiveVar) {
+		if d.Get(setActiveVar).(bool) {
 			if _, err := client.ActivateLabelPolicy(ctx, &admin.ActivateLabelPolicyRequest{}); err != nil {
 				return diag.Errorf("failed to activate default label policy: %v", err)
 			}
