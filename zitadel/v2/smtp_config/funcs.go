@@ -76,34 +76,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(senderAddressVar, senderNameVar, tlsVar, hostVar, userVar) {
-		smtp, err := client.GetSMTPConfig(ctx, &admin.GetSMTPConfigRequest{})
+		_, err = client.UpdateSMTPConfig(ctx, &admin.UpdateSMTPConfigRequest{
+			SenderAddress: d.Get(senderAddressVar).(string),
+			SenderName:    d.Get(senderNameVar).(string),
+			Host:          d.Get(hostVar).(string),
+			Tls:           d.Get(tlsVar).(bool),
+			User:          d.Get(userVar).(string),
+		})
 		if err != nil {
-			return diag.FromErr(err)
-		}
-
-		senderAddress := d.Get(senderAddressVar).(string)
-		senderName := d.Get(senderNameVar).(string)
-		tls := d.Get(tlsVar).(bool)
-		host := d.Get(hostVar).(string)
-		user := d.Get(userVar).(string)
-
-		if smtp.SmtpConfig.SenderName != senderName ||
-			smtp.SmtpConfig.SenderAddress != senderAddress ||
-			smtp.SmtpConfig.Tls != tls ||
-			smtp.SmtpConfig.Host != host ||
-			smtp.SmtpConfig.User != user {
-
-			req := &admin.UpdateSMTPConfigRequest{
-				SenderAddress: senderAddress,
-				SenderName:    senderName,
-				Host:          host,
-				Tls:           tls,
-				User:          user,
-			}
-			_, err = client.UpdateSMTPConfig(ctx, req)
-			if err != nil {
-				return diag.Errorf("failed to update smtp config: %v", err)
-			}
+			return diag.Errorf("failed to update smtp config: %v", err)
 		}
 	}
 

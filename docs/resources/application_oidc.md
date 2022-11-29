@@ -58,7 +58,7 @@ resource zitadel_application_oidc application_oidc_min {
 - `org_id` (String) orgID of the application
 - `project_id` (String) ID of the project
 - `redirect_uris` (List of String) RedirectURIs
-- `response_types` (List of String) Response type, supported values: OIDC_APP_TYPE_NATIVE, OIDC_APP_TYPE_WEB, OIDC_APP_TYPE_USER_AGENT
+- `response_types` (List of String) Response type, supported values: OIDC_RESPONSE_TYPE_CODE, OIDC_RESPONSE_TYPE_ID_TOKEN, OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN
 
 ### Optional
 

@@ -34,7 +34,7 @@ func GetResource() *schema.Resource {
 			keyTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Type of the app key" + helper.DescriptionEnumValuesList(authn.KeyType_value),
+				Description: "Type of the app key" + helper.DescriptionEnumValuesList(authn.KeyType_name),
 				ForceNew:    true,
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(keyTypeVar, value, authn.KeyType_value)

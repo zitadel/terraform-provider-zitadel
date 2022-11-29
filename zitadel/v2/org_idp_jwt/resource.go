@@ -27,7 +27,7 @@ func GetResource() *schema.Resource {
 			stylingTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Some identity providers specify the styling of the button to their login" + helper.DescriptionEnumValuesList(idp.IDPStylingType_value),
+				Description: "Some identity providers specify the styling of the button to their login" + helper.DescriptionEnumValuesList(idp.IDPStylingType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(stylingTypeVar, value, idp.IDPStylingType_value)
 				},

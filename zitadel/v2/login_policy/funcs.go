@@ -50,11 +50,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	current, err := client.GetLoginPolicy(ctx, &management.GetLoginPolicyRequest{})
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	d.SetId(org)
 	if d.HasChanges(
 		allowUsernamePasswordVar,
@@ -91,55 +86,29 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		if err != nil {
 			return diag.FromErr(err)
 		}
-
-		allowUsernamePassword := d.Get(allowUsernamePasswordVar).(bool)
-		allowRegister := d.Get(allowRegisterVar).(bool)
-		allowExternalIdp := d.Get(allowExternalIDPVar).(bool)
-		forceMfa := d.Get(forceMFAVar).(bool)
-		passwordlessType := policy.PasswordlessType(policy.PasswordlessType_value[d.Get(passwordlessTypeVar).(string)])
-		hidePasswordReset := d.Get(hidePasswordResetVar).(bool)
-		ignoreUnkownUsernames := d.Get(ignoreUnknownUsernamesVar).(bool)
-		defaultRedirectUri := d.Get(defaultRedirectURIVar).(string)
-		currentPolicy := current.GetPolicy()
-
-		if currentPolicy.GetAllowUsernamePassword() != allowUsernamePassword ||
-			currentPolicy.GetAllowRegister() != allowRegister ||
-			currentPolicy.GetAllowExternalIdp() != allowExternalIdp ||
-			currentPolicy.GetForceMfa() != forceMfa ||
-			currentPolicy.GetPasswordlessType() != passwordlessType ||
-			currentPolicy.GetHidePasswordReset() != hidePasswordReset ||
-			currentPolicy.GetIgnoreUnknownUsernames() != ignoreUnkownUsernames ||
-			currentPolicy.GetDefaultRedirectUri() != defaultRedirectUri {
-
-			_, err = client.UpdateCustomLoginPolicy(ctx, &management.UpdateCustomLoginPolicyRequest{
-				AllowUsernamePassword:      allowUsernamePassword,
-				AllowRegister:              allowRegister,
-				AllowExternalIdp:           allowExternalIdp,
-				ForceMfa:                   forceMfa,
-				PasswordlessType:           passwordlessType,
-				HidePasswordReset:          hidePasswordReset,
-				IgnoreUnknownUsernames:     ignoreUnkownUsernames,
-				DefaultRedirectUri:         defaultRedirectUri,
-				PasswordCheckLifetime:      durationpb.New(passwordCheckLT),
-				ExternalLoginCheckLifetime: durationpb.New(externalLoginCheckLT),
-				MfaInitSkipLifetime:        durationpb.New(mfaInitSkipLT),
-				SecondFactorCheckLifetime:  durationpb.New(secondFactorCheckLT),
-				MultiFactorCheckLifetime:   durationpb.New(multiFactorCheckLT),
-			})
-			if err != nil {
-				return diag.Errorf("failed to update login policy: %v", err)
-			}
+		_, err = client.UpdateCustomLoginPolicy(ctx, &management.UpdateCustomLoginPolicyRequest{
+			AllowUsernamePassword:      d.Get(allowUsernamePasswordVar).(bool),
+			AllowRegister:              d.Get(allowRegisterVar).(bool),
+			AllowExternalIdp:           d.Get(allowExternalIDPVar).(bool),
+			ForceMfa:                   d.Get(forceMFAVar).(bool),
+			PasswordlessType:           policy.PasswordlessType(policy.PasswordlessType_value[d.Get(passwordlessTypeVar).(string)]),
+			HidePasswordReset:          d.Get(hidePasswordResetVar).(bool),
+			IgnoreUnknownUsernames:     d.Get(ignoreUnknownUsernamesVar).(bool),
+			DefaultRedirectUri:         d.Get(defaultRedirectURIVar).(string),
+			PasswordCheckLifetime:      durationpb.New(passwordCheckLT),
+			ExternalLoginCheckLifetime: durationpb.New(externalLoginCheckLT),
+			MfaInitSkipLifetime:        durationpb.New(mfaInitSkipLT),
+			SecondFactorCheckLifetime:  durationpb.New(secondFactorCheckLT),
+			MultiFactorCheckLifetime:   durationpb.New(multiFactorCheckLT),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update login policy: %v", err)
 		}
 	}
 
 	if d.HasChange(secondFactorsVar) {
-		secondFactors := helper.GetOkSetToStringSlice(d, secondFactorsVar)
-		currentSecondFactors := make([]helper.Stringify, 0)
-
-		for _, secondFactor := range current.GetPolicy().GetSecondFactors() {
-			currentSecondFactors = append(currentSecondFactors, secondFactor)
-		}
-		addSecondFactor, deleteSecondFactors := helper.GetAddAndDelete(currentSecondFactors, secondFactors)
+		o, n := d.GetChange(secondFactorsVar)
+		addSecondFactor, deleteSecondFactors := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
 
 		for _, factor := range addSecondFactor {
 			if _, err := client.AddSecondFactorToLoginPolicy(ctx, &management.AddSecondFactorToLoginPolicyRequest{
@@ -158,13 +127,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChange(multiFactorsVar) {
-		multiFactors := helper.GetOkSetToStringSlice(d, multiFactorsVar)
-		currentMultiFactors := make([]helper.Stringify, 0)
+		o, n := d.GetChange(multiFactorsVar)
+		addMultiFactor, deleteMultiFactors := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
 
-		for _, multiFactor := range current.GetPolicy().GetMultiFactors() {
-			currentMultiFactors = append(currentMultiFactors, multiFactor)
-		}
-		addMultiFactor, deleteMultiFactors := helper.GetAddAndDelete(currentMultiFactors, multiFactors)
 		for _, factor := range addMultiFactor {
 			if _, err := client.AddMultiFactorToLoginPolicy(ctx, &management.AddMultiFactorToLoginPolicyRequest{
 				Type: policy.MultiFactorType(policy.MultiFactorType_value[factor]),
@@ -182,13 +147,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChange(idpsVar) {
-		idps := helper.GetOkSetToStringSlice(d, idpsVar)
-		currentIdps := make([]helper.Stringify, 0)
+		o, n := d.GetChange(idpsVar)
+		addIdps, deleteIdps := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
 
-		for _, currentIdp := range current.GetPolicy().GetIdps() {
-			currentIdps = append(currentIdps, &helper.Stringified{currentIdp.IdpId})
-		}
-		addIdps, deleteIdps := helper.GetAddAndDelete(currentIdps, idps)
 		for _, addIdp := range addIdps {
 			var ownertype idp.IDPOwnerType
 			_, err := client.GetOrgIDPByID(ctx, &management.GetOrgIDPByIDRequest{Id: addIdp})
@@ -207,7 +168,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			}
 		}
 	}
-
 	return nil
 }
 

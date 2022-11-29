@@ -82,7 +82,7 @@ func GetResource() *schema.Resource {
 			genderVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Gender of the user" + helper.DescriptionEnumValuesList(user.Gender_value),
+				Description: "Gender of the user" + helper.DescriptionEnumValuesList(user.Gender_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(genderVar, value.(string), user.Gender_value)
 				},

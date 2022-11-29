@@ -71,24 +71,17 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	currentUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: d.Id()})
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	username := d.Get(userNameVar).(string)
-	if currentUser.GetUser().GetUserName() != username {
+	if d.HasChange(userNameVar) {
 		_, err = client.UpdateUserName(ctx, &management.UpdateUserNameRequest{
 			UserId:   d.Id(),
-			UserName: username,
+			UserName: d.Get(userNameVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update username: %v", err)
 		}
 	}
 
-	currentMachine := currentUser.GetUser().GetMachine()
-	if currentMachine.GetName() != d.Get(nameVar).(string) || currentMachine.GetDescription() != d.Get(descriptionVar).(string) {
+	if d.HasChanges(nameVar, descriptionVar) {
 		_, err := client.UpdateMachine(ctx, &management.UpdateMachineRequest{
 			UserId:      d.Id(),
 			Name:        d.Get(nameVar).(string),
@@ -98,7 +91,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			return diag.Errorf("failed to update machine user: %v", err)
 		}
 	}
-
 	return nil
 }
 

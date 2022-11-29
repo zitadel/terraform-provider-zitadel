@@ -44,7 +44,7 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Required:    true,
-				Description: "Response type" + helper.DescriptionEnumValuesList(app.OIDCAppType_value),
+				Description: "Response type" + helper.DescriptionEnumValuesList(app.OIDCResponseType_name),
 				/* Not yet supported
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return enumValuesValidation(applicationAuthMethodTypeVar, value, app.OIDCResponseType_value)
@@ -56,7 +56,7 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Required:    true,
-				Description: "Grant types" + helper.DescriptionEnumValuesList(app.OIDCGrantType_value),
+				Description: "Grant types" + helper.DescriptionEnumValuesList(app.OIDCGrantType_name),
 				/* Not yet supported
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return enumValuesValidation(applicationGrantTypesVar, value, app.OIDCGrantType_value)
@@ -65,7 +65,7 @@ func GetResource() *schema.Resource {
 			appTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "App type" + helper.DescriptionEnumValuesList(app.OIDCAppType_value),
+				Description: "App type" + helper.DescriptionEnumValuesList(app.OIDCAppType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(appTypeVar, value, app.OIDCAppType_value)
 				},
@@ -74,7 +74,7 @@ func GetResource() *schema.Resource {
 			authMethodTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Auth method type" + helper.DescriptionEnumValuesList(app.OIDCAuthMethodType_value),
+				Description: "Auth method type" + helper.DescriptionEnumValuesList(app.OIDCAuthMethodType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(authMethodTypeVar, value, app.OIDCAuthMethodType_value)
 				},
@@ -91,7 +91,7 @@ func GetResource() *schema.Resource {
 			versionVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Version" + helper.DescriptionEnumValuesList(app.OIDCVersion_value),
+				Description: "Version" + helper.DescriptionEnumValuesList(app.OIDCVersion_name),
 				Default:     app.OIDCVersion_name[0],
 			},
 			devModeVar: {
@@ -102,7 +102,7 @@ func GetResource() *schema.Resource {
 			accessTokenTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Access token type" + helper.DescriptionEnumValuesList(app.OIDCTokenType_value),
+				Description: "Access token type" + helper.DescriptionEnumValuesList(app.OIDCTokenType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(accessTokenTypeVar, value, app.OIDCTokenType_value)
 				},

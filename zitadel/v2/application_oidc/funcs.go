@@ -3,7 +3,6 @@ package application_oidc
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -54,22 +53,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	projectID := d.Get(projectIDVar).(string)
-	oidcApp, err := getApp(ctx, client, projectID, d.Id())
-	if err != nil {
-		return diag.FromErr(err)
-	}
 
 	if d.HasChange(nameVar) {
-		appName := d.Get(nameVar).(string)
-		if oidcApp.GetName() != appName {
-			_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
-				ProjectId: projectID,
-				AppId:     d.Id(),
-				Name:      appName,
-			})
-			if err != nil {
-				return diag.Errorf("failed to update application: %v", err)
-			}
+		_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
+			ProjectId: projectID,
+			AppId:     d.Id(),
+			Name:      d.Get(nameVar).(string),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update application: %v", err)
 		}
 	}
 
@@ -98,50 +90,25 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			return diag.FromErr(err)
 		}
 
-		oidcConfig := oidcApp.GetOidcConfig()
-		redirecURIs := interfaceToStringSlice(d.Get(redirectURIsVar))
-		appType := d.Get(appTypeVar).(string)
-		authMethodType := d.Get(authMethodTypeVar).(string)
-		postLogoutRedirectURIs := interfaceToStringSlice(d.Get(postLogoutRedirectURIsVar))
-		devMode := d.Get(devModeVar).(bool)
-		accessTokenType := d.Get(accessTokenTypeVar).(string)
-		accessTokenRoleAssertion := d.Get(accessTokenRoleAssertionVar).(bool)
-		idTokenRoleAssertion := d.Get(idTokenRoleAssertionVar).(bool)
-		idTokenUserinfoAssertion := d.Get(idTokenUserinfoAssertionVar).(bool)
-		clockSkew := durationpb.New(dur)
-		additionalOrigins := interfaceToStringSlice(d.Get(additionalOriginsVar))
-
-		if !reflect.DeepEqual(redirecURIs, oidcConfig.GetRedirectUris()) ||
-			!reflect.DeepEqual(respTypes, oidcConfig.GetResponseTypes()) ||
-			!reflect.DeepEqual(grantTypes, oidcConfig.GetGrantTypes()) ||
-			appType != oidcConfig.AppType.String() ||
-			authMethodType != oidcConfig.AuthMethodType.String() ||
-			!reflect.DeepEqual(postLogoutRedirectURIs, oidcConfig.GetPostLogoutRedirectUris()) ||
-			devMode != oidcConfig.DevMode ||
-			accessTokenType != oidcConfig.AccessTokenType.String() ||
-			accessTokenRoleAssertion != oidcConfig.AccessTokenRoleAssertion ||
-			clockSkew.String() != oidcConfig.ClockSkew.String() ||
-			!reflect.DeepEqual(additionalOrigins, oidcConfig.GetAdditionalOrigins()) {
-
-			_, err = client.UpdateOIDCAppConfig(ctx, &management.UpdateOIDCAppConfigRequest{
-				ProjectId:                projectID,
-				AppId:                    d.Id(),
-				RedirectUris:             redirecURIs,
-				ResponseTypes:            respTypes,
-				GrantTypes:               grantTypes,
-				AppType:                  app.OIDCAppType(app.OIDCAppType_value[appType]),
-				AuthMethodType:           app.OIDCAuthMethodType(app.OIDCAuthMethodType_value[authMethodType]),
-				PostLogoutRedirectUris:   postLogoutRedirectURIs,
-				DevMode:                  devMode,
-				AccessTokenType:          app.OIDCTokenType(app.OIDCTokenType_value[accessTokenType]),
-				AccessTokenRoleAssertion: accessTokenRoleAssertion,
-				IdTokenRoleAssertion:     idTokenRoleAssertion,
-				IdTokenUserinfoAssertion: idTokenUserinfoAssertion,
-				AdditionalOrigins:        additionalOrigins,
-			})
-			if err != nil {
-				return diag.Errorf("failed to update applicationOIDC: %v", err)
-			}
+		_, err = client.UpdateOIDCAppConfig(ctx, &management.UpdateOIDCAppConfigRequest{
+			ProjectId:                projectID,
+			AppId:                    d.Id(),
+			RedirectUris:             interfaceToStringSlice(d.Get(redirectURIsVar)),
+			ResponseTypes:            respTypes,
+			GrantTypes:               grantTypes,
+			AppType:                  app.OIDCAppType(app.OIDCAppType_value[d.Get(appTypeVar).(string)]),
+			AuthMethodType:           app.OIDCAuthMethodType(app.OIDCAuthMethodType_value[d.Get(authMethodTypeVar).(string)]),
+			PostLogoutRedirectUris:   interfaceToStringSlice(d.Get(postLogoutRedirectURIsVar)),
+			DevMode:                  d.Get(devModeVar).(bool),
+			AccessTokenType:          app.OIDCTokenType(app.OIDCTokenType_value[d.Get(accessTokenTypeVar).(string)]),
+			AccessTokenRoleAssertion: d.Get(accessTokenRoleAssertionVar).(bool),
+			IdTokenRoleAssertion:     d.Get(idTokenRoleAssertionVar).(bool),
+			IdTokenUserinfoAssertion: d.Get(idTokenUserinfoAssertionVar).(bool),
+			AdditionalOrigins:        interfaceToStringSlice(d.Get(additionalOriginsVar)),
+			ClockSkew:                durationpb.New(dur),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update applicationOIDC: %v", err)
 		}
 	}
 	return nil

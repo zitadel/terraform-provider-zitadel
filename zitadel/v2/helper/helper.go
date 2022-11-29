@@ -37,14 +37,14 @@ func SetToStringSlice(set *schema.Set) []string {
 	return slice
 }
 
-func GetAddAndDelete(current []Stringify, desired []string) ([]string, []string) {
+func GetAddAndDelete(current []string, desired []string) ([]string, []string) {
 	addSlice := make([]string, 0)
 	deleteSlice := make([]string, 0)
 
 	for _, desiredItem := range desired {
 		found := false
 		for _, currentItem := range current {
-			if desiredItem == currentItem.String() {
+			if desiredItem == currentItem {
 				found = true
 			}
 		}
@@ -56,12 +56,12 @@ func GetAddAndDelete(current []Stringify, desired []string) ([]string, []string)
 	for _, currentItem := range current {
 		found := false
 		for _, desiredItem := range desired {
-			if desiredItem == currentItem.String() {
+			if desiredItem == currentItem {
 				found = true
 			}
 		}
 		if !found {
-			deleteSlice = append(deleteSlice, currentItem.String())
+			deleteSlice = append(deleteSlice, currentItem)
 		}
 	}
 
@@ -107,13 +107,11 @@ func GetID(d *schema.ResourceData, idVar string) string {
 	return idStr
 }
 
-func DescriptionEnumValuesList(enum map[string]int32) string {
+func DescriptionEnumValuesList(enum map[int32]string) string {
 	str := ", supported values: "
 	values := make([]string, len(enum))
-	i := 0
-	for k := range enum {
-		values[i] = k
-		i++
+	for i := 0; i < len(enum); i++ {
+		values[i] = enum[int32(i)]
 	}
 	str += strings.Join(values, ", ")
 	return str

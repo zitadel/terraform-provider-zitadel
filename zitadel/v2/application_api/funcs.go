@@ -51,34 +51,25 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	projectID := d.Get(projectIDVar).(string)
-	apiApp, err := getApp(ctx, client, projectID, d.Id())
-
 	if d.HasChange(nameVar) {
-		appName := d.Get(nameVar).(string)
-		if apiApp.GetName() != appName {
-			_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
-				ProjectId: projectID,
-				AppId:     d.Id(),
-				Name:      appName,
-			})
-			if err != nil {
-				return diag.Errorf("failed to update application: %v", err)
-			}
+		_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
+			ProjectId: projectID,
+			AppId:     d.Id(),
+			Name:      d.Get(nameVar).(string),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update application: %v", err)
 		}
 	}
 
 	if d.HasChanges(authMethodTypeVar) {
-		apiConfig := apiApp.GetApiConfig()
-		authMethod := d.Get(authMethodTypeVar).(string)
-		if apiConfig.GetAuthMethodType().String() != authMethod {
-			_, err = client.UpdateAPIAppConfig(ctx, &management.UpdateAPIAppConfigRequest{
-				ProjectId:      projectID,
-				AppId:          d.Id(),
-				AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[authMethod]),
-			})
-			if err != nil {
-				return diag.Errorf("failed to update applicationAPI: %v", err)
-			}
+		_, err = client.UpdateAPIAppConfig(ctx, &management.UpdateAPIAppConfigRequest{
+			ProjectId:      projectID,
+			AppId:          d.Id(),
+			AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[d.Get(authMethodTypeVar).(string)]),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update applicationAPI: %v", err)
 		}
 	}
 	return nil

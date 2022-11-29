@@ -30,7 +30,7 @@ resource zitadel_trigger_actions trigger_actions {
 - `action_ids` (Set of String) IDs of the triggered actions
 - `flow_type` (String) Type of the flow to which the action triggers belong, supported values: FLOW_TYPE_UNSPECIFIED, FLOW_TYPE_EXTERNAL_AUTHENTICATION
 - `org_id` (String) ID of the organization
-- `trigger_type` (String) Trigger type on when the actions get triggered, supported values: TRIGGER_TYPE_POST_CREATION, TRIGGER_TYPE_UNSPECIFIED, TRIGGER_TYPE_POST_AUTHENTICATION, TRIGGER_TYPE_PRE_CREATION
+- `trigger_type` (String) Trigger type on when the actions get triggered, supported values: TRIGGER_TYPE_UNSPECIFIED, TRIGGER_TYPE_POST_AUTHENTICATION, TRIGGER_TYPE_PRE_CREATION, TRIGGER_TYPE_POST_CREATION
 
 ### Read-Only
 

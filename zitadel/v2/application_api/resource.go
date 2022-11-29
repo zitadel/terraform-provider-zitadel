@@ -33,7 +33,7 @@ func GetResource() *schema.Resource {
 			authMethodTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Auth method type" + helper.DescriptionEnumValuesList(app.APIAuthMethodType_value),
+				Description: "Auth method type" + helper.DescriptionEnumValuesList(app.APIAuthMethodType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(authMethodTypeVar, value, app.APIAuthMethodType_value)
 				},

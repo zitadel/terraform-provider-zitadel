@@ -113,80 +113,50 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	currentUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: d.Id()})
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	if d.HasChange(userNameVar) {
-		username := d.Get(userNameVar).(string)
-		if currentUser.GetUser().GetUserName() != username {
-			_, err = client.UpdateUserName(ctx, &management.UpdateUserNameRequest{
-				UserId:   d.Id(),
-				UserName: username,
-			})
-			if err != nil {
-				return diag.Errorf("failed to update username: %v", err)
-			}
+		_, err = client.UpdateUserName(ctx, &management.UpdateUserNameRequest{
+			UserId:   d.Id(),
+			UserName: d.Get(userNameVar).(string),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update username: %v", err)
 		}
 	}
 
-	currentHuman := currentUser.GetUser().GetHuman()
 	if d.HasChanges(firstNameVar, lastNameVar, nickNameVar, displayNameVar, preferredLanguageVar, genderVar) {
-		nickname := d.Get(nickNameVar)
-		displayname := d.Get(displayNameVar)
-		prefLang := d.Get(preferredLanguageVar)
-		gender := d.Get(genderVar)
-
-		if currentHuman.GetProfile().GetFirstName() != d.Get(firstNameVar).(string) ||
-			currentHuman.GetProfile().GetLastName() != d.Get(lastNameVar).(string) ||
-			(nickname != nil && currentHuman.GetProfile().GetNickName() != nickname.(string)) ||
-			(displayname != nil && currentHuman.GetProfile().GetDisplayName() != displayname.(string)) ||
-			(prefLang != nil && currentHuman.GetProfile().GetPreferredLanguage() != prefLang.(string)) ||
-			(gender != nil && currentHuman.GetProfile().GetGender().String() != gender.(string)) {
-
-			_, err := client.UpdateHumanProfile(ctx, &management.UpdateHumanProfileRequest{
-				UserId:            d.Id(),
-				FirstName:         d.Get(firstNameVar).(string),
-				LastName:          d.Get(lastNameVar).(string),
-				NickName:          d.Get(nickNameVar).(string),
-				DisplayName:       d.Get(displayNameVar).(string),
-				PreferredLanguage: d.Get(preferredLanguageVar).(string),
-				Gender:            user.Gender(user.Gender_value[gender.(string)]),
-			})
-			if err != nil {
-				return diag.Errorf("failed to update human profile: %v", err)
-			}
+		_, err := client.UpdateHumanProfile(ctx, &management.UpdateHumanProfileRequest{
+			UserId:            d.Id(),
+			FirstName:         d.Get(firstNameVar).(string),
+			LastName:          d.Get(lastNameVar).(string),
+			NickName:          d.Get(nickNameVar).(string),
+			DisplayName:       d.Get(displayNameVar).(string),
+			PreferredLanguage: d.Get(preferredLanguageVar).(string),
+			Gender:            user.Gender(user.Gender_value[d.Get(genderVar).(string)]),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update human profile: %v", err)
 		}
 	}
 
 	if d.HasChanges(emailVar, isEmailVerifiedVar) {
-		email := d.Get(emailVar)
-		emailVerfied := d.Get(isEmailVerifiedVar)
-		if currentHuman.GetEmail().GetEmail() != email.(string) || currentHuman.GetEmail().GetIsEmailVerified() != emailVerfied.(bool) {
-			_, err = client.UpdateHumanEmail(ctx, &management.UpdateHumanEmailRequest{
-				UserId:          d.Id(),
-				Email:           email.(string),
-				IsEmailVerified: emailVerfied.(bool),
-			})
-			if err != nil {
-				return diag.Errorf("failed to update human email: %v", err)
-			}
+		_, err = client.UpdateHumanEmail(ctx, &management.UpdateHumanEmailRequest{
+			UserId:          d.Id(),
+			Email:           d.Get(emailVar).(string),
+			IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update human email: %v", err)
 		}
 	}
 
 	if d.HasChanges(phoneVar, isPhoneVerifiedVar) {
-		phone := d.Get(phoneVar)
-		phoneVerified := d.Get(isPhoneVerifiedVar)
-		if currentHuman.GetPhone().GetPhone() != phone.(string) || currentHuman.GetPhone().GetIsPhoneVerified() != phoneVerified.(bool) {
-			_, err = client.UpdateHumanPhone(ctx, &management.UpdateHumanPhoneRequest{
-				UserId:          d.Id(),
-				Phone:           phone.(string),
-				IsPhoneVerified: phoneVerified.(bool),
-			})
-			if err != nil {
-				return diag.Errorf("failed to update human phone: %v", err)
-			}
+		_, err = client.UpdateHumanPhone(ctx, &management.UpdateHumanPhoneRequest{
+			UserId:          d.Id(),
+			Phone:           d.Get(phoneVar).(string),
+			IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update human phone: %v", err)
 		}
 	}
 	return nil

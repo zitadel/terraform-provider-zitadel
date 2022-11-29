@@ -71,24 +71,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(senderNumberVar, sidVar) {
-		sms, err := client.GetSMSProvider(ctx, &admin.GetSMSProviderRequest{})
+		_, err = client.UpdateSMSProviderTwilio(ctx, &admin.UpdateSMSProviderTwilioRequest{
+			Id:           d.Id(),
+			Sid:          d.Get(sidVar).(string),
+			SenderNumber: d.Get(senderNumberVar).(string),
+		})
 		if err != nil {
-			return diag.FromErr(err)
-		}
-
-		sid := d.Get(sidVar).(string)
-		senderNumber := d.Get(senderNumberVar).(string)
-		twilio := sms.Config.GetTwilio()
-		if twilio.Sid != sid ||
-			twilio.SenderNumber != senderNumber {
-			_, err = client.UpdateSMSProviderTwilio(ctx, &admin.UpdateSMSProviderTwilioRequest{
-				Id:           d.Id(),
-				Sid:          sid,
-				SenderNumber: senderNumber,
-			})
-			if err != nil {
-				return diag.Errorf("failed to update sms provider twilio: %v", err)
-			}
+			return diag.Errorf("failed to update sms provider twilio: %v", err)
 		}
 	}
 

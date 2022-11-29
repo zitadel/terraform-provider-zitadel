@@ -38,7 +38,7 @@ resource zitadel_org_idp_jwt jwt_idp {
 - `keys_endpoint` (String) the endpoint to the key (JWK) which are used to sign the JWT with
 - `name` (String) Name of the IDP
 - `org_id` (String) ID of the organization
-- `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_GOOGLE, STYLING_TYPE_UNSPECIFIED
+- `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_UNSPECIFIED, STYLING_TYPE_GOOGLE
 
 ### Read-Only
 
