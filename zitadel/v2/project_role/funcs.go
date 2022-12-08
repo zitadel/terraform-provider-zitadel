@@ -121,7 +121,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil || resp.Result == nil || len(resp.Result) == 0 {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read project role: %v", err)
 	}
 
 	if len(resp.Result) == 1 {

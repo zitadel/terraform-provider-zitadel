@@ -8,25 +8,25 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the authorization given to a user directly, including the given roles.",
 		Schema: map[string]*schema.Schema{
-			userGrantProjectIDVar: {
+			projectIDVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "ID of the project",
 				ForceNew:    true,
 			},
-			userGrantProjectGrantIDVar: {
+			projectGrantIDVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "ID of the granted project",
 				ForceNew:    true,
 			},
-			userGrantUserIDVar: {
+			userIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the user",
 				ForceNew:    true,
 			},
-			userGrantRoleKeysVar: {
+			roleKeysVar: {
 				Type: schema.TypeSet,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -34,7 +34,7 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "List of roles granted",
 			},
-			userGrantOrgIDVar: {
+			orgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization which owns the resource",

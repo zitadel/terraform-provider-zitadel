@@ -12,13 +12,21 @@ Resource representing a machine key
 ## Example Usage
 
 ```terraform
-resource zitadel_machine_key machine_key {
+resource zitadel_machine_key machine_key_full {
   depends_on = [zitadel_machine_user.machine_user, zitadel_org.org]
 
   org_id          = zitadel_org.org.id
   user_id         = zitadel_machine_user.machine_user.id
   key_type        = "KEY_TYPE_JSON"
   expiration_date = "2519-04-01T08:45:00Z"
+}
+
+resource zitadel_machine_key machine_key_min {
+  depends_on = [zitadel_machine_user.machine_user, zitadel_org.org]
+
+  org_id   = zitadel_org.org.id
+  user_id  = zitadel_machine_user.machine_user.id
+  key_type = "KEY_TYPE_JSON"
 }
 ```
 
@@ -27,10 +35,13 @@ resource zitadel_machine_key machine_key {
 
 ### Required
 
-- `expiration_date` (String) Expiration date of the machine key
-- `key_type` (String) Type of the machine key
+- `key_type` (String) Type of the machine key, supported values: KEY_TYPE_UNSPECIFIED, KEY_TYPE_JSON
 - `org_id` (String) ID of the organization
 - `user_id` (String) ID of the user
+
+### Optional
+
+- `expiration_date` (String) Expiration date of the machine key
 
 ### Read-Only
 

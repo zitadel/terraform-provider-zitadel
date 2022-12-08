@@ -50,7 +50,7 @@ func GetResource() *schema.Resource {
 			privateLabelingSettingVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Defines from where the private labeling should be triggered",
+				Description: "Defines from where the private labeling should be triggered" + helper.DescriptionEnumValuesList(project.PrivateLabelingSetting_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(privateLabelingSettingVar, value, project.PrivateLabelingSetting_value)
 				},

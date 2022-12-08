@@ -50,15 +50,21 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	t, err := time.Parse(time.RFC3339, d.Get(expirationDateVar).(string))
-	if err != nil {
-		return diag.Errorf("failed to parse time: %v", err)
+	req := &management.AddPersonalAccessTokenRequest{
+		UserId: d.Get(userIDVar).(string),
+	}
+	if expiration, ok := d.GetOk(expirationDateVar); ok {
+		t, err := time.Parse(time.RFC3339, expiration.(string))
+		if err != nil {
+			return diag.Errorf("failed to parse time: %v", err)
+		}
+		req.ExpirationDate = timestamppb.New(t)
 	}
 
-	resp, err := client.AddPersonalAccessToken(ctx, &management.AddPersonalAccessTokenRequest{
-		UserId:         d.Get(userIDVar).(string),
-		ExpirationDate: timestamppb.New(t),
-	})
+	resp, err := client.AddPersonalAccessToken(ctx, req)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	if err := d.Set(tokenVar, resp.GetToken()); err != nil {
 		return diag.FromErr(err)

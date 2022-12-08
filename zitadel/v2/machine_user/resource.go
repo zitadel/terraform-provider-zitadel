@@ -41,7 +41,6 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "Preferred login name",
 			},
-
 			nameVar: {
 				Type:        schema.TypeString,
 				Required:    true,

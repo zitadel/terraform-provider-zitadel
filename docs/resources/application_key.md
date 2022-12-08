@@ -30,7 +30,7 @@ resource zitadel_application_key app_key {
 
 - `app_id` (String) ID of the application
 - `expiration_date` (String) Expiration date of the app key
-- `key_type` (String) Type of the app key
+- `key_type` (String) Type of the app key, supported values: KEY_TYPE_UNSPECIFIED, KEY_TYPE_JSON
 - `org_id` (String) ID of the organization
 - `project_id` (String) ID of the project
 

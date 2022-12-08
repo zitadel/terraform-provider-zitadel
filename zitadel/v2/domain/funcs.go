@@ -86,7 +86,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read domain: %v", err)
 	}
 
 	if len(resp.Result) == 1 {

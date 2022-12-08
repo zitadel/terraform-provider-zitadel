@@ -1,4 +1,4 @@
-resource zitadel_org_oidc_idp oidc_idp {
+resource zitadel_org_idp_oidc oidc_idp {
   depends_on = [zitadel_org.org]
 
   org_id               = zitadel_org.org.id

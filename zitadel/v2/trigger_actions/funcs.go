@@ -49,15 +49,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	actionsSet := d.Get(actionsVar).(*schema.Set)
-	actions := make([]string, 0)
-	for _, action := range actionsSet.List() {
-		actions = append(actions, action.(string))
-	}
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
 		FlowType:    action.FlowType(action.FlowType_value[d.Get(flowTypeVar).(string)]),
 		TriggerType: action.TriggerType(action.TriggerType_value[d.Get(triggerTypeVar).(string)]),
-		ActionIds:   actions,
+		ActionIds:   helper.GetOkSetToStringSlice(d, actionsVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update trigger actions: %v", err)
@@ -80,17 +75,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	actionsSet := d.Get(actionsVar).(*schema.Set)
-	actions := make([]string, 0)
-	for _, action := range actionsSet.List() {
-		actions = append(actions, action.(string))
-	}
 	flowType := d.Get(flowTypeVar).(string)
 	triggerType := d.Get(triggerTypeVar).(string)
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
 		FlowType:    action.FlowType(action.FlowType_value[flowType]),
 		TriggerType: action.TriggerType(action.TriggerType_value[triggerType]),
-		ActionIds:   actions,
+		ActionIds:   helper.GetOkSetToStringSlice(d, actionsVar),
 	})
 	d.SetId(getTriggerActionsID(orgID, flowType, triggerType))
 
