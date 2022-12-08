@@ -22,7 +22,7 @@ resource zitadel_default_lockout_policy lockout_policy {
 
 ### Required
 
-- `max_password_attempts` (Number) Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset.
+- `max_password_attempts` (Number) Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset.
 
 ### Read-Only
 

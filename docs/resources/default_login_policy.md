@@ -42,7 +42,6 @@ resource zitadel_default_login_policy login_policy {
 - `external_login_check_lifetime` (String)
 - `force_mfa` (Boolean) defines if a user MUST use a multi factor to log in
 - `hide_password_reset` (Boolean) defines if password reset link should be shown in the login screen
-- `idps` (Set of String) allowed idps to login or register
 - `ignore_unknown_usernames` (Boolean) defines if unknown username on login screen directly return an error or always display the password screen
 - `mfa_init_skip_lifetime` (String)
 - `multi_factor_check_lifetime` (String)
@@ -52,6 +51,10 @@ resource zitadel_default_login_policy login_policy {
 - `second_factor_check_lifetime` (String)
 - `second_factors` (Set of String) allowed second factors
 - `user_login` (Boolean) defines if a user is allowed to login with his username and password
+
+### Optional
+
+- `idps` (Set of String) allowed idps to login or register
 
 ### Read-Only
 
