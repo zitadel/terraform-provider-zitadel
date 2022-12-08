@@ -52,24 +52,29 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	t, err := time.Parse(time.RFC3339, d.Get(expirationDateVar).(string))
-	if err != nil {
-		return diag.Errorf("failed to parse time: %v", err)
+	keyType := d.Get(keyTypeVar).(string)
+	req := &management.AddAppKeyRequest{
+		ProjectId: d.Get(projectIDVar).(string),
+		AppId:     d.Get(appIDVar).(string),
+		Type:      authn.KeyType(authn.KeyType_value[keyType]),
 	}
 
-	keyType := d.Get(keyTypeVar).(string)
-	resp, err := client.AddAppKey(ctx, &management.AddAppKeyRequest{
-		ProjectId:      d.Get(projectIDVar).(string),
-		AppId:          d.Get(appIDVar).(string),
-		Type:           authn.KeyType(authn.KeyType_value[keyType]),
-		ExpirationDate: timestamppb.New(t),
-	})
+	if expiration, ok := d.GetOk(expirationDateVar); ok {
+		t, err := time.Parse(time.RFC3339, expiration.(string))
+		if err != nil {
+			return diag.Errorf("failed to parse time: %v", err)
+		}
+		req.ExpirationDate = timestamppb.New(t)
+	}
 
+	resp, err := client.AddAppKey(ctx, req)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	d.SetId(resp.GetId())
 	if err := d.Set(keyDetailsVar, string(resp.GetKeyDetails())); err != nil {
 		return diag.FromErr(err)
 	}
-
 	return nil
 }
 

@@ -50,7 +50,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.UpdateProjectMember(ctx, &management.UpdateProjectMemberRequest{
 		UserId:    d.Get(userIDVar).(string),
-		Roles:     d.Get(rolesVar).([]string),
+		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
 		ProjectId: d.Get(projectIDVar).(string),
 	})
 	if err != nil {
@@ -75,15 +75,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	userID := d.Get(userIDVar).(string)
 	projectID := d.Get(projectIDVar).(string)
-	roles := make([]string, 0)
-	for _, role := range d.Get(rolesVar).(*schema.Set).List() {
-		roles = append(roles, role.(string))
-	}
-
 	_, err = client.AddProjectMember(ctx, &management.AddProjectMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
-		Roles:     roles,
+		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create projectmember: %v", err)
@@ -120,7 +115,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read projectmember: %v", err)
 	}
 
 	if len(resp.Result) == 1 {

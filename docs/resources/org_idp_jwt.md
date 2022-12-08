@@ -1,18 +1,18 @@
 ---
-page_title: "zitadel_org_jwt_idp Resource - terraform-provider-zitadel"
+page_title: "zitadel_org_idp_jwt Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
   Resource representing a domain of the organization.
 ---
 
-# zitadel_org_jwt_idp (Resource)
+# zitadel_org_idp_jwt (Resource)
 
 Resource representing a domain of the organization.
 
 ## Example Usage
 
 ```terraform
-resource zitadel_org_jwt_idp jwt_idp {
+resource zitadel_org_idp_jwt jwt_idp {
   depends_on = [zitadel_org.org]
 
   org_id        = zitadel_org.org.id
@@ -38,7 +38,7 @@ resource zitadel_org_jwt_idp jwt_idp {
 - `keys_endpoint` (String) the endpoint to the key (JWK) which are used to sign the JWT with
 - `name` (String) Name of the IDP
 - `org_id` (String) ID of the organization
-- `styling_type` (String) Some identity providers specify the styling of the button to their login
+- `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_UNSPECIFIED, STYLING_TYPE_GOOGLE
 
 ### Read-Only
 

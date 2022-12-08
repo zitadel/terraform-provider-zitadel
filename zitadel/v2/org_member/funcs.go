@@ -48,14 +48,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	roles := make([]string, 0)
-	for _, role := range d.Get(rolesVar).(*schema.Set).List() {
-		roles = append(roles, role.(string))
-	}
-
 	_, err = client.UpdateOrgMember(ctx, &management.UpdateOrgMemberRequest{
 		UserId: d.Get(userIDVar).(string),
-		Roles:  roles,
+		Roles:  helper.GetOkSetToStringSlice(d, rolesVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update orgmember: %v", err)
@@ -78,14 +73,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	userID := d.Get(userIDVar).(string)
-	roles := make([]string, 0)
-	for _, role := range d.Get(rolesVar).(*schema.Set).List() {
-		roles = append(roles, role.(string))
-	}
-
 	_, err = client.AddOrgMember(ctx, &management.AddOrgMemberRequest{
 		UserId: userID,
-		Roles:  roles,
+		Roles:  helper.GetOkSetToStringSlice(d, rolesVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create orgmember: %v", err)
@@ -120,7 +110,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read orgmember: %v", err)
 	}
 
 	if len(resp.Result) == 1 {

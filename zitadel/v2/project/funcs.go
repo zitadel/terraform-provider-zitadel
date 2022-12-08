@@ -47,14 +47,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	plSetting := d.Get(privateLabelingSettingVar).(string)
 	_, err = client.UpdateProject(ctx, &management.UpdateProjectRequest{
 		Id:                     d.Id(),
 		Name:                   d.Get(nameVar).(string),
 		ProjectRoleCheck:       d.Get(roleCheckVar).(bool),
 		ProjectRoleAssertion:   d.Get(roleAssertionVar).(bool),
 		HasProjectCheck:        d.Get(hasProjectCheckVar).(bool),
-		PrivateLabelingSetting: project.PrivateLabelingSetting(project.PrivateLabelingSetting_value[plSetting]),
+		PrivateLabelingSetting: project.PrivateLabelingSetting(project.PrivateLabelingSetting_value[d.Get(privateLabelingSettingVar).(string)]),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update project: %v", err)
@@ -108,7 +107,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read project: %v", err)
 	}
 
 	project := resp.GetProject()

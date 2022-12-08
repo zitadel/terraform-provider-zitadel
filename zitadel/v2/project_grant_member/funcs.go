@@ -51,7 +51,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.UpdateProjectGrantMember(ctx, &management.UpdateProjectGrantMemberRequest{
 		UserId:    d.Get(userIDVar).(string),
-		Roles:     d.Get(rolesVar).([]string),
+		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
 		ProjectId: d.Get(projectIDVar).(string),
 		GrantId:   d.Get(grantIDVar).(string),
 	})
@@ -78,15 +78,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	userID := d.Get(userIDVar).(string)
 	projectID := d.Get(projectIDVar).(string)
 	grantID := d.Get(grantIDVar).(string)
-	roles := make([]string, 0)
-	for _, role := range d.Get(rolesVar).(*schema.Set).List() {
-		roles = append(roles, role.(string))
-	}
 	_, err = client.AddProjectGrantMember(ctx, &management.AddProjectGrantMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 		GrantId:   grantID,
-		Roles:     roles,
+		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create projectgrantmember: %v", err)
@@ -125,7 +121,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read projectgrantmember: %v", err)
 	}
 
 	if len(resp.Result) == 1 {

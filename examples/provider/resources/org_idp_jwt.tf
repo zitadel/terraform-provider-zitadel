@@ -1,4 +1,4 @@
-resource zitadel_org_jwt_idp jwt_idp {
+resource zitadel_org_idp_jwt jwt_idp {
   depends_on = [zitadel_org.org]
 
   org_id        = zitadel_org.org.id
