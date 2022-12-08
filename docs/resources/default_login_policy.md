@@ -45,16 +45,16 @@ resource zitadel_default_login_policy login_policy {
 - `ignore_unknown_usernames` (Boolean) defines if unknown username on login screen directly return an error or always display the password screen
 - `mfa_init_skip_lifetime` (String)
 - `multi_factor_check_lifetime` (String)
-- `multi_factors` (Set of String) allowed multi factors
 - `password_check_lifetime` (String)
 - `passwordless_type` (String) defines if passwordless is allowed for users
 - `second_factor_check_lifetime` (String)
-- `second_factors` (Set of String) allowed second factors
 - `user_login` (Boolean) defines if a user is allowed to login with his username and password
 
 ### Optional
 
 - `idps` (Set of String) allowed idps to login or register
+- `multi_factors` (Set of String) allowed multi factors
+- `second_factors` (Set of String) allowed second factors
 
 ### Read-Only
 

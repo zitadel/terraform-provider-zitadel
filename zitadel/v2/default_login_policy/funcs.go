@@ -181,21 +181,41 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		multiFactorCheckLifetimeVar:   resp.Policy.GetMultiFactorCheckLifetime().AsDuration().String(),
 	}
 
-	secondFactors := &schema.Set{}
-	for _, factor := range resp.Policy.SecondFactors {
-		secondFactors.Add(policy.SecondFactorType_name[int32(factor.Number())])
+	respSecond, err := client.ListLoginPolicySecondFactors(ctx, &admin.ListLoginPolicySecondFactorsRequest{})
+	if err != nil {
+		return diag.Errorf("failed to get login policy secondfactors: %v", err)
 	}
-	set[secondFactorsVar] = secondFactors
-	multiFactors := &schema.Set{}
-	for _, factor := range resp.Policy.MultiFactors {
-		multiFactors.Add(policy.MultiFactorType_name[int32(factor.Number())])
+	if len(respSecond.GetResult()) > 0 {
+		factors := make([]string, 0)
+		for _, item := range respSecond.GetResult() {
+			factors = append(factors, item.String())
+		}
+		set[secondFactorsVar] = factors
 	}
-	set[multiFactorsVar] = multiFactors
-	idps := &schema.Set{}
-	for _, idp := range resp.Policy.Idps {
-		idps.Add(idp.IdpId)
+
+	respMulti, err := client.ListLoginPolicyMultiFactors(ctx, &admin.ListLoginPolicyMultiFactorsRequest{})
+	if err != nil {
+		return diag.Errorf("failed to get login policy multifactors: %v", err)
 	}
-	set[idpsVar] = idps
+	if len(respMulti.GetResult()) > 0 {
+		factors := make([]string, 0)
+		for _, item := range respMulti.GetResult() {
+			factors = append(factors, item.String())
+		}
+		set[multiFactorsVar] = factors
+	}
+
+	respIDPs, err := client.ListLoginPolicyIDPs(ctx, &admin.ListLoginPolicyIDPsRequest{})
+	if err != nil {
+		return diag.Errorf("failed to get login policy idps: %v", err)
+	}
+	if len(respIDPs.GetResult()) > 0 {
+		idps := make([]string, 0)
+		for _, idpItem := range respIDPs.GetResult() {
+			idps = append(idps, idpItem.IdpId)
+		}
+		set[idpsVar] = idps
+	}
 
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
