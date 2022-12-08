@@ -51,23 +51,28 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	t, err := time.Parse(time.RFC3339, d.Get(expirationDateVar).(string))
-	if err != nil {
-		return diag.Errorf("failed to parse time: %v", err)
+	keyType := d.Get(keyTypeVar).(string)
+	req := &management.AddMachineKeyRequest{
+		UserId: d.Get(userIDVar).(string),
+		Type:   authn.KeyType(authn.KeyType_value[keyType]),
 	}
 
-	keyType := d.Get(keyTypeVar).(string)
-	resp, err := client.AddMachineKey(ctx, &management.AddMachineKeyRequest{
-		UserId:         d.Get(userIDVar).(string),
-		Type:           authn.KeyType(authn.KeyType_value[keyType]),
-		ExpirationDate: timestamppb.New(t),
-	})
-	d.SetId(resp.GetKeyId())
+	if expiration, ok := d.GetOk(expirationDateVar); ok {
+		t, err := time.Parse(time.RFC3339, expiration.(string))
+		if err != nil {
+			return diag.Errorf("failed to parse time: %v", err)
+		}
+		req.ExpirationDate = timestamppb.New(t)
+	}
 
+	resp, err := client.AddMachineKey(ctx, req)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.SetId(resp.GetKeyId())
 	if err := d.Set(keyDetailsVar, string(resp.GetKeyDetails())); err != nil {
 		return diag.FromErr(err)
 	}
-
 	return nil
 }
 

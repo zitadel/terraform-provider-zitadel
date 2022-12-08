@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -17,6 +19,16 @@ type Stringify interface {
 	String() string
 }
 
+func GetOkSetToStringSlice(d *schema.ResourceData, value string) []string {
+	var slice []string
+	if set, ok := d.GetOk(value); ok {
+		slice = SetToStringSlice(set.(*schema.Set))
+	} else {
+		slice = make([]string, 0)
+	}
+	return slice
+}
+
 func SetToStringSlice(set *schema.Set) []string {
 	slice := make([]string, 0)
 	for _, secondFactor := range set.List() {
@@ -25,14 +37,14 @@ func SetToStringSlice(set *schema.Set) []string {
 	return slice
 }
 
-func GetAddAndDelete(current []Stringify, desired []string) ([]string, []string) {
+func GetAddAndDelete(current []string, desired []string) ([]string, []string) {
 	addSlice := make([]string, 0)
 	deleteSlice := make([]string, 0)
 
 	for _, desiredItem := range desired {
 		found := false
 		for _, currentItem := range current {
-			if desiredItem == currentItem.String() {
+			if desiredItem == currentItem {
 				found = true
 			}
 		}
@@ -44,12 +56,12 @@ func GetAddAndDelete(current []Stringify, desired []string) ([]string, []string)
 	for _, currentItem := range current {
 		found := false
 		for _, desiredItem := range desired {
-			if desiredItem == currentItem.String() {
+			if desiredItem == currentItem {
 				found = true
 			}
 		}
 		if !found {
-			deleteSlice = append(deleteSlice, currentItem.String())
+			deleteSlice = append(deleteSlice, currentItem)
 		}
 	}
 
@@ -93,4 +105,14 @@ func GetID(d *schema.ResourceData, idVar string) string {
 		idStr = d.Id()
 	}
 	return idStr
+}
+
+func DescriptionEnumValuesList(enum map[int32]string) string {
+	str := ", supported values: "
+	values := make([]string, len(enum))
+	for i := 0; i < len(enum); i++ {
+		values[i] = enum[int32(i)]
+	}
+	str += strings.Join(values, ", ")
+	return str
 }

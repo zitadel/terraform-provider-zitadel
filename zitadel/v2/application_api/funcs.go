@@ -51,28 +51,22 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	projectID := d.Get(projectIDVar).(string)
-	appID := d.Id()
-	apiApp, err := getApp(ctx, client, projectID, appID)
-
-	appName := d.Get(nameVar).(string)
-	if apiApp.GetName() != appName {
+	if d.HasChange(nameVar) {
 		_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
 			ProjectId: projectID,
 			AppId:     d.Id(),
-			Name:      appName,
+			Name:      d.Get(nameVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update application: %v", err)
 		}
 	}
 
-	apiConfig := apiApp.GetApiConfig()
-	authMethod := d.Get(authMethodTypeVar).(string)
-	if apiConfig.GetAuthMethodType().String() != authMethod {
+	if d.HasChanges(authMethodTypeVar) {
 		_, err = client.UpdateAPIAppConfig(ctx, &management.UpdateAPIAppConfigRequest{
-			ProjectId:      d.Get(projectIDVar).(string),
+			ProjectId:      projectID,
 			AppId:          d.Id(),
-			AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[authMethod]),
+			AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[d.Get(authMethodTypeVar).(string)]),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update applicationAPI: %v", err)
@@ -133,7 +127,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read api applicationAPI: %v", err)
 	}
 
 	api := app.GetApiConfig()

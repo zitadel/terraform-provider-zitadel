@@ -28,7 +28,7 @@ func GetResource() *schema.Resource {
 			},
 			expirationDateVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Expiration date of the token",
 				ForceNew:    true,
 			},

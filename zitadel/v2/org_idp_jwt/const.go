@@ -1,4 +1,4 @@
-package idp_jwt
+package org_idp_jwt
 
 const (
 	idpIDVar        = "idp_id"

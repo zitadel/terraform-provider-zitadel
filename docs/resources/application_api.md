@@ -12,13 +12,21 @@ Resource representing an API application belonging to a project, with all config
 ## Example Usage
 
 ```terraform
-resource zitadel_application_api application_api {
+resource zitadel_application_api application_api_full {
   depends_on = [zitadel_org.org, zitadel_project.project]
 
   org_id           = zitadel_org.org.id
   project_id       = zitadel_project.project.id
-  name             = "applicationapi"
+  name             = "applicationapifull"
   auth_method_type = "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
+}
+
+resource zitadel_application_api application_api_min {
+  depends_on = [zitadel_org.org, zitadel_project.project]
+
+  org_id     = zitadel_org.org.id
+  project_id = zitadel_project.project.id
+  name       = "applicationapimin"
 }
 ```
 
@@ -27,10 +35,13 @@ resource zitadel_application_api application_api {
 
 ### Required
 
-- `auth_method_type` (String) Auth method type
 - `name` (String) Name of the application
 - `org_id` (String) orgID of the application
 - `project_id` (String) ID of the project
+
+### Optional
+
+- `auth_method_type` (String) Auth method type, supported values: API_AUTH_METHOD_TYPE_BASIC, API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT
 
 ### Read-Only
 

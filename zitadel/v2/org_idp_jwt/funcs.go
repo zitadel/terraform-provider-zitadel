@@ -1,4 +1,4 @@
-package idp_jwt
+package org_idp_jwt
 
 import (
 	"context"
@@ -47,10 +47,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	stylingType := d.Get(stylingTypeVar)
 	resp, err := client.AddOrgJWTIDP(ctx, &management.AddOrgJWTIDPRequest{
 		Name:         d.Get(nameVar).(string),
-		StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[stylingType.(string)]),
+		StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[d.Get(stylingTypeVar).(string)]),
 		JwtEndpoint:  d.Get(jwtEndpointVar).(string),
 		Issuer:       d.Get(issuerVar).(string),
 		KeysEndpoint: d.Get(keysEndpointVar).(string),
@@ -77,47 +76,25 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetOrgIDPByID(ctx, &management.GetOrgIDPByIDRequest{Id: d.Get("id").(string)})
-	if err != nil {
-		return diag.Errorf("failed to read jwt idp: %v", err)
-	}
-
-	idpID := d.Id()
-	name := d.Get(nameVar).(string)
-	stylingType := d.Get(stylingTypeVar).(string)
-	autoRegister := d.Get(autoRegisterVar).(bool)
-	if resp.GetIdp().GetName() != name ||
-		resp.GetIdp().GetStylingType().String() != stylingType ||
-		resp.GetIdp().GetAutoRegister() != autoRegister {
+	if d.HasChanges(nameVar, stylingTypeVar, autoRegisterVar) {
 		_, err := client.UpdateOrgIDP(ctx, &management.UpdateOrgIDPRequest{
-			IdpId:        idpID,
-			Name:         name,
-			StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[stylingType]),
-			AutoRegister: autoRegister,
+			IdpId:        d.Id(),
+			Name:         d.Get(nameVar).(string),
+			StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[d.Get(stylingTypeVar).(string)]),
+			AutoRegister: d.Get(autoRegisterVar).(bool),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update jwt idp: %v", err)
 		}
 	}
 
-	jwt := resp.GetIdp().GetJwtConfig()
-	jwtEndpoint := d.Get(jwtEndpointVar).(string)
-	issuer := d.Get(issuerVar).(string)
-	keysEndpoint := d.Get(keysEndpointVar).(string)
-	headerName := d.Get(headerNameVar).(string)
-
-	//either nothing changed on the IDP or something besides the secret changed
-	if jwt.GetJwtEndpoint() != jwtEndpoint ||
-		jwt.GetIssuer() != issuer ||
-		jwt.GetKeysEndpoint() != keysEndpoint ||
-		jwt.GetHeaderName() != headerName {
-
+	if d.HasChanges(jwtEndpointVar, issuerVar, keysEndpointVar, headerNameVar) {
 		_, err = client.UpdateOrgIDPJWTConfig(ctx, &management.UpdateOrgIDPJWTConfigRequest{
-			IdpId:        idpID,
-			JwtEndpoint:  jwtEndpoint,
-			Issuer:       issuer,
-			KeysEndpoint: keysEndpoint,
-			HeaderName:   headerName,
+			IdpId:        d.Id(),
+			JwtEndpoint:  d.Get(jwtEndpointVar).(string),
+			Issuer:       d.Get(issuerVar).(string),
+			KeysEndpoint: d.Get(keysEndpointVar).(string),
+			HeaderName:   d.Get(headerNameVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update jwt idp config: %v", err)
@@ -143,7 +120,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read jwt idp: %v", err)
 	}
 
 	idp := resp.GetIdp()

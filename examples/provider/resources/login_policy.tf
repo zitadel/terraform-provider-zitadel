@@ -19,3 +19,22 @@ resource zitadel_login_policy login_policy {
   multi_factors                 = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
   idps                          = [zitadel_org_oidc_idp.oidc_idp.id, zitadel_org_jwt_idp.jwt_idp.id]
 }
+
+resource zitadel_login_policy login_policy_min {
+  depends_on = [zitadel_org.org]
+
+  org_id                        = zitadel_org.org.id
+  user_login                    = true
+  allow_register                = true
+  allow_external_idp            = true
+  force_mfa                     = false
+  passwordless_type             = "PASSWORDLESS_TYPE_ALLOWED"
+  hide_password_reset           = "false"
+  password_check_lifetime       = "240h0m0s"
+  external_login_check_lifetime = "240h0m0s"
+  multi_factor_check_lifetime   = "720h0m0s"
+  mfa_init_skip_lifetime        = "24h0m0s"
+  second_factor_check_lifetime  = "24h0m0s"
+  ignore_unknown_usernames      = true
+  default_redirect_uri          = "localhost:8080"
+}

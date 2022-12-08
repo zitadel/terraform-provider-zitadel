@@ -26,9 +26,12 @@ resource zitadel_personal_access_token pat {
 
 ### Required
 
-- `expiration_date` (String) Expiration date of the token
 - `org_id` (String) ID of the organization
 - `user_id` (String) ID of the user
+
+### Optional
+
+- `expiration_date` (String) Expiration date of the token
 
 ### Read-Only
 

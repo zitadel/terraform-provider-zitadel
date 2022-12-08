@@ -20,14 +20,14 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(userGrantOrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	_, err = client.RemoveUserGrant(ctx, &management.RemoveUserGrantRequest{
 		GrantId: d.Id(),
-		UserId:  d.Get(userGrantUserIDVar).(string),
+		UserId:  d.Get(userIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete usergrant: %v", err)
@@ -43,19 +43,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(userGrantOrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	roles := make([]string, 0)
-	for _, role := range d.Get(userGrantRoleKeysVar).(*schema.Set).List() {
-		roles = append(roles, role.(string))
-	}
 	_, err = client.UpdateUserGrant(ctx, &management.UpdateUserGrantRequest{
 		GrantId:  d.Id(),
-		UserId:   d.Get(userGrantUserIDVar).(string),
-		RoleKeys: roles,
+		UserId:   d.Get(userIDVar).(string),
+		RoleKeys: helper.GetOkSetToStringSlice(d, roleKeysVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update usergrant: %v", err)
@@ -71,21 +67,16 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(userGrantOrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	roles := make([]string, 0)
-	for _, role := range d.Get(userGrantRoleKeysVar).(*schema.Set).List() {
-		roles = append(roles, role.(string))
-	}
-
 	resp, err := client.AddUserGrant(ctx, &management.AddUserGrantRequest{
-		UserId:         d.Get(userGrantUserIDVar).(string),
-		ProjectGrantId: d.Get(userGrantProjectGrantIDVar).(string),
-		ProjectId:      d.Get(userGrantProjectIDVar).(string),
-		RoleKeys:       roles,
+		UserId:         d.Get(userIDVar).(string),
+		ProjectGrantId: d.Get(projectGrantIDVar).(string),
+		ProjectId:      d.Get(projectIDVar).(string),
+		RoleKeys:       helper.GetOkSetToStringSlice(d, roleKeysVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create usergrant: %v", err)
@@ -102,17 +93,17 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(userGrantOrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	projectID := d.Get(userGrantProjectIDVar)
-	projectGrantID := d.Get(userGrantProjectGrantIDVar)
+	projectID := d.Get(projectIDVar)
+	projectGrantID := d.Get(projectGrantIDVar)
 
 	queries := []*user.UserGrantQuery{
 		{Query: &user.UserGrantQuery_UserIdQuery{
 			UserIdQuery: &user.UserGrantUserIDQuery{
-				UserId: d.Get(userGrantUserIDVar).(string),
+				UserId: d.Get(userIDVar).(string),
 			},
 		}},
 	}
@@ -138,21 +129,20 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		d.SetId("")
 		return nil
-		//return diag.Errorf("failed to read usergrant: %v", err)
 	}
 
 	if len(grants.GetResult()) == 1 {
 		grant := grants.GetResult()[0]
 		set := map[string]interface{}{
-			userGrantUserIDVar:   grant.GetUserId(),
-			userGrantRoleKeysVar: grant.GetRoleKeys(),
-			userGrantOrgIDVar:    grant.GetDetails().GetResourceOwner(),
+			userIDVar:   grant.GetUserId(),
+			roleKeysVar: grant.GetRoleKeys(),
+			orgIDVar:    grant.GetDetails().GetResourceOwner(),
 		}
 		if grant.GetProjectId() != "" {
-			set[userGrantProjectIDVar] = grant.GetProjectId()
+			set[projectIDVar] = grant.GetProjectId()
 		}
 		if grant.GetProjectGrantId() != "" {
-			set[userGrantProjectGrantIDVar] = grant.GetProjectGrantId()
+			set[projectGrantIDVar] = grant.GetProjectGrantId()
 		}
 		for k, v := range set {
 			if err := d.Set(k, v); err != nil {
