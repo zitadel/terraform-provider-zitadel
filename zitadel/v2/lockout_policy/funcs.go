@@ -93,9 +93,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	resp, err := client.GetLockoutPolicy(ctx, &management.GetLockoutPolicyRequest{})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get lockout policy")
 	}
 
 	policy := resp.Policy

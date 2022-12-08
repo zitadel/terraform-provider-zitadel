@@ -2,12 +2,10 @@ package application_api
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
@@ -123,12 +121,16 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	app, err := getApp(ctx, client, d.Get(projectIDVar).(string), helper.GetID(d, appIDVar))
-	if err != nil {
+	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: d.Get(projectIDVar).(string), AppId: helper.GetID(d, appIDVar)})
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
 	}
+	if err != nil {
+		return diag.Errorf("failed to get application api")
+	}
 
+	app := resp.GetApp()
 	api := app.GetApiConfig()
 	set := map[string]interface{}{
 		orgIDVar:          app.GetDetails().GetResourceOwner(),
@@ -142,13 +144,4 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	d.SetId(app.GetId())
 	return nil
-}
-
-func getApp(ctx context.Context, client *management2.Client, projectID string, appID string) (*app.App, error) {
-	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: projectID, AppId: appID})
-	if err != nil {
-		return nil, fmt.Errorf("failed to read applicationAPI: %v", err)
-	}
-
-	return resp.GetApp(), err
 }

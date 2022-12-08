@@ -11,7 +11,7 @@ func GetResource() *schema.Resource {
 			maxPasswordAttemptsVar: {
 				Type:        schema.TypeInt,
 				Required:    true,
-				Description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset.",
+				Description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset.",
 			},
 		},
 		DeleteContext: delete,

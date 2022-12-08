@@ -141,9 +141,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	resp, err := client.GetPreviewLabelPolicy(ctx, &management.GetPreviewLabelPolicyRequest{})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get label policy")
 	}
 
 	policy := resp.Policy

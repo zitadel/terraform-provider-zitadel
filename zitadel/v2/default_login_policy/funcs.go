@@ -159,9 +159,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	resp, err := client.GetLoginPolicy(ctx, &admin.GetLoginPolicyRequest{})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get default login policy")
 	}
 
 	set := map[string]interface{}{

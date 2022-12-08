@@ -30,7 +30,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	resp, err := client.UpdateLockoutPolicy(ctx, &admin.UpdateLockoutPolicyRequest{
-		MaxPasswordAttempts: d.Get(maxPasswordAttemptsVar).(uint32),
+		MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update default lockout policy: %v", err)
@@ -53,9 +53,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	resp, err := client.GetLockoutPolicy(ctx, &admin.GetLockoutPolicyRequest{})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get default lockout policy")
 	}
 
 	policy := resp.Policy

@@ -94,12 +94,15 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		UserId: userID,
 		KeyId:  d.Id(),
 	})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
 	}
-	d.SetId(resp.GetKey().GetId())
+	if err != nil {
+		return diag.Errorf("failed to get machine key")
+	}
 
+	d.SetId(resp.GetKey().GetId())
 	set := map[string]interface{}{
 		expirationDateVar: resp.GetKey().GetExpirationDate().AsTime().Format(time.RFC3339),
 		userIDVar:         userID,

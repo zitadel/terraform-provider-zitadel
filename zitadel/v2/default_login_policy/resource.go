@@ -94,7 +94,7 @@ func GetResource() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Required:    true,
+				Optional:    true,
 				Description: "allowed idps to login or register",
 			},
 		},

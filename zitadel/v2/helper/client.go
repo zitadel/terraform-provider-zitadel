@@ -9,6 +9,8 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/middleware"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -90,4 +92,11 @@ func GetManagementClient(info *ClientInfo, orgID string) (*management.Client, er
 		return nil, fmt.Errorf("failed to start zitadel client: %v", err)
 	}
 	return client, nil
+}
+
+func IgnoreIfNotFoundError(err error) error {
+	if code := status.Code(err); code == codes.NotFound {
+		return nil
+	}
+	return err
 }
