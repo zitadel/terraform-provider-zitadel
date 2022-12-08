@@ -32,11 +32,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	current, err := client.GetLoginPolicy(ctx, &admin.GetLoginPolicyRequest{})
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	if d.HasChanges(passwordCheckLifetimeVar,
 		externalLoginCheckLifetimeVar,
 		mfaInitSkipLifetimeVar,
@@ -71,7 +66,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		if err != nil {
 			return diag.FromErr(err)
 		}
-
 		resp, err := client.UpdateLoginPolicy(ctx, &admin.UpdateLoginPolicyRequest{
 			AllowUsernamePassword:      d.Get(allowUsernamePasswordVar).(bool),
 			AllowRegister:              d.Get(allowRegisterVar).(bool),
@@ -94,12 +88,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChange(secondFactorsVar) {
-		secondFactors := helper.SetToStringSlice(d.Get(secondFactorsVar).(*schema.Set))
-		currentSecondFactors := make([]helper.Stringify, 0)
-		for _, secondFactor := range current.GetPolicy().GetSecondFactors() {
-			currentSecondFactors = append(currentSecondFactors, secondFactor)
-		}
-		addSecondFactor, deleteSecondFactors := helper.GetAddAndDelete(currentSecondFactors, secondFactors)
+		o, n := d.GetChange(secondFactorsVar)
+		addSecondFactor, deleteSecondFactors := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
 
 		for _, factor := range addSecondFactor {
 			if _, err := client.AddSecondFactorToLoginPolicy(ctx, &admin.AddSecondFactorToLoginPolicyRequest{
@@ -118,12 +108,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChange(multiFactorsVar) {
-		multiFactors := helper.SetToStringSlice(d.Get(multiFactorsVar).(*schema.Set))
-		currentMultiFactors := make([]helper.Stringify, 0)
-		for _, multiFactor := range current.GetPolicy().GetMultiFactors() {
-			currentMultiFactors = append(currentMultiFactors, multiFactor)
-		}
-		addMultiFactor, deleteMultiFactors := helper.GetAddAndDelete(currentMultiFactors, multiFactors)
+		o, n := d.GetChange(multiFactorsVar)
+		addMultiFactor, deleteMultiFactors := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
+
 		for _, factor := range addMultiFactor {
 			if _, err := client.AddMultiFactorToLoginPolicy(ctx, &admin.AddMultiFactorToLoginPolicyRequest{
 				Type: policy.MultiFactorType(policy.MultiFactorType_value[factor]),
@@ -141,12 +128,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChange(idpsVar) {
-		idps := helper.SetToStringSlice(d.Get(idpsVar).(*schema.Set))
-		currentIdps := make([]helper.Stringify, 0)
-		for _, currentIdp := range current.GetPolicy().GetIdps() {
-			currentIdps = append(currentIdps, &helper.Stringified{currentIdp.IdpId})
-		}
-		addIdps, deleteIdps := helper.GetAddAndDelete(currentIdps, idps)
+		o, n := d.GetChange(idpsVar)
+		addIdps, deleteIdps := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
+
 		for _, addIdp := range addIdps {
 			if _, err := client.AddIDPToLoginPolicy(ctx, &admin.AddIDPToLoginPolicyRequest{IdpId: addIdp}); err != nil {
 				return diag.FromErr(err)

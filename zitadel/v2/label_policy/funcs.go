@@ -46,27 +46,38 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateCustomLabelPolicy(ctx, &management.UpdateCustomLabelPolicyRequest{
-		PrimaryColor:        d.Get(primaryColorVar).(string),
-		HideLoginNameSuffix: d.Get(hideLoginNameSuffixVar).(bool),
-		WarnColor:           d.Get(warnColorVar).(string),
-		BackgroundColor:     d.Get(backgroundColorVar).(string),
-		FontColor:           d.Get(fontColorVar).(string),
-		PrimaryColorDark:    d.Get(primaryColorDarkVar).(string),
-		BackgroundColorDark: d.Get(backgroundColorDarkVar).(string),
-		WarnColorDark:       d.Get(warnColorDarkVar).(string),
-		FontColorDark:       d.Get(fontColorDarkVar).(string),
-		DisableWatermark:    d.Get(disableWatermarkVar).(bool),
-	})
-	if err != nil {
-		return diag.Errorf("failed to update label policy: %v", err)
+	if d.HasChanges(
+		primaryColorVar,
+		hideLoginNameSuffixVar,
+		warnColorVar,
+		backgroundColorVar,
+		fontColorVar,
+		primaryColorDarkVar,
+		backgroundColorDarkVar,
+		warnColorDarkVar,
+		fontColorDarkVar,
+		disableWatermarkVar,
+	) {
+		resp, err := client.UpdateCustomLabelPolicy(ctx, &management.UpdateCustomLabelPolicyRequest{
+			PrimaryColor:        d.Get(primaryColorVar).(string),
+			HideLoginNameSuffix: d.Get(hideLoginNameSuffixVar).(bool),
+			WarnColor:           d.Get(warnColorVar).(string),
+			BackgroundColor:     d.Get(backgroundColorVar).(string),
+			FontColor:           d.Get(fontColorVar).(string),
+			PrimaryColorDark:    d.Get(primaryColorDarkVar).(string),
+			BackgroundColorDark: d.Get(backgroundColorDarkVar).(string),
+			WarnColorDark:       d.Get(warnColorDarkVar).(string),
+			FontColorDark:       d.Get(fontColorDarkVar).(string),
+			DisableWatermark:    d.Get(disableWatermarkVar).(bool),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update label policy: %v", err)
+		}
+		d.SetId(resp.Details.ResourceOwner)
 	}
-	d.SetId(org)
 
-	active := d.Get(setActiveVar)
-	if active != nil {
-		activeBool := active.(bool)
-		if activeBool {
+	if d.HasChange(setActiveVar) {
+		if d.Get(setActiveVar).(bool) {
 			if _, err := client.ActivateCustomLabelPolicy(ctx, &management.ActivateCustomLabelPolicyRequest{}); err != nil {
 				return diag.Errorf("failed to activate label policy: %v", err)
 			}
@@ -106,15 +117,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	d.SetId(org)
 
-	active := d.Get(setActiveVar)
-	if active != nil {
-		activeBool := active.(bool)
-		if activeBool {
-			if _, err := client.ActivateCustomLabelPolicy(ctx, &management.ActivateCustomLabelPolicyRequest{}); err != nil {
-				return diag.Errorf("failed to activate label policy: %v", err)
-			}
+	if d.Get(setActiveVar).(bool) {
+		if _, err := client.ActivateCustomLabelPolicy(ctx, &management.ActivateCustomLabelPolicyRequest{}); err != nil {
+			return diag.Errorf("failed to activate label policy: %v", err)
 		}
 	}
+
 	return nil
 }
 

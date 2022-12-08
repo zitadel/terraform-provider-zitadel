@@ -56,7 +56,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to update password complexity policy: %v", err)
 	}
-	d.SetId(org)
 	return nil
 }
 

@@ -54,7 +54,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to update privacy policy: %v", err)
 	}
-	d.SetId(org)
 	return nil
 }
 

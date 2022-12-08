@@ -40,8 +40,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(orgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -52,7 +51,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to update lockout policy: %v", err)
 	}
-	d.SetId(org)
 	return nil
 }
 

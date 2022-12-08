@@ -50,7 +50,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	d.SetId(org)
 	if d.HasChanges(
 		allowUsernamePasswordVar,
 		allowRegisterVar,
