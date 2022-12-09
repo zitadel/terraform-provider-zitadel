@@ -1,0 +1,39 @@
+---
+types:
+  - LoginCustomText
+  - MessageCustomText
+
+target_package_name: text
+default_package_name: textpb
+
+use_state_for_unknown_by_default: true
+sort: true
+
+exclude_fields:
+  - LoginCustomText.details
+  - LoginCustomText.is_default
+  - MessageCustomText.details
+  - MessageCustomText.is_default
+
+injected_fields:
+  LoginCustomText:
+    - name: id
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      computed: true
+    - name: org_id
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      required: true
+    - name: language
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      required: true
+  MessageCustomText:
+    - name: id
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      computed: true
+    - name: org_id
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      required: true
+    - name: language
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      required: true
+
