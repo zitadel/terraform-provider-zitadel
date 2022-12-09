@@ -3,7 +3,6 @@ package helper
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/pkg/oidc"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
@@ -26,20 +25,12 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(d *schema.ResourceData) (*ClientInfo, error) {
-	insecure := d.Get(InsecureVar).(bool)
-	domain := d.Get(DomainVar).(string)
-	options := []zitadel.Option{zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(d.Get(TokenVar).(string)))}
-
-	portStr := ""
-	port := d.Get(PortVar)
-	if port != nil {
-		portStr = port.(string)
-	}
+func GetClientInfo(insecure bool, domain string, token string, port string) (*ClientInfo, error) {
+	options := []zitadel.Option{zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(token))}
 
 	issuer := ""
-	if portStr != "" {
-		domain = domain + ":" + portStr
+	if port != "" {
+		domain = domain + ":" + port
 		issuer = domain
 	} else {
 		issuer = domain
