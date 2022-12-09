@@ -34,10 +34,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		PrivacyLink: d.Get(privacyLinkVar).(string),
 		HelpLink:    d.Get(helpLinkVar).(string),
 	})
-	if err != nil {
+	if helper.IgnorePreconditionError(err) != nil {
 		return diag.Errorf("failed to update default privacy policy: %v", err)
 	}
-	d.SetId(resp.GetDetails().GetResourceOwner())
+	if resp != nil {
+		d.SetId(resp.GetDetails().GetResourceOwner())
+	}
 	return nil
 }
 

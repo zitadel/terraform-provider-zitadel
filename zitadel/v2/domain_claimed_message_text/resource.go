@@ -121,11 +121,10 @@ func (r *domainClaimedMessageTextResource) Read(ctx context.Context, req resourc
 
 	zResp, err := client.GetCustomDomainClaimedMessageText(ctx, &management.GetCustomDomainClaimedMessageTextRequest{Language: language})
 	if err != nil {
-		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 	if zResp.CustomText.IsDefault {
-		resp.Diagnostics.AddError("Error while reading", "No custom texts existing")
+		return
 	}
 
 	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, *zResp.CustomText, &state)...)

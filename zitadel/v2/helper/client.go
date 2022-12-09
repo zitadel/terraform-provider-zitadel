@@ -86,7 +86,22 @@ func GetManagementClient(info *ClientInfo, orgID string) (*management.Client, er
 }
 
 func IgnoreIfNotFoundError(err error) error {
-	if code := status.Code(err); code == codes.NotFound {
+	//permission denied included as nothing can be found then as well
+	if code := status.Code(err); code == codes.NotFound || code == codes.PermissionDenied {
+		return nil
+	}
+	return err
+}
+
+func IgnorePreconditionError(err error) error {
+	if code := status.Code(err); code == codes.FailedPrecondition {
+		return nil
+	}
+	return err
+}
+
+func IgnoreAlreadyExistsError(err error) error {
+	if code := status.Code(err); code == codes.AlreadyExists {
 		return nil
 	}
 	return err

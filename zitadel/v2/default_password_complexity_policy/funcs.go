@@ -36,10 +36,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		HasNumber:    d.Get(hasNumberVar).(bool),
 		HasSymbol:    d.Get(hasSymbolVar).(bool),
 	})
-	if err != nil {
+	if helper.IgnorePreconditionError(err) != nil {
 		return diag.Errorf("failed to update default password complexity policy: %v", err)
 	}
-	d.SetId(resp.GetDetails().GetResourceOwner())
+	if resp != nil {
+		d.SetId(resp.GetDetails().GetResourceOwner())
+	}
 	return nil
 }
 

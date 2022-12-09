@@ -1,4 +1,4 @@
-resource zitadel_human_user human_user_full {
+resource zitadel_human_user human_user {
   depends_on = [zitadel_org.org]
 
   org_id             = zitadel_org.org.id
@@ -14,13 +14,4 @@ resource zitadel_human_user human_user_full {
   email              = "test@zitadel.com"
   is_email_verified  = true
   initial_password   = "Password1!"
-}
-
-resource zitadel_human_user human_user_min {
-  depends_on = [zitadel_org.org]
-
-  org_id     = zitadel_org.org.id
-  user_name  = "humanmin@localhost.com"
-  first_name = "firstname"
-  last_name  = "lastname"
 }

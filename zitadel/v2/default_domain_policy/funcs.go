@@ -34,10 +34,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
 		SmtpSenderAddressMatchesInstanceDomain: d.Get(smtpSenderVar).(bool),
 	})
-	if err != nil {
+	if helper.IgnorePreconditionError(err) != nil {
 		return diag.Errorf("failed to update default domain policy: %v", err)
 	}
-	d.SetId(resp.GetDetails().GetResourceOwner())
+	if resp != nil {
+		d.SetId(resp.GetDetails().GetResourceOwner())
+	}
 	return nil
 }
 

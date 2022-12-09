@@ -81,35 +81,51 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			SecondFactorCheckLifetime:  durationpb.New(secondFactorCheckLT),
 			MultiFactorCheckLifetime:   durationpb.New(multiFactorCheckLT),
 		})
-		if err != nil {
+		if helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to update login policy: %v", err)
 		}
-		d.SetId(resp.GetDetails().GetResourceOwner())
+		if resp != nil {
+			d.SetId(resp.GetDetails().GetResourceOwner())
+		}
 	}
 
 	if d.HasChange(secondFactorsVar) {
-		o, n := d.GetChange(secondFactorsVar)
-		addSecondFactor, deleteSecondFactors := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
+		o, err := client.ListLoginPolicySecondFactors(ctx, &admin.ListLoginPolicySecondFactorsRequest{})
+		if err != nil {
+			return diag.Errorf("failed to get default login policy second factors: %v", err)
+		}
+		factors := make([]string, len(o.GetResult()))
+		for i, factor := range o.GetResult() {
+			factors[i] = policy.SecondFactorType_name[int32(factor.Number())]
+		}
+		addSecondFactor, deleteSecondFactors := helper.GetAddAndDelete(factors, helper.SetToStringSlice(d.Get(secondFactorsVar).(*schema.Set)))
 
 		for _, factor := range addSecondFactor {
 			if _, err := client.AddSecondFactorToLoginPolicy(ctx, &admin.AddSecondFactorToLoginPolicyRequest{
 				Type: policy.SecondFactorType(policy.SecondFactorType_value[factor]),
-			}); err != nil {
+			}); helper.IgnoreAlreadyExistsError(err) != nil {
 				return diag.FromErr(err)
 			}
 		}
 		for _, factor := range deleteSecondFactors {
 			if _, err := client.RemoveSecondFactorFromLoginPolicy(ctx, &admin.RemoveSecondFactorFromLoginPolicyRequest{
 				Type: policy.SecondFactorType(policy.SecondFactorType_value[factor]),
-			}); err != nil {
+			}); helper.IgnoreAlreadyExistsError(err) != nil {
 				return diag.FromErr(err)
 			}
 		}
 	}
 
 	if d.HasChange(multiFactorsVar) {
-		o, n := d.GetChange(multiFactorsVar)
-		addMultiFactor, deleteMultiFactors := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
+		o, err := client.ListLoginPolicyMultiFactors(ctx, &admin.ListLoginPolicyMultiFactorsRequest{})
+		if err != nil {
+			return diag.Errorf("failed to get default login policy multi factors: %v", err)
+		}
+		factors := make([]string, len(o.GetResult()))
+		for i, factor := range o.GetResult() {
+			factors[i] = policy.MultiFactorType_name[int32(factor.Number())]
+		}
+		addMultiFactor, deleteMultiFactors := helper.GetAddAndDelete(factors, helper.SetToStringSlice(d.Get(multiFactorsVar).(*schema.Set)))
 
 		for _, factor := range addMultiFactor {
 			if _, err := client.AddMultiFactorToLoginPolicy(ctx, &admin.AddMultiFactorToLoginPolicyRequest{
@@ -128,8 +144,16 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChange(idpsVar) {
-		o, n := d.GetChange(idpsVar)
-		addIdps, deleteIdps := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
+		o, err := client.ListLoginPolicyIDPs(ctx, &admin.ListLoginPolicyIDPsRequest{})
+		if err != nil {
+			return diag.Errorf("failed to get default login policy idps: %v", err)
+		}
+
+		idps := make([]string, len(o.GetResult()))
+		for i, idp := range o.GetResult() {
+			idps[i] = idp.IdpId
+		}
+		addIdps, deleteIdps := helper.GetAddAndDelete(idps, helper.SetToStringSlice(d.Get(idpsVar).(*schema.Set)))
 
 		for _, addIdp := range addIdps {
 			if _, err := client.AddIDPToLoginPolicy(ctx, &admin.AddIDPToLoginPolicyRequest{IdpId: addIdp}); err != nil {

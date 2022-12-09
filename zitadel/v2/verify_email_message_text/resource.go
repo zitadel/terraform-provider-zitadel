@@ -121,11 +121,10 @@ func (r *verifyEmailMessageTextResource) Read(ctx context.Context, req resource.
 
 	zResp, err := client.GetCustomVerifyEmailMessageText(ctx, &management.GetCustomVerifyEmailMessageTextRequest{Language: language})
 	if err != nil {
-		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 	if zResp.CustomText.IsDefault {
-		resp.Diagnostics.AddError("Error while reading", "No custom texts existing")
+		return
 	}
 
 	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, *zResp.CustomText, &state)...)

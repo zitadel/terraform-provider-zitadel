@@ -121,11 +121,10 @@ func (r *loginTextsResource) Read(ctx context.Context, req resource.ReadRequest,
 
 	zResp, err := client.GetCustomLoginTexts(ctx, &management.GetCustomLoginTextsRequest{Language: language})
 	if err != nil {
-		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 	if zResp.CustomText.IsDefault {
-		resp.Diagnostics.AddError("Error while reading login texts", "No custom login texts existing")
+		return
 	}
 
 	resp.Diagnostics.Append(text.CopyLoginCustomTextToTerraform(ctx, *zResp.CustomText, &state)...)

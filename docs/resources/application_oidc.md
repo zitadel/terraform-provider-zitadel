@@ -12,13 +12,13 @@ Resource representing an OIDC application belonging to a project, with all confi
 ## Example Usage
 
 ```terraform
-resource zitadel_application_oidc application_oidc_full {
+resource zitadel_application_oidc application_oidc{
   depends_on = [zitadel_org.org, zitadel_project.project]
 
   project_id = zitadel_project.project.id
   org_id     = zitadel_org.org.id
 
-  name                        = "applicationoidcfull"
+  name                        = "applicationoidc"
   redirect_uris               = ["https://localhost.com"]
   response_types              = ["OIDC_RESPONSE_TYPE_CODE"]
   grant_types                 = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
@@ -33,18 +33,6 @@ resource zitadel_application_oidc application_oidc_full {
   id_token_role_assertion     = false
   id_token_userinfo_assertion = false
   additional_origins          = []
-}
-
-resource zitadel_application_oidc application_oidc_min {
-  depends_on = [zitadel_org.org, zitadel_project.project]
-
-  project_id = zitadel_project.project.id
-  org_id     = zitadel_org.org.id
-
-  name           = "applicationoidcmin"
-  redirect_uris  = ["https://localhost.com"]
-  response_types = ["OIDC_RESPONSE_TYPE_CODE"]
-  grant_types    = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
 }
 ```
 

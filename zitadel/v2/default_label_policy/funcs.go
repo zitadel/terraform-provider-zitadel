@@ -53,10 +53,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			FontColorDark:       d.Get(fontColorDarkVar).(string),
 			DisableWatermark:    d.Get(disableWatermarkVar).(bool),
 		})
-		if err != nil {
+		if helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to update default label policy: %v", err)
 		}
-		d.SetId(resp.Details.ResourceOwner)
+		if resp != nil {
+			d.SetId(resp.Details.ResourceOwner)
+		}
 	}
 
 	if d.HasChange(setActiveVar) {

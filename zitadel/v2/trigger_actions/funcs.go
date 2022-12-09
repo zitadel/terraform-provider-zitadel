@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/action"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
@@ -26,11 +25,11 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
-		FlowType:    action.FlowType(action.FlowType_value[d.Get(flowTypeVar).(string)]),
-		TriggerType: action.TriggerType(action.TriggerType_value[d.Get(triggerTypeVar).(string)]),
+		FlowType:    d.Get(flowTypeVar).(string),
+		TriggerType: d.Get(triggerTypeVar).(string),
 		ActionIds:   []string{},
 	})
-	if err != nil {
+	if helper.IgnoreIfNotFoundError(err) != nil {
 		return diag.Errorf("failed to delete trigger actions: %v", err)
 	}
 	return nil
@@ -50,8 +49,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
-		FlowType:    action.FlowType(action.FlowType_value[d.Get(flowTypeVar).(string)]),
-		TriggerType: action.TriggerType(action.TriggerType_value[d.Get(triggerTypeVar).(string)]),
+		FlowType:    d.Get(flowTypeVar).(string),
+		TriggerType: d.Get(triggerTypeVar).(string),
 		ActionIds:   helper.GetOkSetToStringSlice(d, actionsVar),
 	})
 	if err != nil {
@@ -78,8 +77,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	flowType := d.Get(flowTypeVar).(string)
 	triggerType := d.Get(triggerTypeVar).(string)
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
-		FlowType:    action.FlowType(action.FlowType_value[flowType]),
-		TriggerType: action.TriggerType(action.TriggerType_value[triggerType]),
+		FlowType:    flowType,
+		TriggerType: triggerType,
 		ActionIds:   helper.GetOkSetToStringSlice(d, actionsVar),
 	})
 	d.SetId(getTriggerActionsID(orgID, flowType, triggerType))
