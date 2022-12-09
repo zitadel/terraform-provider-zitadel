@@ -17,9 +17,15 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_domain_claimed_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_init_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_label_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_lockout_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_login_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_reset_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_passwordless_registration_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_privacy_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_verify_email_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_verify_phone_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain"
@@ -187,34 +193,40 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"zitadel_org":                        org.GetResource(),
-			"zitadel_human_user":                 human_user.GetResource(),
-			"zitadel_machine_user":               machine_user.GetResource(),
-			"zitadel_project":                    project.GetResource(),
-			"zitadel_project_role":               project_role.GetResource(),
-			"zitadel_domain":                     domain.GetResource(),
-			"zitadel_action":                     action.GetResource(),
-			"zitadel_application_oidc":           application_oidc.GetResource(),
-			"zitadel_application_api":            application_api.GetResource(),
-			"zitadel_application_key":            app_key.GetResource(),
-			"zitadel_project_grant":              project_grant.GetResource(),
-			"zitadel_user_grant":                 user_grant.GetResource(),
-			"zitadel_org_member":                 org_member.GetResource(),
-			"zitadel_project_member":             project_member.GetResource(),
-			"zitadel_project_grant_member":       project_grant_member.GetResource(),
-			"zitadel_domain_policy":              domain_policy.GetResource(),
-			"zitadel_label_policy":               label_policy.GetResource(),
-			"zitadel_lockout_policy":             lockout_policy.GetResource(),
-			"zitadel_login_policy":               login_policy.GetResource(),
-			"zitadel_password_complexity_policy": password_complexity_policy.GetResource(),
-			"zitadel_privacy_policy":             privacy_policy.GetResource(),
-			"zitadel_trigger_actions":            trigger_actions.GetResource(),
-			"zitadel_personal_access_token":      pat.GetResource(),
-			"zitadel_machine_key":                machine_key.GetResource(),
-			"zitadel_org_idp_jwt":                org_idp_jwt.GetResource(),
-			"zitadel_org_idp_oidc":               org_idp_oidc.GetResource(),
-			"zitadel_sms_provider_twilio":        sms_provider_twilio.GetResource(),
-			"zitadel_smtp_config":                smtp_config.GetResource(),
+			"zitadel_org":                                org.GetResource(),
+			"zitadel_human_user":                         human_user.GetResource(),
+			"zitadel_machine_user":                       machine_user.GetResource(),
+			"zitadel_project":                            project.GetResource(),
+			"zitadel_project_role":                       project_role.GetResource(),
+			"zitadel_domain":                             domain.GetResource(),
+			"zitadel_action":                             action.GetResource(),
+			"zitadel_application_oidc":                   application_oidc.GetResource(),
+			"zitadel_application_api":                    application_api.GetResource(),
+			"zitadel_application_key":                    app_key.GetResource(),
+			"zitadel_project_grant":                      project_grant.GetResource(),
+			"zitadel_user_grant":                         user_grant.GetResource(),
+			"zitadel_org_member":                         org_member.GetResource(),
+			"zitadel_project_member":                     project_member.GetResource(),
+			"zitadel_project_grant_member":               project_grant_member.GetResource(),
+			"zitadel_domain_policy":                      domain_policy.GetResource(),
+			"zitadel_label_policy":                       label_policy.GetResource(),
+			"zitadel_lockout_policy":                     lockout_policy.GetResource(),
+			"zitadel_login_policy":                       login_policy.GetResource(),
+			"zitadel_password_complexity_policy":         password_complexity_policy.GetResource(),
+			"zitadel_privacy_policy":                     privacy_policy.GetResource(),
+			"zitadel_trigger_actions":                    trigger_actions.GetResource(),
+			"zitadel_personal_access_token":              pat.GetResource(),
+			"zitadel_machine_key":                        machine_key.GetResource(),
+			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
+			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
+			"zitadel_default_label_policy":               default_label_policy.GetResource(),
+			"zitadel_default_login_policy":               default_login_policy.GetResource(),
+			"zitadel_default_lockout_policy":             default_lockout_policy.GetResource(),
+			"zitadel_default_domain_policy":              default_domain_policy.GetResource(),
+			"zitadel_default_privacy_policy":             default_privacy_policy.GetResource(),
+			"zitadel_default_password_complexity_policy": default_password_complexity_policy.GetResource(),
+			"zitadel_sms_provider_twilio":                sms_provider_twilio.GetResource(),
+			"zitadel_smtp_config":                        smtp_config.GetResource(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

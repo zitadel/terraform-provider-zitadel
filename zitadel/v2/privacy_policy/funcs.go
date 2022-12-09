@@ -54,7 +54,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to update privacy policy: %v", err)
 	}
-	d.SetId(org)
 	return nil
 }
 
@@ -99,9 +98,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	resp, err := client.GetPrivacyPolicy(ctx, &management.GetPrivacyPolicyRequest{})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get privacy policy")
 	}
 
 	policy := resp.Policy

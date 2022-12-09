@@ -50,7 +50,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	d.SetId(org)
 	if d.HasChanges(
 		allowUsernamePasswordVar,
 		allowRegisterVar,
@@ -272,9 +271,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	resp, err := client.GetLoginPolicy(ctx, &management.GetLoginPolicyRequest{})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get login policy")
 	}
 
 	policy := resp.Policy

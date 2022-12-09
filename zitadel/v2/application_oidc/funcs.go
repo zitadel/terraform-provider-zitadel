@@ -2,13 +2,11 @@ package application_oidc
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	management2 "github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -190,13 +188,16 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	projectID := d.Get(projectIDVar).(string)
-	oidcApp, err := getApp(ctx, client, projectID, helper.GetID(d, appIDVar))
-	if err != nil {
+	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: d.Get(projectIDVar).(string), AppId: helper.GetID(d, appIDVar)})
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
 	}
+	if err != nil {
+		return diag.Errorf("failed to get application oidc")
+	}
 
+	oidcApp := resp.GetApp()
 	oidc := oidcApp.GetOidcConfig()
 	grantTypes := make([]string, 0)
 	for _, grantType := range oidc.GetGrantTypes() {
@@ -245,13 +246,4 @@ func interfaceToStringSlice(in interface{}) []string {
 		ret = append(ret, item.(string))
 	}
 	return ret
-}
-
-func getApp(ctx context.Context, client *management2.Client, projectID string, appID string) (*app.App, error) {
-	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: projectID, AppId: appID})
-	if err != nil {
-		return nil, fmt.Errorf("failed to read project: %v", err)
-	}
-
-	return resp.GetApp(), err
 }

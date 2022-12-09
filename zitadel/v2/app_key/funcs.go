@@ -98,9 +98,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		AppId:     appID,
 		KeyId:     d.Id(),
 	})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get app key")
 	}
 	d.SetId(resp.GetKey().GetId())
 

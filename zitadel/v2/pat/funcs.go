@@ -91,9 +91,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		UserId:  userID,
 		TokenId: d.Id(),
 	})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get pat")
 	}
 
 	set := map[string]interface{}{
@@ -103,7 +106,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of project: %v", k, err)
+			return diag.Errorf("failed to set %s of pat: %v", k, err)
 		}
 	}
 	d.SetId(resp.GetToken().GetId())
