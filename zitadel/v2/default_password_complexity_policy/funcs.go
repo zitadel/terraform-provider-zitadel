@@ -41,6 +41,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	if resp != nil {
 		d.SetId(resp.GetDetails().GetResourceOwner())
+	} else {
+		resp, err := client.GetPasswordComplexityPolicy(ctx, &admin.GetPasswordComplexityPolicyRequest{})
+		if err != nil {
+			return diag.Errorf("failed to get default password complexity policy: %v", err)
+		}
+		d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
 	}
 	return nil
 }

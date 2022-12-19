@@ -39,6 +39,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	if resp != nil {
 		d.SetId(resp.GetDetails().GetResourceOwner())
+	} else {
+		resp, err := client.GetDomainPolicy(ctx, &admin.GetDomainPolicyRequest{})
+		if err != nil {
+			return diag.Errorf("failed to update default domain policy: %v", err)
+		}
+		d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
 	}
 	return nil
 }

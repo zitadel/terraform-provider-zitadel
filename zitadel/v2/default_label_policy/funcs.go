@@ -58,6 +58,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 		if resp != nil {
 			d.SetId(resp.Details.ResourceOwner)
+		} else {
+			resp, err := client.GetLabelPolicy(ctx, &admin.GetLabelPolicyRequest{})
+			if err != nil {
+				return diag.Errorf("failed to update default label policy: %v", err)
+			}
+			d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
 		}
 	}
 

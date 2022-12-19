@@ -86,6 +86,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 		if resp != nil {
 			d.SetId(resp.GetDetails().GetResourceOwner())
+		} else {
+			resp, err := client.GetLoginPolicy(ctx, &admin.GetLoginPolicyRequest{})
+			if err != nil {
+				return diag.Errorf("failed to update default login policy: %v", err)
+			}
+			d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
 		}
 	}
 
@@ -198,6 +204,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		forceMFAVar:                   resp.Policy.GetForceMfa(),
 		passwordlessTypeVar:           resp.Policy.GetPasswordlessType().String(),
 		hidePasswordResetVar:          resp.Policy.GetHidePasswordReset(),
+		ignoreUnknownUsernamesVar:     resp.Policy.GetIgnoreUnknownUsernames(),
+		defaultRedirectURIVar:         resp.Policy.GetDefaultRedirectUri(),
 		passwordCheckLifetimeVar:      resp.Policy.GetPasswordCheckLifetime().AsDuration().String(),
 		externalLoginCheckLifetimeVar: resp.Policy.GetExternalLoginCheckLifetime().AsDuration().String(),
 		mfaInitSkipLifetimeVar:        resp.Policy.GetMfaInitSkipLifetime().AsDuration().String(),
