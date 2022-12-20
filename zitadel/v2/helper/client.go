@@ -22,6 +22,7 @@ const (
 type ClientInfo struct {
 	Domain  string
 	Issuer  string
+	KeyPath string
 	Options []zitadel.Option
 }
 
@@ -51,6 +52,7 @@ func GetClientInfo(insecure bool, domain string, token string, port string) (*Cl
 	return &ClientInfo{
 		domain,
 		issuer,
+		token,
 		options,
 	}, nil
 }
