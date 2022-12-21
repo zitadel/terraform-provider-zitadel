@@ -64,9 +64,29 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "disable watermark",
 			},
+			logoPathVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "",
+			},
+			logoHashVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "",
+			},
 			logoURLVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
+				Description: "",
+			},
+			iconPathVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "",
+			},
+			iconHashVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "",
 			},
 			iconURLVar: {
@@ -74,14 +94,44 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "",
 			},
+			logoDarkPathVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "",
+			},
+			logoDarkHashVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "",
+			},
 			logoURLDarkVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "",
 			},
+			iconDarkPathVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "",
+			},
+			iconDarkHashVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "",
+			},
 			iconURLDarkVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
+				Description: "",
+			},
+			fontPathVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "",
+			},
+			fontHashVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "",
 			},
 			fontURLVar: {

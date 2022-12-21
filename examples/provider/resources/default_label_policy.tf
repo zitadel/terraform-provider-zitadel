@@ -18,6 +18,6 @@ resource zitadel_default_label_policy label_policy {
   icon_path              = "/path/to/icon.jpg"
   icon_dark_hash         = filemd5("/path/to/icon_dark.jpg")
   icon_dark_path         = "/path/to/icon_dark.jpg"
-  font_hash              = filemd5("/path/to/font.jpg")
-  font_path              = "/path/to/font.jpg"
+  font_hash              = filemd5("/path/to/font.tff")
+  font_path              = "/path/to/font.tff"
 }

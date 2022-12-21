@@ -87,7 +87,23 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(setActiveVar) {
+	if d.HasChanges(
+		primaryColorVar,
+		hideLoginNameSuffixVar,
+		warnColorVar,
+		backgroundColorVar,
+		fontColorVar,
+		primaryColorDarkVar,
+		backgroundColorDarkVar,
+		warnColorDarkVar,
+		fontColorDarkVar,
+		disableWatermarkVar,
+		logoHashVar,
+		logoDarkHashVar,
+		iconHashVar,
+		iconDarkHashVar,
+		fontHashVar,
+	) {
 		if d.Get(setActiveVar).(bool) {
 			if _, err := client.ActivateLabelPolicy(ctx, &admin.ActivateLabelPolicyRequest{}); err != nil {
 				return diag.Errorf("failed to activate default label policy: %v", err)
