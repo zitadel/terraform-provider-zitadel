@@ -25,24 +25,17 @@ func escapeQuotes(s string) string {
 	return quoteEscaper.Replace(s)
 }
 
-func FormFilePost(clientInfo *ClientInfo, endpoint, path string) diag.Diagnostics {
+func createMultipartRequest(issuer, endpoint, path string) (*http.Request, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return diag.Errorf("failed to read file: %v", err)
-	}
-	info, err := file.Stat()
-	if err != nil {
-		return diag.Errorf("failed to read file info: %v", err)
-	}
-	if info.Size() > (1 << 19) {
-		return diag.Errorf("file to large")
+		return nil, fmt.Errorf("failed to read file: %v", err)
 	}
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	data, err := io.ReadAll(file)
 	if err != nil {
-		return diag.Errorf("failed to read asset: %v", err)
+		return nil, fmt.Errorf("failed to read asset: %v", err)
 	}
 
 	h := make(textproto.MIMEHeader)
@@ -52,17 +45,45 @@ func FormFilePost(clientInfo *ClientInfo, endpoint, path string) diag.Diagnostic
 	h.Set("Content-Type", mimetype.Detect(data).String())
 	part, err := writer.CreatePart(h)
 	if err != nil {
-		return diag.Errorf("failed to create asset part: %v", err)
+		return nil, fmt.Errorf("failed to create asset part: %v", err)
 	}
 	io.Copy(part, bytes.NewBuffer(data))
 	writer.Close()
 
-	r, err := http.NewRequest(http.MethodPost, clientInfo.Issuer+endpoint, body)
+	r, err := http.NewRequest(http.MethodPost, issuer+endpoint, body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create asset request: %v", err)
+	}
+
+	r.Header.Add("Content-Type", writer.FormDataContentType())
+	return r, nil
+}
+
+func InstanceFormFilePost(clientInfo *ClientInfo, endpoint, path string) diag.Diagnostics {
+	r, err := createMultipartRequest(clientInfo.Issuer, endpoint, path)
 	if err != nil {
 		return diag.Errorf("failed to create asset request: %v", err)
 	}
 
-	r.Header.Add("Content-Type", writer.FormDataContentType())
+	client, err := NewClientWithInterceptor(clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
+	if err != nil {
+		return diag.Errorf("failed to create client: %v", err)
+	}
+
+	resp, err := client.Do(r)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return diag.Errorf("failed to do asset request: %v", err)
+	}
+	return nil
+}
+
+func OrgFormFilePost(clientInfo *ClientInfo, endpoint, orgID, path string) diag.Diagnostics {
+	r, err := createMultipartRequest(clientInfo.Issuer, endpoint, path)
+	if err != nil {
+		return diag.Errorf("failed to create asset request: %v", err)
+	}
+	r.Header.Add("x-zitadel-orgid", orgID)
+
 	client, err := NewClientWithInterceptor(clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
 	if err != nil {
 		return diag.Errorf("failed to create client: %v", err)
