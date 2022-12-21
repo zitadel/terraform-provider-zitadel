@@ -34,6 +34,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/init_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/instance_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/login_policy"
@@ -206,6 +207,7 @@ func Provider() *schema.Provider {
 			"zitadel_project_grant":                      project_grant.GetResource(),
 			"zitadel_user_grant":                         user_grant.GetResource(),
 			"zitadel_org_member":                         org_member.GetResource(),
+			"zitadel_instance_member":                    instance_member.GetResource(),
 			"zitadel_project_member":                     project_member.GetResource(),
 			"zitadel_project_grant_member":               project_grant_member.GetResource(),
 			"zitadel_domain_policy":                      domain_policy.GetResource(),
