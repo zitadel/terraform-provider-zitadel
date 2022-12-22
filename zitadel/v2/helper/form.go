@@ -60,29 +60,21 @@ func createMultipartRequest(issuer, endpoint, path string) (*http.Request, error
 }
 
 func InstanceFormFilePost(clientInfo *ClientInfo, endpoint, path string) diag.Diagnostics {
-	r, err := createMultipartRequest(clientInfo.Issuer, endpoint, path)
-	if err != nil {
-		return diag.Errorf("failed to create asset request: %v", err)
-	}
-
-	client, err := NewClientWithInterceptor(clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
-	if err != nil {
-		return diag.Errorf("failed to create client: %v", err)
-	}
-
-	resp, err := client.Do(r)
-	if err != nil || resp.StatusCode != http.StatusOK {
-		return diag.Errorf("failed to do asset request: %v", err)
-	}
-	return nil
+	return formFilePost(clientInfo, endpoint, path, map[string]string{})
 }
 
-func OrgFormFilePost(clientInfo *ClientInfo, endpoint, orgID, path string) diag.Diagnostics {
+func OrgFormFilePost(clientInfo *ClientInfo, endpoint, path, orgID string) diag.Diagnostics {
+	return formFilePost(clientInfo, endpoint, path, map[string]string{"x-zitadel-orgid": orgID})
+}
+
+func formFilePost(clientInfo *ClientInfo, endpoint, path string, additionalHeaders map[string]string) diag.Diagnostics {
 	r, err := createMultipartRequest(clientInfo.Issuer, endpoint, path)
 	if err != nil {
 		return diag.Errorf("failed to create asset request: %v", err)
 	}
-	r.Header.Add("x-zitadel-orgid", orgID)
+	for k, v := range additionalHeaders {
+		r.Header.Add(k, v)
+	}
 
 	client, err := NewClientWithInterceptor(clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
 	if err != nil {
