@@ -37,6 +37,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	if resp != nil {
 		d.SetId(resp.GetDetails().GetResourceOwner())
+	} else {
+		resp, err := client.GetLockoutPolicy(ctx, &admin.GetLockoutPolicyRequest{})
+		if err != nil {
+			return diag.Errorf("failed to update default lockout policy: %v", err)
+		}
+		d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
 	}
 	return nil
 }

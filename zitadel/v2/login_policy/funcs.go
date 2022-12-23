@@ -292,6 +292,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		forceMFAVar:                   policy.GetForceMfa(),
 		passwordlessTypeVar:           policy.GetPasswordlessType().String(),
 		hidePasswordResetVar:          policy.GetHidePasswordReset(),
+		ignoreUnknownUsernamesVar:     policy.GetIgnoreUnknownUsernames(),
+		defaultRedirectURIVar:         policy.GetDefaultRedirectUri(),
 		passwordCheckLifetimeVar:      policy.GetPasswordCheckLifetime().AsDuration().String(),
 		externalLoginCheckLifetimeVar: policy.GetExternalLoginCheckLifetime().AsDuration().String(),
 		mfaInitSkipLifetimeVar:        policy.GetMfaInitSkipLifetime().AsDuration().String(),
