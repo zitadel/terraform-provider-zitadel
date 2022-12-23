@@ -67,7 +67,49 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(setActiveVar) {
+	if d.HasChanges(logoHashVar, logoPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, logoURL, d.Get(logoPathVar).(string)); err != nil {
+			return diag.Errorf("failed to upload logo: %v", err)
+		}
+	}
+	if d.HasChanges(logoDarkHashVar, logoDarkPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, logoDarkURL, d.Get(logoDarkPathVar).(string)); err != nil {
+			return diag.Errorf("failed to upload logo dark: %v", err)
+		}
+	}
+	if d.HasChanges(iconHashVar, iconPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, iconURL, d.Get(iconPathVar).(string)); err != nil {
+			return diag.Errorf("failed to upload icon: %v", err)
+		}
+	}
+	if d.HasChanges(iconDarkHashVar, iconDarkPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, iconDarkURL, d.Get(iconDarkPathVar).(string)); err != nil {
+			return diag.Errorf("failed to upload icon dark: %v", err)
+		}
+	}
+	if d.HasChanges(fontHashVar, fontPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, fontURL, d.Get(fontPathVar).(string)); err != nil {
+			return diag.Errorf("failed to upload font: %v", err)
+		}
+	}
+
+	if d.HasChanges(
+		primaryColorVar,
+		hideLoginNameSuffixVar,
+		warnColorVar,
+		backgroundColorVar,
+		fontColorVar,
+		primaryColorDarkVar,
+		backgroundColorDarkVar,
+		warnColorDarkVar,
+		fontColorDarkVar,
+		disableWatermarkVar,
+		logoHashVar,
+		logoDarkHashVar,
+		iconHashVar,
+		iconDarkHashVar,
+		fontHashVar,
+	) {
 		if d.Get(setActiveVar).(bool) {
 			if _, err := client.ActivateLabelPolicy(ctx, &admin.ActivateLabelPolicyRequest{}); err != nil {
 				return diag.Errorf("failed to activate default label policy: %v", err)

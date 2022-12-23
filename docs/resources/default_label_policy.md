@@ -24,6 +24,16 @@ resource zitadel_default_label_policy label_policy {
   font_color_dark        = "#ffffff"
   disable_watermark      = false
   set_active             = true
+  logo_hash              = filemd5("/path/to/logo.jpg")
+  logo_path              = "/path/to/logo.jpg"
+  logo_dark_hash         = filemd5("/path/to/logo_dark.jpg")
+  logo_dark_path         = "/path/to/logo_dark.jpg"
+  icon_hash              = filemd5("/path/to/icon.jpg")
+  icon_path              = "/path/to/icon.jpg"
+  icon_dark_hash         = filemd5("/path/to/icon_dark.jpg")
+  icon_dark_path         = "/path/to/icon_dark.jpg"
+  font_hash              = filemd5("/path/to/font.tff")
+  font_path              = "/path/to/font.tff"
 }
 ```
 
@@ -45,6 +55,16 @@ resource zitadel_default_label_policy label_policy {
 
 ### Optional
 
+- `font_hash` (String)
+- `font_path` (String)
+- `icon_dark_hash` (String)
+- `icon_dark_path` (String)
+- `icon_hash` (String)
+- `icon_path` (String)
+- `logo_dark_hash` (String)
+- `logo_dark_path` (String)
+- `logo_hash` (String)
+- `logo_path` (String)
 - `set_active` (Boolean) set the label policy active after creating/updating
 
 ### Read-Only
