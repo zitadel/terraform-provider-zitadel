@@ -26,7 +26,7 @@ func GetResource() *schema.Resource {
 			hostVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Host address to your SMTP server.",
+				Description: "Host and port address to your SMTP server.",
 			},
 			userVar: {
 				Type:        schema.TypeString,

@@ -37,7 +37,7 @@ func GetResource() *schema.Resource {
 			expirationDateVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Expiration date of the machine key",
+				Description: "Expiration date of the machine key in the RFC3339 format",
 				ForceNew:    true,
 				Computed:    true,
 			},

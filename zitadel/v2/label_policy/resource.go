@@ -22,7 +22,7 @@ func GetResource() *schema.Resource {
 			hideLoginNameSuffixVar: {
 				Type:        schema.TypeBool,
 				Required:    true,
-				Description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes",
+				Description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes",
 			},
 			warnColorVar: {
 				Type:        schema.TypeString,
