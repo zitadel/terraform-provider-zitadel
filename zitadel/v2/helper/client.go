@@ -13,10 +13,12 @@ import (
 )
 
 const (
-	DomainVar   = "domain"
-	InsecureVar = "insecure"
-	TokenVar    = "token"
-	PortVar     = "port"
+	DomainVar      = "domain"
+	InsecureVar    = "insecure"
+	TokenVar       = "token"
+	PortVar        = "port"
+	JWTProfileFile = "jwt_profile_file"
+	JWTProfileJSON = "jwt_profile_json"
 )
 
 type ClientInfo struct {
@@ -26,8 +28,15 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(insecure bool, domain string, token string, port string) (*ClientInfo, error) {
-	options := []zitadel.Option{zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(token))}
+func GetClientInfo(insecure bool, domain string, jwtProfileFile string, jwtProfileJSON string, token string, port string) (*ClientInfo, error) {
+	options := []zitadel.Option{}
+	if jwtProfileFile != "" {
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(jwtProfileFile)))
+	} else if jwtProfileJSON != "" {
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData([]byte(jwtProfileJSON))))
+	} else {
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(token)))
+	}
 
 	issuer := ""
 	if port != "" {
