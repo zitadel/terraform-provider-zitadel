@@ -29,3 +29,6 @@ override.tf.json
 # example: *tfplan*
 
 /test
+
+# IDEs
+.idea
