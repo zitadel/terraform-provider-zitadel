@@ -99,6 +99,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			MfaInitSkipLifetime:        durationpb.New(mfaInitSkipLT),
 			SecondFactorCheckLifetime:  durationpb.New(secondFactorCheckLT),
 			MultiFactorCheckLifetime:   durationpb.New(multiFactorCheckLT),
+			AllowDomainDiscovery:       d.Get(allowDomainDiscovery).(bool),
+			DisableLoginWithEmail:      d.Get(disableLoginWithEmail).(bool),
+			DisableLoginWithPhone:      d.Get(disableLoginWithPhone).(bool),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update login policy: %v", err)
