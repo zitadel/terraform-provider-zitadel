@@ -217,6 +217,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		mfaInitSkipLifetimeVar:        resp.Policy.GetMfaInitSkipLifetime().AsDuration().String(),
 		secondFactorCheckLifetimeVar:  resp.Policy.GetSecondFactorCheckLifetime().AsDuration().String(),
 		multiFactorCheckLifetimeVar:   resp.Policy.GetMultiFactorCheckLifetime().AsDuration().String(),
+		allowDomainDiscovery:          resp.Policy.GetAllowDomainDiscovery(),
+		disableLoginWithEmail:         resp.Policy.GetDisableLoginWithEmail(),
+		disableLoginWithPhone:         resp.Policy.GetDisableLoginWithPhone(),
 	}
 
 	respSecond, err := client.ListLoginPolicySecondFactors(ctx, &admin.ListLoginPolicySecondFactorsRequest{})

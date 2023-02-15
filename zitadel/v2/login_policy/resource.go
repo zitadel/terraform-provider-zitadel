@@ -109,7 +109,6 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeBool,
 				},
 				Optional:    true,
-				Default:     false,
 				Description: "if set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.",
 			},
 			disableLoginWithEmail: {
@@ -118,7 +117,6 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeBool,
 				},
 				Optional:    true,
-				Default:     false,
 				Description: "defines if user can additionally (to the loginname) be identified by their verified email address",
 			},
 			disableLoginWithPhone: {
@@ -127,7 +125,6 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeBool,
 				},
 				Optional:    true,
-				Default:     false,
 				Description: "defines if user can additionally (to the loginname) be identified by their verified phone number",
 			},
 		},
