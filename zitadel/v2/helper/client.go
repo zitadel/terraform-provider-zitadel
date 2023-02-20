@@ -25,17 +25,18 @@ type ClientInfo struct {
 	Domain  string
 	Issuer  string
 	KeyPath string
+	Data    []byte
 	Options []zitadel.Option
 }
 
-func GetClientInfo(insecure bool, domain string, jwtProfileFile string, jwtProfileJSON string, token string, port string) (*ClientInfo, error) {
+func GetClientInfo(insecure bool, domain string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
 	options := []zitadel.Option{}
 	if jwtProfileFile != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(jwtProfileFile)))
 	} else if jwtProfileJSON != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData([]byte(jwtProfileJSON))))
 	} else {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(token)))
+		return nil, fmt.Errorf("either 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
 
 	issuer := ""
@@ -61,7 +62,8 @@ func GetClientInfo(insecure bool, domain string, jwtProfileFile string, jwtProfi
 	return &ClientInfo{
 		domain,
 		issuer,
-		token,
+		jwtProfileFile,
+		[]byte(jwtProfileJSON),
 		options,
 	}, nil
 }
