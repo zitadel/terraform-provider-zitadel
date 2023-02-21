@@ -104,26 +104,17 @@ func GetResource() *schema.Resource {
 				Description: "allowed idps to login or register",
 			},
 			allowDomainDiscovery: {
-				Type: schema.TypeSet,
-				Elem: &schema.Schema{
-					Type: schema.TypeBool,
-				},
+				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "if set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.",
 			},
 			disableLoginWithEmail: {
-				Type: schema.TypeSet,
-				Elem: &schema.Schema{
-					Type: schema.TypeBool,
-				},
+				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "defines if user can additionally (to the loginname) be identified by their verified email address",
 			},
 			disableLoginWithPhone: {
-				Type: schema.TypeSet,
-				Elem: &schema.Schema{
-					Type: schema.TypeBool,
-				},
+				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "defines if user can additionally (to the loginname) be identified by their verified phone number",
 			},
