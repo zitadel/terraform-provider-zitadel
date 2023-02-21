@@ -18,4 +18,7 @@ resource zitadel_login_policy login_policy {
   second_factors                = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
   multi_factors                 = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
   idps                          = [zitadel_org_idp_oidc.oidc_idp.id, zitadel_org_idp_jwt.jwt_idp.id]
+  allow_domain_discovery        = true
+  disable_login_with_email      = true
+  disable_login_with_phone      = true
 }

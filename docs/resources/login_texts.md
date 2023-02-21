@@ -394,11 +394,11 @@ Optional:
 - `next_button_text` (String)
 - `nickname_label` (String)
 - `phone_label` (String)
+- `privacy_confirm` (String)
 - `privacy_link_text` (String)
 - `title` (String)
 - `tos_and_privacy_label` (String)
 - `tos_confirm` (String)
-- `tos_confirm_and` (String)
 - `tos_link_text` (String)
 - `username_label` (String)
 
@@ -411,11 +411,11 @@ Optional:
 - `auto_register_button_text` (String)
 - `description` (String)
 - `link_button_text` (String)
+- `privacy_confirm` (String)
 - `privacy_link_text` (String)
 - `title` (String)
 - `tos_and_privacy_label` (String)
 - `tos_confirm` (String)
-- `tos_confirm_and` (String)
 - `tos_link_text` (String)
 
 
@@ -690,6 +690,7 @@ Optional:
 
 - `description` (String)
 - `external_login_description` (String)
+- `login_button_text` (String)
 - `title` (String)
 - `user_name_button_text` (String)
 
@@ -706,12 +707,12 @@ Optional:
 - `orgname_label` (String)
 - `password_confirm_label` (String)
 - `password_label` (String)
+- `privacy_confirm` (String)
 - `privacy_link_text` (String)
 - `save_button_text` (String)
 - `title` (String)
 - `tos_and_privacy_label` (String)
 - `tos_confirm` (String)
-- `tos_confirm_and` (String)
 - `tos_link_text` (String)
 - `username_label` (String)
 
@@ -732,11 +733,11 @@ Optional:
 - `next_button_text` (String)
 - `password_confirm_label` (String)
 - `password_label` (String)
+- `privacy_confirm` (String)
 - `privacy_link_text` (String)
 - `title` (String)
 - `tos_and_privacy_label` (String)
 - `tos_confirm` (String)
-- `tos_confirm_and` (String)
 - `tos_link_text` (String)
 - `username_label` (String)
 

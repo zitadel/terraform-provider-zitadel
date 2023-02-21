@@ -18,4 +18,7 @@ const (
 	secondFactorsVar              = "second_factors"
 	multiFactorsVar               = "multi_factors"
 	idpsVar                       = "idps"
+	allowDomainDiscovery          = "allow_domain_discovery"
+	disableLoginWithEmail         = "disable_login_with_email"
+	disableLoginWithPhone         = "disable_login_with_phone"
 )
