@@ -83,7 +83,7 @@ func formFilePost(clientInfo *ClientInfo, endpoint, path string, additionalHeade
 			return diag.Errorf("failed to create client: %v", err)
 		}
 	} else if len(clientInfo.Data) > 0 {
-		client, err = NewClientWithInterceptorFromKeyFile(clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
+		client, err = NewClientWithInterceptorFromKeyFileData(clientInfo.Issuer, clientInfo.Data, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
 		if err != nil {
 			return diag.Errorf("failed to create client: %v", err)
 		}
