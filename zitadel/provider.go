@@ -78,6 +78,7 @@ type providerModel struct {
 	Insecure       types.Bool   `tfsdk:"insecure"`
 	Domain         types.String `tfsdk:"domain"`
 	Port           types.String `tfsdk:"port"`
+	Token          types.String `tfsdk:"token"`
 	JWTProfileFile types.String `tfsdk:"jwt_profile_file"`
 	JWTProfileJSON types.String `tfsdk:"jwt_profile_json"`
 }
@@ -97,6 +98,11 @@ func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnost
 				Type:        types.BoolType,
 				Optional:    true,
 				Description: "Use insecure connection",
+			},
+			helper.TokenVar: {
+				Type:        types.StringType,
+				Optional:    true,
+				Description: "Path to the file containing credentials to connect to ZITADEL",
 			},
 			helper.JWTProfileFile: {
 				Type:        types.StringType,
@@ -128,6 +134,7 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 	info, err := helper.GetClientInfo(
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
+		config.Token.ValueString(),
 		config.JWTProfileFile.ValueString(),
 		config.JWTProfileJSON.ValueString(),
 		config.Port.ValueString(),
@@ -188,6 +195,11 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Use insecure connection",
+			},
+			helper.TokenVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Path to the file containing credentials to connect to ZITADEL",
 			},
 			helper.JWTProfileFile: {
 				Type:        schema.TypeString,
@@ -250,6 +262,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	clientinfo, err := helper.GetClientInfo(
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
+		d.Get(helper.TokenVar).(string),
 		d.Get(helper.JWTProfileFile).(string),
 		d.Get(helper.JWTProfileJSON).(string),
 		d.Get(helper.PortVar).(string),
