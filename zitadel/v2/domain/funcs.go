@@ -56,6 +56,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to create domain: %v", err)
 	}
 	d.SetId(name)
+	_, err = client.SetPrimaryOrgDomain(ctx, &management.SetPrimaryOrgDomainRequest{Domain: name})
+	if err != nil {
+		return diag.Errorf("failed to set domain primary: %v", err)
+	}
 	return nil
 }
 

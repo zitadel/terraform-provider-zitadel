@@ -27,7 +27,7 @@ func GetResource() *schema.Resource {
 			},
 			isPrimaryVar: {
 				Type:        schema.TypeBool,
-				Computed:    true,
+				Optional:    true,
 				Description: "Is domain primary",
 			},
 			validationTypeVar: {
