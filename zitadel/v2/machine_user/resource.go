@@ -51,6 +51,11 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Description of the user",
 			},
+			accessTokenTypeVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Access token type of the user",
+			},
 		},
 		ReadContext:   read,
 		CreateContext: create,

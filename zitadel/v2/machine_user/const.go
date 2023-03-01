@@ -8,6 +8,7 @@ const (
 	loginNamesVar         = "login_names"
 	preferredLoginNameVar = "preferred_login_name"
 
-	nameVar        = "name"
-	descriptionVar = "description"
+	nameVar            = "name"
+	descriptionVar     = "description"
+	accessTokenTypeVar = "access_token_type"
 )

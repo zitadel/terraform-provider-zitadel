@@ -50,6 +50,11 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Description of the user",
 			},
+			accessTokenTypeVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Access token type of the user",
+			},
 		},
 		ReadContext: read,
 		Importer:    &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
