@@ -1873,7 +1873,7 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 								if !v.Null && !v.Unknown {
 									t = string(v.Value)
 								}
-								obj.TosConfirmAnd = t
+								obj.TosConfirm = t
 							}
 						}
 					}
@@ -2061,7 +2061,7 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 								if !v.Null && !v.Unknown {
 									t = string(v.Value)
 								}
-								obj.TosConfirmAnd = t
+								obj.TosConfirm = t
 							}
 						}
 					}
@@ -4770,7 +4770,7 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 								if !v.Null && !v.Unknown {
 									t = string(v.Value)
 								}
-								obj.TosConfirmAnd = t
+								obj.TosConfirm = t
 							}
 						}
 					}
@@ -5094,7 +5094,7 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 								if !v.Null && !v.Unknown {
 									t = string(v.Value)
 								}
-								obj.TosConfirmAnd = t
+								obj.TosConfirm = t
 							}
 						}
 					}
@@ -6359,9 +6359,9 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.TosConfirmAnd) == ""
+								v.Null = string(obj.TosConfirm) == ""
 							}
-							v.Value = string(obj.TosConfirmAnd)
+							v.Value = string(obj.TosConfirm)
 							v.Unknown = false
 							tf.Attrs["tos_confirm_and"] = v
 						}
@@ -6611,9 +6611,9 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.TosConfirmAnd) == ""
+								v.Null = string(obj.TosConfirm) == ""
 							}
-							v.Value = string(obj.TosConfirmAnd)
+							v.Value = string(obj.TosConfirm)
 							v.Unknown = false
 							tf.Attrs["tos_confirm_and"] = v
 						}
@@ -10317,9 +10317,9 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.TosConfirmAnd) == ""
+								v.Null = string(obj.TosConfirm) == ""
 							}
-							v.Value = string(obj.TosConfirmAnd)
+							v.Value = string(obj.TosConfirm)
 							v.Unknown = false
 							tf.Attrs["tos_confirm_and"] = v
 						}
@@ -10745,9 +10745,9 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.TosConfirmAnd) == ""
+								v.Null = string(obj.TosConfirm) == ""
 							}
-							v.Value = string(obj.TosConfirmAnd)
+							v.Value = string(obj.TosConfirm)
 							v.Unknown = false
 							tf.Attrs["tos_confirm_and"] = v
 						}
