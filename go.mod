@@ -14,7 +14,7 @@ require (
 	github.com/hashicorp/terraform-plugin-mux v0.7.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.24.1
 	github.com/zitadel/oidc v1.12.1
-	github.com/zitadel/zitadel-go/v2 v2.0.9
+	github.com/zitadel/zitadel-go/v2 v2.0.10
 	golang.org/x/oauth2 v0.4.0
 	google.golang.org/grpc v1.52.3
 	google.golang.org/protobuf v1.28.1

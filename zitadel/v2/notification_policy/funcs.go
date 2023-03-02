@@ -1,4 +1,4 @@
-package domain_policy
+package notification_policy
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
@@ -20,17 +19,14 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	org := d.Get(orgIDVar).(string)
 
-	_, err = client.ResetCustomDomainPolicyToDefault(ctx, &admin.ResetCustomDomainPolicyToDefaultRequest{
-		OrgId: org,
-	})
+	_, err = client.ResetNotificationPolicyToDefault(ctx, &management.ResetNotificationPolicyToDefaultRequest{})
 	if err != nil {
-		return diag.Errorf("failed to reset domain policy: %v", err)
+		return diag.Errorf("failed to reset notification policy: %v", err)
 	}
 	return nil
 }
@@ -43,20 +39,17 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	org := d.Get(orgIDVar).(string)
 
-	_, err = client.UpdateCustomDomainPolicy(ctx, &admin.UpdateCustomDomainPolicyRequest{
-		OrgId:                                  org,
-		UserLoginMustBeDomain:                  d.Get(userLoginMustBeDomainVar).(bool),
-		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
-		SmtpSenderAddressMatchesInstanceDomain: d.Get(smtpSenderVar).(bool),
+	_, err = client.UpdateCustomNotificationPolicy(ctx, &management.UpdateCustomNotificationPolicyRequest{
+		PasswordChange: d.Get(passwordChangeVar).(bool),
 	})
 	if err != nil {
-		return diag.Errorf("failed to update domain policy: %v", err)
+		return diag.Errorf("failed to update notification policy: %v", err)
 	}
 	d.SetId(org)
 	return nil
@@ -70,20 +63,17 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	org := d.Get(orgIDVar).(string)
 
-	_, err = client.AddCustomDomainPolicy(ctx, &admin.AddCustomDomainPolicyRequest{
-		OrgId:                                  org,
-		UserLoginMustBeDomain:                  d.Get(userLoginMustBeDomainVar).(bool),
-		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
-		SmtpSenderAddressMatchesInstanceDomain: d.Get(smtpSenderVar).(bool),
+	_, err = client.AddCustomNotificationPolicy(ctx, &management.AddCustomNotificationPolicyRequest{
+		PasswordChange: d.Get(passwordChangeVar).(bool),
 	})
 	if err != nil {
-		return diag.Errorf("failed to create domain policy: %v", err)
+		return diag.Errorf("failed to create notification policy: %v", err)
 	}
 	d.SetId(org)
 	return nil
@@ -103,13 +93,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetDomainPolicy(ctx, &management.GetDomainPolicyRequest{})
+	resp, err := client.GetNotificationPolicy(ctx, &management.GetNotificationPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get domain policy")
+		return diag.Errorf("failed to get notification policy")
 	}
 
 	policy := resp.Policy
@@ -118,15 +108,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	set := map[string]interface{}{
-		orgIDVar:                 policy.GetDetails().GetResourceOwner(),
-		userLoginMustBeDomainVar: policy.GetUserLoginMustBeDomain(),
-		validateOrgDomainVar:     policy.GetValidateOrgDomains(),
-		smtpSenderVar:            policy.GetSmtpSenderAddressMatchesInstanceDomain(),
+		orgIDVar:          policy.GetDetails().GetResourceOwner(),
+		passwordChangeVar: policy.GetPasswordChange(),
 	}
 
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of domain: %v", k, err)
+			return diag.Errorf("failed to set %s of notification: %v", k, err)
 		}
 	}
 	d.SetId(policy.GetDetails().GetResourceOwner())
