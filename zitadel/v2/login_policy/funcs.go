@@ -64,6 +64,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		mfaInitSkipLifetimeVar,
 		secondFactorCheckLifetimeVar,
 		multiFactorCheckLifetimeVar,
+		allowDomainDiscovery,
+		disableLoginWithEmail,
+		disableLoginWithPhone,
 	) {
 		passwordCheckLT, err := time.ParseDuration(d.Get(passwordCheckLifetimeVar).(string))
 		if err != nil {
@@ -99,6 +102,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			MfaInitSkipLifetime:        durationpb.New(mfaInitSkipLT),
 			SecondFactorCheckLifetime:  durationpb.New(secondFactorCheckLT),
 			MultiFactorCheckLifetime:   durationpb.New(multiFactorCheckLT),
+			AllowDomainDiscovery:       d.Get(allowDomainDiscovery).(bool),
+			DisableLoginWithEmail:      d.Get(disableLoginWithEmail).(bool),
+			DisableLoginWithPhone:      d.Get(disableLoginWithPhone).(bool),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update login policy: %v", err)
@@ -234,6 +240,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		MultiFactorCheckLifetime:   durationpb.New(multiFactorCheckLT),
 		SecondFactors:              secondFactors,
 		MultiFactors:               multiFactors,
+		AllowDomainDiscovery:       d.Get(allowDomainDiscovery).(bool),
+		DisableLoginWithEmail:      d.Get(disableLoginWithEmail).(bool),
+		DisableLoginWithPhone:      d.Get(disableLoginWithPhone).(bool),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create login policy: %v", err)
@@ -299,6 +308,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		mfaInitSkipLifetimeVar:        policy.GetMfaInitSkipLifetime().AsDuration().String(),
 		secondFactorCheckLifetimeVar:  policy.GetSecondFactorCheckLifetime().AsDuration().String(),
 		multiFactorCheckLifetimeVar:   policy.GetMultiFactorCheckLifetime().AsDuration().String(),
+		allowDomainDiscovery:          policy.GetAllowDomainDiscovery(),
+		disableLoginWithEmail:         policy.GetDisableLoginWithEmail(),
+		disableLoginWithPhone:         policy.GetDisableLoginWithPhone(),
 	}
 
 	respSecond, err := client.ListLoginPolicySecondFactors(ctx, &management.ListLoginPolicySecondFactorsRequest{})

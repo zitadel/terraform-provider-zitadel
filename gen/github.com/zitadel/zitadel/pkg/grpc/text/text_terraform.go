@@ -21,8 +21,8 @@ package text
 import (
 	context "context"
 	fmt "fmt"
-	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
 	math "math"
+	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
 
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/gogo/protobuf/proto"
@@ -32,6 +32,7 @@ import (
 	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
 	github_com_hashicorp_terraform_plugin_go_tftypes "github.com/hashicorp/terraform-plugin-go/tftypes"
+	
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -151,6 +152,11 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
+				"privacy_confirm": {
+					Description: "",
+					Optional:    true,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+				},
 				"privacy_link_text": {
 					Description: "",
 					Optional:    true,
@@ -167,11 +173,6 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 				"tos_confirm": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_confirm_and": {
 					Description: "",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
@@ -207,6 +208,11 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
+				"privacy_confirm": {
+					Description: "",
+					Optional:    true,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+				},
 				"privacy_link_text": {
 					Description: "",
 					Optional:    true,
@@ -223,11 +229,6 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 				"tos_confirm": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_confirm_and": {
 					Description: "",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
@@ -982,6 +983,11 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
+				"login_button_text": {
+					Description: "",
+					Optional:    true,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+				},
 				"title": {
 					Description: "",
 					Optional:    true,
@@ -1033,6 +1039,11 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
+				"privacy_confirm": {
+					Description: "",
+					Optional:    true,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+				},
 				"privacy_link_text": {
 					Description: "",
 					Optional:    true,
@@ -1054,11 +1065,6 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 				"tos_confirm": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_confirm_and": {
 					Description: "",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
@@ -1134,6 +1140,11 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
+				"privacy_confirm": {
+					Description: "",
+					Optional:    true,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+				},
 				"privacy_link_text": {
 					Description: "",
 					Optional:    true,
@@ -1150,11 +1161,6 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 				"tos_confirm": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_confirm_and": {
 					Description: "",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
@@ -1793,6 +1799,23 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 						}
 					}
 					{
+						a, ok := tf.Attrs["privacy_confirm"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.privacy_confirm"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.PrivacyConfirm = t
+							}
+						}
+					}
+					{
 						a, ok := tf.Attrs["privacy_link_text"]
 						if !ok {
 							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.privacy_link_text"})
@@ -1857,23 +1880,6 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 									t = string(v.Value)
 								}
 								obj.TosConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_confirm_and"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.tos_confirm_and"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosConfirmAnd = t
 							}
 						}
 					}
@@ -1981,6 +1987,23 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 						}
 					}
 					{
+						a, ok := tf.Attrs["privacy_confirm"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.privacy_confirm"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.PrivacyConfirm = t
+							}
+						}
+					}
+					{
 						a, ok := tf.Attrs["privacy_link_text"]
 						if !ok {
 							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.privacy_link_text"})
@@ -2045,23 +2068,6 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 									t = string(v.Value)
 								}
 								obj.TosConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_confirm_and"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.tos_confirm_and"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosConfirmAnd = t
 							}
 						}
 					}
@@ -4502,6 +4508,23 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 						}
 					}
 					{
+						a, ok := tf.Attrs["login_button_text"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_option_text.login_button_text"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_option_text.login_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.LoginButtonText = t
+							}
+						}
+					}
+					{
 						a, ok := tf.Attrs["title"]
 						if !ok {
 							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_option_text.title"})
@@ -4673,6 +4696,23 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 						}
 					}
 					{
+						a, ok := tf.Attrs["privacy_confirm"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.privacy_confirm"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.PrivacyConfirm = t
+							}
+						}
+					}
+					{
 						a, ok := tf.Attrs["privacy_link_text"]
 						if !ok {
 							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.privacy_link_text"})
@@ -4754,23 +4794,6 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 									t = string(v.Value)
 								}
 								obj.TosConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_confirm_and"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.tos_confirm_and"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosConfirmAnd = t
 							}
 						}
 					}
@@ -5014,6 +5037,23 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 						}
 					}
 					{
+						a, ok := tf.Attrs["privacy_confirm"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.privacy_confirm"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.PrivacyConfirm = t
+							}
+						}
+					}
+					{
 						a, ok := tf.Attrs["privacy_link_text"]
 						if !ok {
 							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.privacy_link_text"})
@@ -5078,23 +5118,6 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 									t = string(v.Value)
 								}
 								obj.TosConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_confirm_and"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.tos_confirm_and"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosConfirmAnd = t
 							}
 						}
 					}
@@ -6257,6 +6280,28 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 						}
 					}
 					{
+						t, ok := tf.AttrTypes["privacy_confirm"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.privacy_confirm"})
+						} else {
+							v, ok := tf.Attrs["privacy_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.privacy_confirm", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.PrivacyConfirm) == ""
+							}
+							v.Value = string(obj.PrivacyConfirm)
+							v.Unknown = false
+							tf.Attrs["privacy_confirm"] = v
+						}
+					}
+					{
 						t, ok := tf.AttrTypes["privacy_link_text"]
 						if !ok {
 							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.privacy_link_text"})
@@ -6342,28 +6387,6 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 							v.Value = string(obj.TosConfirm)
 							v.Unknown = false
 							tf.Attrs["tos_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_confirm_and"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.tos_confirm_and"})
-						} else {
-							v, ok := tf.Attrs["tos_confirm_and"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.tos_confirm_and", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosConfirmAnd) == ""
-							}
-							v.Value = string(obj.TosConfirmAnd)
-							v.Unknown = false
-							tf.Attrs["tos_confirm_and"] = v
 						}
 					}
 					{
@@ -6509,6 +6532,28 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 						}
 					}
 					{
+						t, ok := tf.AttrTypes["privacy_confirm"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.privacy_confirm"})
+						} else {
+							v, ok := tf.Attrs["privacy_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.privacy_confirm", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.PrivacyConfirm) == ""
+							}
+							v.Value = string(obj.PrivacyConfirm)
+							v.Unknown = false
+							tf.Attrs["privacy_confirm"] = v
+						}
+					}
+					{
 						t, ok := tf.AttrTypes["privacy_link_text"]
 						if !ok {
 							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.privacy_link_text"})
@@ -6594,28 +6639,6 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 							v.Value = string(obj.TosConfirm)
 							v.Unknown = false
 							tf.Attrs["tos_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_confirm_and"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.tos_confirm_and"})
-						} else {
-							v, ok := tf.Attrs["tos_confirm_and"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.tos_confirm_and", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosConfirmAnd) == ""
-							}
-							v.Value = string(obj.TosConfirmAnd)
-							v.Unknown = false
-							tf.Attrs["tos_confirm_and"] = v
 						}
 					}
 					{
@@ -9963,6 +9986,28 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 						}
 					}
 					{
+						t, ok := tf.AttrTypes["login_button_text"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_option_text.login_button_text"})
+						} else {
+							v, ok := tf.Attrs["login_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_option_text.login_button_text", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_option_text.login_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.LoginButtonText) == ""
+							}
+							v.Value = string(obj.LoginButtonText)
+							v.Unknown = false
+							tf.Attrs["login_button_text"] = v
+						}
+					}
+					{
 						t, ok := tf.AttrTypes["title"]
 						if !ok {
 							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_option_text.title"})
@@ -10193,6 +10238,28 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 						}
 					}
 					{
+						t, ok := tf.AttrTypes["privacy_confirm"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.privacy_confirm"})
+						} else {
+							v, ok := tf.Attrs["privacy_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.privacy_confirm", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.PrivacyConfirm) == ""
+							}
+							v.Value = string(obj.PrivacyConfirm)
+							v.Unknown = false
+							tf.Attrs["privacy_confirm"] = v
+						}
+					}
+					{
 						t, ok := tf.AttrTypes["privacy_link_text"]
 						if !ok {
 							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.privacy_link_text"})
@@ -10300,28 +10367,6 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 							v.Value = string(obj.TosConfirm)
 							v.Unknown = false
 							tf.Attrs["tos_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_confirm_and"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.tos_confirm_and"})
-						} else {
-							v, ok := tf.Attrs["tos_confirm_and"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.tos_confirm_and", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosConfirmAnd) == ""
-							}
-							v.Value = string(obj.TosConfirmAnd)
-							v.Unknown = false
-							tf.Attrs["tos_confirm_and"] = v
 						}
 					}
 					{
@@ -10643,6 +10688,28 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 						}
 					}
 					{
+						t, ok := tf.AttrTypes["privacy_confirm"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.privacy_confirm"})
+						} else {
+							v, ok := tf.Attrs["privacy_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.privacy_confirm", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.PrivacyConfirm) == ""
+							}
+							v.Value = string(obj.PrivacyConfirm)
+							v.Unknown = false
+							tf.Attrs["privacy_confirm"] = v
+						}
+					}
+					{
 						t, ok := tf.AttrTypes["privacy_link_text"]
 						if !ok {
 							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.privacy_link_text"})
@@ -10728,28 +10795,6 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 							v.Value = string(obj.TosConfirm)
 							v.Unknown = false
 							tf.Attrs["tos_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_confirm_and"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.tos_confirm_and"})
-						} else {
-							v, ok := tf.Attrs["tos_confirm_and"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.tos_confirm_and", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.tos_confirm_and", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosConfirmAnd) == ""
-							}
-							v.Value = string(obj.TosConfirmAnd)
-							v.Unknown = false
-							tf.Attrs["tos_confirm_and"] = v
 						}
 					}
 					{

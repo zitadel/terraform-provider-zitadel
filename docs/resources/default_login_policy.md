@@ -28,6 +28,9 @@ resource zitadel_default_login_policy login_policy {
   default_redirect_uri          = "localhost:8080"
   second_factors                = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
   multi_factors                 = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
+  allow_domain_discovery        = true
+  disable_login_with_email      = true
+  disable_login_with_phone      = true
 }
 ```
 
@@ -52,6 +55,9 @@ resource zitadel_default_login_policy login_policy {
 
 ### Optional
 
+- `allow_domain_discovery` (Boolean) if set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+- `disable_login_with_email` (Boolean) defines if user can additionally (to the loginname) be identified by their verified email address
+- `disable_login_with_phone` (Boolean) defines if user can additionally (to the loginname) be identified by their verified phone number
 - `idps` (Set of String) allowed idps to login or register
 - `multi_factors` (Set of String) allowed multi factors
 - `second_factors` (Set of String) allowed second factors
