@@ -32,6 +32,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	id := ""
 	if d.HasChanges(passwordCheckLifetimeVar,
 		externalLoginCheckLifetimeVar,
 		mfaInitSkipLifetimeVar,
@@ -91,15 +92,18 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			return diag.Errorf("failed to update login policy: %v", err)
 		}
 		if resp != nil {
-			d.SetId(resp.GetDetails().GetResourceOwner())
-		} else {
-			resp, err := client.GetLoginPolicy(ctx, &admin.GetLoginPolicyRequest{})
-			if err != nil {
-				return diag.Errorf("failed to update default login policy: %v", err)
-			}
-			d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
+			id = resp.GetDetails().GetResourceOwner()
 		}
 	}
+
+	if id == "" {
+		resp, err := client.GetLoginPolicy(ctx, &admin.GetLoginPolicyRequest{})
+		if err != nil {
+			return diag.Errorf("failed to update default login policy: %v", err)
+		}
+		id = resp.GetPolicy().GetDetails().GetResourceOwner()
+	}
+	d.SetId(id)
 
 	if d.HasChange(secondFactorsVar) {
 		o, err := client.ListLoginPolicySecondFactors(ctx, &admin.ListLoginPolicySecondFactorsRequest{})

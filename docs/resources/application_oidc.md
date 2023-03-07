@@ -12,9 +12,7 @@ Resource representing an OIDC application belonging to a project, with all confi
 ## Example Usage
 
 ```terraform
-resource zitadel_application_oidc application_oidc{
-  depends_on = [zitadel_org.org, zitadel_project.project]
-
+resource zitadel_application_oidc application_oidc {
   project_id = zitadel_project.project.id
   org_id     = zitadel_org.org.id
 

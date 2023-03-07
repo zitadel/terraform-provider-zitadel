@@ -29,21 +29,26 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.UpdateLockoutPolicy(ctx, &admin.UpdateLockoutPolicyRequest{
-		MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
-	})
-	if helper.IgnorePreconditionError(err) != nil {
-		return diag.Errorf("failed to update default lockout policy: %v", err)
+	id := ""
+	if d.HasChanges(maxPasswordAttemptsVar) {
+		resp, err := client.UpdateLockoutPolicy(ctx, &admin.UpdateLockoutPolicyRequest{
+			MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
+		})
+		if helper.IgnorePreconditionError(err) != nil {
+			return diag.Errorf("failed to update default lockout policy: %v", err)
+		}
+		if resp != nil {
+			id = resp.GetDetails().GetResourceOwner()
+		}
 	}
-	if resp != nil {
-		d.SetId(resp.GetDetails().GetResourceOwner())
-	} else {
+	if id == "" {
 		resp, err := client.GetLockoutPolicy(ctx, &admin.GetLockoutPolicyRequest{})
 		if err != nil {
 			return diag.Errorf("failed to update default lockout policy: %v", err)
 		}
-		d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
+		id = resp.GetPolicy().GetDetails().GetResourceOwner()
 	}
+	d.SetId(id)
 	return nil
 }
 

@@ -29,21 +29,24 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.UpdateNotificationPolicy(ctx, &admin.UpdateNotificationPolicyRequest{
-		PasswordChange: d.Get(passwordChangeVar).(bool),
-	})
-	if helper.IgnorePreconditionError(err) != nil {
-		return diag.Errorf("failed to update default notification policy: %v", err)
-	}
-	if resp != nil {
-		d.SetId(resp.GetDetails().GetResourceOwner())
-	} else {
-		resp, err := client.GetNotificationPolicy(ctx, &admin.GetNotificationPolicyRequest{})
-		if err != nil {
+	if d.HasChanges(passwordChangeVar) {
+		resp, err := client.UpdateNotificationPolicy(ctx, &admin.UpdateNotificationPolicyRequest{
+			PasswordChange: d.Get(passwordChangeVar).(bool),
+		})
+		if helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to update default notification policy: %v", err)
 		}
-		d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
+		if resp != nil {
+			d.SetId(resp.GetDetails().GetResourceOwner())
+			return nil
+		}
 	}
+
+	resp, err := client.GetNotificationPolicy(ctx, &admin.GetNotificationPolicyRequest{})
+	if err != nil {
+		return diag.Errorf("failed to update default notification policy: %v", err)
+	}
+	d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
 	return nil
 }
 

@@ -29,25 +29,30 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.UpdatePasswordComplexityPolicy(ctx, &admin.UpdatePasswordComplexityPolicyRequest{
-		MinLength:    uint32(d.Get(minLengthVar).(int)),
-		HasUppercase: d.Get(hasUppercaseVar).(bool),
-		HasLowercase: d.Get(hasLowercaseVar).(bool),
-		HasNumber:    d.Get(hasNumberVar).(bool),
-		HasSymbol:    d.Get(hasSymbolVar).(bool),
-	})
-	if helper.IgnorePreconditionError(err) != nil {
-		return diag.Errorf("failed to update default password complexity policy: %v", err)
+	id := ""
+	if d.HasChanges(minLengthVar, hasUppercaseVar, hasLowercaseVar, hasNumberVar, hasSymbolVar) {
+		resp, err := client.UpdatePasswordComplexityPolicy(ctx, &admin.UpdatePasswordComplexityPolicyRequest{
+			MinLength:    uint32(d.Get(minLengthVar).(int)),
+			HasUppercase: d.Get(hasUppercaseVar).(bool),
+			HasLowercase: d.Get(hasLowercaseVar).(bool),
+			HasNumber:    d.Get(hasNumberVar).(bool),
+			HasSymbol:    d.Get(hasSymbolVar).(bool),
+		})
+		if helper.IgnorePreconditionError(err) != nil {
+			return diag.Errorf("failed to update default password complexity policy: %v", err)
+		}
+		if resp != nil {
+			id = resp.GetDetails().GetResourceOwner()
+		}
 	}
-	if resp != nil {
-		d.SetId(resp.GetDetails().GetResourceOwner())
-	} else {
+	if id == "" {
 		resp, err := client.GetPasswordComplexityPolicy(ctx, &admin.GetPasswordComplexityPolicyRequest{})
 		if err != nil {
 			return diag.Errorf("failed to get default password complexity policy: %v", err)
 		}
-		d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
+		id = resp.GetPolicy().GetDetails().GetResourceOwner()
 	}
+	d.SetId(id)
 	return nil
 }
 

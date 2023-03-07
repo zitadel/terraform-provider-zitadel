@@ -13,8 +13,6 @@ Datasource representing a human user situated under an organization, which then 
 
 ```terraform
 data zitadel_human_user human_user {
-  depends_on = [data.zitadel_org.org]
-
   org_id  = data.zitadel_org.org.id
   user_id = "177073614158299139"
 }

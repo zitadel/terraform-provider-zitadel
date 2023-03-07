@@ -1,6 +1,4 @@
 resource zitadel_application_api application_api {
-  depends_on = [zitadel_org.org, zitadel_project.project]
-
   org_id           = zitadel_org.org.id
   project_id       = zitadel_project.project.id
   name             = "applicationapi"

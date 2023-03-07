@@ -13,8 +13,6 @@ Resource representing the custom label policy of an organization.
 
 ```terraform
 resource zitadel_label_policy label_policy {
-  depends_on = [zitadel_org.org]
-
   org_id                 = zitadel_org.org.id
   primary_color          = "#5469d4"
   hide_login_name_suffix = true

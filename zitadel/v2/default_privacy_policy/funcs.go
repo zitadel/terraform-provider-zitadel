@@ -29,23 +29,28 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.UpdatePrivacyPolicy(ctx, &admin.UpdatePrivacyPolicyRequest{
-		TosLink:     d.Get(tosLinkVar).(string),
-		PrivacyLink: d.Get(privacyLinkVar).(string),
-		HelpLink:    d.Get(helpLinkVar).(string),
-	})
-	if helper.IgnorePreconditionError(err) != nil {
-		return diag.Errorf("failed to update default privacy policy: %v", err)
+	id := ""
+	if d.HasChanges(tosLinkVar, privacyLinkVar, helpLinkVar) {
+		resp, err := client.UpdatePrivacyPolicy(ctx, &admin.UpdatePrivacyPolicyRequest{
+			TosLink:     d.Get(tosLinkVar).(string),
+			PrivacyLink: d.Get(privacyLinkVar).(string),
+			HelpLink:    d.Get(helpLinkVar).(string),
+		})
+		if helper.IgnorePreconditionError(err) != nil {
+			return diag.Errorf("failed to update default privacy policy: %v", err)
+		}
+		if resp != nil {
+			id = resp.GetDetails().GetResourceOwner()
+		}
 	}
-	if resp != nil {
-		d.SetId(resp.GetDetails().GetResourceOwner())
-	} else {
+	if id == "" {
 		resp, err := client.GetPrivacyPolicy(ctx, &admin.GetPrivacyPolicyRequest{})
 		if err != nil {
 			return diag.Errorf("failed to update default privacy policy: %v", err)
 		}
-		d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
+		id = resp.GetPolicy().GetDetails().GetResourceOwner()
 	}
+	d.SetId(id)
 	return nil
 }
 

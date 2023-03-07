@@ -45,11 +45,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	org := d.Get(orgIDVar).(string)
 
-	_, err = client.UpdateCustomNotificationPolicy(ctx, &management.UpdateCustomNotificationPolicyRequest{
-		PasswordChange: d.Get(passwordChangeVar).(bool),
-	})
-	if err != nil {
-		return diag.Errorf("failed to update notification policy: %v", err)
+	if d.HasChanges(passwordChangeVar) {
+		_, err = client.UpdateCustomNotificationPolicy(ctx, &management.UpdateCustomNotificationPolicyRequest{
+			PasswordChange: d.Get(passwordChangeVar).(bool),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update notification policy: %v", err)
+		}
 	}
 	d.SetId(org)
 	return nil

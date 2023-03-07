@@ -29,6 +29,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	id := ""
 	if d.HasChanges(
 		primaryColorVar,
 		hideLoginNameSuffixVar,
@@ -57,15 +58,17 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			return diag.Errorf("failed to update default label policy: %v", err)
 		}
 		if resp != nil {
-			d.SetId(resp.Details.ResourceOwner)
-		} else {
-			resp, err := client.GetLabelPolicy(ctx, &admin.GetLabelPolicyRequest{})
-			if err != nil {
-				return diag.Errorf("failed to update default label policy: %v", err)
-			}
-			d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
+			id = resp.Details.ResourceOwner
 		}
 	}
+	if id == "" {
+		resp, err := client.GetLabelPolicy(ctx, &admin.GetLabelPolicyRequest{})
+		if err != nil {
+			return diag.Errorf("failed to update default label policy: %v", err)
+		}
+		id = resp.GetPolicy().GetDetails().GetResourceOwner()
+	}
+	d.SetId(id)
 
 	if d.HasChanges(logoHashVar, logoPathVar) {
 		if err := helper.InstanceFormFilePost(clientinfo, logoURL, d.Get(logoPathVar).(string)); err != nil {

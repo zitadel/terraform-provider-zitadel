@@ -1,6 +1,4 @@
 resource zitadel_login_policy login_policy {
-  depends_on = [zitadel_org.org, zitadel_org_idp_jwt.jwt_idp, zitadel_org_idp_oidc.oidc_idp]
-
   org_id                        = zitadel_org.org.id
   user_login                    = true
   allow_register                = true
