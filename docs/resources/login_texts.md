@@ -760,7 +760,7 @@ Optional:
 
 Optional:
 
-- `auto_redirect_description` (String) Text to describe that auto redirect should happen after successful login
+- `auto_redirect_description` (String) Text to describe that auto-redirect should happen after successful login
 - `next_button_text` (String)
 - `redirected_description` (String) Text to describe that the window can be closed after redirect
 - `title` (String)

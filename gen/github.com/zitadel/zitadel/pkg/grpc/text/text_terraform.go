@@ -1228,7 +1228,7 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 		"success_login_text": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"auto_redirect_description": {
-					Description: "Text to describe that auto redirect should happen after successful login",
+					Description: "Text to describe that auto-redirect should happen after successful login",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
