@@ -1,7 +1,5 @@
 resource zitadel_login_texts login_texts_en {
-  depends_on = [zitadel_org.org]
-
-  org_id = zitadel_org.org.id
+  org_id   = zitadel_org.org.id
   language = "en"
 
   email_verification_done_text = {

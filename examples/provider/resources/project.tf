@@ -1,7 +1,4 @@
-
 resource zitadel_project project {
-  depends_on = [zitadel_org.org]
-
   name                     = "projectname"
   org_id                   = zitadel_org.org.id
   project_role_assertion   = true

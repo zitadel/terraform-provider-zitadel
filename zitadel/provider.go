@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_login_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_notification_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_reset_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_passwordless_registration_message_text"
@@ -41,6 +42,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/login_texts"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/machine_key"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/machine_user"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/notification_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_jwt"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_oidc"
@@ -229,6 +231,8 @@ func Provider() *schema.Provider {
 			"zitadel_default_password_complexity_policy": default_password_complexity_policy.GetResource(),
 			"zitadel_sms_provider_twilio":                sms_provider_twilio.GetResource(),
 			"zitadel_smtp_config":                        smtp_config.GetResource(),
+			"zitadel_default_notification_policy":        default_notification_policy.GetResource(),
+			"zitadel_notification_policy":                notification_policy.GetResource(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

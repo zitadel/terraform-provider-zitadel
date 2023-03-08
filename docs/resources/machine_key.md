@@ -13,8 +13,6 @@ Resource representing a machine key
 
 ```terraform
 resource zitadel_machine_key machine_key {
-  depends_on = [zitadel_machine_user.machine_user, zitadel_org.org]
-
   org_id          = zitadel_org.org.id
   user_id         = zitadel_machine_user.machine_user.id
   key_type        = "KEY_TYPE_JSON"

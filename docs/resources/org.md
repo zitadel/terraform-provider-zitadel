@@ -13,7 +13,7 @@ Resource representing an organization in ZITADEL, which is the highest level aft
 
 ```terraform
 resource zitadel_org org {
-  name     = "terraform-test"
+  name = "terraform-test"
 }
 ```
 

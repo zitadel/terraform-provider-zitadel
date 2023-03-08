@@ -1,7 +1,4 @@
-
 resource zitadel_human_user granted_human_user {
-  depends_on = [zitadel_org.grantedorg]
-
   org_id             = zitadel_org.grantedorg.id
   user_name          = "human@localhost"
   first_name         = "firstname"

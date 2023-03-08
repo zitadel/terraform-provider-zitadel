@@ -13,8 +13,6 @@ Resource representing a OIDC IDP of the organization.
 
 ```terraform
 resource zitadel_org_idp_oidc oidc_idp {
-  depends_on = [zitadel_org.org]
-
   org_id               = zitadel_org.org.id
   name                 = "oidcidp"
   styling_type         = "STYLING_TYPE_UNSPECIFIED"

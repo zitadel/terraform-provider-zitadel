@@ -29,23 +29,28 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.UpdateDomainPolicy(ctx, &admin.UpdateDomainPolicyRequest{
-		UserLoginMustBeDomain:                  d.Get(userLoginMustBeDomainVar).(bool),
-		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
-		SmtpSenderAddressMatchesInstanceDomain: d.Get(smtpSenderVar).(bool),
-	})
-	if helper.IgnorePreconditionError(err) != nil {
-		return diag.Errorf("failed to update default domain policy: %v", err)
+	id := ""
+	if d.HasChanges(userLoginMustBeDomainVar, validateOrgDomainVar, smtpSenderVar) {
+		resp, err := client.UpdateDomainPolicy(ctx, &admin.UpdateDomainPolicyRequest{
+			UserLoginMustBeDomain:                  d.Get(userLoginMustBeDomainVar).(bool),
+			ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
+			SmtpSenderAddressMatchesInstanceDomain: d.Get(smtpSenderVar).(bool),
+		})
+		if helper.IgnorePreconditionError(err) != nil {
+			return diag.Errorf("failed to update default domain policy: %v", err)
+		}
+		if resp != nil {
+			id = resp.GetDetails().GetResourceOwner()
+		}
 	}
-	if resp != nil {
-		d.SetId(resp.GetDetails().GetResourceOwner())
-	} else {
+	if id == "" {
 		resp, err := client.GetDomainPolicy(ctx, &admin.GetDomainPolicyRequest{})
 		if err != nil {
 			return diag.Errorf("failed to update default domain policy: %v", err)
 		}
-		d.SetId(resp.GetPolicy().GetDetails().GetResourceOwner())
+		id = resp.GetPolicy().GetDetails().GetResourceOwner()
 	}
+	d.SetId(id)
 	return nil
 }
 

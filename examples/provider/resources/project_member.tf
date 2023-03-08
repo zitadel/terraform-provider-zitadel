@@ -1,7 +1,4 @@
-
 resource zitadel_project_member project_member {
-  depends_on = [zitadel_org.org, zitadel_project.project, zitadel_human_user.human_user]
-
   org_id     = zitadel_org.org.id
   project_id = zitadel_project.project.id
   user_id    = zitadel_human_user.human_user.id

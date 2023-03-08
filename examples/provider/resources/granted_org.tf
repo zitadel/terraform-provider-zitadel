@@ -1,4 +1,3 @@
-
 resource zitadel_org grantedorg {
-  name     = "terraform-test-granted"
+  name = "terraform-test-granted"
 }
