@@ -25,7 +25,7 @@ resource zitadel_instance_member instance_member {
 
 ### Required
 
-- `roles` (Set of String) List of roles granted
+- `roles` (Set of String) List of roles granted, full list available here: https://zitadel.com/docs/guides/manage/console/managers#roles
 - `user_id` (String) ID of the user
 
 ### Read-Only

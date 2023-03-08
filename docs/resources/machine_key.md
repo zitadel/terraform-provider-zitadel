@@ -33,7 +33,7 @@ resource zitadel_machine_key machine_key {
 
 ### Optional
 
-- `expiration_date` (String) Expiration date of the machine key
+- `expiration_date` (String) Expiration date of the machine key in the RFC3339 format
 
 ### Read-Only
 

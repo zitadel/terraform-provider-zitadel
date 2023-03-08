@@ -27,7 +27,7 @@ resource zitadel_smtp_config smtp {
 
 ### Required
 
-- `host` (String) Host address to your SMTP server.
+- `host` (String) Host and port address to your SMTP server.
 - `sender_address` (String) Address used to send emails.
 - `sender_name` (String) Sender name used to send emails.
 

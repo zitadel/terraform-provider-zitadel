@@ -31,7 +31,7 @@ resource zitadel_personal_access_token pat {
 
 ### Optional
 
-- `expiration_date` (String) Expiration date of the token
+- `expiration_date` (String) Expiration date of the token in the RFC3339 format
 
 ### Read-Only
 
