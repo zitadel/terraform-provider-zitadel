@@ -56,6 +56,38 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to create domain: %v", err)
 	}
 	d.SetId(name)
+	if d.Get(isPrimaryVar).(bool) {
+		_, err = client.SetPrimaryOrgDomain(ctx, &management.SetPrimaryOrgDomainRequest{Domain: name})
+		if err != nil {
+			return diag.Errorf("failed to set domain primary: %v", err)
+		}
+	}
+	return nil
+}
+
+func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started create")
+
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	name := d.Get(nameVar).(string)
+	d.SetId(name)
+	if d.HasChange(isPrimaryVar) {
+		if d.Get(isPrimaryVar).(bool) {
+			_, err = client.SetPrimaryOrgDomain(ctx, &management.SetPrimaryOrgDomainRequest{Domain: name})
+			if err != nil {
+				return diag.Errorf("failed to set domain primary: %v", err)
+			}
+		}
+	}
 	return nil
 }
 

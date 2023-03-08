@@ -13,8 +13,9 @@ Resource representing a domain of the organization.
 
 ```terraform
 resource zitadel_domain domain {
-  org_id = zitadel_org.org.id
-  name   = "localhost.com"
+  org_id    = zitadel_org.org.id
+  name      = "zitadel.default.127.0.0.1.sslip.io"
+  is_primary = true
 }
 ```
 
@@ -26,9 +27,12 @@ resource zitadel_domain domain {
 - `name` (String) Name of the domain
 - `org_id` (String) ID of the organization
 
+### Optional
+
+- `is_primary` (Boolean) Is domain primary
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `is_primary` (Boolean) Is domain primary
 - `is_verified` (Boolean) Is domain verified
 - `validation_type` (Number) Validation type

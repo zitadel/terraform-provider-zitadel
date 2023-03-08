@@ -20,7 +20,7 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Required:    true,
-				Description: "List of roles granted",
+				Description: "List of roles granted, full list available here: https://zitadel.com/docs/guides/manage/console/managers#roles",
 			},
 		},
 		DeleteContext: delete,
