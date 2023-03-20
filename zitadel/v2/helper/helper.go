@@ -130,3 +130,11 @@ func DescriptionEnumValuesList(enum map[int32]string) string {
 	str += strings.Join(values, ", ")
 	return str
 }
+
+func EnumValueMap(enum map[int32]string) map[string]int32 {
+	values := make(map[string]int32)
+	for k, v := range enum {
+		values[v] = k
+	}
+	return values
+}

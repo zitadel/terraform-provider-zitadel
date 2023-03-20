@@ -18,7 +18,7 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "the state of the action",
-				/* Not necessary as long as only active users are created
+				/* Not necessary as long as only active actions are created
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return EnumValueValidation(actionState, value, action.ActionState_value)
 				},*/

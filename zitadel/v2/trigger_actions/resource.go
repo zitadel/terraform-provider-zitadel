@@ -1,7 +1,11 @@
 package trigger_actions
 
 import (
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
@@ -17,14 +21,20 @@ func GetResource() *schema.Resource {
 			flowTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Type of the flow to which the action triggers belong",
-				ForceNew:    true,
+				Description: "Type of the flow to which the action triggers belong" + helper.DescriptionEnumValuesList(flowTypes()),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(flowTypeVar, value, helper.EnumValueMap(flowTypes()))
+				},
+				ForceNew: true,
 			},
 			triggerTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Trigger type on when the actions get triggered",
-				ForceNew:    true,
+				Description: "Trigger type on when the actions get triggered" + helper.DescriptionEnumValuesList(triggerTypes()),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(triggerTypeVar, value, helper.EnumValueMap(triggerTypes()))
+				},
+				ForceNew: true,
 			},
 			actionsVar: {
 				Type: schema.TypeSet,
@@ -40,5 +50,24 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		ReadContext:   read,
 		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+	}
+}
+
+func flowTypes() map[int32]string {
+	return map[int32]string{
+		0: "FLOW_TYPE_UNSPECIFIED",
+		1: "FLOW_TYPE_EXTERNAL_AUTHENTICATION",
+		2: "FLOW_TYPE_CUSTOMISE_TOKEN",
+		3: "FLOW_TYPE_INTERNAL_AUTHENTICATION",
+	}
+}
+func triggerTypes() map[int32]string {
+	return map[int32]string{
+		0: "TRIGGER_TYPE_UNSPECIFIED",
+		1: "TRIGGER_TYPE_POST_AUTHENTICATION",
+		2: "TRIGGER_TYPE_PRE_CREATION",
+		3: "TRIGGER_TYPE_POST_CREATION",
+		4: "TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION",
+		5: "TRIGGER_TYPE_PRE_USERINFO_CREATION",
 	}
 }
