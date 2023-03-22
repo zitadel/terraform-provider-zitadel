@@ -13,21 +13,36 @@ import (
 )
 
 const (
-	DomainVar   = "domain"
-	InsecureVar = "insecure"
-	TokenVar    = "token"
-	PortVar     = "port"
+	DomainVar      = "domain"
+	InsecureVar    = "insecure"
+	TokenVar       = "token"
+	PortVar        = "port"
+	JWTProfileFile = "jwt_profile_file"
+	JWTProfileJSON = "jwt_profile_json"
 )
 
 type ClientInfo struct {
 	Domain  string
 	Issuer  string
 	KeyPath string
+	Data    []byte
 	Options []zitadel.Option
 }
 
-func GetClientInfo(insecure bool, domain string, token string, port string) (*ClientInfo, error) {
-	options := []zitadel.Option{zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(token))}
+func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+	options := []zitadel.Option{}
+	keyPath := ""
+	if token != "" {
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(token)))
+		keyPath = token
+	} else if jwtProfileFile != "" {
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(jwtProfileFile)))
+		keyPath = token
+	} else if jwtProfileJSON != "" {
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData([]byte(jwtProfileJSON))))
+	} else {
+		return nil, fmt.Errorf("either 'jwt_profile_file' or 'jwt_profile_json' is required")
+	}
 
 	issuer := ""
 	if port != "" {
@@ -52,7 +67,8 @@ func GetClientInfo(insecure bool, domain string, token string, port string) (*Cl
 	return &ClientInfo{
 		domain,
 		issuer,
-		token,
+		keyPath,
+		[]byte(jwtProfileJSON),
 		options,
 	}, nil
 }

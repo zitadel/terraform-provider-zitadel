@@ -68,6 +68,7 @@ func OrgFormFilePost(clientInfo *ClientInfo, endpoint, path, orgID string) diag.
 }
 
 func formFilePost(clientInfo *ClientInfo, endpoint, path string, additionalHeaders map[string]string) diag.Diagnostics {
+	var client *http.Client
 	r, err := createMultipartRequest(clientInfo.Issuer, endpoint, path)
 	if err != nil {
 		return diag.Errorf("failed to create asset request: %v", err)
@@ -76,9 +77,18 @@ func formFilePost(clientInfo *ClientInfo, endpoint, path string, additionalHeade
 		r.Header.Add(k, v)
 	}
 
-	client, err := NewClientWithInterceptor(clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
-	if err != nil {
-		return diag.Errorf("failed to create client: %v", err)
+	if clientInfo.KeyPath != "" {
+		client, err = NewClientWithInterceptorFromKeyFile(clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
+		if err != nil {
+			return diag.Errorf("failed to create client: %v", err)
+		}
+	} else if len(clientInfo.Data) > 0 {
+		client, err = NewClientWithInterceptorFromKeyFileData(clientInfo.Issuer, clientInfo.Data, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
+		if err != nil {
+			return diag.Errorf("failed to create client: %v", err)
+		}
+	} else {
+		return diag.Errorf("either 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
 
 	resp, err := client.Do(r)
@@ -93,8 +103,19 @@ type Interceptor struct {
 	core        http.RoundTripper
 }
 
-func NewClientWithInterceptor(issuer, keyPath string, scopes []string) (*http.Client, error) {
+func NewClientWithInterceptorFromKeyFile(issuer, keyPath string, scopes []string) (*http.Client, error) {
 	ts, err := profile.NewJWTProfileTokenSourceFromKeyFile(issuer, keyPath, scopes)
+	if err != nil {
+		return nil, err
+	}
+
+	return &http.Client{
+		Transport: Interceptor{core: http.DefaultTransport, tokenSource: ts},
+	}, nil
+}
+
+func NewClientWithInterceptorFromKeyFileData(issuer string, data []byte, scopes []string) (*http.Client, error) {
+	ts, err := profile.NewJWTProfileTokenSourceFromKeyFileData(issuer, data, scopes)
 	if err != nil {
 		return nil, err
 	}
