@@ -55,7 +55,6 @@ func GetResource() *schema.Resource {
 
 func flowTypes() map[int32]string {
 	return map[int32]string{
-		0: "FLOW_TYPE_UNSPECIFIED",
 		1: "FLOW_TYPE_EXTERNAL_AUTHENTICATION",
 		2: "FLOW_TYPE_CUSTOMISE_TOKEN",
 		3: "FLOW_TYPE_INTERNAL_AUTHENTICATION",
@@ -63,7 +62,6 @@ func flowTypes() map[int32]string {
 }
 func triggerTypes() map[int32]string {
 	return map[int32]string{
-		0: "TRIGGER_TYPE_UNSPECIFIED",
 		1: "TRIGGER_TYPE_POST_AUTHENTICATION",
 		2: "TRIGGER_TYPE_PRE_CREATION",
 		3: "TRIGGER_TYPE_POST_CREATION",
