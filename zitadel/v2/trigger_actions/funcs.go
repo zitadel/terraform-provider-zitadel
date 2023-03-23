@@ -2,6 +2,7 @@ package trigger_actions
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -24,9 +25,13 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	flowType := d.Get(flowTypeVar).(string)
+	flowTypeValues := helper.EnumValueMap(flowTypes())
+	triggerType := d.Get(triggerTypeVar).(string)
+	triggerTypeValues := helper.EnumValueMap(triggerTypes())
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
-		FlowType:    d.Get(flowTypeVar).(string),
-		TriggerType: d.Get(triggerTypeVar).(string),
+		FlowType:    strconv.Itoa(int(flowTypeValues[flowType])),
+		TriggerType: strconv.Itoa(int(triggerTypeValues[triggerType])),
 		ActionIds:   []string{},
 	})
 	if helper.IgnoreIfNotFoundError(err) != nil {
@@ -48,9 +53,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	flowType := d.Get(flowTypeVar).(string)
+	flowTypeValues := helper.EnumValueMap(flowTypes())
+	triggerType := d.Get(triggerTypeVar).(string)
+	triggerTypeValues := helper.EnumValueMap(triggerTypes())
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
-		FlowType:    d.Get(flowTypeVar).(string),
-		TriggerType: d.Get(triggerTypeVar).(string),
+		FlowType:    strconv.Itoa(int(flowTypeValues[flowType])),
+		TriggerType: strconv.Itoa(int(triggerTypeValues[triggerType])),
 		ActionIds:   helper.GetOkSetToStringSlice(d, actionsVar),
 	})
 	if err != nil {
@@ -75,10 +84,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	flowType := d.Get(flowTypeVar).(string)
+	flowTypeValues := helper.EnumValueMap(flowTypes())
 	triggerType := d.Get(triggerTypeVar).(string)
+	triggerTypeValues := helper.EnumValueMap(triggerTypes())
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
-		FlowType:    flowType,
-		TriggerType: triggerType,
+		FlowType:    strconv.Itoa(int(flowTypeValues[flowType])),
+		TriggerType: strconv.Itoa(int(triggerTypeValues[triggerType])),
 		ActionIds:   helper.GetOkSetToStringSlice(d, actionsVar),
 	})
 	d.SetId(getTriggerActionsID(orgID, flowType, triggerType))
