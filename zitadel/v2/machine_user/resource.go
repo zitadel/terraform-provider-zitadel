@@ -1,8 +1,10 @@
 package machine_user
 
 import (
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/user"
 )
 
@@ -56,11 +58,10 @@ func GetResource() *schema.Resource {
 			accessTokenTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Access token type of the user, (enum; ACCESS_TOKEN_TYPE_BEARER, ACCESS_TOKEN_TYPE_JWT)",
-				ValidateFunc: validation.StringInSlice([]string{
-					user.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER.String(),
-					user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT.String(),
-				}, false),
+				Description: "Access token type" + helper.DescriptionEnumValuesList(user.AccessTokenType_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(accessTokenTypeVar, value, user.AccessTokenType_value)
+				},
 			},
 		},
 		ReadContext:   read,

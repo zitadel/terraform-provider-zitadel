@@ -1,10 +1,6 @@
 package machine_user
 
-import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/user"
-)
+import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
@@ -57,13 +53,8 @@ func GetDatasource() *schema.Resource {
 			accessTokenTypeVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Access token type of the user, (enum; ACCESS_TOKEN_TYPE_BEARER, ACCESS_TOKEN_TYPE_JWT)",
-				ValidateFunc: validation.StringInSlice([]string{
-					user.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER.String(),
-					user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT.String(),
-				}, false),
-			},
-		},
+				Description: "Access token type",
+			}},
 		ReadContext: read,
 		Importer:    &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
