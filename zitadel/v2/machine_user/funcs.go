@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/user"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
@@ -47,9 +48,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	respUser, err := client.AddMachineUser(ctx, &management.AddMachineUserRequest{
-		UserName:    d.Get(userNameVar).(string),
-		Name:        d.Get(nameVar).(string),
-		Description: d.Get(descriptionVar).(string),
+		UserName:        d.Get(userNameVar).(string),
+		Name:            d.Get(nameVar).(string),
+		Description:     d.Get(descriptionVar).(string),
+		AccessTokenType: user.AccessTokenType(user.AccessTokenType_value[(d.Get(accessTokenTypeVar).(string))]),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create machine user: %v", err)
@@ -81,11 +83,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChanges(nameVar, descriptionVar) {
+	if d.HasChanges(nameVar, descriptionVar, accessTokenTypeVar) {
 		_, err := client.UpdateMachine(ctx, &management.UpdateMachineRequest{
-			UserId:      d.Id(),
-			Name:        d.Get(nameVar).(string),
-			Description: d.Get(descriptionVar).(string),
+			UserId:          d.Id(),
+			Name:            d.Get(nameVar).(string),
+			Description:     d.Get(descriptionVar).(string),
+			AccessTokenType: user.AccessTokenType(user.AccessTokenType_value[(d.Get(accessTokenTypeVar).(string))]),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update machine user: %v", err)
@@ -127,6 +130,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if machine := user.GetMachine(); machine != nil {
 		set[nameVar] = machine.GetName()
 		set[descriptionVar] = machine.GetDescription()
+		set[accessTokenTypeVar] = machine.GetAccessTokenType().String()
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
