@@ -31,17 +31,17 @@ terraform {
   required_providers {
     zitadel = {
       source  = "zitadel/zitadel"
-      version = "1.0.0-alpha.7"
+      version = "1.0.0-alpha.14"
     }
   }
 }
 
 provider zitadel {
-  domain = "localhost"
-  insecure = "true"
-  port = "8080"
-  project = "170832731415117995"
-  token   = "local-token"
+  domain           = "localhost"
+  insecure         = "true"
+  port             = "8080"
+  project          = "170832731415117995"
+  jwt_profile_file = "local-token"
 }
 ```
 
@@ -51,12 +51,14 @@ provider zitadel {
 ### Required
 
 - `domain` (String) Domain used to connect to the ZITADEL instance
-- `token` (String) Path to the file containing credentials to connect to ZITADEL
 
 ### Optional
 
 - `insecure` (Boolean) Use insecure connection
+- `jwt_profile_file` (String) Path to the file containing credentials to connect to ZITADEL. Either 'jwt_profile_file' or 'jwt_profile_json' is required
+- `jwt_profile_json` (String) JSON value of credentials to connect to ZITADEL. Either 'jwt_profile_file' or 'jwt_profile_json' is required
 - `port` (String) Used port if not the default ports 80 or 443 are configured
+- `token` (String) Path to the file containing credentials to connect to ZITADEL
 
 ## Limitations
 

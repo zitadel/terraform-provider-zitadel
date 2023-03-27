@@ -32,6 +32,7 @@ output machine_user {
 
 ### Read-Only
 
+- `access_token_type` (String) Access token type
 - `description` (String) Description of the user
 - `id` (String) The ID of this resource.
 - `login_names` (List of String) Loginnames

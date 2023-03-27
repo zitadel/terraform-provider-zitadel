@@ -31,6 +31,7 @@ resource zitadel_machine_user machine_user {
 
 ### Optional
 
+- `access_token_type` (String) Access token type, supported values: ACCESS_TOKEN_TYPE_BEARER, ACCESS_TOKEN_TYPE_JWT
 - `description` (String) Description of the user
 
 ### Read-Only
