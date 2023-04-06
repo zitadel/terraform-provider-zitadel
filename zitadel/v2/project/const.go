@@ -1,5 +1,7 @@
 package project
 
+import "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/project"
+
 const (
 	projectIDVar              = "project_id"
 	nameVar                   = "name"
@@ -9,4 +11,8 @@ const (
 	roleCheckVar              = "project_role_check"
 	hasProjectCheckVar        = "has_project_check"
 	privateLabelingSettingVar = "private_labeling_setting"
+)
+
+var (
+	defaultPrivateLabelingSetting = project.PrivateLabelingSetting_name[0]
 )

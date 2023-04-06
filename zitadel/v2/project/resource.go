@@ -54,6 +54,7 @@ func GetResource() *schema.Resource {
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(privateLabelingSettingVar, value, project.PrivateLabelingSetting_value)
 				},
+				Default: defaultPrivateLabelingSetting,
 			},
 		},
 		DeleteContext: delete,
