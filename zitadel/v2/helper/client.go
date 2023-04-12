@@ -44,10 +44,10 @@ func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile st
 		return nil, fmt.Errorf("either 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
 
-	issuerScheme := "https"
+	issuerScheme := "https://"
 	if insecure {
 		options = append(options, zitadel.WithInsecure())
-		issuerScheme = "http"
+		issuerScheme = "http://"
 	}
 
 	issuerPort := port
