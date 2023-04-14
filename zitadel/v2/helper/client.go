@@ -55,9 +55,9 @@ func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile st
 		issuerPort = ""
 	}
 
-	issuer := issuerScheme + domain + ":" + issuerPort
-	if issuerPort == "" {
-		issuer = issuerScheme + domain
+	issuer := issuerScheme + domain
+	if issuerPort != "" {
+		issuer = issuer + ":" + issuerPort
 	}
 
 	clientDomain := domain + ":" + port
