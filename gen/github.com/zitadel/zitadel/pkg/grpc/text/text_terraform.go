@@ -254,6 +254,11 @@ func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terrafo
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
+				"support_email": {
+					Description: "",
+					Optional:    true,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+				},
 				"tos": {
 					Description: "",
 					Optional:    true,
@@ -2137,6 +2142,23 @@ func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp
 									t = string(v.Value)
 								}
 								obj.PrivacyPolicy = t
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["support_email"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"LoginCustomText.footer_text.support_email"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.footer_text.support_email", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.SupportEmail = t
 							}
 						}
 					}
@@ -6737,6 +6759,28 @@ func CopyLoginCustomTextToTerraform(ctx context.Context, obj textpb.LoginCustomT
 							v.Value = string(obj.PrivacyPolicy)
 							v.Unknown = false
 							tf.Attrs["privacy_policy"] = v
+						}
+					}
+					{
+						t, ok := tf.AttrTypes["support_email"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"LoginCustomText.footer_text.support_email"})
+						} else {
+							v, ok := tf.Attrs["support_email"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"LoginCustomText.footer_text.support_email", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.footer_text.support_email", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.SupportEmail) == ""
+							}
+							v.Value = string(obj.SupportEmail)
+							v.Unknown = false
+							tf.Attrs["support_email"] = v
 						}
 					}
 					{
