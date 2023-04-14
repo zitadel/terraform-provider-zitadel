@@ -44,6 +44,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/machine_user"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/notification_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_github"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_jwt"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_member"
@@ -186,6 +187,7 @@ func Provider() *schema.Provider {
 			"zitadel_trigger_actions":  trigger_actions.GetDatasource(),
 			"zitadel_org_jwt_idp":      org_idp_jwt.GetDatasource(),
 			"zitadel_org_oidc_idp":     org_idp_oidc.GetDatasource(),
+			"zitadel_org_idp_github":   org_idp_github.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -247,6 +249,7 @@ func Provider() *schema.Provider {
 			"zitadel_machine_key":                        machine_key.GetResource(),
 			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
 			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
+			"zitadel_org_idp_github":                     org_idp_github.GetResource(),
 			"zitadel_default_label_policy":               default_label_policy.GetResource(),
 			"zitadel_default_login_policy":               default_login_policy.GetResource(),
 			"zitadel_default_lockout_policy":             default_lockout_policy.GetResource(),

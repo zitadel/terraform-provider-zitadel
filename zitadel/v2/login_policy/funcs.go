@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	mgmtclient "github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/policy"
@@ -156,14 +157,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		addIdps, deleteIdps := helper.GetAddAndDelete(helper.SetToStringSlice(o.(*schema.Set)), helper.SetToStringSlice(n.(*schema.Set)))
 
 		for _, addIdp := range addIdps {
-			var ownertype idp.IDPOwnerType
-			_, err := client.GetOrgIDPByID(ctx, &management.GetOrgIDPByIDRequest{Id: addIdp})
+			idpOwnerType, err := getIDPOwnerType(ctx, client, addIdp)
 			if err != nil {
-				ownertype = idp.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
-			} else {
-				ownertype = idp.IDPOwnerType_IDP_OWNER_TYPE_ORG
+				return diag.FromErr(err)
 			}
-			if _, err := client.AddIDPToLoginPolicy(ctx, &management.AddIDPToLoginPolicyRequest{IdpId: addIdp, OwnerType: ownertype}); err != nil {
+			if _, err := client.AddIDPToLoginPolicy(ctx, &management.AddIDPToLoginPolicyRequest{IdpId: addIdp, OwnerType: idpOwnerType}); err != nil {
 				return diag.FromErr(err)
 			}
 		}
@@ -251,18 +249,40 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	idps := helper.GetOkSetToStringSlice(d, idpsVar)
 	for _, addIdp := range idps {
-		var ownertype idp.IDPOwnerType
-		_, err := client.GetOrgIDPByID(ctx, &management.GetOrgIDPByIDRequest{Id: addIdp})
+		idpOwnerType, err := getIDPOwnerType(ctx, client, addIdp)
 		if err != nil {
-			ownertype = idp.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
-		} else {
-			ownertype = idp.IDPOwnerType_IDP_OWNER_TYPE_ORG
+			return diag.FromErr(err)
 		}
-		if _, err := client.AddIDPToLoginPolicy(ctx, &management.AddIDPToLoginPolicyRequest{IdpId: addIdp, OwnerType: ownertype}); err != nil {
+		if _, err := client.AddIDPToLoginPolicy(ctx, &management.AddIDPToLoginPolicyRequest{IdpId: addIdp, OwnerType: idpOwnerType}); err != nil {
 			return diag.FromErr(err)
 		}
 	}
 	return nil
+}
+
+func getIDPOwnerType(ctx context.Context, client *mgmtclient.Client, id string) (idp.IDPOwnerType, error) {
+	ownertype := idp.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
+	templateProvider, err := client.GetProviderByID(ctx, &management.GetProviderByIDRequest{Id: id})
+	err = helper.IgnoreIfNotFoundError(err)
+	if err != nil {
+		return idp.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED, err
+	}
+	ownertype = templateProvider.GetIdp().GetOwner()
+	if ownertype == idp.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED {
+		// Maybe it's a legacy provider
+		legacyProvider, err := client.GetOrgIDPByID(ctx, &management.GetOrgIDPByIDRequest{Id: id})
+		err = helper.IgnoreIfNotFoundError(err)
+		if err != nil {
+			return idp.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED, err
+		}
+		ownertype = legacyProvider.GetIdp().GetOwner()
+	}
+
+	if ownertype == idp.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED {
+		// If the IDP is still not found, the only possibility left is a legacy instance level provider
+		ownertype = idp.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
+	}
+	return ownertype, nil
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
