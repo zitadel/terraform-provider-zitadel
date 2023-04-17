@@ -152,7 +152,9 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 }
 
 func (p *providerPV6) DataSources(_ context.Context) []func() datasource.DataSource {
-	return nil
+	return []func() datasource.DataSource{
+		org_idp_github.NewDataSource,
+	}
 }
 
 func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
@@ -170,6 +172,7 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 		default_passwordless_registration_message_text.New,
 		default_verify_email_message_text.New,
 		default_verify_phone_message_text.New,
+		org_idp_github.NewResource,
 	}
 }
 
@@ -187,7 +190,6 @@ func Provider() *schema.Provider {
 			"zitadel_trigger_actions":  trigger_actions.GetDatasource(),
 			"zitadel_org_jwt_idp":      org_idp_jwt.GetDatasource(),
 			"zitadel_org_oidc_idp":     org_idp_oidc.GetDatasource(),
-			"zitadel_org_idp_github":   org_idp_github.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -249,7 +251,6 @@ func Provider() *schema.Provider {
 			"zitadel_machine_key":                        machine_key.GetResource(),
 			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
 			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
-			"zitadel_org_idp_github":                     org_idp_github.GetResource(),
 			"zitadel_default_label_policy":               default_label_policy.GetResource(),
 			"zitadel_default_login_policy":               default_login_policy.GetResource(),
 			"zitadel_default_lockout_policy":             default_lockout_policy.GetResource(),
