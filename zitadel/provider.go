@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_login_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_notification_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_reset_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_passwordless_registration_message_text"
@@ -165,6 +166,7 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 		passwordless_registration_message_text.New,
 		default_domain_claimed_message_text.New,
 		default_init_message_text.New,
+		default_password_change_message_text.New,
 		default_password_reset_message_text.New,
 		default_passwordless_registration_message_text.New,
 		default_verify_email_message_text.New,
