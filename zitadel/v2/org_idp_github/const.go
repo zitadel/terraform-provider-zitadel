@@ -1,7 +1,7 @@
 package org_idp_github
 
 const (
-	idpIDVar             = "idp_id"
+	idpIDVar             = "id"
 	orgIDVar             = "org_id"
 	nameVar              = "name"
 	clientIDVar          = "client_id"

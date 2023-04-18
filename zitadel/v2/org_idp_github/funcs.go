@@ -66,7 +66,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if d.HasChanges(nameVar, clientIDVar, clientSecretVar, scopesVar, isLinkingAllowedVar, isCreationAllowedVar, isAutoCreationVar, isAutoUpdateVar) {
+	if d.HasChangesExcept(idpIDVar, orgIDVar) {
 		_, err = client.UpdateGitHubProvider(ctx, &management.UpdateGitHubProviderRequest{
 			Id:           d.Id(),
 			Name:         d.Get(nameVar).(string),
