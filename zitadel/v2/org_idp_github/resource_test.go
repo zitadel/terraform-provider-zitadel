@@ -133,18 +133,6 @@ func checkName(expect string, getProviderByIDResponse *management.GetProviderByI
 	}
 }
 
-func checkClientSecret(ctx context.Context, expectClientSecret string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		zitadelCtx := fromZitadelContext(ctx)
-		currentState := state.RootModule().Resources[zitadelCtx.terraformName].Primary
-		actual := currentState.Attributes["client_secret"]
-		if actual != expectClientSecret {
-			return fmt.Errorf("expected client_secret to be %s, but got %s", expectClientSecret, actual)
-		}
-		return nil
-	}
-}
-
 func checkDestroy(ctx context.Context) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		err := assignGetProviderByIDResponse(ctx, new(management.GetProviderByIDResponse))(state)
