@@ -32,3 +32,6 @@ override.tf.json
 
 # IDEs
 .idea
+
+# local binary
+terraform-provider-zitadel
