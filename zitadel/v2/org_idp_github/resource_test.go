@@ -21,12 +21,7 @@ func TestAccZITADELOrgIdPGitHub(t *testing.T) {
 	}
 	zitadelCtx := fromZitadelContext(ctx)
 	getProviderByIDResponse := new(management.GetProviderByIDResponse)
-	resource.Test(t, resource.TestCase{
-		ProviderFactories: zitadelProviderFactories(ctx),
-		CheckDestroy:      checkDestroy(ctx),
-		Steps: []resource.TestStep{
-			{ // Check resource can be created
-				Config: fmt.Sprintf(`
+	initialConfig := fmt.Sprintf(`
 resource "zitadel_org_idp_github" "%s" {
   org_id              = "%s"
   name                = "aninitialprovidername"
@@ -39,18 +34,8 @@ resource "zitadel_org_idp_github" "%s" {
   is_auto_update      = true
 }
 %s
-`, zitadelCtx.terraformID, zitadelCtx.orgID, zitadelCtx.providerSnippet),
-				RefreshState: false,
-				//				ExpectNonEmptyPlan: true,
-				Check: resource.ComposeTestCheckFunc(
-					assignGetProviderByIDResponse(ctx, getProviderByIDResponse),
-					resource.ComposeAggregateTestCheckFunc(
-						checkStateHasIDSet(ctx),
-						checkName("aninitialprovidername", getProviderByIDResponse),
-					),
-				),
-			}, { // Check resource can be updated
-				Config: fmt.Sprintf(`
+`, zitadelCtx.terraformID, zitadelCtx.orgID, zitadelCtx.providerSnippet)
+	updatedNameConfig := fmt.Sprintf(`
 resource "zitadel_org_idp_github" "%s" {
   org_id              = "%s"
   name                = "anupdatedprovidername"
@@ -63,45 +48,57 @@ resource "zitadel_org_idp_github" "%s" {
   is_auto_update      = true
 }
 %s
-`, zitadelCtx.terraformID, zitadelCtx.orgID, zitadelCtx.providerSnippet),
-				//				ExpectNonEmptyPlan: true,
+`, zitadelCtx.terraformID, zitadelCtx.orgID, zitadelCtx.providerSnippet)
+	updatedClientSecret := fmt.Sprintf(`
+resource "zitadel_org_idp_github" "%s" {
+  org_id              = "%s"
+  name                = "anupdatedprovidername"
+  client_id           = "aclientid"
+  client_secret       = "another secret"
+  scopes              = ["two", "scopes"]
+  is_linking_allowed  = false
+  is_creation_allowed = true
+  is_auto_creation    = false
+  is_auto_update      = true
+}
+%s
+`, zitadelCtx.terraformID, zitadelCtx.orgID, zitadelCtx.providerSnippet)
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: zitadelProviderFactories(ctx),
+		CheckDestroy:      checkDestroy(ctx),
+		Steps: []resource.TestStep{
+			{ // Check first plan has a diff
+				Config:             initialConfig,
+				ExpectNonEmptyPlan: true,
+				// ExpectNonEmptyPlan just works with PlanOnly set to true
+				PlanOnly: true,
+			}, { // Check resource is created
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					assignGetProviderByIDResponse(ctx, getProviderByIDResponse),
+					resource.ComposeAggregateTestCheckFunc(
+						checkStateHasIDSet(ctx),
+						checkName("aninitialprovidername", getProviderByIDResponse),
+					),
+				),
+			}, { // Check updating name has a diff
+				Config:             updatedNameConfig,
+				ExpectNonEmptyPlan: true,
+				// ExpectNonEmptyPlan just works with PlanOnly set to true
+				PlanOnly: true,
+			}, { // Check name can be updated
+				Config: updatedNameConfig,
 				Check: resource.ComposeTestCheckFunc(
 					assignGetProviderByIDResponse(ctx, getProviderByIDResponse),
 					checkName("anupdatedprovidername", getProviderByIDResponse),
 				),
-			}, { // Check client secret can be updated
-				Config: fmt.Sprintf(`
-resource "zitadel_org_idp_github" "%s" {
-  org_id              = "%s"
-  name                = "anupdatedprovidername"
-  client_id           = "aclientid"
-  client_secret       = "another secret"
-  scopes              = ["two", "scopes"]
-  is_linking_allowed  = false
-  is_creation_allowed = true
-  is_auto_creation    = false
-  is_auto_update      = true
-}
-%s
-`, zitadelCtx.terraformID, zitadelCtx.orgID, zitadelCtx.providerSnippet),
-				//				ExpectNonEmptyPlan: true,
-			}, { // No changes produce an empty plan
-				Config: fmt.Sprintf(`
-resource "zitadel_org_idp_github" "%s" {
-  org_id              = "%s"
-  name                = "anupdatedprovidername"
-  client_id           = "aclientid"
-  client_secret       = "another secret"
-  scopes              = ["two", "scopes"]
-  is_linking_allowed  = false
-  is_creation_allowed = true
-  is_auto_creation    = false
-  is_auto_update      = true
-}
-%s
-`, zitadelCtx.terraformID, zitadelCtx.orgID, zitadelCtx.providerSnippet),
+			}, { // Check updating client secret has a diff
+				Config:             updatedClientSecret,
+				ExpectNonEmptyPlan: true,
+				// ExpectNonEmptyPlan just works with PlanOnly set to true
 				PlanOnly: true,
-				//				ExpectNonEmptyPlan: false,
+			}, { // Check client secret can be updated
+				Config: updatedClientSecret,
 			},
 		},
 	})
