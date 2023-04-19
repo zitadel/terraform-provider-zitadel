@@ -3,6 +3,8 @@ package zitadel
 import (
 	"context"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_google"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_azure_ad"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_google"
@@ -202,18 +204,19 @@ func Provider() *schema.Provider {
 			"zitadel_application_oidc":           application_oidc.GetDatasource(),
 			"zitadel_application_api":            application_api.GetDatasource(),
 			"zitadel_trigger_actions":            trigger_actions.GetDatasource(),
-			"zitadel_org_jwt_idp":                org_idp_jwt.GetDatasource(),
-			"zitadel_org_oidc_idp":               org_idp_oidc.GetDatasource(),
-			"zitadel_org_idp_github":             org_idp_github.GetDatasource(),
-			"zitadel_org_idp_github_es":          org_idp_github_es.GetDatasource(),
-			"zitadel_org_idp_gitlab":             org_idp_gitlab.GetDatasource(),
-			"zitadel_org_idp_gitlab_self_hosted": org_idp_gitlab_self_hosted.GetDatasource(),
 			"zitadel_idp_github":                 idp_github.GetDatasource(),
 			"zitadel_idp_github_es":              idp_github_es.GetDatasource(),
 			"zitadel_idp_gitlab":                 idp_gitlab.GetDatasource(),
 			"zitadel_idp_gitlab_self_hosted":     idp_gitlab_self_hosted.GetDatasource(),
 			"zitadel_idp_google":                 idp_google.GetDatasource(),
 			"zitadel_idp_azure_ad":               idp_azure_ad.GetDatasource(),
+			"zitadel_org_jwt_idp":                org_idp_jwt.GetDatasource(),
+			"zitadel_org_oidc_idp":               org_idp_oidc.GetDatasource(),
+			"zitadel_org_idp_github":             org_idp_github.GetDatasource(),
+			"zitadel_org_idp_github_es":          org_idp_github_es.GetDatasource(),
+			"zitadel_org_idp_gitlab":             org_idp_gitlab.GetDatasource(),
+			"zitadel_org_idp_gitlab_self_hosted": org_idp_gitlab_self_hosted.GetDatasource(),
+			"zitadel_org_idp_google":             org_idp_google.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -273,18 +276,6 @@ func Provider() *schema.Provider {
 			"zitadel_trigger_actions":                    trigger_actions.GetResource(),
 			"zitadel_personal_access_token":              pat.GetResource(),
 			"zitadel_machine_key":                        machine_key.GetResource(),
-			"zitadel_idp_github":                         idp_github.GetResource(),
-			"zitadel_idp_github_es":                      idp_github_es.GetResource(),
-			"zitadel_idp_gitlab":                         idp_gitlab.GetResource(),
-			"zitadel_idp_google":                         idp_google.GetResource(),
-			"zitadel_idp_azure_ad":                       idp_azure_ad.GetResource(),
-			"zitadel_idp_gitlab_self_hosted":             idp_gitlab_self_hosted.GetResource(),
-			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
-			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
-			"zitadel_org_idp_github":                     org_idp_github.GetResource(),
-			"zitadel_org_idp_github_es":                  org_idp_github_es.GetResource(),
-			"zitadel_org_idp_gitlab":                     org_idp_gitlab.GetResource(),
-			"zitadel_org_idp_gitlab_self_hosted":         org_idp_gitlab_self_hosted.GetResource(),
 			"zitadel_default_label_policy":               default_label_policy.GetResource(),
 			"zitadel_default_login_policy":               default_login_policy.GetResource(),
 			"zitadel_default_lockout_policy":             default_lockout_policy.GetResource(),
@@ -295,6 +286,19 @@ func Provider() *schema.Provider {
 			"zitadel_smtp_config":                        smtp_config.GetResource(),
 			"zitadel_default_notification_policy":        default_notification_policy.GetResource(),
 			"zitadel_notification_policy":                notification_policy.GetResource(),
+			"zitadel_idp_github":                         idp_github.GetResource(),
+			"zitadel_idp_github_es":                      idp_github_es.GetResource(),
+			"zitadel_idp_gitlab":                         idp_gitlab.GetResource(),
+			"zitadel_idp_gitlab_self_hosted":             idp_gitlab_self_hosted.GetResource(),
+			"zitadel_idp_google":                         idp_google.GetResource(),
+			"zitadel_idp_azure_ad":                       idp_azure_ad.GetResource(),
+			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
+			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
+			"zitadel_org_idp_github":                     org_idp_github.GetResource(),
+			"zitadel_org_idp_github_es":                  org_idp_github_es.GetResource(),
+			"zitadel_org_idp_gitlab":                     org_idp_gitlab.GetResource(),
+			"zitadel_org_idp_gitlab_self_hosted":         org_idp_gitlab_self_hosted.GetResource(),
+			"zitadel_org_idp_google":                     org_idp_google.GetResource(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
