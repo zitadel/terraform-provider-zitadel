@@ -2,6 +2,7 @@ package zitadel
 
 import (
 	"context"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_azure_ad"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_google"
 
@@ -217,6 +218,7 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_gitlab":             org_idp_gitlab.GetDatasource(),
 			"zitadel_org_idp_gitlab_self_hosted": org_idp_gitlab_self_hosted.GetDatasource(),
 			"zitadel_org_idp_google":             org_idp_google.GetDatasource(),
+			"zitadel_org_idp_azure_ad":           org_idp_azure_ad.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -299,6 +301,7 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_gitlab":                     org_idp_gitlab.GetResource(),
 			"zitadel_org_idp_gitlab_self_hosted":         org_idp_gitlab_self_hosted.GetResource(),
 			"zitadel_org_idp_google":                     org_idp_google.GetResource(),
+			"zitadel_org_idp_azure_ad":                   org_idp_azure_ad.GetResource(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
