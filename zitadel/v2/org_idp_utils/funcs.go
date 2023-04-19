@@ -9,6 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 
 func Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -30,7 +32,7 @@ func Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 func ImportIDPWithOrgAndClientSecret(_ context.Context, data *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
 	id := data.Id()
 	if id == "" {
-		return nil, fmt.Errorf("%s is not set", IdpIDVar)
+		return nil, fmt.Errorf("%s is not set", idp_utils.IdpIDVar)
 	}
 	parts := strings.SplitN(id, ":", 3)
 	if len(parts) != 3 || parts[0] == "" || parts[1] == "" || parts[2] == "" {
@@ -40,7 +42,7 @@ func ImportIDPWithOrgAndClientSecret(_ context.Context, data *schema.ResourceDat
 		return nil, err
 	}
 	data.SetId(parts[1])
-	if err := data.Set(ClientSecretVar, parts[2]); err != nil {
+	if err := data.Set(idp_utils.ClientSecretVar, parts[2]); err != nil {
 		return nil, err
 	}
 	return []*schema.ResourceData{data}, nil
