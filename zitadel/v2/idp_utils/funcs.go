@@ -44,3 +44,12 @@ func ImportIDPWithSecret(secretVar string) schema.StateContextFunc {
 		return []*schema.ResourceData{data}, nil
 	}
 }
+
+func InterfaceToStringSlice(in interface{}) []string {
+	slice := in.([]interface{})
+	ret := make([]string, 0)
+	for _, item := range slice {
+		ret = append(ret, item.(string))
+	}
+	return ret
+}

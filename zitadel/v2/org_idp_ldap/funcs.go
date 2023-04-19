@@ -1,4 +1,4 @@
-package idp_ldap
+package org_idp_ldap
 
 import (
 	"context"
@@ -6,13 +6,16 @@ import (
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -20,7 +23,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -28,7 +31,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	req := &admin.AddLDAPProviderRequest{
+	resp, err := client.AddLDAPProvider(ctx, &management.AddLDAPProviderRequest{
 		Name:              d.Get(idp_utils.NameVar).(string),
 		Servers:           idp_utils.InterfaceToStringSlice(d.Get(idp_utils.ServersVar)),
 		StartTls:          d.Get(idp_utils.StartTLSVar).(bool),
@@ -60,8 +63,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
 			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
 		},
-	}
-	resp, err := client.AddLDAPProvider(ctx, req)
+	})
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
 	}
@@ -74,7 +76,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -82,8 +84,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if d.HasChangesExcept(idp_utils.IdpIDVar) {
-		_, err = client.UpdateLDAPProvider(ctx, &admin.UpdateLDAPProviderRequest{
+	if d.HasChangesExcept(idp_utils.IdpIDVar, org_idp_utils.OrgIDVar) {
+		_, err = client.UpdateLDAPProvider(ctx, &management.UpdateLDAPProviderRequest{
 			Id:                d.Id(),
 			Name:              d.Get(idp_utils.NameVar).(string),
 			Servers:           idp_utils.InterfaceToStringSlice(d.Get(idp_utils.ServersVar)),
@@ -129,11 +131,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetProviderByID(ctx, &admin.GetProviderByIDRequest{Id: helper.GetID(d, idp_utils.IdpIDVar)})
+	resp, err := client.GetProviderByID(ctx, &management.GetProviderByIDRequest{Id: helper.GetID(d, idp_utils.IdpIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -147,6 +149,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	attributesCfg := specificCfg.GetAttributes()
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
+		org_idp_utils.OrgIDVar:                  idp.GetDetails().GetResourceOwner(),
 		idp_utils.NameVar:                       idp.GetName(),
 		idp_utils.IsLinkingAllowedVar:           generalCfg.GetIsLinkingAllowed(),
 		idp_utils.IsCreationAllowedVar:          generalCfg.GetIsCreationAllowed(),

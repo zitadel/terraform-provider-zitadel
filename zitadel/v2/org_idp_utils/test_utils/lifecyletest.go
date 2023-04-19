@@ -23,6 +23,7 @@ func RunBasicLifecyleTest(
 	t *testing.T,
 	frame *OrgTestFrame,
 	resourceFunc func(string, string) string,
+	secretAttribute string,
 ) {
 	getProviderByIDResponse := new(management.GetProviderByIDResponse)
 	initialConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(initialProviderName, initialSecret))
@@ -57,14 +58,14 @@ func RunBasicLifecyleTest(
 					AssignGetProviderByIDResponse(frame, getProviderByIDResponse),
 					test_utils.CheckName(updatedProviderName, getProviderByIDResponse),
 				),
-			}, { // Check updating client secret has a diff
+			}, { // Check updating secret has a diff
 				Config:             updatedClientSecretConfig,
 				ExpectNonEmptyPlan: true,
 				// ExpectNonEmptyPlan just works with PlanOnly set to true
 				PlanOnly: true,
-			}, { // Check client secret can be updated
+			}, { // Check secret can be updated
 				Config: updatedClientSecretConfig,
-			}, { // Expect import error if client secret is not given
+			}, { // Expect import error if secret is not given
 				ResourceName:  frame.TerraformName,
 				ImportState:   true,
 				ImportStateId: "123:456",
@@ -77,13 +78,13 @@ func RunBasicLifecyleTest(
 					return fmt.Sprintf("%s:%s:%s", lastState.Attributes["org_id"], lastState.ID, importedSecret), nil
 				},
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"client_secret"},
+				ImportStateVerifyIgnore: []string{secretAttribute},
 				Check: func(state *terraform.State) error {
-					// Check the client_secret is imported correctly
+					// Check the secretAttribute is imported correctly
 					currentState := state.RootModule().Resources[frame.TerraformName].Primary
-					actual := currentState.Attributes["client_secret"]
+					actual := currentState.Attributes[secretAttribute]
 					if actual != importedSecret {
-						return fmt.Errorf("expected client_secret to be %s, but got %s", importedSecret, actual)
+						return fmt.Errorf("expected %s to be %s, but got %s", secretAttribute, importedSecret, actual)
 					}
 					return nil
 				},
