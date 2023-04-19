@@ -8,7 +8,7 @@ import (
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Datasource representing a GitHub IDP of the organization.",
+		Description: "Datasource representing a GitLab Self Hosted IdP of the organization.",
 		Schema: map[string]*schema.Schema{
 			org_idp_utils.OrgIDVar: {
 				Type:        schema.TypeString,

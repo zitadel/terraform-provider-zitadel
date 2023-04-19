@@ -11,7 +11,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing a OIDC IDP of the organization.",
+		Description: "Resource representing a generic OIDC IdP on the organization.",
 		Schema: map[string]*schema.Schema{
 			orgIDVar: {
 				Type:        schema.TypeString,

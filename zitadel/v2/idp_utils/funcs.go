@@ -27,19 +27,20 @@ func Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	return nil
 }
 
-func ImportIDPWithClientSecret(_ context.Context, data *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
-	id := data.Id()
-	if id == "" {
-		return nil, fmt.Errorf("%s is not set", IdpIDVar)
+func ImportIDPWithSecret(secretVar string) schema.StateContextFunc {
+	return func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
+		id := data.Id()
+		if id == "" {
+			return nil, fmt.Errorf("%s is not set", IdpIDVar)
+		}
+		parts := strings.SplitN(id, ":", 2)
+		if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+			return nil, fmt.Errorf("unexpected format of ID (%s), expected %s:%s", id, IdpIDVar, secretVar)
+		}
+		data.SetId(parts[0])
+		if err := data.Set(secretVar, parts[1]); err != nil {
+			return nil, err
+		}
+		return []*schema.ResourceData{data}, nil
 	}
-	parts := strings.SplitN(id, ":", 2)
-	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-		return nil, fmt.Errorf("unexpected format of ID (%s), expected idpid:clientsecret", id)
-	}
-	data.SetId(parts[0])
-	if err := data.Set(ClientSecretVar, parts[1]); err != nil {
-		return nil, err
-	}
-	return []*schema.ResourceData{data}, nil
-
 }

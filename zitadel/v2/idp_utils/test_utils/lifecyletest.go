@@ -23,11 +23,12 @@ func RunBasicLifecyleTest(
 	t *testing.T,
 	frame *InstanceTestFrame,
 	resourceFunc func(string, string) string,
+	secretAttribute string,
 ) {
 	getProviderByIDResponse := new(admin.GetProviderByIDResponse)
 	initialConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(initialProviderName, initialSecret))
 	updatedNameConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProviderName, initialSecret))
-	updatedClientSecretConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProviderName, updatedSecret))
+	updatedSecretConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProviderName, updatedSecret))
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: ZitadelProviderFactories(frame.ConfiguredProvider),
 		CheckDestroy:      CheckDestroy(frame),
@@ -57,14 +58,14 @@ func RunBasicLifecyleTest(
 					AssignGetProviderByIDResponse(frame, getProviderByIDResponse),
 					CheckName(updatedProviderName, getProviderByIDResponse),
 				),
-			}, { // Check updating client secret has a diff
-				Config:             updatedClientSecretConfig,
+			}, { // Check updating secret has a diff
+				Config:             updatedSecretConfig,
 				ExpectNonEmptyPlan: true,
 				// ExpectNonEmptyPlan just works with PlanOnly set to true
 				PlanOnly: true,
-			}, { // Check client secret can be updated
-				Config: updatedClientSecretConfig,
-			}, { // Expect import error if client secret is not given
+			}, { // Check secret can be updated
+				Config: updatedSecretConfig,
+			}, { // Expect import error if secret is not given
 				ResourceName:  frame.TerraformName,
 				ImportState:   true,
 				ImportStateId: "12345",
@@ -77,13 +78,13 @@ func RunBasicLifecyleTest(
 					return fmt.Sprintf("%s:%s", lastState.ID, importedSecret), nil
 				},
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"client_secret"},
+				ImportStateVerifyIgnore: []string{secretAttribute},
 				Check: func(state *terraform.State) error {
-					// Check the client_secret is imported correctly
+					// Check the secret is imported correctly
 					currentState := state.RootModule().Resources[frame.TerraformName].Primary
-					actual := currentState.Attributes["client_secret"]
+					actual := currentState.Attributes[secretAttribute]
 					if actual != importedSecret {
-						return fmt.Errorf("expected client_secret to be %s, but got %s", importedSecret, actual)
+						return fmt.Errorf("expected %s to be %s, but got %s", secretAttribute, importedSecret, actual)
 					}
 					return nil
 				},

@@ -60,6 +60,6 @@ func GetDatasource() *schema.Resource {
 			},
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithClientSecret},
+		Importer:    &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithSecret(idp_utils.ClientSecretVar)},
 	}
 }

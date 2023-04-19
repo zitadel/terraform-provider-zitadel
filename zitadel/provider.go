@@ -2,6 +2,8 @@ package zitadel
 
 import (
 	"context"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_azure_ad"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_google"
@@ -211,6 +213,7 @@ func Provider() *schema.Provider {
 			"zitadel_idp_gitlab_self_hosted":     idp_gitlab_self_hosted.GetDatasource(),
 			"zitadel_idp_google":                 idp_google.GetDatasource(),
 			"zitadel_idp_azure_ad":               idp_azure_ad.GetDatasource(),
+			"zitadel_idp_ldap":                   idp_ldap.GetDatasource(),
 			"zitadel_org_jwt_idp":                org_idp_jwt.GetDatasource(),
 			"zitadel_org_oidc_idp":               org_idp_oidc.GetDatasource(),
 			"zitadel_org_idp_github":             org_idp_github.GetDatasource(),
@@ -294,6 +297,7 @@ func Provider() *schema.Provider {
 			"zitadel_idp_gitlab_self_hosted":             idp_gitlab_self_hosted.GetResource(),
 			"zitadel_idp_google":                         idp_google.GetResource(),
 			"zitadel_idp_azure_ad":                       idp_azure_ad.GetResource(),
+			"zitadel_idp_ldap":                           idp_ldap.GetResource(),
 			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
 			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
 			"zitadel_org_idp_github":                     org_idp_github.GetResource(),

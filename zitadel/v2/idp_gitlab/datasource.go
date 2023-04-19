@@ -7,7 +7,7 @@ import (
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Datasource representing a GitHub IDP on the instance.",
+		Description: "Datasource representing a GitLab IDP on the instance.",
 		Schema: map[string]*schema.Schema{
 			idp_utils.IdpIDVar: {
 				Type:        schema.TypeString,
@@ -60,6 +60,6 @@ func GetDatasource() *schema.Resource {
 			},
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithClientSecret},
+		Importer:    &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithSecret(idp_utils.ClientSecretVar)},
 	}
 }

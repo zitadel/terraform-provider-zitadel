@@ -25,5 +25,5 @@ resource "%s" "%s" {
   is_auto_creation    = false
   is_auto_update      = true
 }`, resourceName, frame.UniqueResourcesID, name, secret)
-	})
+	}, "client_secret")
 }

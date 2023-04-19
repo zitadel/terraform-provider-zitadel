@@ -10,7 +10,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing a OIDC IDP on the instance.",
+		Description: "Resource representing an Azure AD IDP on the instance.",
 		Schema: map[string]*schema.Schema{
 			idp_utils.NameVar: {
 				Type:        schema.TypeString,
@@ -77,6 +77,6 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: idp_utils.Delete,
-		Importer:      &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithClientSecret},
+		Importer:      &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithSecret(idp_utils.ClientSecretVar)},
 	}
 }

@@ -8,7 +8,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing a OIDC IDP on the organization.",
+		Description: "Resource representing a GitLab Self Hosted IdP on the organization.",
 		Schema: map[string]*schema.Schema{
 			org_idp_utils.OrgIDVar: {
 				Type:        schema.TypeString,

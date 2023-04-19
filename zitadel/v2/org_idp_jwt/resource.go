@@ -11,7 +11,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing a domain of the organization.",
+		Description: "Resource representing a generic JWT IdP of the organization.",
 		Schema: map[string]*schema.Schema{
 			orgIDVar: {
 				Type:        schema.TypeString,
