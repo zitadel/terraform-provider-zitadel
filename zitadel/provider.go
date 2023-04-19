@@ -3,6 +3,8 @@ package zitadel
 import (
 	"context"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_github_es"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_github"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -191,6 +193,7 @@ func Provider() *schema.Provider {
 			"zitadel_org_oidc_idp":     org_idp_oidc.GetDatasource(),
 			"zitadel_org_idp_github":   org_idp_github.GetDatasource(),
 			"zitadel_idp_github":       idp_github.GetDatasource(),
+			"zitadel_idp_github_es":    idp_github_es.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -251,6 +254,7 @@ func Provider() *schema.Provider {
 			"zitadel_personal_access_token":              pat.GetResource(),
 			"zitadel_machine_key":                        machine_key.GetResource(),
 			"zitadel_idp_github":                         idp_github.GetResource(),
+			"zitadel_idp_github_es":                      idp_github_es.GetResource(),
 			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
 			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
 			"zitadel_org_idp_github":                     org_idp_github.GetResource(),
