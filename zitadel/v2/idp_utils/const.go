@@ -14,4 +14,7 @@ const (
 	TokenEndpointVar         = "token_endpoint"
 	UserEndpointVar          = "user_endpoint"
 	IssuerVar                = "issuer"
+	TenantTypeVar            = "tenant_type"
+	TenantIDVar              = "tenant_id"
+	EmailVerifiedVar         = "email_verified"
 )
