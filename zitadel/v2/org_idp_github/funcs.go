@@ -2,8 +2,8 @@ package org_idp_github
 
 import (
 	"context"
-	"fmt"
-	"strings"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -13,43 +13,25 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
-func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	clientinfo, ok := m.(*helper.ClientInfo)
-	if !ok {
-		return diag.Errorf("failed to get client")
-	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	_, err = client.DeleteProvider(ctx, &management.DeleteProviderRequest{
-		Id: d.Id(),
-	})
-	if err != nil {
-		return diag.Errorf("failed to delete idp: %v", err)
-	}
-	return nil
-}
-
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	resp, err := client.AddGitHubProvider(ctx, &management.AddGitHubProviderRequest{
-		Name:         d.Get(nameVar).(string),
-		ClientId:     d.Get(clientIDVar).(string),
-		ClientSecret: d.Get(clientSecretVar).(string),
-		Scopes:       helper.GetOkSetToStringSlice(d, scopesVar),
+		Name:         d.Get(org_idp_utils.NameVar).(string),
+		ClientId:     d.Get(org_idp_utils.ClientIDVar).(string),
+		ClientSecret: d.Get(org_idp_utils.ClientSecretVar).(string),
+		Scopes:       helper.GetOkSetToStringSlice(d, org_idp_utils.ScopesVar),
 		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(isLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(isCreationAllowedVar).(bool),
-			IsAutoUpdate:      d.Get(isAutoUpdateVar).(bool),
-			IsAutoCreation:    d.Get(isAutoCreationVar).(bool),
+			IsLinkingAllowed:  d.Get(org_idp_utils.IsLinkingAllowedVar).(bool),
+			IsCreationAllowed: d.Get(org_idp_utils.IsCreationAllowedVar).(bool),
+			IsAutoUpdate:      d.Get(org_idp_utils.IsAutoUpdateVar).(bool),
+			IsAutoCreation:    d.Get(org_idp_utils.IsAutoCreationVar).(bool),
 		},
 	})
 	if err != nil {
@@ -64,22 +46,22 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if d.HasChangesExcept(idpIDVar, orgIDVar) {
+	if d.HasChangesExcept(org_idp_utils.IdpIDVar, org_idp_utils.OrgIDVar) {
 		_, err = client.UpdateGitHubProvider(ctx, &management.UpdateGitHubProviderRequest{
 			Id:           d.Id(),
-			Name:         d.Get(nameVar).(string),
-			ClientId:     d.Get(clientIDVar).(string),
-			ClientSecret: d.Get(clientSecretVar).(string),
-			Scopes:       helper.GetOkSetToStringSlice(d, scopesVar),
+			Name:         d.Get(org_idp_utils.NameVar).(string),
+			ClientId:     d.Get(org_idp_utils.ClientIDVar).(string),
+			ClientSecret: d.Get(org_idp_utils.ClientSecretVar).(string),
+			Scopes:       helper.GetOkSetToStringSlice(d, org_idp_utils.ScopesVar),
 			ProviderOptions: &idp.Options{
-				IsLinkingAllowed:  d.Get(isLinkingAllowedVar).(bool),
-				IsCreationAllowed: d.Get(isCreationAllowedVar).(bool),
-				IsAutoCreation:    d.Get(isAutoCreationVar).(bool),
-				IsAutoUpdate:      d.Get(isAutoUpdateVar).(bool),
+				IsLinkingAllowed:  d.Get(org_idp_utils.IsLinkingAllowedVar).(bool),
+				IsCreationAllowed: d.Get(org_idp_utils.IsCreationAllowedVar).(bool),
+				IsAutoCreation:    d.Get(org_idp_utils.IsAutoCreationVar).(bool),
+				IsAutoUpdate:      d.Get(org_idp_utils.IsAutoUpdateVar).(bool),
 			},
 		})
 		if err != nil {
@@ -94,11 +76,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetProviderByID(ctx, &management.GetProviderByIDRequest{Id: helper.GetID(d, idpIDVar)})
+	resp, err := client.GetProviderByID(ctx, &management.GetProviderByIDRequest{Id: helper.GetID(d, org_idp_utils.IdpIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -111,15 +93,15 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	specificCfg := cfg.GetGithub()
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
-		orgIDVar:             idp.GetDetails().GetResourceOwner(),
-		nameVar:              idp.GetName(),
-		clientIDVar:          specificCfg.GetClientId(),
-		clientSecretVar:      d.Get(clientSecretVar).(string),
-		scopesVar:            specificCfg.GetScopes(),
-		isLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
-		isCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
-		isAutoCreationVar:    generalCfg.GetIsAutoCreation(),
-		isAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
+		org_idp_utils.OrgIDVar:             idp.GetDetails().GetResourceOwner(),
+		org_idp_utils.NameVar:              idp.GetName(),
+		org_idp_utils.ClientIDVar:          specificCfg.GetClientId(),
+		org_idp_utils.ClientSecretVar:      d.Get(org_idp_utils.ClientSecretVar).(string),
+		org_idp_utils.ScopesVar:            specificCfg.GetScopes(),
+		org_idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
+		org_idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
+		org_idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
+		org_idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
@@ -128,24 +110,4 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	d.SetId(idp.Id)
 	return nil
-}
-
-func importIDPWithOrgAndClientSecret(_ context.Context, data *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
-	id := data.Id()
-	if id == "" {
-		return nil, fmt.Errorf("%s is not set", idpIDVar)
-	}
-	parts := strings.SplitN(id, ":", 3)
-	if len(parts) != 3 || parts[0] == "" || parts[1] == "" || parts[2] == "" {
-		return nil, fmt.Errorf("unexpected format of ID (%s), expected orgid:idpid:clientsecret", id)
-	}
-	if err := data.Set(orgIDVar, parts[0]); err != nil {
-		return nil, err
-	}
-	data.SetId(parts[1])
-	if err := data.Set(clientSecretVar, parts[2]); err != nil {
-		return nil, err
-	}
-	return []*schema.ResourceData{data}, nil
-
 }

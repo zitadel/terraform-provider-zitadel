@@ -77,6 +77,10 @@ func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile st
 	}, nil
 }
 
+func (c *ClientInfo) GetAdminClient() {
+
+}
+
 func GetAdminClient(info *ClientInfo) (*admin.Client, error) {
 	client, err := admin.NewClient(
 		info.Issuer, info.Domain,
