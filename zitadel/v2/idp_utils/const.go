@@ -13,4 +13,5 @@ const (
 	AuthorizationEndpointVar = "authorization_endpoint"
 	TokenEndpointVar         = "token_endpoint"
 	UserEndpointVar          = "user_endpoint"
+	IssuerVar                = "issuer"
 )

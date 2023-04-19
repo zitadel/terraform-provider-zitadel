@@ -3,6 +3,8 @@ package zitadel
 import (
 	"context"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab_self_hosted"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_github_es"
@@ -183,22 +185,23 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
-			"zitadel_org":               org.GetDatasource(),
-			"zitadel_human_user":        human_user.GetDatasource(),
-			"zitadel_machine_user":      machine_user.GetDatasource(),
-			"zitadel_project":           project.GetDatasource(),
-			"zitadel_project_role":      project_role.GetDatasource(),
-			"zitadel_action":            action.GetDatasource(),
-			"zitadel_application_oidc":  application_oidc.GetDatasource(),
-			"zitadel_application_api":   application_api.GetDatasource(),
-			"zitadel_trigger_actions":   trigger_actions.GetDatasource(),
-			"zitadel_org_jwt_idp":       org_idp_jwt.GetDatasource(),
-			"zitadel_org_oidc_idp":      org_idp_oidc.GetDatasource(),
-			"zitadel_org_idp_github":    org_idp_github.GetDatasource(),
-			"zitadel_org_idp_github_es": org_idp_github_es.GetDatasource(),
-			"zitadel_idp_github":        idp_github.GetDatasource(),
-			"zitadel_idp_github_es":     idp_github_es.GetDatasource(),
-			"zitadel_idp_gitlab":        idp_gitlab.GetDatasource(),
+			"zitadel_org":                    org.GetDatasource(),
+			"zitadel_human_user":             human_user.GetDatasource(),
+			"zitadel_machine_user":           machine_user.GetDatasource(),
+			"zitadel_project":                project.GetDatasource(),
+			"zitadel_project_role":           project_role.GetDatasource(),
+			"zitadel_action":                 action.GetDatasource(),
+			"zitadel_application_oidc":       application_oidc.GetDatasource(),
+			"zitadel_application_api":        application_api.GetDatasource(),
+			"zitadel_trigger_actions":        trigger_actions.GetDatasource(),
+			"zitadel_org_jwt_idp":            org_idp_jwt.GetDatasource(),
+			"zitadel_org_oidc_idp":           org_idp_oidc.GetDatasource(),
+			"zitadel_org_idp_github":         org_idp_github.GetDatasource(),
+			"zitadel_org_idp_github_es":      org_idp_github_es.GetDatasource(),
+			"zitadel_idp_github":             idp_github.GetDatasource(),
+			"zitadel_idp_github_es":          idp_github_es.GetDatasource(),
+			"zitadel_idp_gitlab":             idp_gitlab.GetDatasource(),
+			"zitadel_idp_gitlab_self_hosted": idp_gitlab_self_hosted.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -261,6 +264,7 @@ func Provider() *schema.Provider {
 			"zitadel_idp_github":                         idp_github.GetResource(),
 			"zitadel_idp_github_es":                      idp_github_es.GetResource(),
 			"zitadel_idp_gitlab":                         idp_gitlab.GetResource(),
+			"zitadel_idp_gitlab_self_hosted":             idp_gitlab_self_hosted.GetResource(),
 			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
 			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
 			"zitadel_org_idp_github":                     org_idp_github.GetResource(),
