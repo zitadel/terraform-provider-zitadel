@@ -124,10 +124,8 @@ func GetStringFromAttr(ctx context.Context, attrs map[string]attr.Value, key str
 func DescriptionEnumValuesList(enum map[int32]string) string {
 	str := ", supported values: "
 	values := make([]string, len(enum))
-	i := 0
-	for k := range enum {
-		values[i] = enum[k]
-		i++
+	for i := 0; i < len(enum); i++ {
+		values[i] = enum[int32(i)]
 	}
 	str += strings.Join(values, ", ")
 	return str

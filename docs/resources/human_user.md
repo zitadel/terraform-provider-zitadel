@@ -45,7 +45,7 @@ resource zitadel_human_user human_user {
 ### Optional
 
 - `display_name` (String) Display name of the user
-- `gender` (String) Gender of the user, supported values: GENDER_MALE, GENDER_DIVERSE, GENDER_UNSPECIFIED, GENDER_FEMALE
+- `gender` (String) Gender of the user, supported values: GENDER_UNSPECIFIED, GENDER_FEMALE, GENDER_MALE, GENDER_DIVERSE
 - `initial_password` (String, Sensitive) Initially set password for the user, not changeable after creation
 - `is_email_verified` (Boolean) Is the email verified of the user, can only be true if password of the user is set
 - `is_phone_verified` (Boolean) Is the phone verified of the user

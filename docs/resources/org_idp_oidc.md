@@ -39,7 +39,7 @@ resource zitadel_org_idp_oidc oidc_idp {
 - `name` (String) Name of the IDP
 - `org_id` (String) ID of the organization
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
-- `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_GOOGLE, STYLING_TYPE_UNSPECIFIED
+- `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_UNSPECIFIED, STYLING_TYPE_GOOGLE
 - `username_mapping` (String) definition which field is mapped to the email of the user
 
 ### Read-Only
