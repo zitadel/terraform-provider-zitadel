@@ -34,3 +34,11 @@ data "zitadel_idp_google" "google" {
 - `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
 - `name` (String) Name of the IDP
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
+
+## Import
+
+Instance IdP imports use semicolon-delimited identifiers. The resource can be imported using the IdPs id and the IdPs client_secret.
+
+```
+terraform import zitadel_idp_google 210210971312980331:myclientsecret
+```

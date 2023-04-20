@@ -14,3 +14,11 @@ description: |-
 {{ tffile "examples/provider/data-sources/org_idp_azure_ad.tf" }}
 
 {{ .SchemaMarkdown | trimspace }}
+
+## Import
+
+Organization IdP imports use semicolon-delimited identifiers. The resource can be imported using the org_id, the IdPs id and the IdPs client_secret.
+
+```
+terraform import {{.Name}} 210148218065912171:210210971312980331:myclientsecret
+```

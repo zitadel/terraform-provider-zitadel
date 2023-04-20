@@ -53,3 +53,11 @@ data "zitadel_idp_ldap" "ldap" {
 - `user_base` (String) User base for LDAP connections
 - `user_filters` (Set of String) User filters for LDAP connections
 - `user_object_classes` (Set of String) User object classes for LDAP connections
+
+## Import
+
+Instance IdP imports use semicolon-delimited identifiers. The resource can be imported using the IdPs id and the IdPs bind_password.
+
+```
+terraform import zitadel_idp_ldap 210210971312980331:mybindpassword
+```

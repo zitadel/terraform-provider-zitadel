@@ -38,3 +38,11 @@ data "zitadel_org_idp_github_es" "github_es" {
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 - `token_endpoint` (String) the providers token endpoint
 - `user_endpoint` (String) the providers user endpoint
+
+## Import
+
+Organization IdP imports use semicolon-delimited identifiers. The resource can be imported using the org_id, the IdPs id and the IdPs client_secret.
+
+```
+terraform import zitadel_org_idp_github_es 210148218065912171:210210971312980331:myclientsecret
+```
