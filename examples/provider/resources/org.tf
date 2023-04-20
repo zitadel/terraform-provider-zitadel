@@ -1,3 +1,3 @@
-resource zitadel_org org {
+resource "zitadel_org" "org" {
   name = "terraform-test"
 }
