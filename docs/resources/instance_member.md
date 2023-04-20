@@ -12,7 +12,7 @@ Resource representing the membership of a user on an instance, defined with the 
 ## Example Usage
 
 ```terraform
-resource zitadel_instance_member instance_member {
+resource "zitadel_instance_member" "instance_member" {
   user_id = zitadel_human_user.human_user.id
   roles   = ["IAM_OWNER"]
 }

@@ -12,7 +12,7 @@ Resource representing triggers, when actions get started
 ## Example Usage
 
 ```terraform
-resource zitadel_trigger_actions trigger_actions {
+resource "zitadel_trigger_actions" "trigger_actions" {
   org_id       = zitadel_org.org.id
   flow_type    = "FLOW_TYPE_EXTERNAL_AUTHENTICATION"
   trigger_type = "TRIGGER_TYPE_POST_AUTHENTICATION"
@@ -26,9 +26,9 @@ resource zitadel_trigger_actions trigger_actions {
 ### Required
 
 - `action_ids` (Set of String) IDs of the triggered actions
-- `flow_type` (String) Type of the flow to which the action triggers belong, supported values: FLOW_TYPE_INTERNAL_AUTHENTICATION, FLOW_TYPE_EXTERNAL_AUTHENTICATION, FLOW_TYPE_CUSTOMISE_TOKEN
+- `flow_type` (String) Type of the flow to which the action triggers belong, supported values: FLOW_TYPE_CUSTOMISE_TOKEN, FLOW_TYPE_INTERNAL_AUTHENTICATION, FLOW_TYPE_EXTERNAL_AUTHENTICATION
 - `org_id` (String) ID of the organization
-- `trigger_type` (String) Trigger type on when the actions get triggered, supported values: TRIGGER_TYPE_POST_AUTHENTICATION, TRIGGER_TYPE_PRE_CREATION, TRIGGER_TYPE_POST_CREATION, TRIGGER_TYPE_PRE_USERINFO_CREATION, TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION
+- `trigger_type` (String) Trigger type on when the actions get triggered, supported values: TRIGGER_TYPE_PRE_USERINFO_CREATION, TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION, TRIGGER_TYPE_POST_AUTHENTICATION, TRIGGER_TYPE_PRE_CREATION, TRIGGER_TYPE_POST_CREATION
 
 ### Read-Only
 

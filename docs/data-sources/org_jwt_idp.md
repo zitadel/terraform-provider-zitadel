@@ -12,12 +12,12 @@ Datasource representing a domain of the organization.
 ## Example Usage
 
 ```terraform
-data zitadel_org_jwt_idp org_jwt_idp {
+data "zitadel_org_jwt_idp" "org_jwt_idp" {
   org_id = data.zitadel_org.org.id
   idp_id = "177073612581240835"
 }
 
-output org_jwt_idp {
+output "org_jwt_idp" {
   value = data.zitadel_org_jwt_idp.org_jwt_idp
 }
 ```

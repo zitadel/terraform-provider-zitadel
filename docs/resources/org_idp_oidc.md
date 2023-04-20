@@ -12,7 +12,7 @@ Resource representing a OIDC IDP of the organization.
 ## Example Usage
 
 ```terraform
-resource zitadel_org_idp_oidc oidc_idp {
+resource "zitadel_org_idp_oidc" "oidc_idp" {
   org_id               = zitadel_org.org.id
   name                 = "oidcidp"
   styling_type         = "STYLING_TYPE_UNSPECIFIED"

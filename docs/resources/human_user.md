@@ -14,7 +14,7 @@ Resource representing a human user situated under an organization, which then ca
 ## Example Usage
 
 ```terraform
-resource zitadel_human_user human_user {
+resource "zitadel_human_user" "human_user" {
   org_id             = zitadel_org.org.id
   user_name          = "humanfull@localhost.com"
   first_name         = "firstname"
@@ -45,7 +45,7 @@ resource zitadel_human_user human_user {
 ### Optional
 
 - `display_name` (String) Display name of the user
-- `gender` (String) Gender of the user, supported values: GENDER_UNSPECIFIED, GENDER_FEMALE, GENDER_MALE, GENDER_DIVERSE
+- `gender` (String) Gender of the user, supported values: GENDER_DIVERSE, GENDER_UNSPECIFIED, GENDER_FEMALE, GENDER_MALE
 - `initial_password` (String, Sensitive) Initially set password for the user, not changeable after creation
 - `is_email_verified` (Boolean) Is the email verified of the user, can only be true if password of the user is set
 - `is_phone_verified` (Boolean) Is the phone verified of the user
