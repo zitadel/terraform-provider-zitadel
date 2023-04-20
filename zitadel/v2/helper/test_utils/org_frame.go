@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils/test_utils"
 	mgmt "github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/grpc/codes"
@@ -13,17 +12,16 @@ import (
 
 const (
 	orgName = "terraform-tests"
-	domain  = test_utils.Domain
 )
 
 type OrgTestFrame struct {
-	test_utils.BaseTestFrame
+	BaseTestFrame
 	*mgmt.Client
 	OrgID string
 }
 
 func NewOrgTestFrame(resourceType string) (*OrgTestFrame, error) {
-	baseFrame, err := test_utils.NewBaseTestFrame(resourceType)
+	baseFrame, err := NewBaseTestFrame(resourceType)
 	if err != nil {
 		return nil, err
 	}

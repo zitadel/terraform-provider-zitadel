@@ -1,22 +1,21 @@
-package test_utils
+package idp_test_utils
 
 import (
 	"fmt"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func CheckProviderName(frame test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+func CheckProviderName(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expectName string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			rs := state.RootModule().Resources[frame.TerraformName]
-			remoteProvider, err := frame.GetProviderByID(frame, &management.GetProviderByIDRequest{Id: rs.Primary.ID})
+			remoteProvider, err := frame.Client.GetProviderByID(frame, &admin.GetProviderByIDRequest{Id: rs.Primary.ID})
 			if err != nil {
 				return err
 			}
@@ -29,7 +28,7 @@ func CheckProviderName(frame test_utils.OrgTestFrame) func(string) resource.Test
 	}
 }
 
-func CheckDestroy(frame test_utils.OrgTestFrame) resource.TestCheckFunc {
+func CheckDestroy(frame test_utils.InstanceTestFrame) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		err := CheckProviderName(frame)("")(state)
 		if status.Code(err) != codes.NotFound {

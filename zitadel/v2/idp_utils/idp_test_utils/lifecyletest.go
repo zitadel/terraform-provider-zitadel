@@ -1,19 +1,17 @@
-package test_utils
+package idp_test_utils
 
 import (
 	"fmt"
 	"testing"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-func RunOrgLifecyleTest(
+func RunInstanceIDPLifecyleTest(
 	t *testing.T,
-	frame test_utils.OrgTestFrame,
+	frame test_utils.InstanceTestFrame,
 	resourceFunc func(string, string) string,
 	secretAttribute string,
 ) {
@@ -27,7 +25,7 @@ func RunOrgLifecyleTest(
 		CheckProviderName(frame),
 		CheckDestroy(frame),
 		func(state *terraform.State) error {
-			// Check the secretAttribute is imported correctly
+			// Check the secret is imported correctly
 			currentState := state.RootModule().Resources[frame.TerraformName].Primary
 			actual := currentState.Attributes[secretAttribute]
 			if actual != importedSecret {
@@ -37,9 +35,9 @@ func RunOrgLifecyleTest(
 		},
 		func(state *terraform.State) (string, error) {
 			lastState := state.RootModule().Resources[frame.TerraformName].Primary
-			return fmt.Sprintf("%s:%s:%s", lastState.Attributes[org_idp_utils.OrgIDVar], lastState.ID, importedSecret), nil
+			return fmt.Sprintf("%s:%s", lastState.ID, importedSecret), nil
 		},
-		"123:456",
+		"12345",
 		secretAttribute,
 	)
 }
