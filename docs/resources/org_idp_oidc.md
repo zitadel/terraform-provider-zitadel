@@ -2,12 +2,12 @@
 page_title: "zitadel_org_idp_oidc Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing a OIDC IDP of the organization.
+  Resource representing a generic OIDC IdP on the organization.
 ---
 
 # zitadel_org_idp_oidc (Resource)
 
-Resource representing a OIDC IDP of the organization.
+Resource representing a generic OIDC IdP on the organization.
 
 ## Example Usage
 
@@ -39,7 +39,7 @@ resource zitadel_org_idp_oidc oidc_idp {
 - `name` (String) Name of the IDP
 - `org_id` (String) ID of the organization
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
-- `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_UNSPECIFIED, STYLING_TYPE_GOOGLE
+- `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_GOOGLE, STYLING_TYPE_UNSPECIFIED
 - `username_mapping` (String) definition which field is mapped to the email of the user
 
 ### Read-Only

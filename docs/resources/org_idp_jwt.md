@@ -2,12 +2,12 @@
 page_title: "zitadel_org_idp_jwt Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing a domain of the organization.
+  Resource representing a generic JWT IdP of the organization.
 ---
 
 # zitadel_org_idp_jwt (Resource)
 
-Resource representing a domain of the organization.
+Resource representing a generic JWT IdP of the organization.
 
 ## Example Usage
 
