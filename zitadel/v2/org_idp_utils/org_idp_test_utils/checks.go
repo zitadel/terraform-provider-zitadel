@@ -1,4 +1,4 @@
-package test_utils
+package org_idp_test_utils
 
 import (
 	"fmt"

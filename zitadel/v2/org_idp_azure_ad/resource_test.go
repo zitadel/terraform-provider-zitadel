@@ -2,12 +2,12 @@ package org_idp_azure_ad_test
 
 import (
 	"fmt"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"testing"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils/org_idp_test_utils"
 
-	test_utils_org "github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 
 func TestAccZITADELOrgIdPAzureAD(t *testing.T) {
@@ -16,7 +16,7 @@ func TestAccZITADELOrgIdPAzureAD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils_org.RunOrgLifecyleTest(t, *frame, func(name, secret string) string {
+	org_idp_test_utils.RunOrgLifecyleTest(t, *frame, func(name, secret string) string {
 		return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id              = "%s"
