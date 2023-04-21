@@ -21,18 +21,18 @@ func GetResource() *schema.Resource {
 			flowTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Type of the flow to which the action triggers belong" + helper.DescriptionEnumValuesList(flowTypes()),
+				Description: "Type of the flow to which the action triggers belong" + helper.DescriptionEnumValuesList(FlowTypes()),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(flowTypeVar, value, helper.EnumValueMap(flowTypes()))
+					return helper.EnumValueValidation(flowTypeVar, value, helper.EnumValueMap(FlowTypes()))
 				},
 				ForceNew: true,
 			},
 			triggerTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Trigger type on when the actions get triggered" + helper.DescriptionEnumValuesList(triggerTypes()),
+				Description: "Trigger type on when the actions get triggered" + helper.DescriptionEnumValuesList(TriggerTypes()),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(triggerTypeVar, value, helper.EnumValueMap(triggerTypes()))
+					return helper.EnumValueValidation(triggerTypeVar, value, helper.EnumValueMap(TriggerTypes()))
 				},
 				ForceNew: true,
 			},
@@ -53,14 +53,14 @@ func GetResource() *schema.Resource {
 	}
 }
 
-func flowTypes() map[int32]string {
+func FlowTypes() map[int32]string {
 	return map[int32]string{
 		1: "FLOW_TYPE_EXTERNAL_AUTHENTICATION",
 		2: "FLOW_TYPE_CUSTOMISE_TOKEN",
 		3: "FLOW_TYPE_INTERNAL_AUTHENTICATION",
 	}
 }
-func triggerTypes() map[int32]string {
+func TriggerTypes() map[int32]string {
 	return map[int32]string{
 		1: "TRIGGER_TYPE_POST_AUTHENTICATION",
 		2: "TRIGGER_TYPE_PRE_CREATION",
