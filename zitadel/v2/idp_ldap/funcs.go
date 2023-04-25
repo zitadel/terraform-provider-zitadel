@@ -84,46 +84,44 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if d.HasChangesExcept(idp_utils.IdpIDVar) {
-		_, err = client.UpdateLDAPProvider(ctx, &admin.UpdateLDAPProviderRequest{
-			Id:   d.Id(),
-			Name: d.Get(idp_utils.NameVar).(string),
-			ProviderOptions: &idp.Options{
-				IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-				IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-				IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-				IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-			},
+	_, err = client.UpdateLDAPProvider(ctx, &admin.UpdateLDAPProviderRequest{
+		Id:   d.Id(),
+		Name: d.Get(idp_utils.NameVar).(string),
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
+			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
+			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
+			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
+		},
 
-			Servers:           idp_utils.InterfaceToStringSlice(d.Get(ServersVar)),
-			StartTls:          d.Get(StartTLSVar).(bool),
-			BaseDn:            d.Get(BaseDNVar).(string),
-			BindDn:            d.Get(BindDNVar).(string),
-			BindPassword:      d.Get(BindPasswordVar).(string),
-			UserBase:          d.Get(UserBaseVar).(string),
-			UserObjectClasses: helper.GetOkSetToStringSlice(d, UserObjectClassesVar),
-			UserFilters:       helper.GetOkSetToStringSlice(d, UserFiltersVar),
-			Timeout:           durationpb.New(timeout),
+		Servers:           idp_utils.InterfaceToStringSlice(d.Get(ServersVar)),
+		StartTls:          d.Get(StartTLSVar).(bool),
+		BaseDn:            d.Get(BaseDNVar).(string),
+		BindDn:            d.Get(BindDNVar).(string),
+		BindPassword:      d.Get(BindPasswordVar).(string),
+		UserBase:          d.Get(UserBaseVar).(string),
+		UserObjectClasses: helper.GetOkSetToStringSlice(d, UserObjectClassesVar),
+		UserFilters:       helper.GetOkSetToStringSlice(d, UserFiltersVar),
+		Timeout:           durationpb.New(timeout),
 
-			Attributes: &idp.LDAPAttributes{
-				IdAttribute:                d.Get(IdAttributeVar).(string),
-				FirstNameAttribute:         d.Get(FirstNameAttributeVar).(string),
-				LastNameAttribute:          d.Get(LastNameAttributeVar).(string),
-				DisplayNameAttribute:       d.Get(DisplayNameAttributeVar).(string),
-				NickNameAttribute:          d.Get(NickNameAttributeVar).(string),
-				PreferredUsernameAttribute: d.Get(PreferredUsernameAttributeVar).(string),
-				EmailAttribute:             d.Get(EmailAttributeVar).(string),
-				EmailVerifiedAttribute:     d.Get(EmailVerifiedAttributeVar).(string),
-				PhoneAttribute:             d.Get(PhoneAttributeVar).(string),
-				PhoneVerifiedAttribute:     d.Get(PhoneVerifiedAttributeVar).(string),
-				PreferredLanguageAttribute: d.Get(PreferredLanguageAttributeVar).(string),
-				AvatarUrlAttribute:         d.Get(AvatarURLAttributeVar).(string),
-				ProfileAttribute:           d.Get(ProfileAttributeVar).(string),
-			},
-		})
-		if err != nil {
-			return diag.Errorf("failed to update idp: %v", err)
-		}
+		Attributes: &idp.LDAPAttributes{
+			IdAttribute:                d.Get(IdAttributeVar).(string),
+			FirstNameAttribute:         d.Get(FirstNameAttributeVar).(string),
+			LastNameAttribute:          d.Get(LastNameAttributeVar).(string),
+			DisplayNameAttribute:       d.Get(DisplayNameAttributeVar).(string),
+			NickNameAttribute:          d.Get(NickNameAttributeVar).(string),
+			PreferredUsernameAttribute: d.Get(PreferredUsernameAttributeVar).(string),
+			EmailAttribute:             d.Get(EmailAttributeVar).(string),
+			EmailVerifiedAttribute:     d.Get(EmailVerifiedAttributeVar).(string),
+			PhoneAttribute:             d.Get(PhoneAttributeVar).(string),
+			PhoneVerifiedAttribute:     d.Get(PhoneVerifiedAttributeVar).(string),
+			PreferredLanguageAttribute: d.Get(PreferredLanguageAttributeVar).(string),
+			AvatarUrlAttribute:         d.Get(AvatarURLAttributeVar).(string),
+			ProfileAttribute:           d.Get(ProfileAttributeVar).(string),
+		},
+	})
+	if err != nil {
+		return diag.Errorf("failed to update idp: %v", err)
 	}
 	return nil
 }

@@ -52,23 +52,21 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if d.HasChangesExcept(idp_utils.IdpIDVar, org_idp_utils.OrgIDVar) {
-		_, err = client.UpdateGitLabProvider(ctx, &management.UpdateGitLabProviderRequest{
-			Id:           d.Id(),
-			Name:         d.Get(idp_utils.NameVar).(string),
-			ClientId:     d.Get(idp_utils.ClientIDVar).(string),
-			ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
-			Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
-			ProviderOptions: &idp.Options{
-				IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-				IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-				IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-				IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-			},
-		})
-		if err != nil {
-			return diag.Errorf("failed to update idp: %v", err)
-		}
+	_, err = client.UpdateGitLabProvider(ctx, &management.UpdateGitLabProviderRequest{
+		Id:           d.Id(),
+		Name:         d.Get(idp_utils.NameVar).(string),
+		ClientId:     d.Get(idp_utils.ClientIDVar).(string),
+		ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
+		Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
+			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
+			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
+			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
+		},
+	})
+	if err != nil {
+		return diag.Errorf("failed to update idp: %v", err)
 	}
 	return nil
 }
