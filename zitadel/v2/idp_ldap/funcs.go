@@ -24,41 +24,43 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	timeout, err := time.ParseDuration(d.Get(idp_utils.TimeoutVar).(string))
+	timeout, err := time.ParseDuration(d.Get(TimeoutVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	req := &admin.AddLDAPProviderRequest{
-		Name:              d.Get(idp_utils.NameVar).(string),
-		Servers:           idp_utils.InterfaceToStringSlice(d.Get(idp_utils.ServersVar)),
-		StartTls:          d.Get(idp_utils.StartTLSVar).(bool),
-		BaseDn:            d.Get(idp_utils.BaseDNVar).(string),
-		BindDn:            d.Get(idp_utils.BindDNVar).(string),
-		BindPassword:      d.Get(idp_utils.BindPasswordVar).(string),
-		UserBase:          d.Get(idp_utils.UserBaseVar).(string),
-		UserObjectClasses: helper.GetOkSetToStringSlice(d, idp_utils.UserObjectClassesVar),
-		UserFilters:       helper.GetOkSetToStringSlice(d, idp_utils.UserFiltersVar),
-		Timeout:           durationpb.New(timeout),
-		Attributes: &idp.LDAPAttributes{
-			IdAttribute:                d.Get(idp_utils.IdAttributeVar).(string),
-			FirstNameAttribute:         d.Get(idp_utils.FirstNameAttributeVar).(string),
-			LastNameAttribute:          d.Get(idp_utils.LastNameAttributeVar).(string),
-			DisplayNameAttribute:       d.Get(idp_utils.DisplayNameAttributeVar).(string),
-			NickNameAttribute:          d.Get(idp_utils.NickNameAttributeVar).(string),
-			PreferredUsernameAttribute: d.Get(idp_utils.PreferredUsernameAttributeVar).(string),
-			EmailAttribute:             d.Get(idp_utils.EmailAttributeVar).(string),
-			EmailVerifiedAttribute:     d.Get(idp_utils.EmailVerifiedAttributeVar).(string),
-			PhoneAttribute:             d.Get(idp_utils.PhoneAttributeVar).(string),
-			PhoneVerifiedAttribute:     d.Get(idp_utils.PhoneVerifiedAttributeVar).(string),
-			PreferredLanguageAttribute: d.Get(idp_utils.PreferredLanguageAttributeVar).(string),
-			AvatarUrlAttribute:         d.Get(idp_utils.AvatarURLAttributeVar).(string),
-			ProfileAttribute:           d.Get(idp_utils.ProfileAttributeVar).(string),
-		},
+		Name: d.Get(idp_utils.NameVar).(string),
 		ProviderOptions: &idp.Options{
 			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
 			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
 			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
 			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
+		},
+
+		Servers:           idp_utils.InterfaceToStringSlice(d.Get(ServersVar)),
+		StartTls:          d.Get(StartTLSVar).(bool),
+		BaseDn:            d.Get(BaseDNVar).(string),
+		BindDn:            d.Get(BindDNVar).(string),
+		BindPassword:      d.Get(BindPasswordVar).(string),
+		UserBase:          d.Get(UserBaseVar).(string),
+		UserObjectClasses: helper.GetOkSetToStringSlice(d, UserObjectClassesVar),
+		UserFilters:       helper.GetOkSetToStringSlice(d, UserFiltersVar),
+		Timeout:           durationpb.New(timeout),
+
+		Attributes: &idp.LDAPAttributes{
+			IdAttribute:                d.Get(IdAttributeVar).(string),
+			FirstNameAttribute:         d.Get(FirstNameAttributeVar).(string),
+			LastNameAttribute:          d.Get(LastNameAttributeVar).(string),
+			DisplayNameAttribute:       d.Get(DisplayNameAttributeVar).(string),
+			NickNameAttribute:          d.Get(NickNameAttributeVar).(string),
+			PreferredUsernameAttribute: d.Get(PreferredUsernameAttributeVar).(string),
+			EmailAttribute:             d.Get(EmailAttributeVar).(string),
+			EmailVerifiedAttribute:     d.Get(EmailVerifiedAttributeVar).(string),
+			PhoneAttribute:             d.Get(PhoneAttributeVar).(string),
+			PhoneVerifiedAttribute:     d.Get(PhoneVerifiedAttributeVar).(string),
+			PreferredLanguageAttribute: d.Get(PreferredLanguageAttributeVar).(string),
+			AvatarUrlAttribute:         d.Get(AvatarURLAttributeVar).(string),
+			ProfileAttribute:           d.Get(ProfileAttributeVar).(string),
 		},
 	}
 	resp, err := client.AddLDAPProvider(ctx, req)
@@ -78,43 +80,45 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	timeout, err := time.ParseDuration(d.Get(idp_utils.TimeoutVar).(string))
+	timeout, err := time.ParseDuration(d.Get(TimeoutVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	if d.HasChangesExcept(idp_utils.IdpIDVar) {
 		_, err = client.UpdateLDAPProvider(ctx, &admin.UpdateLDAPProviderRequest{
-			Id:                d.Id(),
-			Name:              d.Get(idp_utils.NameVar).(string),
-			Servers:           idp_utils.InterfaceToStringSlice(d.Get(idp_utils.ServersVar)),
-			StartTls:          d.Get(idp_utils.StartTLSVar).(bool),
-			BaseDn:            d.Get(idp_utils.BaseDNVar).(string),
-			BindDn:            d.Get(idp_utils.BindDNVar).(string),
-			BindPassword:      d.Get(idp_utils.BindPasswordVar).(string),
-			UserBase:          d.Get(idp_utils.UserBaseVar).(string),
-			UserObjectClasses: helper.GetOkSetToStringSlice(d, idp_utils.UserObjectClassesVar),
-			UserFilters:       helper.GetOkSetToStringSlice(d, idp_utils.UserFiltersVar),
-			Timeout:           durationpb.New(timeout),
-			Attributes: &idp.LDAPAttributes{
-				IdAttribute:                d.Get(idp_utils.IdAttributeVar).(string),
-				FirstNameAttribute:         d.Get(idp_utils.FirstNameAttributeVar).(string),
-				LastNameAttribute:          d.Get(idp_utils.LastNameAttributeVar).(string),
-				DisplayNameAttribute:       d.Get(idp_utils.DisplayNameAttributeVar).(string),
-				NickNameAttribute:          d.Get(idp_utils.NickNameAttributeVar).(string),
-				PreferredUsernameAttribute: d.Get(idp_utils.PreferredUsernameAttributeVar).(string),
-				EmailAttribute:             d.Get(idp_utils.EmailAttributeVar).(string),
-				EmailVerifiedAttribute:     d.Get(idp_utils.EmailVerifiedAttributeVar).(string),
-				PhoneAttribute:             d.Get(idp_utils.PhoneAttributeVar).(string),
-				PhoneVerifiedAttribute:     d.Get(idp_utils.PhoneVerifiedAttributeVar).(string),
-				PreferredLanguageAttribute: d.Get(idp_utils.PreferredLanguageAttributeVar).(string),
-				AvatarUrlAttribute:         d.Get(idp_utils.AvatarURLAttributeVar).(string),
-				ProfileAttribute:           d.Get(idp_utils.ProfileAttributeVar).(string),
-			},
+			Id:   d.Id(),
+			Name: d.Get(idp_utils.NameVar).(string),
 			ProviderOptions: &idp.Options{
 				IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
 				IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
 				IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
 				IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
+			},
+
+			Servers:           idp_utils.InterfaceToStringSlice(d.Get(ServersVar)),
+			StartTls:          d.Get(StartTLSVar).(bool),
+			BaseDn:            d.Get(BaseDNVar).(string),
+			BindDn:            d.Get(BindDNVar).(string),
+			BindPassword:      d.Get(BindPasswordVar).(string),
+			UserBase:          d.Get(UserBaseVar).(string),
+			UserObjectClasses: helper.GetOkSetToStringSlice(d, UserObjectClassesVar),
+			UserFilters:       helper.GetOkSetToStringSlice(d, UserFiltersVar),
+			Timeout:           durationpb.New(timeout),
+
+			Attributes: &idp.LDAPAttributes{
+				IdAttribute:                d.Get(IdAttributeVar).(string),
+				FirstNameAttribute:         d.Get(FirstNameAttributeVar).(string),
+				LastNameAttribute:          d.Get(LastNameAttributeVar).(string),
+				DisplayNameAttribute:       d.Get(DisplayNameAttributeVar).(string),
+				NickNameAttribute:          d.Get(NickNameAttributeVar).(string),
+				PreferredUsernameAttribute: d.Get(PreferredUsernameAttributeVar).(string),
+				EmailAttribute:             d.Get(EmailAttributeVar).(string),
+				EmailVerifiedAttribute:     d.Get(EmailVerifiedAttributeVar).(string),
+				PhoneAttribute:             d.Get(PhoneAttributeVar).(string),
+				PhoneVerifiedAttribute:     d.Get(PhoneVerifiedAttributeVar).(string),
+				PreferredLanguageAttribute: d.Get(PreferredLanguageAttributeVar).(string),
+				AvatarUrlAttribute:         d.Get(AvatarURLAttributeVar).(string),
+				ProfileAttribute:           d.Get(ProfileAttributeVar).(string),
 			},
 		})
 		if err != nil {
@@ -147,33 +151,35 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	attributesCfg := specificCfg.GetAttributes()
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
-		idp_utils.NameVar:                       idp.GetName(),
-		idp_utils.IsLinkingAllowedVar:           generalCfg.GetIsLinkingAllowed(),
-		idp_utils.IsCreationAllowedVar:          generalCfg.GetIsCreationAllowed(),
-		idp_utils.IsAutoCreationVar:             generalCfg.GetIsAutoCreation(),
-		idp_utils.IsAutoUpdateVar:               generalCfg.GetIsAutoUpdate(),
-		idp_utils.ServersVar:                    specificCfg.GetServers(),
-		idp_utils.StartTLSVar:                   specificCfg.GetStartTls(),
-		idp_utils.BaseDNVar:                     specificCfg.GetBaseDn(),
-		idp_utils.BindDNVar:                     specificCfg.GetBindDn(),
-		idp_utils.BindPasswordVar:               d.Get(idp_utils.BindPasswordVar).(string),
-		idp_utils.UserBaseVar:                   specificCfg.GetUserBase(),
-		idp_utils.UserObjectClassesVar:          specificCfg.GetUserObjectClasses(),
-		idp_utils.UserFiltersVar:                specificCfg.GetUserFilters(),
-		idp_utils.TimeoutVar:                    specificCfg.GetTimeout().AsDuration().String(),
-		idp_utils.IdAttributeVar:                attributesCfg.GetIdAttribute(),
-		idp_utils.FirstNameAttributeVar:         attributesCfg.GetFirstNameAttribute(),
-		idp_utils.LastNameAttributeVar:          attributesCfg.GetLastNameAttribute(),
-		idp_utils.DisplayNameAttributeVar:       attributesCfg.GetDisplayNameAttribute(),
-		idp_utils.NickNameAttributeVar:          attributesCfg.GetNickNameAttribute(),
-		idp_utils.PreferredUsernameAttributeVar: attributesCfg.GetPreferredUsernameAttribute(),
-		idp_utils.EmailAttributeVar:             attributesCfg.GetEmailAttribute(),
-		idp_utils.EmailVerifiedAttributeVar:     attributesCfg.GetEmailVerifiedAttribute(),
-		idp_utils.PhoneAttributeVar:             attributesCfg.GetPhoneAttribute(),
-		idp_utils.PhoneVerifiedAttributeVar:     attributesCfg.GetPhoneVerifiedAttribute(),
-		idp_utils.PreferredLanguageAttributeVar: attributesCfg.GetPreferredLanguageAttribute(),
-		idp_utils.AvatarURLAttributeVar:         attributesCfg.GetAvatarUrlAttribute(),
-		idp_utils.ProfileAttributeVar:           attributesCfg.GetProfileAttribute(),
+		idp_utils.NameVar:              idp.GetName(),
+		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
+		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
+		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
+		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
+
+		ServersVar:           specificCfg.GetServers(),
+		StartTLSVar:          specificCfg.GetStartTls(),
+		BaseDNVar:            specificCfg.GetBaseDn(),
+		BindDNVar:            specificCfg.GetBindDn(),
+		BindPasswordVar:      d.Get(BindPasswordVar).(string),
+		UserBaseVar:          specificCfg.GetUserBase(),
+		UserObjectClassesVar: specificCfg.GetUserObjectClasses(),
+		UserFiltersVar:       specificCfg.GetUserFilters(),
+		TimeoutVar:           specificCfg.GetTimeout().AsDuration().String(),
+		IdAttributeVar:       attributesCfg.GetIdAttribute(),
+
+		FirstNameAttributeVar:         attributesCfg.GetFirstNameAttribute(),
+		LastNameAttributeVar:          attributesCfg.GetLastNameAttribute(),
+		DisplayNameAttributeVar:       attributesCfg.GetDisplayNameAttribute(),
+		NickNameAttributeVar:          attributesCfg.GetNickNameAttribute(),
+		PreferredUsernameAttributeVar: attributesCfg.GetPreferredUsernameAttribute(),
+		EmailAttributeVar:             attributesCfg.GetEmailAttribute(),
+		EmailVerifiedAttributeVar:     attributesCfg.GetEmailVerifiedAttribute(),
+		PhoneAttributeVar:             attributesCfg.GetPhoneAttribute(),
+		PhoneVerifiedAttributeVar:     attributesCfg.GetPhoneVerifiedAttribute(),
+		PreferredLanguageAttributeVar: attributesCfg.GetPreferredLanguageAttribute(),
+		AvatarURLAttributeVar:         attributesCfg.GetAvatarUrlAttribute(),
+		ProfileAttributeVar:           attributesCfg.GetProfileAttribute(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

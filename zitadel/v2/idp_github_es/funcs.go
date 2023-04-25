@@ -22,19 +22,19 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	resp, err := client.AddGitHubEnterpriseServerProvider(ctx, &admin.AddGitHubEnterpriseServerProviderRequest{
-		ClientId:              d.Get(idp_utils.ClientIDVar).(string),
-		Name:                  d.Get(idp_utils.NameVar).(string),
-		ClientSecret:          d.Get(idp_utils.ClientSecretVar).(string),
-		AuthorizationEndpoint: d.Get(idp_utils.AuthorizationEndpointVar).(string),
-		TokenEndpoint:         d.Get(idp_utils.TokenEndpointVar).(string),
-		UserEndpoint:          d.Get(idp_utils.UserEndpointVar).(string),
-		Scopes:                helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
+		ClientId:     d.Get(idp_utils.ClientIDVar).(string),
+		Name:         d.Get(idp_utils.NameVar).(string),
+		ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
+		Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
 		ProviderOptions: &idp.Options{
 			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
 			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
 			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
 			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
 		},
+		AuthorizationEndpoint: d.Get(AuthorizationEndpointVar).(string),
+		TokenEndpoint:         d.Get(TokenEndpointVar).(string),
+		UserEndpoint:          d.Get(UserEndpointVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
@@ -54,20 +54,20 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	if d.HasChangesExcept(idp_utils.IdpIDVar) {
 		_, err = client.UpdateGitHubEnterpriseServerProvider(ctx, &admin.UpdateGitHubEnterpriseServerProviderRequest{
-			Id:                    d.Id(),
-			Name:                  d.Get(idp_utils.NameVar).(string),
-			ClientId:              d.Get(idp_utils.ClientIDVar).(string),
-			ClientSecret:          d.Get(idp_utils.ClientSecretVar).(string),
-			Scopes:                helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
-			AuthorizationEndpoint: d.Get(idp_utils.AuthorizationEndpointVar).(string),
-			TokenEndpoint:         d.Get(idp_utils.TokenEndpointVar).(string),
-			UserEndpoint:          d.Get(idp_utils.UserEndpointVar).(string),
+			Id:           d.Id(),
+			Name:         d.Get(idp_utils.NameVar).(string),
+			ClientId:     d.Get(idp_utils.ClientIDVar).(string),
+			ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
+			Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
 			ProviderOptions: &idp.Options{
 				IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
 				IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
 				IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
 				IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
 			},
+			AuthorizationEndpoint: d.Get(AuthorizationEndpointVar).(string),
+			TokenEndpoint:         d.Get(TokenEndpointVar).(string),
+			UserEndpoint:          d.Get(UserEndpointVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update idp: %v", err)
@@ -98,17 +98,17 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	specificCfg := cfg.GetGithubEs()
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
-		idp_utils.NameVar:                  idp.GetName(),
-		idp_utils.ClientIDVar:              specificCfg.GetClientId(),
-		idp_utils.ClientSecretVar:          d.Get(idp_utils.ClientSecretVar).(string),
-		idp_utils.ScopesVar:                specificCfg.GetScopes(),
-		idp_utils.AuthorizationEndpointVar: specificCfg.GetAuthorizationEndpoint(),
-		idp_utils.TokenEndpointVar:         specificCfg.GetTokenEndpoint(),
-		idp_utils.UserEndpointVar:          specificCfg.GetUserEndpoint(),
-		idp_utils.IsLinkingAllowedVar:      generalCfg.GetIsLinkingAllowed(),
-		idp_utils.IsCreationAllowedVar:     generalCfg.GetIsCreationAllowed(),
-		idp_utils.IsAutoCreationVar:        generalCfg.GetIsAutoCreation(),
-		idp_utils.IsAutoUpdateVar:          generalCfg.GetIsAutoUpdate(),
+		idp_utils.NameVar:              idp.GetName(),
+		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
+		idp_utils.ClientSecretVar:      d.Get(idp_utils.ClientSecretVar).(string),
+		idp_utils.ScopesVar:            specificCfg.GetScopes(),
+		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
+		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
+		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
+		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
+		AuthorizationEndpointVar:       specificCfg.GetAuthorizationEndpoint(),
+		TokenEndpointVar:               specificCfg.GetTokenEndpoint(),
+		UserEndpointVar:                specificCfg.GetUserEndpoint(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

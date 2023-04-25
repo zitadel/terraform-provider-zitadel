@@ -3,6 +3,8 @@ package org_idp_gitlab_self_hosted
 import (
 	"context"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab_self_hosted"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
@@ -28,7 +30,6 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Name:         d.Get(idp_utils.NameVar).(string),
 		ClientId:     d.Get(idp_utils.ClientIDVar).(string),
 		ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
-		Issuer:       d.Get(idp_utils.IssuerVar).(string),
 		Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
 		ProviderOptions: &idp.Options{
 			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
@@ -36,6 +37,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
 			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
 		},
+		Issuer: d.Get(idp_gitlab_self_hosted.IssuerVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
@@ -59,7 +61,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			Name:         d.Get(idp_utils.NameVar).(string),
 			ClientId:     d.Get(idp_utils.ClientIDVar).(string),
 			ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
-			Issuer:       d.Get(idp_utils.IssuerVar).(string),
 			Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
 			ProviderOptions: &idp.Options{
 				IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
@@ -67,6 +68,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 				IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
 				IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
 			},
+			Issuer: d.Get(idp_gitlab_self_hosted.IssuerVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update idp: %v", err)
@@ -97,16 +99,16 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	specificCfg := cfg.GetGitlabSelfHosted()
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
-		org_idp_utils.OrgIDVar:         idp.GetDetails().GetResourceOwner(),
-		idp_utils.NameVar:              idp.GetName(),
-		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
-		idp_utils.ClientSecretVar:      d.Get(idp_utils.ClientSecretVar).(string),
-		idp_utils.IssuerVar:            specificCfg.GetIssuer(),
-		idp_utils.ScopesVar:            specificCfg.GetScopes(),
-		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
-		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
-		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
-		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
+		org_idp_utils.OrgIDVar:           idp.GetDetails().GetResourceOwner(),
+		idp_utils.NameVar:                idp.GetName(),
+		idp_utils.ClientIDVar:            specificCfg.GetClientId(),
+		idp_utils.ClientSecretVar:        d.Get(idp_utils.ClientSecretVar).(string),
+		idp_utils.ScopesVar:              specificCfg.GetScopes(),
+		idp_utils.IsLinkingAllowedVar:    generalCfg.GetIsLinkingAllowed(),
+		idp_utils.IsCreationAllowedVar:   generalCfg.GetIsCreationAllowed(),
+		idp_utils.IsAutoCreationVar:      generalCfg.GetIsAutoCreation(),
+		idp_utils.IsAutoUpdateVar:        generalCfg.GetIsAutoUpdate(),
+		idp_gitlab_self_hosted.IssuerVar: specificCfg.GetIssuer(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
