@@ -17,6 +17,9 @@
 
 # Run Acceptance Tests
 
+Ensure ZITADEL listens at http://localhost:8080 and you have a service account key in your local filesystem.
+The easiest way to achieve that is [to follow this guide](https://zitadel.com/docs/self-hosting/deploy/compose#docker-compose-with-service-account).
+
 ```bash
 TF_ACC=1 TF_ACC_ZITADEL_TOKEN=/my-token.json go test ./...
 ```
