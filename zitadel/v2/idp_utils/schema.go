@@ -22,7 +22,7 @@ var (
 	}
 	NameResourceField = &schema.Schema{
 		Type:        schema.TypeString,
-		Required:    true,
+		Optional:    true,
 		Description: "Name of the IDP",
 	}
 	NameDataSourceField = &schema.Schema{
@@ -57,7 +57,7 @@ var (
 		Elem: &schema.Schema{
 			Type: schema.TypeString,
 		},
-		Required:    true,
+		Optional:    true,
 		Description: "the scopes requested by ZITADEL during the request on the identity provider",
 	}
 	ScopesDataSourceField = &schema.Schema{
