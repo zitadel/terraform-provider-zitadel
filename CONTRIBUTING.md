@@ -26,3 +26,9 @@ TF_ACC=1 TF_ACC_ZITADEL_TOKEN=/my-token.json go test ./...
 
 The tests are flaky when resources should be cleaned up.
 This results in dangling resources.
+
+# Generate Docs
+
+1. Manually maintain files in /templates and /examples
+1. Install the tool tfplugindocs with `go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs`
+1. Generate the docs with `tfplugindocs generate`

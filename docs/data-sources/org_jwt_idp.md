@@ -2,12 +2,12 @@
 page_title: "zitadel_org_jwt_idp Data Source - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Datasource representing a domain of the organization.
+  Datasource representing a generic JWT IdP on the organization.
 ---
 
 # zitadel_org_jwt_idp (Data Source)
 
-Datasource representing a domain of the organization.
+Datasource representing a generic JWT IdP on the organization.
 
 ## Example Usage
 

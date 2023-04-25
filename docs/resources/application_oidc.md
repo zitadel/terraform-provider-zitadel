@@ -39,7 +39,7 @@ resource zitadel_application_oidc application_oidc {
 
 ### Required
 
-- `grant_types` (List of String) Grant types, supported values: OIDC_GRANT_TYPE_REFRESH_TOKEN, OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDC_GRANT_TYPE_IMPLICIT
+- `grant_types` (List of String) Grant types, supported values: OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDC_GRANT_TYPE_IMPLICIT, OIDC_GRANT_TYPE_REFRESH_TOKEN
 - `name` (String) Name of the application
 - `org_id` (String) orgID of the application
 - `project_id` (String) ID of the project
@@ -51,8 +51,8 @@ resource zitadel_application_oidc application_oidc {
 - `access_token_role_assertion` (Boolean) Access token role assertion
 - `access_token_type` (String) Access token type, supported values: OIDC_TOKEN_TYPE_BEARER, OIDC_TOKEN_TYPE_JWT
 - `additional_origins` (List of String) Additional origins
-- `app_type` (String) App type, supported values: OIDC_APP_TYPE_NATIVE, OIDC_APP_TYPE_WEB, OIDC_APP_TYPE_USER_AGENT
-- `auth_method_type` (String) Auth method type, supported values: OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT, OIDC_AUTH_METHOD_TYPE_BASIC, OIDC_AUTH_METHOD_TYPE_POST, OIDC_AUTH_METHOD_TYPE_NONE
+- `app_type` (String) App type, supported values: OIDC_APP_TYPE_WEB, OIDC_APP_TYPE_USER_AGENT, OIDC_APP_TYPE_NATIVE
+- `auth_method_type` (String) Auth method type, supported values: OIDC_AUTH_METHOD_TYPE_BASIC, OIDC_AUTH_METHOD_TYPE_POST, OIDC_AUTH_METHOD_TYPE_NONE, OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT
 - `clock_skew` (String) Clockskew
 - `dev_mode` (Boolean) Dev mode
 - `id_token_role_assertion` (Boolean) ID token role assertion

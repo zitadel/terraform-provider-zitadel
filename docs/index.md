@@ -36,7 +36,7 @@ terraform {
   }
 }
 
-provider zitadel {
+provider "zitadel" {
   domain           = "localhost"
   insecure         = "true"
   port             = "8080"
