@@ -2,6 +2,7 @@ package idp_github_test
 
 import (
 	"fmt"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"testing"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
@@ -26,5 +27,5 @@ resource "%s" "%s" {
   is_auto_creation    = false
   is_auto_update      = true
 }`, resourceName, frame.UniqueResourcesID, name, secret)
-	}, "client_secret")
+	}, idp_utils.ClientSecretVar)
 }

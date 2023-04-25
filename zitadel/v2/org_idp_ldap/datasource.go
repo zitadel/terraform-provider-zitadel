@@ -2,6 +2,7 @@ package org_idp_ldap
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 )
@@ -10,161 +11,37 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing an LDAP IdP on the organization.",
 		Schema: map[string]*schema.Schema{
-			org_idp_utils.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-			},
-			idp_utils.IdpIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "The ID of this resource.",
-			},
-			idp_utils.NameVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Name of the IDP",
-			},
-			idp_utils.ServersVar: {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Computed:    true,
-				Description: "Servers to try in order for establishing LDAP connections",
-			},
-			idp_utils.StartTLSVar: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "Wether to use StartTLS for LDAP connections",
-			},
-			idp_utils.BaseDNVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Base DN for LDAP connections",
-			},
-			idp_utils.BindDNVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Bind DN for LDAP connections",
-			},
-			idp_utils.BindPasswordVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Bind password for LDAP connections",
-				Sensitive:   true,
-			},
-			idp_utils.UserBaseVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User base for LDAP connections",
-			},
-			idp_utils.UserObjectClassesVar: {
-				Type: schema.TypeSet,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Computed:    true,
-				Description: "User object classes for LDAP connections",
-			},
-			idp_utils.UserFiltersVar: {
-				Type: schema.TypeSet,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Computed:    true,
-				Description: "User filters for LDAP connections",
-			},
-			idp_utils.TimeoutVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Timeout for LDAP connections",
-			},
-			idp_utils.IdAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the id",
-			},
-			idp_utils.FirstNameAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the first name",
-			},
-			idp_utils.LastNameAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the last name",
-			},
-			idp_utils.DisplayNameAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the display name",
-			},
-			idp_utils.NickNameAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the nick name",
-			},
-			idp_utils.PreferredUsernameAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the preferred username",
-			},
-			idp_utils.EmailAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the email",
-			},
-			idp_utils.EmailVerifiedAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the email verified state",
-			},
-			idp_utils.PhoneAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the phone",
-			},
-			idp_utils.PhoneVerifiedAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the phone verified state",
-			},
-			idp_utils.PreferredLanguageAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the preferred language",
-			},
-			idp_utils.AvatarURLAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the avatar url",
-			},
-			idp_utils.ProfileAttributeVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "User attribute for the profile",
-			},
-			idp_utils.IsLinkingAllowedVar: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "enable if users should be able to link an existing ZITADEL user with an external account",
-			},
-			idp_utils.IsCreationAllowedVar: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "enable if users should be able to create a new account in ZITADEL when using an external account",
-			},
-			idp_utils.IsAutoCreationVar: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "enable if a new account in ZITADEL should be created automatically when login with an external account",
-			},
-			idp_utils.IsAutoUpdateVar: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "enable if a the ZITADEL account fields should be updated automatically on each login",
-			},
+			idp_utils.IdpIDVar:             idp_utils.IdPIDDataSourceField,
+			org_idp_utils.OrgIDVar:         org_idp_utils.OrgIDDatasourceField,
+			idp_utils.NameVar:              idp_utils.NameDataSourceField,
+			idp_utils.IsLinkingAllowedVar:  idp_utils.IsLinkingAllowedDataSourceField,
+			idp_utils.IsCreationAllowedVar: idp_utils.IsCreationAllowedDataSourceField,
+			idp_utils.IsAutoCreationVar:    idp_utils.IsAutoCreationDataSourceField,
+			idp_utils.IsAutoUpdateVar:      idp_utils.IsAutoUpdateDataSourceField,
+
+			idp_ldap.ServersVar:           idp_ldap.ServersDataSourceField,
+			idp_ldap.StartTLSVar:          idp_ldap.StartTLSDataSourceField,
+			idp_ldap.BaseDNVar:            idp_ldap.BaseDNDataSourceField,
+			idp_ldap.BindDNVar:            idp_ldap.BindDNDataSourceField,
+			idp_ldap.BindPasswordVar:      idp_ldap.BindPasswordDataSourceField,
+			idp_ldap.UserBaseVar:          idp_ldap.UserBaseDataSourceField,
+			idp_ldap.UserObjectClassesVar: idp_ldap.UserObjectClassesDataSourceField,
+			idp_ldap.UserFiltersVar:       idp_ldap.UserFiltersDataSourceField,
+			idp_ldap.TimeoutVar:           idp_ldap.TimeoutDataSourceField,
+			idp_ldap.IdAttributeVar:       idp_ldap.IdAttributeDataSourceField,
+
+			idp_ldap.FirstNameAttributeVar:         idp_ldap.FirstNameAttributeDataSourceField,
+			idp_ldap.LastNameAttributeVar:          idp_ldap.LastNameAttributeDataSourceField,
+			idp_ldap.DisplayNameAttributeVar:       idp_ldap.DisplayNameAttributeDataSourceField,
+			idp_ldap.NickNameAttributeVar:          idp_ldap.NickNameAttributeDataSourceField,
+			idp_ldap.PreferredUsernameAttributeVar: idp_ldap.PreferredUsernameAttributeDataSourceField,
+			idp_ldap.EmailAttributeVar:             idp_ldap.EmailAttributeDataSourceField,
+			idp_ldap.EmailVerifiedAttributeVar:     idp_ldap.EmailVerifiedAttributeDataSourceField,
+			idp_ldap.PhoneAttributeVar:             idp_ldap.PhoneAttributeDataSourceField,
+			idp_ldap.PhoneVerifiedAttributeVar:     idp_ldap.PhoneVerifiedAttributeDataSourceField,
+			idp_ldap.PreferredLanguageAttributeVar: idp_ldap.PreferredLanguageAttributeDataSourceField,
+			idp_ldap.AvatarURLAttributeVar:         idp_ldap.AvatarURLAttributeDataSourceField,
+			idp_ldap.ProfileAttributeVar:           idp_ldap.ProfileAttributeDataSourceField,
 		},
 		ReadContext: read,
 		Importer:    &schema.ResourceImporter{StateContext: org_idp_utils.ImportIDPWithOrgAndSecret(idp_utils.ClientSecretVar)},

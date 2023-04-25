@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils/org_idp_test_utils"
 )
 
@@ -37,5 +37,5 @@ resource "%s" "%s" {
   is_auto_creation      = false
   is_auto_update        = true
 }`, resourceName, frame.UniqueResourcesID, frame.OrgID, name, secret)
-	}, idp_utils.BindPasswordVar)
+	}, idp_ldap.BindPasswordVar)
 }
