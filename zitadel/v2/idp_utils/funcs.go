@@ -7,8 +7,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -42,6 +44,27 @@ func ImportIDPWithSecret(secretVar string) schema.StateContextFunc {
 			return nil, err
 		}
 		return []*schema.ResourceData{data}, nil
+	}
+}
+
+func StringValue(d *schema.ResourceData, attributeVar string) string {
+	return d.Get(attributeVar).(string)
+}
+
+func BoolValue(d *schema.ResourceData, attributeVar string) bool {
+	return d.Get(attributeVar).(bool)
+}
+
+func ScopesValue(d *schema.ResourceData) []string {
+	return helper.GetOkSetToStringSlice(d, ScopesVar)
+}
+
+func ProviderOptionsValue(d *schema.ResourceData) *idp.Options {
+	return &idp.Options{
+		IsLinkingAllowed:  BoolValue(d, IsLinkingAllowedVar),
+		IsCreationAllowed: BoolValue(d, IsCreationAllowedVar),
+		IsAutoUpdate:      BoolValue(d, IsAutoUpdateVar),
+		IsAutoCreation:    BoolValue(d, IsAutoCreationVar),
 	}
 }
 

@@ -22,18 +22,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	resp, err := client.AddAzureADProvider(ctx, &admin.AddAzureADProviderRequest{
-		Name:         d.Get(idp_utils.NameVar).(string),
-		ClientId:     d.Get(idp_utils.ClientIDVar).(string),
-		ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
-		Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
-		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-		},
-		Tenant:        ConstructTenant(d),
-		EmailVerified: d.Get(EmailVerifiedVar).(bool),
+		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
+		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
+		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		Scopes:          idp_utils.ScopesValue(d),
+		ProviderOptions: idp_utils.ProviderOptionsValue(d),
+		Tenant:          ConstructTenant(d),
+		EmailVerified:   idp_utils.BoolValue(d, EmailVerifiedVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
@@ -52,19 +47,14 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	_, err = client.UpdateAzureADProvider(ctx, &admin.UpdateAzureADProviderRequest{
-		Id:           d.Id(),
-		Name:         d.Get(idp_utils.NameVar).(string),
-		ClientId:     d.Get(idp_utils.ClientIDVar).(string),
-		ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
-		Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
-		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-		},
-		Tenant:        ConstructTenant(d),
-		EmailVerified: d.Get(EmailVerifiedVar).(bool),
+		Id:              d.Id(),
+		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
+		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
+		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		Scopes:          idp_utils.ScopesValue(d),
+		ProviderOptions: idp_utils.ProviderOptionsValue(d),
+		Tenant:          ConstructTenant(d),
+		EmailVerified:   idp_utils.BoolValue(d, EmailVerifiedVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update idp: %v", err)
@@ -96,7 +86,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		idp_utils.NameVar:              respIdp.GetName(),
 		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
-		idp_utils.ClientSecretVar:      d.Get(idp_utils.ClientSecretVar).(string),
+		idp_utils.ClientSecretVar:      idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		idp_utils.ScopesVar:            specificCfg.GetScopes(),
 		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
 		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
@@ -117,14 +107,14 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 func ConstructTenant(d *schema.ResourceData) *idp.AzureADTenant {
 	tenant := &idp.AzureADTenant{}
-	tenantId := d.Get(TenantIDVar).(string)
+	tenantId := idp_utils.StringValue(d, TenantIDVar)
 	if tenantId != "" {
 		tenant.Type = &idp.AzureADTenant_TenantId{
 			TenantId: tenantId,
 		}
 	} else {
 		tenant.Type = &idp.AzureADTenant_TenantType{
-			TenantType: idp.AzureADTenantType(idp.AzureADTenantType_value[d.Get(TenantTypeVar).(string)]),
+			TenantType: idp.AzureADTenantType(idp.AzureADTenantType_value[idp_utils.StringValue(d, TenantTypeVar)]),
 		}
 	}
 	return tenant

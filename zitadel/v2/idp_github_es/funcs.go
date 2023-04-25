@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
@@ -22,19 +21,14 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	resp, err := client.AddGitHubEnterpriseServerProvider(ctx, &admin.AddGitHubEnterpriseServerProviderRequest{
-		ClientId:     d.Get(idp_utils.ClientIDVar).(string),
-		Name:         d.Get(idp_utils.NameVar).(string),
-		ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
-		Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
-		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-		},
-		AuthorizationEndpoint: d.Get(AuthorizationEndpointVar).(string),
-		TokenEndpoint:         d.Get(TokenEndpointVar).(string),
-		UserEndpoint:          d.Get(UserEndpointVar).(string),
+		Name:                  idp_utils.StringValue(d, idp_utils.NameVar),
+		ClientId:              idp_utils.StringValue(d, idp_utils.ClientIDVar),
+		ClientSecret:          idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		Scopes:                idp_utils.ScopesValue(d),
+		ProviderOptions:       idp_utils.ProviderOptionsValue(d),
+		AuthorizationEndpoint: idp_utils.StringValue(d, AuthorizationEndpointVar),
+		TokenEndpoint:         idp_utils.StringValue(d, TokenEndpointVar),
+		UserEndpoint:          idp_utils.StringValue(d, UserEndpointVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
@@ -53,20 +47,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	_, err = client.UpdateGitHubEnterpriseServerProvider(ctx, &admin.UpdateGitHubEnterpriseServerProviderRequest{
-		Id:           d.Id(),
-		Name:         d.Get(idp_utils.NameVar).(string),
-		ClientId:     d.Get(idp_utils.ClientIDVar).(string),
-		ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
-		Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
-		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-		},
-		AuthorizationEndpoint: d.Get(AuthorizationEndpointVar).(string),
-		TokenEndpoint:         d.Get(TokenEndpointVar).(string),
-		UserEndpoint:          d.Get(UserEndpointVar).(string),
+		Id:                    d.Id(),
+		Name:                  idp_utils.StringValue(d, idp_utils.NameVar),
+		ClientId:              idp_utils.StringValue(d, idp_utils.ClientIDVar),
+		ClientSecret:          idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		Scopes:                idp_utils.ScopesValue(d),
+		ProviderOptions:       idp_utils.ProviderOptionsValue(d),
+		AuthorizationEndpoint: idp_utils.StringValue(d, AuthorizationEndpointVar),
+		TokenEndpoint:         idp_utils.StringValue(d, TokenEndpointVar),
+		UserEndpoint:          idp_utils.StringValue(d, UserEndpointVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update idp: %v", err)
@@ -98,7 +87,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		idp_utils.NameVar:              idp.GetName(),
 		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
-		idp_utils.ClientSecretVar:      d.Get(idp_utils.ClientSecretVar).(string),
+		idp_utils.ClientSecretVar:      idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		idp_utils.ScopesVar:            specificCfg.GetScopes(),
 		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
 		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),

@@ -3,18 +3,14 @@ package org_idp_gitlab_self_hosted
 import (
 	"context"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab_self_hosted"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab_self_hosted"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 )
 
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -22,22 +18,17 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, org_idp_utils.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	resp, err := client.AddGitLabSelfHostedProvider(ctx, &management.AddGitLabSelfHostedProviderRequest{
-		Name:         d.Get(idp_utils.NameVar).(string),
-		ClientId:     d.Get(idp_utils.ClientIDVar).(string),
-		ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
-		Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
-		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-		},
-		Issuer: d.Get(idp_gitlab_self_hosted.IssuerVar).(string),
+		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
+		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
+		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		Scopes:          idp_utils.ScopesValue(d),
+		ProviderOptions: idp_utils.ProviderOptionsValue(d),
+		Issuer:          idp_utils.StringValue(d, idp_gitlab_self_hosted.IssuerVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
@@ -51,23 +42,18 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, org_idp_utils.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	_, err = client.UpdateGitLabSelfHostedProvider(ctx, &management.UpdateGitLabSelfHostedProviderRequest{
-		Id:           d.Id(),
-		Name:         d.Get(idp_utils.NameVar).(string),
-		ClientId:     d.Get(idp_utils.ClientIDVar).(string),
-		ClientSecret: d.Get(idp_utils.ClientSecretVar).(string),
-		Scopes:       helper.GetOkSetToStringSlice(d, idp_utils.ScopesVar),
-		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-		},
-		Issuer: d.Get(idp_gitlab_self_hosted.IssuerVar).(string),
+		Id:              d.Id(),
+		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
+		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
+		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		Scopes:          idp_utils.ScopesValue(d),
+		ProviderOptions: idp_utils.ProviderOptionsValue(d),
+		Issuer:          idp_utils.StringValue(d, idp_gitlab_self_hosted.IssuerVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update idp: %v", err)
@@ -80,7 +66,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, org_idp_utils.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -100,7 +86,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		org_idp_utils.OrgIDVar:           idp.GetDetails().GetResourceOwner(),
 		idp_utils.NameVar:                idp.GetName(),
 		idp_utils.ClientIDVar:            specificCfg.GetClientId(),
-		idp_utils.ClientSecretVar:        d.Get(idp_utils.ClientSecretVar).(string),
+		idp_utils.ClientSecretVar:        idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		idp_utils.ScopesVar:              specificCfg.GetScopes(),
 		idp_utils.IsLinkingAllowedVar:    generalCfg.GetIsLinkingAllowed(),
 		idp_utils.IsCreationAllowedVar:   generalCfg.GetIsCreationAllowed(),

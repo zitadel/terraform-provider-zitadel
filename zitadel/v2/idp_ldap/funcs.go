@@ -4,12 +4,11 @@ import (
 	"context"
 	"time"
 
-	"google.golang.org/protobuf/types/known/durationpb"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
@@ -24,43 +23,38 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	timeout, err := time.ParseDuration(d.Get(TimeoutVar).(string))
+	timeout, err := time.ParseDuration(idp_utils.StringValue(d, TimeoutVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	req := &admin.AddLDAPProviderRequest{
-		Name: d.Get(idp_utils.NameVar).(string),
-		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-		},
+		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
+		ProviderOptions: idp_utils.ProviderOptionsValue(d),
 
 		Servers:           idp_utils.InterfaceToStringSlice(d.Get(ServersVar)),
-		StartTls:          d.Get(StartTLSVar).(bool),
-		BaseDn:            d.Get(BaseDNVar).(string),
-		BindDn:            d.Get(BindDNVar).(string),
-		BindPassword:      d.Get(BindPasswordVar).(string),
-		UserBase:          d.Get(UserBaseVar).(string),
+		StartTls:          idp_utils.BoolValue(d, StartTLSVar),
+		BaseDn:            idp_utils.StringValue(d, BaseDNVar),
+		BindDn:            idp_utils.StringValue(d, BindDNVar),
+		BindPassword:      idp_utils.StringValue(d, BindPasswordVar),
+		UserBase:          idp_utils.StringValue(d, UserBaseVar),
 		UserObjectClasses: helper.GetOkSetToStringSlice(d, UserObjectClassesVar),
 		UserFilters:       helper.GetOkSetToStringSlice(d, UserFiltersVar),
 		Timeout:           durationpb.New(timeout),
 
 		Attributes: &idp.LDAPAttributes{
-			IdAttribute:                d.Get(IdAttributeVar).(string),
-			FirstNameAttribute:         d.Get(FirstNameAttributeVar).(string),
-			LastNameAttribute:          d.Get(LastNameAttributeVar).(string),
-			DisplayNameAttribute:       d.Get(DisplayNameAttributeVar).(string),
-			NickNameAttribute:          d.Get(NickNameAttributeVar).(string),
-			PreferredUsernameAttribute: d.Get(PreferredUsernameAttributeVar).(string),
-			EmailAttribute:             d.Get(EmailAttributeVar).(string),
-			EmailVerifiedAttribute:     d.Get(EmailVerifiedAttributeVar).(string),
-			PhoneAttribute:             d.Get(PhoneAttributeVar).(string),
-			PhoneVerifiedAttribute:     d.Get(PhoneVerifiedAttributeVar).(string),
-			PreferredLanguageAttribute: d.Get(PreferredLanguageAttributeVar).(string),
-			AvatarUrlAttribute:         d.Get(AvatarURLAttributeVar).(string),
-			ProfileAttribute:           d.Get(ProfileAttributeVar).(string),
+			IdAttribute:                idp_utils.StringValue(d, IdAttributeVar),
+			FirstNameAttribute:         idp_utils.StringValue(d, FirstNameAttributeVar),
+			LastNameAttribute:          idp_utils.StringValue(d, LastNameAttributeVar),
+			DisplayNameAttribute:       idp_utils.StringValue(d, DisplayNameAttributeVar),
+			NickNameAttribute:          idp_utils.StringValue(d, NickNameAttributeVar),
+			PreferredUsernameAttribute: idp_utils.StringValue(d, PreferredUsernameAttributeVar),
+			EmailAttribute:             idp_utils.StringValue(d, EmailAttributeVar),
+			EmailVerifiedAttribute:     idp_utils.StringValue(d, EmailVerifiedAttributeVar),
+			PhoneAttribute:             idp_utils.StringValue(d, PhoneAttributeVar),
+			PhoneVerifiedAttribute:     idp_utils.StringValue(d, PhoneVerifiedAttributeVar),
+			PreferredLanguageAttribute: idp_utils.StringValue(d, PreferredLanguageAttributeVar),
+			AvatarUrlAttribute:         idp_utils.StringValue(d, AvatarURLAttributeVar),
+			ProfileAttribute:           idp_utils.StringValue(d, ProfileAttributeVar),
 		},
 	}
 	resp, err := client.AddLDAPProvider(ctx, req)
@@ -80,44 +74,39 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	timeout, err := time.ParseDuration(d.Get(TimeoutVar).(string))
+	timeout, err := time.ParseDuration(idp_utils.StringValue(d, TimeoutVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	_, err = client.UpdateLDAPProvider(ctx, &admin.UpdateLDAPProviderRequest{
-		Id:   d.Id(),
-		Name: d.Get(idp_utils.NameVar).(string),
-		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-		},
+		Id:              d.Id(),
+		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
+		ProviderOptions: idp_utils.ProviderOptionsValue(d),
 
 		Servers:           idp_utils.InterfaceToStringSlice(d.Get(ServersVar)),
-		StartTls:          d.Get(StartTLSVar).(bool),
-		BaseDn:            d.Get(BaseDNVar).(string),
-		BindDn:            d.Get(BindDNVar).(string),
-		BindPassword:      d.Get(BindPasswordVar).(string),
-		UserBase:          d.Get(UserBaseVar).(string),
+		StartTls:          idp_utils.BoolValue(d, StartTLSVar),
+		BaseDn:            idp_utils.StringValue(d, BaseDNVar),
+		BindDn:            idp_utils.StringValue(d, BindDNVar),
+		BindPassword:      idp_utils.StringValue(d, BindPasswordVar),
+		UserBase:          idp_utils.StringValue(d, UserBaseVar),
 		UserObjectClasses: helper.GetOkSetToStringSlice(d, UserObjectClassesVar),
 		UserFilters:       helper.GetOkSetToStringSlice(d, UserFiltersVar),
 		Timeout:           durationpb.New(timeout),
 
 		Attributes: &idp.LDAPAttributes{
-			IdAttribute:                d.Get(IdAttributeVar).(string),
-			FirstNameAttribute:         d.Get(FirstNameAttributeVar).(string),
-			LastNameAttribute:          d.Get(LastNameAttributeVar).(string),
-			DisplayNameAttribute:       d.Get(DisplayNameAttributeVar).(string),
-			NickNameAttribute:          d.Get(NickNameAttributeVar).(string),
-			PreferredUsernameAttribute: d.Get(PreferredUsernameAttributeVar).(string),
-			EmailAttribute:             d.Get(EmailAttributeVar).(string),
-			EmailVerifiedAttribute:     d.Get(EmailVerifiedAttributeVar).(string),
-			PhoneAttribute:             d.Get(PhoneAttributeVar).(string),
-			PhoneVerifiedAttribute:     d.Get(PhoneVerifiedAttributeVar).(string),
-			PreferredLanguageAttribute: d.Get(PreferredLanguageAttributeVar).(string),
-			AvatarUrlAttribute:         d.Get(AvatarURLAttributeVar).(string),
-			ProfileAttribute:           d.Get(ProfileAttributeVar).(string),
+			IdAttribute:                idp_utils.StringValue(d, IdAttributeVar),
+			FirstNameAttribute:         idp_utils.StringValue(d, FirstNameAttributeVar),
+			LastNameAttribute:          idp_utils.StringValue(d, LastNameAttributeVar),
+			DisplayNameAttribute:       idp_utils.StringValue(d, DisplayNameAttributeVar),
+			NickNameAttribute:          idp_utils.StringValue(d, NickNameAttributeVar),
+			PreferredUsernameAttribute: idp_utils.StringValue(d, PreferredUsernameAttributeVar),
+			EmailAttribute:             idp_utils.StringValue(d, EmailAttributeVar),
+			EmailVerifiedAttribute:     idp_utils.StringValue(d, EmailVerifiedAttributeVar),
+			PhoneAttribute:             idp_utils.StringValue(d, PhoneAttributeVar),
+			PhoneVerifiedAttribute:     idp_utils.StringValue(d, PhoneVerifiedAttributeVar),
+			PreferredLanguageAttribute: idp_utils.StringValue(d, PreferredLanguageAttributeVar),
+			AvatarUrlAttribute:         idp_utils.StringValue(d, AvatarURLAttributeVar),
+			ProfileAttribute:           idp_utils.StringValue(d, ProfileAttributeVar),
 		},
 	})
 	if err != nil {
@@ -159,7 +148,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		StartTLSVar:          specificCfg.GetStartTls(),
 		BaseDNVar:            specificCfg.GetBaseDn(),
 		BindDNVar:            specificCfg.GetBindDn(),
-		BindPasswordVar:      d.Get(BindPasswordVar).(string),
+		BindPasswordVar:      idp_utils.StringValue(d, BindPasswordVar),
 		UserBaseVar:          specificCfg.GetUserBase(),
 		UserObjectClassesVar: specificCfg.GetUserObjectClasses(),
 		UserFiltersVar:       specificCfg.GetUserFilters(),
