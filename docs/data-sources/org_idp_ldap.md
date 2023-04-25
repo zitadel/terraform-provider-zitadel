@@ -36,10 +36,10 @@ data "zitadel_org_idp_ldap" "ldap" {
 - `email_verified_attribute` (String) User attribute for the email verified state
 - `first_name_attribute` (String) User attribute for the first name
 - `id_attribute` (String) User attribute for the id
-- `is_auto_creation` (Boolean) enable if a new account in ZITADEL should be created automatically when login with an external account
-- `is_auto_update` (Boolean) enable if a the ZITADEL account fields should be updated automatically on each login
-- `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
-- `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
+- `is_auto_creation` (Boolean) enabled if a new account in ZITADEL are created automatically on login with an external account
+- `is_auto_update` (Boolean) enabled if a the ZITADEL account fields are updated automatically on each login
+- `is_creation_allowed` (Boolean) enabled if users are able to create a new account in ZITADEL when using an external account
+- `is_linking_allowed` (Boolean) enabled if users are able to link an existing ZITADEL user with an external account
 - `last_name_attribute` (String) User attribute for the last name
 - `name` (String) Name of the IDP
 - `nick_name_attribute` (String) User attribute for the nick name

@@ -41,11 +41,10 @@ resource "zitadel_idp_ldap" "ldap" {
 - `base_dn` (String) Base DN for LDAP connections
 - `bind_dn` (String) Bind DN for LDAP connections
 - `bind_password` (String, Sensitive) Bind password for LDAP connections
-- `is_auto_creation` (Boolean) enable if a new account in ZITADEL should be created automatically when login with an external account
+- `is_auto_creation` (Boolean) enable if a new account in ZITADEL should be created automatically on login with an external account
 - `is_auto_update` (Boolean) enable if a the ZITADEL account fields should be updated automatically on each login
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
 - `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
-- `name` (String) Name of the IDP
 - `servers` (List of String) Servers to try in order for establishing LDAP connections
 - `start_tls` (Boolean) Wether to use StartTLS for LDAP connections
 - `timeout` (String) Timeout for LDAP connections
@@ -62,6 +61,7 @@ resource "zitadel_idp_ldap" "ldap" {
 - `first_name_attribute` (String) User attribute for the first name
 - `id_attribute` (String) User attribute for the id
 - `last_name_attribute` (String) User attribute for the last name
+- `name` (String) Name of the IDP
 - `nick_name_attribute` (String) User attribute for the nick name
 - `phone_attribute` (String) User attribute for the phone
 - `phone_verified_attribute` (String) User attribute for the phone verified state
