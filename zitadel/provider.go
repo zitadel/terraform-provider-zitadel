@@ -3,30 +3,6 @@ package zitadel
 import (
 	"context"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_ldap"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_ldap"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_azure_ad"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_google"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_azure_ad"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_google"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_gitlab"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_gitlab_self_hosted"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab_self_hosted"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_github_es"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_github_es"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_github"
-
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	fdiag "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -58,6 +34,13 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_azure_ad"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_github"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_github_es"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab_self_hosted"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_google"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/init_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/instance_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/label_policy"
@@ -68,8 +51,14 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/machine_user"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/notification_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_azure_ad"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_github"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_github_es"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_gitlab"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_gitlab_self_hosted"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_google"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_jwt"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/password_complexity_policy"

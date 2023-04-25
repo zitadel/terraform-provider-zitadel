@@ -4,18 +4,16 @@ import (
 	"context"
 	"time"
 
-	"google.golang.org/protobuf/types/known/durationpb"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_ldap"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 )
 
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -23,45 +21,42 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, org_idp_utils.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	timeout, err := time.ParseDuration(d.Get(idp_utils.TimeoutVar).(string))
+	timeout, err := time.ParseDuration(d.Get(idp_ldap.TimeoutVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	resp, err := client.AddLDAPProvider(ctx, &management.AddLDAPProviderRequest{
-		Name:              d.Get(idp_utils.NameVar).(string),
-		Servers:           idp_utils.InterfaceToStringSlice(d.Get(idp_utils.ServersVar)),
-		StartTls:          d.Get(idp_utils.StartTLSVar).(bool),
-		BaseDn:            d.Get(idp_utils.BaseDNVar).(string),
-		BindDn:            d.Get(idp_utils.BindDNVar).(string),
-		BindPassword:      d.Get(idp_utils.BindPasswordVar).(string),
-		UserBase:          d.Get(idp_utils.UserBaseVar).(string),
-		UserObjectClasses: helper.GetOkSetToStringSlice(d, idp_utils.UserObjectClassesVar),
-		UserFilters:       helper.GetOkSetToStringSlice(d, idp_utils.UserFiltersVar),
+		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
+		ProviderOptions: idp_utils.ProviderOptionsValue(d),
+
+		Servers:           idp_utils.InterfaceToStringSlice(d.Get(idp_ldap.ServersVar)),
+		StartTls:          idp_utils.BoolValue(d, idp_ldap.StartTLSVar),
+		BaseDn:            idp_utils.StringValue(d, idp_ldap.BaseDNVar),
+		BindDn:            idp_utils.StringValue(d, idp_ldap.BindDNVar),
+		BindPassword:      idp_utils.StringValue(d, idp_ldap.BindPasswordVar),
+		UserBase:          idp_utils.StringValue(d, idp_ldap.UserBaseVar),
+		UserObjectClasses: helper.GetOkSetToStringSlice(d, idp_ldap.UserObjectClassesVar),
+		UserFilters:       helper.GetOkSetToStringSlice(d, idp_ldap.UserFiltersVar),
 		Timeout:           durationpb.New(timeout),
+
 		Attributes: &idp.LDAPAttributes{
-			IdAttribute:                d.Get(idp_utils.IdAttributeVar).(string),
-			FirstNameAttribute:         d.Get(idp_utils.FirstNameAttributeVar).(string),
-			LastNameAttribute:          d.Get(idp_utils.LastNameAttributeVar).(string),
-			DisplayNameAttribute:       d.Get(idp_utils.DisplayNameAttributeVar).(string),
-			NickNameAttribute:          d.Get(idp_utils.NickNameAttributeVar).(string),
-			PreferredUsernameAttribute: d.Get(idp_utils.PreferredUsernameAttributeVar).(string),
-			EmailAttribute:             d.Get(idp_utils.EmailAttributeVar).(string),
-			EmailVerifiedAttribute:     d.Get(idp_utils.EmailVerifiedAttributeVar).(string),
-			PhoneAttribute:             d.Get(idp_utils.PhoneAttributeVar).(string),
-			PhoneVerifiedAttribute:     d.Get(idp_utils.PhoneVerifiedAttributeVar).(string),
-			PreferredLanguageAttribute: d.Get(idp_utils.PreferredLanguageAttributeVar).(string),
-			AvatarUrlAttribute:         d.Get(idp_utils.AvatarURLAttributeVar).(string),
-			ProfileAttribute:           d.Get(idp_utils.ProfileAttributeVar).(string),
-		},
-		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-			IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-			IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-			IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
+			IdAttribute:                idp_utils.StringValue(d, idp_ldap.IdAttributeVar),
+			FirstNameAttribute:         idp_utils.StringValue(d, idp_ldap.FirstNameAttributeVar),
+			LastNameAttribute:          idp_utils.StringValue(d, idp_ldap.LastNameAttributeVar),
+			DisplayNameAttribute:       idp_utils.StringValue(d, idp_ldap.DisplayNameAttributeVar),
+			NickNameAttribute:          idp_utils.StringValue(d, idp_ldap.NickNameAttributeVar),
+			PreferredUsernameAttribute: idp_utils.StringValue(d, idp_ldap.PreferredUsernameAttributeVar),
+			EmailAttribute:             idp_utils.StringValue(d, idp_ldap.EmailAttributeVar),
+			EmailVerifiedAttribute:     idp_utils.StringValue(d, idp_ldap.EmailVerifiedAttributeVar),
+			PhoneAttribute:             idp_utils.StringValue(d, idp_ldap.PhoneAttributeVar),
+			PhoneVerifiedAttribute:     idp_utils.StringValue(d, idp_ldap.PhoneVerifiedAttributeVar),
+			PreferredLanguageAttribute: idp_utils.StringValue(d, idp_ldap.PreferredLanguageAttributeVar),
+			AvatarUrlAttribute:         idp_utils.StringValue(d, idp_ldap.AvatarURLAttributeVar),
+			ProfileAttribute:           idp_utils.StringValue(d, idp_ldap.ProfileAttributeVar),
 		},
 	})
 	if err != nil {
@@ -76,52 +71,47 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, org_idp_utils.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	timeout, err := time.ParseDuration(d.Get(idp_utils.TimeoutVar).(string))
+	timeout, err := time.ParseDuration(d.Get(idp_ldap.TimeoutVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if d.HasChangesExcept(idp_utils.IdpIDVar, org_idp_utils.OrgIDVar) {
-		_, err = client.UpdateLDAPProvider(ctx, &management.UpdateLDAPProviderRequest{
-			Id:                d.Id(),
-			Name:              d.Get(idp_utils.NameVar).(string),
-			Servers:           idp_utils.InterfaceToStringSlice(d.Get(idp_utils.ServersVar)),
-			StartTls:          d.Get(idp_utils.StartTLSVar).(bool),
-			BaseDn:            d.Get(idp_utils.BaseDNVar).(string),
-			BindDn:            d.Get(idp_utils.BindDNVar).(string),
-			BindPassword:      d.Get(idp_utils.BindPasswordVar).(string),
-			UserBase:          d.Get(idp_utils.UserBaseVar).(string),
-			UserObjectClasses: helper.GetOkSetToStringSlice(d, idp_utils.UserObjectClassesVar),
-			UserFilters:       helper.GetOkSetToStringSlice(d, idp_utils.UserFiltersVar),
-			Timeout:           durationpb.New(timeout),
-			Attributes: &idp.LDAPAttributes{
-				IdAttribute:                d.Get(idp_utils.IdAttributeVar).(string),
-				FirstNameAttribute:         d.Get(idp_utils.FirstNameAttributeVar).(string),
-				LastNameAttribute:          d.Get(idp_utils.LastNameAttributeVar).(string),
-				DisplayNameAttribute:       d.Get(idp_utils.DisplayNameAttributeVar).(string),
-				NickNameAttribute:          d.Get(idp_utils.NickNameAttributeVar).(string),
-				PreferredUsernameAttribute: d.Get(idp_utils.PreferredUsernameAttributeVar).(string),
-				EmailAttribute:             d.Get(idp_utils.EmailAttributeVar).(string),
-				EmailVerifiedAttribute:     d.Get(idp_utils.EmailVerifiedAttributeVar).(string),
-				PhoneAttribute:             d.Get(idp_utils.PhoneAttributeVar).(string),
-				PhoneVerifiedAttribute:     d.Get(idp_utils.PhoneVerifiedAttributeVar).(string),
-				PreferredLanguageAttribute: d.Get(idp_utils.PreferredLanguageAttributeVar).(string),
-				AvatarUrlAttribute:         d.Get(idp_utils.AvatarURLAttributeVar).(string),
-				ProfileAttribute:           d.Get(idp_utils.ProfileAttributeVar).(string),
-			},
-			ProviderOptions: &idp.Options{
-				IsLinkingAllowed:  d.Get(idp_utils.IsLinkingAllowedVar).(bool),
-				IsCreationAllowed: d.Get(idp_utils.IsCreationAllowedVar).(bool),
-				IsAutoCreation:    d.Get(idp_utils.IsAutoCreationVar).(bool),
-				IsAutoUpdate:      d.Get(idp_utils.IsAutoUpdateVar).(bool),
-			},
-		})
-		if err != nil {
-			return diag.Errorf("failed to update idp: %v", err)
-		}
+	_, err = client.UpdateLDAPProvider(ctx, &management.UpdateLDAPProviderRequest{
+		Id:              d.Id(),
+		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
+		ProviderOptions: idp_utils.ProviderOptionsValue(d),
+
+		Servers:           idp_utils.InterfaceToStringSlice(d.Get(idp_ldap.ServersVar)),
+		StartTls:          idp_utils.BoolValue(d, idp_ldap.StartTLSVar),
+		BaseDn:            idp_utils.StringValue(d, idp_ldap.BaseDNVar),
+		BindDn:            idp_utils.StringValue(d, idp_ldap.BindDNVar),
+		BindPassword:      idp_utils.StringValue(d, idp_ldap.BindPasswordVar),
+		UserBase:          idp_utils.StringValue(d, idp_ldap.UserBaseVar),
+		UserObjectClasses: helper.GetOkSetToStringSlice(d, idp_ldap.UserObjectClassesVar),
+		UserFilters:       helper.GetOkSetToStringSlice(d, idp_ldap.UserFiltersVar),
+		Timeout:           durationpb.New(timeout),
+
+		Attributes: &idp.LDAPAttributes{
+			IdAttribute:                idp_utils.StringValue(d, idp_ldap.IdAttributeVar),
+			FirstNameAttribute:         idp_utils.StringValue(d, idp_ldap.FirstNameAttributeVar),
+			LastNameAttribute:          idp_utils.StringValue(d, idp_ldap.LastNameAttributeVar),
+			DisplayNameAttribute:       idp_utils.StringValue(d, idp_ldap.DisplayNameAttributeVar),
+			NickNameAttribute:          idp_utils.StringValue(d, idp_ldap.NickNameAttributeVar),
+			PreferredUsernameAttribute: idp_utils.StringValue(d, idp_ldap.PreferredUsernameAttributeVar),
+			EmailAttribute:             idp_utils.StringValue(d, idp_ldap.EmailAttributeVar),
+			EmailVerifiedAttribute:     idp_utils.StringValue(d, idp_ldap.EmailVerifiedAttributeVar),
+			PhoneAttribute:             idp_utils.StringValue(d, idp_ldap.PhoneAttributeVar),
+			PhoneVerifiedAttribute:     idp_utils.StringValue(d, idp_ldap.PhoneVerifiedAttributeVar),
+			PreferredLanguageAttribute: idp_utils.StringValue(d, idp_ldap.PreferredLanguageAttributeVar),
+			AvatarUrlAttribute:         idp_utils.StringValue(d, idp_ldap.AvatarURLAttributeVar),
+			ProfileAttribute:           idp_utils.StringValue(d, idp_ldap.ProfileAttributeVar),
+		},
+	})
+	if err != nil {
+		return diag.Errorf("failed to update idp: %v", err)
 	}
 	return nil
 }
@@ -131,7 +121,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(org_idp_utils.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, org_idp_utils.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -149,34 +139,36 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	attributesCfg := specificCfg.GetAttributes()
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
-		org_idp_utils.OrgIDVar:                  idp.GetDetails().GetResourceOwner(),
-		idp_utils.NameVar:                       idp.GetName(),
-		idp_utils.IsLinkingAllowedVar:           generalCfg.GetIsLinkingAllowed(),
-		idp_utils.IsCreationAllowedVar:          generalCfg.GetIsCreationAllowed(),
-		idp_utils.IsAutoCreationVar:             generalCfg.GetIsAutoCreation(),
-		idp_utils.IsAutoUpdateVar:               generalCfg.GetIsAutoUpdate(),
-		idp_utils.ServersVar:                    specificCfg.GetServers(),
-		idp_utils.StartTLSVar:                   specificCfg.GetStartTls(),
-		idp_utils.BaseDNVar:                     specificCfg.GetBaseDn(),
-		idp_utils.BindDNVar:                     specificCfg.GetBindDn(),
-		idp_utils.BindPasswordVar:               d.Get(idp_utils.BindPasswordVar).(string),
-		idp_utils.UserBaseVar:                   specificCfg.GetUserBase(),
-		idp_utils.UserObjectClassesVar:          specificCfg.GetUserObjectClasses(),
-		idp_utils.UserFiltersVar:                specificCfg.GetUserFilters(),
-		idp_utils.TimeoutVar:                    specificCfg.GetTimeout().AsDuration().String(),
-		idp_utils.IdAttributeVar:                attributesCfg.GetIdAttribute(),
-		idp_utils.FirstNameAttributeVar:         attributesCfg.GetFirstNameAttribute(),
-		idp_utils.LastNameAttributeVar:          attributesCfg.GetLastNameAttribute(),
-		idp_utils.DisplayNameAttributeVar:       attributesCfg.GetDisplayNameAttribute(),
-		idp_utils.NickNameAttributeVar:          attributesCfg.GetNickNameAttribute(),
-		idp_utils.PreferredUsernameAttributeVar: attributesCfg.GetPreferredUsernameAttribute(),
-		idp_utils.EmailAttributeVar:             attributesCfg.GetEmailAttribute(),
-		idp_utils.EmailVerifiedAttributeVar:     attributesCfg.GetEmailVerifiedAttribute(),
-		idp_utils.PhoneAttributeVar:             attributesCfg.GetPhoneAttribute(),
-		idp_utils.PhoneVerifiedAttributeVar:     attributesCfg.GetPhoneVerifiedAttribute(),
-		idp_utils.PreferredLanguageAttributeVar: attributesCfg.GetPreferredLanguageAttribute(),
-		idp_utils.AvatarURLAttributeVar:         attributesCfg.GetAvatarUrlAttribute(),
-		idp_utils.ProfileAttributeVar:           attributesCfg.GetProfileAttribute(),
+		org_idp_utils.OrgIDVar:         idp.GetDetails().GetResourceOwner(),
+		idp_utils.NameVar:              idp.GetName(),
+		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
+		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
+		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
+		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
+
+		idp_ldap.ServersVar:           specificCfg.GetServers(),
+		idp_ldap.StartTLSVar:          specificCfg.GetStartTls(),
+		idp_ldap.BaseDNVar:            specificCfg.GetBaseDn(),
+		idp_ldap.BindDNVar:            specificCfg.GetBindDn(),
+		idp_ldap.BindPasswordVar:      idp_utils.StringValue(d, idp_ldap.BindPasswordVar),
+		idp_ldap.UserBaseVar:          specificCfg.GetUserBase(),
+		idp_ldap.UserObjectClassesVar: specificCfg.GetUserObjectClasses(),
+		idp_ldap.UserFiltersVar:       specificCfg.GetUserFilters(),
+		idp_ldap.TimeoutVar:           specificCfg.GetTimeout().AsDuration().String(),
+		idp_ldap.IdAttributeVar:       attributesCfg.GetIdAttribute(),
+
+		idp_ldap.FirstNameAttributeVar:         attributesCfg.GetFirstNameAttribute(),
+		idp_ldap.LastNameAttributeVar:          attributesCfg.GetLastNameAttribute(),
+		idp_ldap.DisplayNameAttributeVar:       attributesCfg.GetDisplayNameAttribute(),
+		idp_ldap.NickNameAttributeVar:          attributesCfg.GetNickNameAttribute(),
+		idp_ldap.PreferredUsernameAttributeVar: attributesCfg.GetPreferredUsernameAttribute(),
+		idp_ldap.EmailAttributeVar:             attributesCfg.GetEmailAttribute(),
+		idp_ldap.EmailVerifiedAttributeVar:     attributesCfg.GetEmailVerifiedAttribute(),
+		idp_ldap.PhoneAttributeVar:             attributesCfg.GetPhoneAttribute(),
+		idp_ldap.PhoneVerifiedAttributeVar:     attributesCfg.GetPhoneVerifiedAttribute(),
+		idp_ldap.PreferredLanguageAttributeVar: attributesCfg.GetPreferredLanguageAttribute(),
+		idp_ldap.AvatarURLAttributeVar:         attributesCfg.GetAvatarUrlAttribute(),
+		idp_ldap.ProfileAttributeVar:           attributesCfg.GetProfileAttribute(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
