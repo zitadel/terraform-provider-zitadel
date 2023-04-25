@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	Domain   = "localhost"
+	domain   = "localhost"
 	insecure = true
 	port     = "8080"
 )
@@ -32,7 +32,7 @@ func NewBaseTestFrame(resourceType string) (*BaseTestFrame, error) {
 	tokenPath := os.Getenv("TF_ACC_ZITADEL_TOKEN")
 	zitadelProvider := zitadel.Provider()
 	diag := zitadelProvider.Configure(ctx, terraform.NewResourceConfigRaw(map[string]interface{}{
-		"domain":   Domain,
+		"domain":   domain,
 		"insecure": insecure,
 		"port":     port,
 		"token":    tokenPath,
@@ -44,7 +44,7 @@ provider "zitadel" {
   port     = "%s"
   token    = "%s"
 }
-`, Domain, insecure, port, tokenPath)
+`, domain, insecure, port, tokenPath)
 	if diag.HasError() {
 		return nil, fmt.Errorf("unknown error configuring the test provider: %v", diag)
 	}

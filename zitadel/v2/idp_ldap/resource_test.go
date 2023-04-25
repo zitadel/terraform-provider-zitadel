@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_ldap"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils/idp_test_utils"
 )
 
 func TestAccZITADELInstanceIdPLDAP(t *testing.T) {
@@ -15,7 +15,7 @@ func TestAccZITADELInstanceIdPLDAP(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils.RunBasicLifecyleTest(t, frame, func(name, secret string) string {
+	idp_test_utils.RunInstanceIDPLifecyleTest(t, *frame, func(name, secret string) string {
 		return fmt.Sprintf(`
 resource "%s" "%s" {
   name                  = "%s"

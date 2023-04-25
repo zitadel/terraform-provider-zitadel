@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
-
-	test_utils_org "github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils/org_idp_test_utils"
 )
 
 func TestAccZITADELOrgIdPGoogle(t *testing.T) {
 	resourceName := "zitadel_org_idp_google"
-	frame, err := test_utils_org.NewOrgTestFrame(resourceName)
+	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils_org.RunBasicLifecyleTest(t, frame, func(name, secret string) string {
+	org_idp_test_utils.RunOrgLifecyleTest(t, *frame, func(name, secret string) string {
 		return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id              = "%s"
