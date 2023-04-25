@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_login_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_notification_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_reset_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_passwordless_registration_message_text"
@@ -47,6 +48,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_jwt"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_member"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/password_reset_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/passwordless_registration_message_text"
@@ -159,6 +161,7 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 		init_message_text.New,
 		login_texts.New,
 		password_reset_message_text.New,
+		password_change_message_text.New,
 		verify_email_message_text.New,
 		verify_phone_message_text.New,
 		domain_claimed_message_text.New,
@@ -166,6 +169,7 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 		default_domain_claimed_message_text.New,
 		default_init_message_text.New,
 		default_password_reset_message_text.New,
+		default_password_change_message_text.New,
 		default_passwordless_registration_message_text.New,
 		default_verify_email_message_text.New,
 		default_verify_phone_message_text.New,
