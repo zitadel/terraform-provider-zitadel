@@ -14,7 +14,25 @@ import (
 )
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "org delete not yet implemented")
+	tflog.Info(ctx, "started delete")
+
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := helper.GetAdminClient(clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	_, err = client.RemoveOrg(ctx, &admin.RemoveOrgRequest{
+		OrgId: d.Id(),
+	})
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.SetId("")
 	return nil
 }
 
