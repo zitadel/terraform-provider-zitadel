@@ -16,11 +16,9 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-
     - name: Set up ZITADEL
-      run: docker compose --file ./acceptance/docker-compose.yaml run wait_for_zitadel
+      working-directory: acceptance
+      run: docker compose run wait_for_zitadel
 
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -29,3 +27,16 @@ jobs:
 
     - name: Run Acceptance Tests
       run: TF_ACC=1 TF_ACC_ZITADEL_TOKEN=$(pwd)/acceptance/machinekey/zitadel-admin-sa.json go test ./...
+
+    - name: Save ZITADEL Logs
+      if: always()
+      run: docker compose logs zitadel > .zitadel.log
+
+    - name: Archive ZITADEL Logs
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: pull-request-tests
+        path: |
+          .zitadel.log
+        retention-days: 30
