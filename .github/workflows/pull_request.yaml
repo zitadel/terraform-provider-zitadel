@@ -1,0 +1,22 @@
+name: Test Provider
+
+on: pull_request
+
+jobs:
+  test:
+
+    runs-on: ubuntu-20.04
+
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up ZITADEL
+      run: docker compose --file ./acceptance/docker-compose.yaml run wait_for_zitadel
+
+    - name: Run Acceptance Tests
+      run: TF_ACC=1 TF_ACC_ZITADEL_TOKEN=$(pwd)/acceptance/machinekey/zitadel-admin-sa.json go test ./...

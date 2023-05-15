@@ -1,0 +1,13 @@
+FirstInstance:
+  MachineKeyPath: /machinekey/zitadel-admin-sa.json
+  Org:
+    Machine:
+      Machine:
+        Username: zitadel-admin-sa
+        Name: Admin
+      MachineKey:
+        Type: 1
+
+Database:
+  Cockroach:
+    Host: db

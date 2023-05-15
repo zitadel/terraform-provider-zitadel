@@ -3,6 +3,8 @@ package org_idp_test_utils
 import (
 	"fmt"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils/idp_test_utils"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -31,10 +33,12 @@ func CheckProviderName(frame test_utils.OrgTestFrame) func(string) resource.Test
 
 func CheckDestroy(frame test_utils.OrgTestFrame) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		err := CheckProviderName(frame)("")(state)
-		if status.Code(err) != codes.NotFound {
-			return fmt.Errorf("expected not found error but got: %w", err)
-		}
-		return nil
+		return idp_test_utils.RetryAMinute(func() error {
+			err := CheckProviderName(frame)("")(state)
+			if status.Code(err) != codes.NotFound {
+				return fmt.Errorf("expected not found error but got: %w", err)
+			}
+			return nil
+		})
 	}
 }
