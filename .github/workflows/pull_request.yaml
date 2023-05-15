@@ -29,6 +29,7 @@ jobs:
       run: TF_ACC=1 TF_ACC_ZITADEL_TOKEN=$(pwd)/acceptance/machinekey/zitadel-admin-sa.json go test ./...
 
     - name: Save ZITADEL Logs
+      working-directory: acceptance
       if: always()
       run: docker compose logs zitadel > .zitadel.log
 
