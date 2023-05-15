@@ -9,7 +9,10 @@ Learn more about ZITADEL by checking out the [source repository on GitHub](https
 
 ## About this Terraform Provider
 
-This is the official ZITADEL terraform provider, which handles the migration part between different ZITADEL instances and different ZITADEL versions in addition to the creation of different resources with the help of the ZITADEL API.
+This is the official ZITADEL Terraform provider.
+It lets you declare ZITADEL resources declaratively and apply the resources to any ZITADEL instance.
+Importing existing resources to the Terraform state is supported.
+Therefore, as long as you have all resources declared, it is even easy to migrate state between instances.
 
 The provider is currently in [Beta state](https://zitadel.com/docs/support/general) and the support level is Enterprise Support.
 
@@ -30,7 +33,7 @@ In case you miss something you are welcome to [contribute](#contributing).
 ## Contributing
 
 If you found a bug or want to request a new feature, please open an [issue](https://github.com/zitadel/terraform-provider-zitadel/issues).
-Contributions to the provider are very welcome, please follow the general guidance in ZITADEL's [Contribution Guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md).
+Contributions to the provider are very welcome, please follow the general guidance in the [Contribution Guide](https://github.com/zitadel/terraform-provider-zitadel/blob/main/CONTRIBUTING.md).
 
 ## Contributors
 
