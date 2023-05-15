@@ -1,3 +1,7 @@
+# Git Base Branch
+
+Please use the alpha branch as base, until we merge alpha to main.
+
 # Debug
 
 1. Run the local plugin code with your debugging IDE of choice with something similar to `go run ./... -debug`.
