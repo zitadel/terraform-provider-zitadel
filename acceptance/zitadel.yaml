@@ -11,3 +11,8 @@ FirstInstance:
 Database:
   Cockroach:
     Host: db
+
+Logstore:
+  Access:
+    Stdout:
+      Enabled: true
