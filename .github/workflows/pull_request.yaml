@@ -16,9 +16,9 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Debug
+    - name: Make Machinekey Directory Writable
       working-directory: acceptance
-      run: "chmod 777 machinekey"
+      run: "chmod -R 777 machinekey"
 
     - name: Debug MK
       working-directory: acceptance

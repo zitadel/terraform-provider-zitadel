@@ -13,7 +13,6 @@ services:
     depends_on:
       db:
         condition: 'service_healthy'
-    restart: 'never'
     networks:
       - zitadel_net
 
@@ -29,7 +28,6 @@ services:
     ports:
       - "26257:26257"
       - "9090:9090"
-    restart: 'never'
     networks:
       - zitadel_net
 
