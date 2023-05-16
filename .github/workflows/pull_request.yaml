@@ -39,5 +39,5 @@ jobs:
       with:
         name: pull-request-tests
         path: |
-          .zitadel.log
+          acceptance/.zitadel.log
         retention-days: 30
