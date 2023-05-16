@@ -12,7 +12,8 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -20,18 +21,21 @@ jobs:
       working-directory: acceptance
       run: "chmod -R 777 machinekey"
 
-    - name: Debug MK
-      working-directory: acceptance
-      run: "ls -la machinekey"
-
     - name: Set up ZITADEL
       working-directory: acceptance
-      run: docker compose run wait_for_zitadel
+      run: docker compose up -d zitadel
 
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
         go-version: 1.19
+
+    - name: Download Go Modules
+      run: go mod download
+
+    - name: Await ZITADEL
+      working-directory: acceptance
+      run: docker compose run wait_for_zitadel
 
     - name: Run Acceptance Tests
       run: TF_ACC=1 TF_ACC_ZITADEL_TOKEN=$(pwd)/acceptance/machinekey/zitadel-admin-sa.json go test ./...
