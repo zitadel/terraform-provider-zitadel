@@ -16,6 +16,14 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Debug
+      working-directory: acceptance
+      run: "ls -la"
+
+    - name: Debug MK
+      working-directory: acceptance
+      run: "ls -la machinekey"
+
     - name: Set up ZITADEL
       working-directory: acceptance
       run: docker compose run wait_for_zitadel
