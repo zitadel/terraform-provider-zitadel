@@ -3,7 +3,6 @@ version: '3.8'
 services:
   zitadel:
     user: '$UID'
-    restart: 'on-failure'
     image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
@@ -14,6 +13,7 @@ services:
     depends_on:
       db:
         condition: 'service_healthy'
+    restart: 'never'
     networks:
       - zitadel_net
 
@@ -29,7 +29,7 @@ services:
     ports:
       - "26257:26257"
       - "9090:9090"
-    restart: 'on-failure'
+    restart: 'never'
     networks:
       - zitadel_net
 
