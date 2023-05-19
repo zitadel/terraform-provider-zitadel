@@ -1,7 +1,7 @@
 name: 🛠️ Improvement
 description: 
 title: ""
-labels: ["type: improvement"]
+labels: ["improvement"]
 body:
   - type: markdown
     attributes:
