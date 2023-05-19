@@ -22,7 +22,7 @@ body:
     attributes:
       label: Describe your problem
       description: Is your proposal / feature request related to a problem. Please describe it.
-      placeholder: As a [type of user], I want [some goal] so that [some reason].
+      placeholder: Describe the problem you have
     validations:
       required: true
   - type: textarea
@@ -30,7 +30,7 @@ body:
     attributes:
       label: Describe your ideal solution
       description: Which solution do you propose?
-      placeholder: Describe the ideal solution you like to get.
+      placeholder: As a [type of user], I want [some goal] so that [some reason].
     validations:
       required: true
   - type: input
