@@ -22,7 +22,7 @@ body:
     attributes:
       label: Describe the docs your are missing or that are wrong
       description: Is your proposal / feature request related to a problem. Please describe it.
-      placeholder: Describe your problem
+      placeholder: As a [type of user], I want [some goal] so that [some reason].
     validations:
       required: true
   - type: textarea
