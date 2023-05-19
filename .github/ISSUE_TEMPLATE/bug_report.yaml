@@ -43,6 +43,7 @@ body:
   attributes:
     label: Expected behavior
     description: A clear and concise description of what you expected to happen.
+    placeholder: As a [type of user], I want [some goal] so that [some reason].
 - type: input
   id: version
   attributes:
