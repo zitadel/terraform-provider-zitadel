@@ -1,7 +1,7 @@
 name: 📄 Documentation
 description: Create an issue for missing or wrong documentation.
 title: ""
-labels: ["category: docs"]
+labels: ["docs"]
 body:
   - type: markdown
     attributes:
