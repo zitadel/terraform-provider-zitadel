@@ -17,6 +17,12 @@ body:
       required: true
     - label:
         I have joined the [ZITADEL chat](https://zitadel.com/chat)
+- type: input
+  id: version
+  attributes:
+    label: Version
+    required: true
+    description: Which version of ZITADEL are you using.
 - type: textarea
   id: description
   attributes:
