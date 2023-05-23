@@ -17,18 +17,24 @@ func CheckStateHasIDSet(frame BaseTestFrame) resource.TestCheckFunc {
 	}
 }
 
-func RetryAMinute(check resource.TestCheckFunc) resource.TestCheckFunc {
+func CheckAMinute(check resource.TestCheckFunc) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		start := time.Now()
-		for {
-			err := check(state)
-			if err == nil {
-				return nil
-			}
-			if time.Since(start) > time.Minute {
-				return fmt.Errorf("function failed after retrying for a minute: %w", err)
-			}
-			time.Sleep(time.Second)
+		return retryAMinute(func() error {
+			return check(state)
+		})
+	}
+}
+
+func retryAMinute(try func() error) error {
+	start := time.Now()
+	for {
+		err := try()
+		if err == nil {
+			return nil
 		}
+		if time.Since(start) > time.Minute {
+			return fmt.Errorf("function failed after retrying for a minute: %w", err)
+		}
+		time.Sleep(time.Second)
 	}
 }
