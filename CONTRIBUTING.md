@@ -20,6 +20,10 @@
 Run a local ZITADEL instance using docker compose.
 
 ```bash
+# To have the machine key written with the correct ownership, set your current users ID.
+export TF_ZITADEL_UID="$(id -u)"
+
+# Setup ZITADEL
 docker compose --file ./acceptance/docker-compose.yaml run wait_for_zitadel
 ```
 
