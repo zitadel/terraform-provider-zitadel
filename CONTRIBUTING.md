@@ -21,7 +21,7 @@ Run a local ZITADEL instance using docker compose.
 
 ```bash
 # To have the machine key written with the correct ownership, set your current users ID.
-export TF_ZITADEL_UID="$(id -u)"
+export ZITADEL_DEV_UID="$(id -u)"
 
 # Pull Images
 docker compose --file ./acceptance/docker-compose.yaml pull
