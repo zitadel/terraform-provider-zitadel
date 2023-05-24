@@ -21,7 +21,7 @@ body:
     id: problem
     attributes:
       label: Describe your problem
-      description: Is your proposal / feature request related to a problem. Please describe it.
+      description: Please describe your problem this improvement is supposed to solve.
       placeholder: Describe the problem you have
     validations:
       required: true
