@@ -29,15 +29,24 @@ func NewOrgTestFrame(resourceType string) (*OrgTestFrame, error) {
 	if err != nil {
 		return nil, err
 	}
-	org, err := mgmtClient.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: fmt.Sprintf("%s.%s", orgName, domain)})
-	orgID := org.GetOrg().GetId()
-	if status.Code(err) == codes.NotFound {
-		var newOrg *management.AddOrgResponse
-		newOrg, err = mgmtClient.AddOrg(baseFrame, &management.AddOrgRequest{Name: orgName})
-		orgID = newOrg.GetId()
-	}
-	if err != nil {
+	org, err := mgmtClient.AddOrg(baseFrame, &management.AddOrgRequest{Name: orgName})
+	alreadyExists := status.Code(err) == codes.AlreadyExists
+	if err != nil && !alreadyExists {
 		return nil, err
+	}
+	orgID := org.GetId()
+	if alreadyExists {
+		err := retryAMinute(func() error {
+			getOrgResp, getOrgErr := mgmtClient.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: fmt.Sprintf("%s.%s", orgName, domain)})
+			if getOrgErr != nil {
+				return getOrgErr
+			}
+			orgID = getOrgResp.GetOrg().GetId()
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
 	mgmtClient, err = helper.GetManagementClient(baseFrame.ClientInfo, orgID)
 	return &OrgTestFrame{

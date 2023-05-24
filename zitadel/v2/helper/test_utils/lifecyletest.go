@@ -33,7 +33,7 @@ func RunLifecyleTest(
 		}, { // Check resource is created
 			Config: initialConfig,
 			Check: resource.ComposeAggregateTestCheckFunc(
-				checkRemoteProperty(initialProperty),
+				CheckAMinute(checkRemoteProperty(initialProperty)),
 				CheckStateHasIDSet(frame),
 			),
 		}, { // Check updating name has a diff
@@ -43,7 +43,7 @@ func RunLifecyleTest(
 			PlanOnly: true,
 		}, { // Check remote state can be updated
 			Config: updatedNameConfig,
-			Check:  checkRemoteProperty(updatedProperty),
+			Check:  CheckAMinute(checkRemoteProperty(updatedProperty)),
 		},
 	}
 	if secretAttribute != "" {
@@ -77,7 +77,7 @@ func RunLifecyleTest(
 	}
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: ZitadelProviderFactories(frame.ConfiguredProvider),
-		CheckDestroy:      checkDestroy,
+		CheckDestroy:      CheckAMinute(checkDestroy),
 		Steps:             steps,
 	})
 }
