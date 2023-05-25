@@ -22,12 +22,17 @@ body:
   attributes:
     label: Version
     required: true
+    description: Which version of the Terrafor Provider are you using.
+- type: input
+  id: zitadelversion
+  attributes:
+    label: ZITADEL Version
     description: Which version of ZITADEL are you using.
 - type: textarea
-  id: description
+  id: impact
   attributes:
-    label: Describe the bug
-    description: A clear and concise description of what the bug is.
+    label: Describe the problems caused by this bug
+    description: A clear and concise description of what the problems you face and the bug you have.
   validations:
     required: true
 - type: textarea
@@ -50,11 +55,6 @@ body:
     label: Expected behavior
     description: A clear and concise description of what you expected to happen.
     placeholder: As a [type of user], I want [some goal] so that [some reason].
-- type: input
-  id: version
-  attributes:
-    label: Version
-    description: Which version of the Terrafor Provider are you using.
 - type: textarea
   id: config
   attributes:
