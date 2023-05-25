@@ -18,9 +18,9 @@ The provider is currently in [Beta state](https://zitadel.com/docs/support/gener
 
 For general availability the following issues need to be resolved
 
-- [ ] https://github.com/zitadel/terraform-provider-zitadel/issues/85
-- [ ] https://github.com/zitadel/terraform-provider-zitadel/issues/92
-- [ ] https://github.com/zitadel/terraform-provider-zitadel/issues/91
+- [ ] [Release 1.0.0](https://github.com/zitadel/terraform-provider-zitadel/issues/85)
+- [x] [Run Tests on PR](https://github.com/zitadel/terraform-provider-zitadel/issues/92)
+- [ ] [Lifecycle Tests on all Ressources](https://github.com/zitadel/terraform-provider-zitadel/issues/91)
 
 ## Usage
 
