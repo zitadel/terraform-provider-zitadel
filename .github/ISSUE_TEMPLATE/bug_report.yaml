@@ -15,11 +15,4 @@ body:
         I could not find a solution in the documentation, the existing issues or discussions
       required: true
     - label:
-        I have joined the [ZITADEL chat](https://zitadel.com/chat)
-- type: input
-  id: version
-  attributes:
-    label: Version
-    required: true
-    description: Which version of the Terrafor Provider are you using.
-    
+        I have joined the [ZITADEL chat](https://zitadel.com/chat)  
