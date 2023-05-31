@@ -16,3 +16,21 @@ body:
       required: true
     - label:
         I have joined the [ZITADEL chat](https://zitadel.com/chat)
+- type: input
+  id: version
+  attributes:
+    label: Version
+    required: true
+    description: Which version of the Terrafor Provider are you using.
+- type: input
+  id: zitadelversion
+  attributes:
+    label: ZITADEL Version
+    description: Which version of ZITADEL are you using.
+- type: textarea
+  id: impact
+  attributes:
+    label: Describe the problems caused by this bug
+    description: A clear and concise description of what the problems you face and the bug you have.
+  validations:
+    required: true
