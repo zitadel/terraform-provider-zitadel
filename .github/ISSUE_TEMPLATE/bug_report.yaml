@@ -28,15 +28,6 @@ body:
     label: ZITADEL Version
     description: Which version of ZITADEL are you using.
 - type: textarea
-  id: reproduce
-  attributes:
-    label: To reproduce
-    description: Steps to reproduce the behaviour
-    placeholder: |
-      Steps to reproduce the behavior:
-  validations:
-    required: true
-- type: textarea
   id: screenshots
   attributes:
     label: Screenshots
