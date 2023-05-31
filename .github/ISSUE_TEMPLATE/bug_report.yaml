@@ -22,11 +22,15 @@ body:
     label: Version
     required: true
     description: Which version of the Terrafor Provider are you using.
-- type: input
-  id: zitadelversion
+- type: textarea
+  id: reproduce
   attributes:
-    label: ZITADEL Version
-    description: Which version of ZITADEL are you using.
+    label: To reproduce
+    description: Steps to reproduce the behaviour
+    placeholder: |
+      Steps to reproduce the behavior:
+  validations:
+    required: true
 - type: textarea
   id: screenshots
   attributes:
