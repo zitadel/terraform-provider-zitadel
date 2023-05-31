@@ -1,6 +1,5 @@
 name: 🐛 Bug Report
 description: "Create a bug report to help us improve ZITADEL Terrafform Provider."
-title: ""
 labels: ["bug"]
 body:
 - type: markdown
