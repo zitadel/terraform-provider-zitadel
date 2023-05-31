@@ -1,6 +1,5 @@
 name: 🛠️ Improvement
-description: 
-title: ""
+description: "Create an issue for an improvemnt you like to see in the terraform provider"
 labels: ["improvement"]
 body:
   - type: markdown
