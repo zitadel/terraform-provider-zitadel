@@ -21,6 +21,8 @@ body:
   attributes:
     label: Version
     description: Which version of the Terraform Provider are you using.
+  validations:
+   required: true
 - type: input
   id: zitadelversion
   attributes:
