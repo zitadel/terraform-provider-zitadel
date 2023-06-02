@@ -32,3 +32,16 @@ services:
     command: [ "/bin/sh", "-c", "i=0; while ! curl http://zitadel:8080/debug/ready && [ $$i -lt 30 ]; do sleep 1; i=$$((i+1)); done; [ $$i -eq 30 ] && exit 1 || exit 0" ]
     depends_on:
       - zitadel
+
+  setup:
+    user: '${ZITADEL_DEV_UID}'
+    container_name: setup
+    build: .
+    environment:
+      KEY: /key/zitadel-admin-sa.json
+      SERVICE: http://zitadel:8080
+    volumes:
+      - "./machinekey:/key"
+    depends_on:
+      wait_for_zitadel:
+        condition: 'service_completed_successfully'

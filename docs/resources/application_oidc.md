@@ -39,7 +39,7 @@ resource zitadel_application_oidc application_oidc {
 
 ### Required
 
-- `grant_types` (List of String) Grant types, supported values: OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDC_GRANT_TYPE_IMPLICIT, OIDC_GRANT_TYPE_REFRESH_TOKEN
+- `grant_types` (List of String) Grant types, supported values: OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDC_GRANT_TYPE_IMPLICIT, OIDC_GRANT_TYPE_REFRESH_TOKEN, OIDC_GRANT_TYPE_DEVICE_CODE
 - `name` (String) Name of the application
 - `org_id` (String) orgID of the application
 - `project_id` (String) ID of the project
