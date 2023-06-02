@@ -50,15 +50,15 @@ flow_type = "%s"
 		},
 		initialTriggerType, updatedTriggerType,
 		"", "",
-		CheckTriggerType(*frame, flowType),
-		CheckDestroy(*frame, flowType, []string{initialTriggerType, updatedTriggerType}),
+		checkTriggerType(*frame, flowType),
+		checkDestroy(*frame, flowType, []string{initialTriggerType, updatedTriggerType}),
 		nil, nil, "", "",
 	)
 }
 
 var errTriggerTypeNotFound = errors.New("trigger type not found")
 
-func CheckTriggerType(frame test_utils.OrgTestFrame, flowType string) func(string) resource.TestCheckFunc {
+func checkTriggerType(frame test_utils.OrgTestFrame, flowType string) func(string) resource.TestCheckFunc {
 	return func(expectTriggerType string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			flowTypeValues := helper.EnumValueMap(trigger_actions.FlowTypes())
@@ -84,10 +84,10 @@ func CheckTriggerType(frame test_utils.OrgTestFrame, flowType string) func(strin
 	}
 }
 
-func CheckDestroy(frame test_utils.OrgTestFrame, flowType string, testTypes []string) resource.TestCheckFunc {
+func checkDestroy(frame test_utils.OrgTestFrame, flowType string, testTypes []string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		for _, testTriggerType := range testTypes {
-			if err := CheckTriggerType(frame, flowType)(testTriggerType)(state); !errors.Is(err, errTriggerTypeNotFound) {
+			if err := checkTriggerType(frame, flowType)(testTriggerType)(state); !errors.Is(err, errTriggerTypeNotFound) {
 				return fmt.Errorf("expected error %v, but got %w", errTriggerTypeNotFound, err)
 			}
 		}

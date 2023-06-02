@@ -11,7 +11,7 @@ import (
 func RunLifecyleTest(
 	t *testing.T,
 	frame BaseTestFrame,
-	resourceFunc func(string, string) string,
+	resourceFunc func(initialProperty, initialSecret string) string,
 	initialProperty, updatedProperty,
 	initialSecret, updatedSecret string,
 	checkRemoteProperty func(expect string) resource.TestCheckFunc,
