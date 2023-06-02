@@ -2,6 +2,7 @@ package zitadel
 
 import (
 	"context"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_oidc_settings"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	fdiag "github.com/hashicorp/terraform-plugin-framework/diag"
@@ -305,6 +306,7 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_google":                     org_idp_google.GetResource(),
 			"zitadel_org_idp_azure_ad":                   org_idp_azure_ad.GetResource(),
 			"zitadel_org_idp_ldap":                       org_idp_ldap.GetResource(),
+			"zitadel_default_oidc_settings":              default_oidc_settings.GetResource(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
