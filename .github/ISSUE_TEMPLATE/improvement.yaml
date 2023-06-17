@@ -1,6 +1,5 @@
 name: 🛠️ Improvement
-description: 
-title: ""
+description: "Create a report to help us improve ZITADEL Terraform Provider."
 labels: ["improvement"]
 body:
   - type: markdown

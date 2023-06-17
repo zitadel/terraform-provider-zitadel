@@ -1,6 +1,5 @@
 name: 💡 Proposal / Feature request
-description: 
-title: ""
+description: "Create a proposal or feature request for ZITADEL Terraform Provider."
 labels: ["enhancement"]
 body:
   - type: markdown
