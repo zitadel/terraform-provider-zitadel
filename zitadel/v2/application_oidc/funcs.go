@@ -63,10 +63,14 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChanges(redirectURIsVar,
+	if d.HasChanges(
+		redirectURIsVar,
+		responseTypesVar,
+		grantTypesVar,
 		appTypeVar,
 		authMethodTypeVar,
 		postLogoutRedirectURIsVar,
+		versionVar,
 		devModeVar,
 		accessTokenTypeVar,
 		accessTokenRoleAssertionVar,
