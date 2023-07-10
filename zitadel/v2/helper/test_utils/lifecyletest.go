@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
@@ -76,8 +78,11 @@ func RunLifecyleTest(
 		})
 	}
 	resource.Test(t, resource.TestCase{
-		ProviderFactories: ZitadelProviderFactories(frame.ConfiguredProvider),
-		CheckDestroy:      CheckAMinute(checkDestroy),
-		Steps:             steps,
+		CheckDestroy: CheckAMinute(checkDestroy),
+		Steps:        steps,
+		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
+			"upgraded-v5": frame.upgradedV5ProviderFactory,
+			"zitadel":     frame.v6ProviderFactory,
+		},
 	})
 }
