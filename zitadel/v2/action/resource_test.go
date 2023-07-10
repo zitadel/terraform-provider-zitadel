@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
@@ -38,7 +35,7 @@ resource "%s" "%s" {
 		initialProperty, updatedProperty,
 		"", "",
 		checkRemoteProperty(frame),
-		checkDestroy(frame),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame)),
 		nil, nil, "", "",
 	)
 }
@@ -57,15 +54,5 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.T
 			}
 			return nil
 		}
-	}
-}
-
-func checkDestroy(frame *test_utils.OrgTestFrame) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		err := checkRemoteProperty(frame)("")(state)
-		if status.Code(err) != codes.NotFound {
-			return fmt.Errorf("expected not found error but got: %w", err)
-		}
-		return nil
 	}
 }

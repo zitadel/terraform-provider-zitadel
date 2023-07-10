@@ -5,6 +5,9 @@ import (
 	"regexp"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
@@ -22,6 +25,16 @@ func CheckAMinute(check resource.TestCheckFunc) resource.TestCheckFunc {
 		return retryAMinute(func() error {
 			return check(state)
 		})
+	}
+}
+
+func CheckIsNotFoundFromPropertyCheck(checkRemoteProperty func(string) resource.TestCheckFunc) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		err := checkRemoteProperty("")(state)
+		if status.Code(err) != codes.NotFound {
+			return fmt.Errorf("expected not found error but got: %w", err)
+		}
+		return nil
 	}
 }
 

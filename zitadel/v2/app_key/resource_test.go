@@ -4,13 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
@@ -51,7 +47,7 @@ resource "%s" "%s" {
 		initialProperty, updatedProperty,
 		"", "",
 		checkRemoteProperty(frame, project.GetId(), app.GetAppId()),
-		checkDestroy(frame, project.GetId(), app.GetAppId()),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId(), app.GetAppId())),
 		nil, nil, "", "",
 	)
 }
@@ -70,15 +66,5 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId, appId string
 			}
 			return nil
 		}
-	}
-}
-
-func checkDestroy(frame *test_utils.OrgTestFrame, projectId, appId string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		err := checkRemoteProperty(frame, projectId, appId)("")(state)
-		if status.Code(err) != codes.NotFound {
-			return fmt.Errorf("expected not found error but got: %w", err)
-		}
-		return nil
 	}
 }
