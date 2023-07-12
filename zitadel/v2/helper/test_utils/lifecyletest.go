@@ -11,10 +11,10 @@ import (
 func RunLifecyleTest(
 	t *testing.T,
 	frame BaseTestFrame,
-	resourceFunc func(initialProperty, initialSecret string) string,
+	resourceFunc func(initialProperty, initialSecret interface{}) string,
 	initialProperty, updatedProperty,
-	initialSecret, updatedSecret string,
-	checkRemoteProperty func(expect string) resource.TestCheckFunc,
+	initialSecret, updatedSecret interface{},
+	checkRemoteProperty func(expect interface{}) resource.TestCheckFunc,
 	idPattern *regexp.Regexp,
 	checkDestroy, checkImportState resource.TestCheckFunc,
 	importStateIdFunc resource.ImportStateIdFunc,

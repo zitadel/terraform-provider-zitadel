@@ -19,7 +19,9 @@ func RunInstanceIDPLifecyleTest(
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		resourceFunc,
+		func(initialProperty, initialSecret interface{}) string {
+			return resourceFunc(initialProperty.(string), initialSecret.(string))
+		},
 		"an initial provider name", "an updated provider name",
 		"an_initial_secret", "an_updated_secret",
 		CheckProviderName(frame),

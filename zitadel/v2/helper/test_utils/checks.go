@@ -29,15 +29,17 @@ func CheckAMinute(check resource.TestCheckFunc) resource.TestCheckFunc {
 	}
 }
 
-func CheckIsNotFoundFromPropertyCheck(checkRemoteProperty func(string) resource.TestCheckFunc) resource.TestCheckFunc {
+func CheckIsNotFoundFromPropertyCheck(checkRemoteProperty func(interface{}) resource.TestCheckFunc, validProperty interface{}) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		err := checkRemoteProperty("")(state)
+		err := checkRemoteProperty(validProperty)(state)
 		if status.Code(err) != codes.NotFound {
 			return fmt.Errorf("expected not found error but got: %w", err)
 		}
 		return nil
 	}
 }
+
+func CheckNothing(*terraform.State) error { return nil }
 
 func retryAMinute(try func() error) error {
 	start := time.Now()

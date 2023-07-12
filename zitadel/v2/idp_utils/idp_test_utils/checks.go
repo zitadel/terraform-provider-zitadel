@@ -11,8 +11,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func CheckProviderName(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
-	return func(expectName string) resource.TestCheckFunc {
+func CheckProviderName(frame test_utils.InstanceTestFrame) func(interface{}) resource.TestCheckFunc {
+	return func(expectName interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			rs := state.RootModule().Resources[frame.TerraformName]
 			remoteProvider, err := frame.Client.GetProviderByID(frame, &admin.GetProviderByIDRequest{Id: rs.Primary.ID})

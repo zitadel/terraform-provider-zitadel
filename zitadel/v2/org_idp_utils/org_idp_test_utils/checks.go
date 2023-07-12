@@ -12,8 +12,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func CheckProviderName(frame test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
-	return func(expectName string) resource.TestCheckFunc {
+func CheckProviderName(frame test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
+	return func(expectName interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			rs := state.RootModule().Resources[frame.TerraformName]
 			remoteProvider, err := frame.GetProviderByID(frame, &management.GetProviderByIDRequest{Id: rs.Primary.ID})
@@ -22,7 +22,7 @@ func CheckProviderName(frame test_utils.OrgTestFrame) func(string) resource.Test
 			}
 			actual := remoteProvider.GetIdp().GetName()
 			if actual != expectName {
-				return fmt.Errorf("expected name %s, actual name: %s", expectName, actual)
+				return fmt.Errorf("expected name %s, but got name %s", expectName, actual)
 			}
 			return nil
 		}

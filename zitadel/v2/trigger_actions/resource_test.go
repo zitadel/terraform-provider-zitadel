@@ -39,7 +39,7 @@ func TestAccTriggerActions(t *testing.T) {
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(name, _ string) string {
+		func(name, _ interface{}) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
 	org_id              = "%s"
@@ -50,7 +50,7 @@ flow_type = "%s"
 		},
 		initialTriggerType, updatedTriggerType,
 		"", "",
-		checkTriggerType(*frame, flowType),
+		checkRemoteProperty(*frame, flowType),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		checkDestroy(*frame, flowType, []string{initialTriggerType, updatedTriggerType}),
 		nil, nil, "", "",
@@ -59,8 +59,8 @@ flow_type = "%s"
 
 var errTriggerTypeNotFound = errors.New("trigger type not found")
 
-func checkTriggerType(frame test_utils.OrgTestFrame, flowType string) func(string) resource.TestCheckFunc {
-	return func(expectTriggerType string) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.OrgTestFrame, flowType string) func(interface{}) resource.TestCheckFunc {
+	return func(expectTriggerType interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			flowTypeValues := helper.EnumValueMap(trigger_actions.FlowTypes())
 			resp, err := frame.GetFlow(frame, &management.GetFlowRequest{Type: strconv.Itoa(int(flowTypeValues[flowType]))})
@@ -88,7 +88,7 @@ func checkTriggerType(frame test_utils.OrgTestFrame, flowType string) func(strin
 func checkDestroy(frame test_utils.OrgTestFrame, flowType string, testTypes []string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		for _, testTriggerType := range testTypes {
-			if err := checkTriggerType(frame, flowType)(testTriggerType)(state); !errors.Is(err, errTriggerTypeNotFound) {
+			if err := checkRemoteProperty(frame, flowType)(testTriggerType)(state); !errors.Is(err, errTriggerTypeNotFound) {
 				return fmt.Errorf("expected error %v, but got %w", errTriggerTypeNotFound, err)
 			}
 		}

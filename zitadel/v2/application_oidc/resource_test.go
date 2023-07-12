@@ -28,7 +28,7 @@ func TestAccZITADELAppOIDC(t *testing.T) {
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
+		func(configProperty, _ interface{}) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id           = "%s"
@@ -54,13 +54,13 @@ resource "%s" "%s" {
 		"", "",
 		checkRemoteProperty(frame, project.GetId()),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId())),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId()), updatedProperty),
 		nil, nil, "", "",
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(string) resource.TestCheckFunc {
-	return func(expect string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(interface{}) resource.TestCheckFunc {
+	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			rs := state.RootModule().Resources[frame.TerraformName]
 			remoteResource, err := frame.GetAppByID(frame, &management.GetAppByIDRequest{AppId: rs.Primary.ID, ProjectId: projectId})
@@ -69,7 +69,7 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(
 			}
 			actual := remoteResource.GetApp().GetName()
 			if actual != expect {
-				return fmt.Errorf("expected %s, actual: %s", expect, actual)
+				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}
 			return nil
 		}

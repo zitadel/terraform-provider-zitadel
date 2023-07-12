@@ -22,7 +22,7 @@ func TestAccZITADELAction(t *testing.T) {
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
+		func(configProperty, _ interface{}) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id          = "%s"
@@ -36,13 +36,13 @@ resource "%s" "%s" {
 		"", "",
 		checkRemoteProperty(frame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame)),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), updatedProperty),
 		nil, nil, "", "",
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
-	return func(expect string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
+	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			rs := state.RootModule().Resources[frame.TerraformName]
 			remoteResource, err := frame.GetAction(frame, &management.GetActionRequest{Id: rs.Primary.ID})
@@ -51,7 +51,7 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.T
 			}
 			actual := remoteResource.GetAction().GetScript()
 			if actual != expect {
-				return fmt.Errorf("expected %s, actual: %s", expect, actual)
+				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}
 			return nil
 		}

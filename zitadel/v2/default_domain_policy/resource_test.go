@@ -1,4 +1,4 @@
-package default_oidc_settings_test
+package default_domain_policy_test
 
 import (
 	"fmt"
@@ -11,10 +11,10 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccDefaultOIDCSettings(t *testing.T) {
-	resourceName := "zitadel_default_oidc_settings"
-	initialProperty := "123h0m0s"
-	updatedProperty := "456h0m0s"
+func TestAccDefaultDomainPolicy(t *testing.T) {
+	resourceName := "zitadel_default_domain_policy"
+	initialProperty := true
+	updatedProperty := false
 	frame, err := test_utils.NewInstanceTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
@@ -22,14 +22,13 @@ func TestAccDefaultOIDCSettings(t *testing.T) {
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(accessTokenLifetime, _ interface{}) string {
+		func(configProperty, _ interface{}) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
-	access_token_lifetime = "%s"
-  	id_token_lifetime = "777h0m0s"
-  	refresh_token_idle_expiration = "888h0m0s"
-  	refresh_token_expiration = "999h0m0s"
-}`, resourceName, frame.UniqueResourcesID, accessTokenLifetime)
+  user_login_must_be_domain                   = %t
+  validate_org_domains                        = false
+  smtp_sender_address_matches_instance_domain = false
+}`, resourceName, frame.UniqueResourcesID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -43,13 +42,13 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			resp, err := frame.GetOIDCSettings(frame, &admin.GetOIDCSettingsRequest{})
+			resp, err := frame.GetDomainPolicy(frame, &admin.GetDomainPolicyRequest{})
 			if err != nil {
-				return fmt.Errorf("getting oidc settings failed: %w", err)
+				return fmt.Errorf("getting policy failed: %w", err)
 			}
-			actual := resp.GetSettings().GetAccessTokenLifetime().AsDuration().String()
+			actual := resp.GetPolicy().GetUserLoginMustBeDomain()
 			if actual != expect {
-				return fmt.Errorf("expected %s, but got %s", expect, actual)
+				return fmt.Errorf("expected %t, but got %t", expect, actual)
 			}
 			return nil
 		}

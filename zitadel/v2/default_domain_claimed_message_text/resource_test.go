@@ -24,7 +24,7 @@ func TestAccZITADELDefaultDomainClaimedMessageTextSameLanguage(t *testing.T) {
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
+		func(configProperty, _ interface{}) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   language    = "%s"
@@ -47,8 +47,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.InstanceTestFrame, lang string) func(string) resource.TestCheckFunc {
-	return func(expect string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame, lang string) func(interface{}) resource.TestCheckFunc {
+	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			remoteResource, err := frame.GetCustomDomainClaimedMessageText(frame, &admin.GetCustomDomainClaimedMessageTextRequest{Language: lang})
 			if err != nil {
@@ -56,7 +56,7 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame, lang string) func(
 			}
 			actual := remoteResource.GetCustomText().GetTitle()
 			if actual != expect {
-				return fmt.Errorf("expected %s, actual: %s", expect, actual)
+				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}
 			return nil
 		}
