@@ -34,6 +34,7 @@ resource "%s" "%s" {
 		initialAccessTokenLifetime, updatedAccessTokenLifetime,
 		"", "",
 		checkAccessTokenLifetime(*frame),
+		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		func(state *terraform.State) error { return nil },
 		nil, nil, "", "",
 	)

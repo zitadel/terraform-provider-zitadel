@@ -35,6 +35,7 @@ resource "%s" "%s" {
 		initialProperty, updatedProperty,
 		"", "",
 		checkRemoteProperty(frame),
+		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame)),
 		nil, nil, "", "",
 	)

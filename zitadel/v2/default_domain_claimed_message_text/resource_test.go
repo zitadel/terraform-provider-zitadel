@@ -2,6 +2,7 @@ package default_domain_claimed_message_text_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
@@ -39,7 +40,9 @@ resource "%s" "%s" {
 		initialProperty, updatedProperty,
 		"", "",
 		checkRemoteProperty(frame, language),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, language)),
+		regexp.MustCompile(`^en$`),
+		// When deleted, the default should be returned
+		checkRemoteProperty(frame, language)("ZITADEL - Domain has been claimed"),
 		nil, nil, "", "",
 	)
 }

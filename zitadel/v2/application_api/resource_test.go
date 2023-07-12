@@ -40,6 +40,7 @@ resource "%s" "%s" {
 		initialProperty, updatedProperty,
 		"", "",
 		checkRemoteProperty(frame, project.GetId()),
+		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId())),
 		nil, nil, "", "",
 	)

@@ -5,8 +5,6 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
@@ -17,6 +15,7 @@ func RunLifecyleTest(
 	initialProperty, updatedProperty,
 	initialSecret, updatedSecret string,
 	checkRemoteProperty func(expect string) resource.TestCheckFunc,
+	idPattern *regexp.Regexp,
 	checkDestroy, checkImportState resource.TestCheckFunc,
 	importStateIdFunc resource.ImportStateIdFunc,
 	wrongImportID,
@@ -36,7 +35,7 @@ func RunLifecyleTest(
 			Config: initialConfig,
 			Check: resource.ComposeAggregateTestCheckFunc(
 				CheckAMinute(checkRemoteProperty(initialProperty)),
-				CheckStateHasIDSet(frame),
+				CheckStateHasIDSet(frame, idPattern),
 			),
 		}, { // Check updating name has a diff
 			Config:             updatedNameConfig,
@@ -78,11 +77,9 @@ func RunLifecyleTest(
 		})
 	}
 	resource.Test(t, resource.TestCase{
-		CheckDestroy: CheckAMinute(checkDestroy),
-		Steps:        steps,
-		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
-			"upgraded-v5": frame.upgradedV5ProviderFactory,
-			"zitadel":     frame.v6ProviderFactory,
-		},
+		CheckDestroy:             CheckAMinute(checkDestroy),
+		Steps:                    steps,
+		ProtoV6ProviderFactories: frame.v6ProviderFactories,
+		ProtoV5ProviderFactories: frame.v5ProviderFactories,
 	})
 }

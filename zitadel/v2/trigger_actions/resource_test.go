@@ -51,6 +51,7 @@ flow_type = "%s"
 		initialTriggerType, updatedTriggerType,
 		"", "",
 		checkTriggerType(*frame, flowType),
+		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		checkDestroy(*frame, flowType, []string{initialTriggerType, updatedTriggerType}),
 		nil, nil, "", "",
 	)

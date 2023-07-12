@@ -23,6 +23,7 @@ func RunInstanceIDPLifecyleTest(
 		"an initial provider name", "an updated provider name",
 		"an_initial_secret", "an_updated_secret",
 		CheckProviderName(frame),
+		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		CheckDestroy(frame),
 		func(state *terraform.State) error {
 			// Check the secret is imported correctly

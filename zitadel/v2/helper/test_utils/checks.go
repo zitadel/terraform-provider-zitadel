@@ -12,9 +12,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-func CheckStateHasIDSet(frame BaseTestFrame) resource.TestCheckFunc {
-	// ZITADEL IDs have thirteen digits
-	idPattern := regexp.MustCompile(`\d{13}`)
+// ZITADEL IDs have thirteen digits
+var ZITADEL_GENERATED_ID_REGEX = regexp.MustCompile(`\d{13}`)
+
+func CheckStateHasIDSet(frame BaseTestFrame, idPattern *regexp.Regexp) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		return resource.TestMatchResourceAttr(frame.TerraformName, "id", idPattern)(state)
 	}
