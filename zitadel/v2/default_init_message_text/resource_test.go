@@ -1,4 +1,4 @@
-package default_domain_claimed_message_text_test
+package default_init_message_text_test
 
 import (
 	"fmt"
@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELDefaultDomainClaimedMessageText(t *testing.T) {
-	resourceName := "zitadel_default_domain_claimed_message_text"
+func TestAccZITADELDefaultInitMessageText(t *testing.T) {
+	resourceName := "zitadel_default_init_message_text"
 	initialProperty := "initialtitle"
 	updatedProperty := "updatedtitle"
 	language := "en"
@@ -43,7 +43,7 @@ resource "%s" "%s" {
 		checkRemoteProperty(frame, language),
 		regexp.MustCompile(`^en$`),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, language)("ZITADEL - Domain has been claimed"),
+		checkRemoteProperty(frame, language)("ZITADEL - Initialize User"),
 		nil, nil, "", "",
 	)
 }
@@ -51,7 +51,7 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame, lang string) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteResource, err := frame.GetCustomDomainClaimedMessageText(frame, &admin.GetCustomDomainClaimedMessageTextRequest{Language: lang})
+			remoteResource, err := frame.GetCustomInitMessageText(frame, &admin.GetCustomInitMessageTextRequest{Language: lang})
 			if err != nil {
 				return err
 			}
