@@ -51,7 +51,7 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame, lang string) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteResource, err := frame.GetDefaultPasswordChangeMessageText(frame, &admin.GetDefaultPasswordChangeMessageTextRequest{Language: lang})
+			remoteResource, err := frame.GetCustomPasswordChangeMessageText(frame, &admin.GetCustomPasswordChangeMessageTextRequest{Language: lang})
 			if err != nil {
 				return err
 			}

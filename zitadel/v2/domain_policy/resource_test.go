@@ -13,8 +13,8 @@ import (
 
 func TestAccDomainPolicy(t *testing.T) {
 	resourceName := "zitadel_domain_policy"
-	initialProperty := true
-	updatedProperty := false
+	initialProperty := false
+	updatedProperty := true
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)

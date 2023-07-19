@@ -51,7 +51,7 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame, lang string) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteResource, err := frame.GetDefaultVerifyEmailMessageText(frame, &admin.GetDefaultVerifyEmailMessageTextRequest{Language: lang})
+			remoteResource, err := frame.GetCustomVerifyEmailMessageText(frame, &admin.GetCustomVerifyEmailMessageTextRequest{Language: lang})
 			if err != nil {
 				return err
 			}

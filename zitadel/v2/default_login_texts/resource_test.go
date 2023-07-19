@@ -322,7 +322,7 @@ resource "%s" "%s" {
 		checkRemoteProperty(frame, language),
 		regexp.MustCompile(`^en$`),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, language)("E-Mail Verification"),
+		checkRemoteProperty(frame, language)(""),
 		nil, nil, "", "",
 	)
 }
