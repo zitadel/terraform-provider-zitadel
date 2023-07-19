@@ -8,7 +8,7 @@ services:
     ports:
     - "8080:8080"
     volumes:
-      - ./machinekey:/machinekey
+      - ./keys:/keys
       - ./zitadel.yaml:/zitadel.yaml
     depends_on:
       db:
@@ -38,10 +38,10 @@ services:
     container_name: setup
     build: .
     environment:
-      KEY: /key/zitadel-admin-sa.json
+      KEYS_DIRECTORY: /keys
       SERVICE: http://zitadel:8080
     volumes:
-      - "./machinekey:/key"
+      - "./keys:/keys"
     depends_on:
       wait_for_zitadel:
         condition: 'service_completed_successfully'

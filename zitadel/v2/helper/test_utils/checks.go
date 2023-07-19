@@ -13,6 +13,7 @@ import (
 )
 
 // ZITADEL IDs have thirteen digits
+// TODO: This is not true. The IDs have 18 digits.
 var ZITADEL_GENERATED_ID_REGEX = regexp.MustCompile(`\d{13}`)
 
 func CheckStateHasIDSet(frame BaseTestFrame, idPattern *regexp.Regexp) resource.TestCheckFunc {

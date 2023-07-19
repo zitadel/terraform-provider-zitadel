@@ -1,13 +1,13 @@
 package test_utils
 
 import (
-	"fmt"
+	"context"
+
+	"github.com/zitadel/terraform-provider-zitadel/acceptance"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	mgmt "github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -21,7 +21,9 @@ type OrgTestFrame struct {
 }
 
 func NewOrgTestFrame(resourceType string) (*OrgTestFrame, error) {
-	baseFrame, err := NewBaseTestFrame(resourceType)
+	ctx := context.Background()
+	cfg := acceptance.GetConfig().OrgLevel
+	baseFrame, err := NewBaseTestFrame(ctx, resourceType, cfg.Domain, cfg.AdminSAJSON)
 	if err != nil {
 		return nil, err
 	}
@@ -29,25 +31,11 @@ func NewOrgTestFrame(resourceType string) (*OrgTestFrame, error) {
 	if err != nil {
 		return nil, err
 	}
-	org, err := mgmtClient.AddOrg(baseFrame, &management.AddOrgRequest{Name: orgName})
-	alreadyExists := status.Code(err) == codes.AlreadyExists
-	if err != nil && !alreadyExists {
+	org, err := mgmtClient.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: "zitadel." + cfg.Domain})
+	if err != nil {
 		return nil, err
 	}
-	orgID := org.GetId()
-	if alreadyExists {
-		err := retryAMinute(func() error {
-			getOrgResp, getOrgErr := mgmtClient.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: fmt.Sprintf("%s.%s", orgName, domain)})
-			if getOrgErr != nil {
-				return getOrgErr
-			}
-			orgID = getOrgResp.GetOrg().GetId()
-			return nil
-		})
-		if err != nil {
-			return nil, err
-		}
-	}
+	orgID := org.GetOrg().GetId()
 	mgmtClient, err = helper.GetManagementClient(baseFrame.ClientInfo, orgID)
 	return &OrgTestFrame{
 		BaseTestFrame: *baseFrame,

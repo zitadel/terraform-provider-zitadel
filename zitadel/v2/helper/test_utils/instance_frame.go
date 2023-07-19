@@ -1,9 +1,11 @@
 package test_utils
 
 import (
-	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
+	"context"
 
+	"github.com/zitadel/terraform-provider-zitadel/acceptance"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
 )
 
 type InstanceTestFrame struct {
@@ -12,7 +14,9 @@ type InstanceTestFrame struct {
 }
 
 func NewInstanceTestFrame(resourceType string) (*InstanceTestFrame, error) {
-	baseFrame, err := NewBaseTestFrame(resourceType)
+	ctx := context.Background()
+	cfg := acceptance.GetConfig().InstanceLevel
+	baseFrame, err := NewBaseTestFrame(ctx, resourceType, cfg.Domain, cfg.AdminSAJSON)
 	if err != nil {
 		return nil, err
 	}
@@ -23,5 +27,5 @@ func NewInstanceTestFrame(resourceType string) (*InstanceTestFrame, error) {
 	return &InstanceTestFrame{
 		BaseTestFrame: *baseFrame,
 		Client:        adminClient,
-	}, err
+	}, nil
 }

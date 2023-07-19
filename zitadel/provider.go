@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	zitadel_go "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/action"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/app_key"
@@ -84,15 +85,14 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/verify_phone_message_text"
 )
 
-var (
-	_ provider.Provider = &providerPV6{}
-)
+var _ provider.Provider = (*providerPV6)(nil)
 
 type providerPV6 struct {
+	customOptions []zitadel_go.Option
 }
 
-func NewProviderPV6() provider.Provider {
-	return &providerPV6{}
+func NewProviderPV6(option ...zitadel_go.Option) provider.Provider {
+	return &providerPV6{customOptions: option}
 }
 
 type providerModel struct {
@@ -310,11 +310,11 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_ldap":                       org_idp_ldap.GetResource(),
 			"zitadel_default_oidc_settings":              default_oidc_settings.GetResource(),
 		},
-		ConfigureContextFunc: providerConfigure,
+		ConfigureContextFunc: ProviderConfigure,
 	}
 }
 
-func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	clientinfo, err := helper.GetClientInfo(
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
