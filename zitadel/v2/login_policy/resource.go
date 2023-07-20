@@ -34,6 +34,11 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "defines if a user MUST use a multi factor to log in",
 			},
+			forceMFALocalOnlyVar: {
+				Type:        schema.TypeBool,
+				Required:    true,
+				Description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login.",
+			},
 			passwordlessTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,

@@ -55,6 +55,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		allowRegisterVar,
 		allowExternalIDPVar,
 		forceMFAVar,
+		forceMFALocalOnlyVar,
 		passwordlessTypeVar,
 		hidePasswordResetVar,
 		ignoreUnknownUsernamesVar,
@@ -105,6 +106,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			AllowDomainDiscovery:       d.Get(allowDomainDiscovery).(bool),
 			DisableLoginWithEmail:      d.Get(disableLoginWithEmail).(bool),
 			DisableLoginWithPhone:      d.Get(disableLoginWithPhone).(bool),
+			ForceMFALocalOnly:          d.Get(forceMFALocalOnlyVar).(bool),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update login policy: %v", err)
@@ -240,6 +242,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		AllowDomainDiscovery:       d.Get(allowDomainDiscovery).(bool),
 		DisableLoginWithEmail:      d.Get(disableLoginWithEmail).(bool),
 		DisableLoginWithPhone:      d.Get(disableLoginWithPhone).(bool),
+		ForceMFALocalOnly:          d.Get(forceMFALocalOnlyVar).(bool),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create login policy: %v", err)
@@ -330,6 +333,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		allowDomainDiscovery:          policy.GetAllowDomainDiscovery(),
 		disableLoginWithEmail:         policy.GetDisableLoginWithEmail(),
 		disableLoginWithPhone:         policy.GetDisableLoginWithPhone(),
+		forceMFALocalOnlyVar:          policy.GetForceMfaLocalOnly(),
 	}
 
 	respSecond, err := client.ListLoginPolicySecondFactors(ctx, &management.ListLoginPolicySecondFactorsRequest{})
