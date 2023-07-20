@@ -1,7 +1,6 @@
 package trigger_actions_test
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"testing"
@@ -52,12 +51,10 @@ flow_type = "%s"
 		"", "",
 		checkRemoteProperty(*frame, flowType),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		checkDestroy(*frame, flowType, []string{initialTriggerType, updatedTriggerType}),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), initialTriggerType),
 		nil, nil, "", "",
 	)
 }
-
-var errTriggerTypeNotFound = errors.New("trigger type not found")
 
 func checkRemoteProperty(frame test_utils.OrgTestFrame, flowType string) func(interface{}) resource.TestCheckFunc {
 	return func(expectTriggerType interface{}) resource.TestCheckFunc {
@@ -80,18 +77,7 @@ func checkRemoteProperty(frame test_utils.OrgTestFrame, flowType string) func(in
 					return nil
 				}
 			}
-			return fmt.Errorf("expected trigger type %s not found in %v: %w", expectTriggerType, foundTypes, errTriggerTypeNotFound)
+			return fmt.Errorf("expected trigger type %s not found in %v: %w", expectTriggerType, foundTypes, test_utils.ErrNotFound)
 		}
-	}
-}
-
-func checkDestroy(frame test_utils.OrgTestFrame, flowType string, testTypes []string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		for _, testTriggerType := range testTypes {
-			if err := checkRemoteProperty(frame, flowType)(testTriggerType)(state); !errors.Is(err, errTriggerTypeNotFound) {
-				return fmt.Errorf("expected error %v, but got %w", errTriggerTypeNotFound, err)
-			}
-		}
-		return nil
 	}
 }

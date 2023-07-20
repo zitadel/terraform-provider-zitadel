@@ -1,6 +1,7 @@
 package test_utils
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"time"
@@ -30,11 +31,13 @@ func CheckAMinute(check resource.TestCheckFunc) resource.TestCheckFunc {
 	}
 }
 
+var ErrNotFound = fmt.Errorf("not found")
+
 func CheckIsNotFoundFromPropertyCheck(checkRemoteProperty func(interface{}) resource.TestCheckFunc, validProperty interface{}) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		err := checkRemoteProperty(validProperty)(state)
-		if status.Code(err) != codes.NotFound {
-			return fmt.Errorf("expected not found error but got: %w", err)
+		if status.Code(err) != codes.NotFound && !errors.Is(err, ErrNotFound) {
+			return fmt.Errorf("expected not found error but got: %v: %w", err, ErrNotFound)
 		}
 		return nil
 	}

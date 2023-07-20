@@ -1,7 +1,6 @@
 package domain_test
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"testing"
@@ -38,12 +37,10 @@ resource "%s" "%s" {
 		"", "",
 		checkRemoteProperty(frame),
 		regexp.MustCompile(fmt.Sprintf(`^%s$|^%s$`, initialProperty, updatedProperty)),
-		checkDestroy(frame, updatedProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		nil, nil, "", "",
 	)
 }
-
-var ErrNotFound = errors.New("not found")
 
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
@@ -61,22 +58,9 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resou
 				return err
 			}
 			if len(remoteResource.GetResult()) == 0 {
-				return fmt.Errorf("expected to find %s, but didn't: %w", expect, ErrNotFound)
+				return fmt.Errorf("expected to find %s, but didn't: %w", expect, test_utils.ErrNotFound)
 			}
 			return nil
 		}
-	}
-}
-
-func checkDestroy(frame *test_utils.OrgTestFrame, expectNotFound string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		err := checkRemoteProperty(frame)(expectNotFound)(state)
-		if errors.Is(err, ErrNotFound) {
-			return nil
-		}
-		if err == nil {
-			return fmt.Errorf("expected to not find %s, but did", expectNotFound)
-		}
-		return err
 	}
 }
