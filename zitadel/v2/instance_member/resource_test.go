@@ -16,8 +16,8 @@ import (
 
 func TestAccInstanceMember(t *testing.T) {
 	resourceName := "zitadel_instance_member"
-	initialProperty := "ORG_OWNER"
-	updatedProperty := "ORG_OWNER_VIEWER"
+	initialProperty := "IAM_OWNER"
+	updatedProperty := "IAM_OWNER_VIEWER"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)

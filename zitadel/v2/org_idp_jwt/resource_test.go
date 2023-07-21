@@ -1,4 +1,4 @@
-package action_test
+package org_idp_jwt_test
 
 import (
 	"fmt"
@@ -11,10 +11,10 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccAction(t *testing.T) {
-	resourceName := "zitadel_action"
-	initialProperty := "initialproperty"
-	updatedProperty := "updatedproperty"
+func TestAccOrgIDPJWT(t *testing.T) {
+	resourceName := "zitadel_org_idp_jwt"
+	initialProperty := "https://initialproperty.com"
+	updatedProperty := "https://updatedproperty.com"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
@@ -26,11 +26,14 @@ func TestAccAction(t *testing.T) {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id          = "%s"
-  name            = "testaction"
-  script          = "%s"
-  timeout         = "10s"
-  allowed_to_fail = true
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
+  name            = "%s"
+  styling_type  = "STYLING_TYPE_UNSPECIFIED"
+  jwt_endpoint  = "%s"
+  issuer        = "https://google.com"
+  keys_endpoint = "https://jwtendpoint.com/keys"
+  header_name   = "x-auth-token"
+  auto_register = false
+}`, resourceName, frame.UniqueResourcesID, frame.OrgID, frame.UniqueResourcesID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -44,11 +47,11 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteResource, err := frame.GetAction(frame, &management.GetActionRequest{Id: frame.State(state).ID})
+			remoteResource, err := frame.GetOrgIDPByID(frame, &management.GetOrgIDPByIDRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return err
 			}
-			actual := remoteResource.GetAction().GetScript()
+			actual := remoteResource.GetIdp().GetJwtConfig().GetJwtEndpoint()
 			if actual != expect {
 				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}

@@ -68,7 +68,7 @@ func checkRemoteProperty(frame test_utils.OrgTestFrame, projectID string) func(i
 		return func(state *terraform.State) error {
 			resp, err := frame.GetProjectGrantByID(frame, &management.GetProjectGrantByIDRequest{
 				ProjectId: projectID,
-				GrantId:   frame.StateID(state),
+				GrantId:   frame.State(state).ID,
 			})
 			if err != nil {
 				return err
