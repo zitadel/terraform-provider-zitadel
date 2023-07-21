@@ -44,7 +44,7 @@ jobs:
       with:
         key: acceptance-test-${{ hashFiles( 'go.*', 'acceptance', 'zitadel/**/*.go') }}
         restore-keys: |
-          acceptance-test-postgres-core-
+          acceptance-test-
         path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
 
     - name: Run Acceptance Tests
