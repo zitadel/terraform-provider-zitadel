@@ -33,26 +33,37 @@ jobs:
       working-directory: acceptance
       run: docker compose run setup
 
-    - name: Set Cache Path
-      id: go-cache-path
-      run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+    - name: Set Cache Variables
+      id: go-cache-variables
+      run: |
+        echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+        echo "GO_CACHE_KEY_PREFIX=${GO_CACHE_KEY_PREFIX}" >> $GITHUB_OUTPUT
+        echo "GO_CACHE_KEY=${GO_CACHE_KEY_PREFIX}${{ hashFiles( 'go.*', 'acceptance', 'zitadel/**/*.go') }}" >> $GITHUB_OUTPUT
+      env:
+        GO_CACHE_KEY_PREFIX: acceptance-test-
 
     - name: Restore Previous Results
       uses: actions/cache/restore@v3
       id: cache
       timeout-minutes: 1
       with:
-        key: acceptance-test-${{ hashFiles( 'go.*', 'acceptance', 'zitadel/**/*.go') }}
-        restore-keys: |
-          acceptance-test-
-        path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
+        key: ${{ steps.go-cache-variables.outputs.GO_CACHE_KEY }}
+        restore-keys: ${{ steps.go-cache-variables.outputs.GO_CACHE_KEY_PREFIX }}
+        path: ${{ steps.go-cache-variables.outputs.GO_CACHE_PATH }}
 
     - name: Run Acceptance Tests
       run: TF_ACC=1 go test ./...
 
-    - name: Save Docker Compose Logs
-      working-directory: acceptance
+    - name: Cache Results
       if: always()
+      uses: actions/cache/save@v3
+      with:
+        key: ${{ steps.go-cache-variables.outputs.GO_CACHE_KEY }}
+        path: ${{ steps.go-cache-variables.outputs.GO_CACHE_PATH }}
+
+    - name: Save Docker Compose Logs
+      if: always()
+      working-directory: acceptance
       run: docker compose logs > .docker-compose.log
 
     - name: Archive Docker Compose Logs
