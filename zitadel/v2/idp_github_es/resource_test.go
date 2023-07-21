@@ -2,14 +2,15 @@ package idp_github_es_test
 
 import (
 	"fmt"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"testing"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils/idp_test_utils"
 )
 
-func TestAccZITADELInstanceIdPGitHubES(t *testing.T) {
+func TestAccInstanceIdPGitHubES(t *testing.T) {
 	resourceName := "zitadel_idp_github_es"
 	frame, err := test_utils.NewInstanceTestFrame(resourceName)
 	if err != nil {

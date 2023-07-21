@@ -31,15 +31,14 @@ func RunOrgLifecyleTest(
 		CheckDestroy(frame),
 		func(state *terraform.State) error {
 			// Check the secretAttribute is imported correctly
-			currentState := state.RootModule().Resources[frame.TerraformName].Primary
-			actual := currentState.Attributes[secretAttribute]
+			actual := frame.State(state).Attributes[secretAttribute]
 			if actual != importedSecret {
 				return fmt.Errorf("expected %s to be %s, but got %s", secretAttribute, importedSecret, actual)
 			}
 			return nil
 		},
 		func(state *terraform.State) (string, error) {
-			lastState := state.RootModule().Resources[frame.TerraformName].Primary
+			lastState := frame.State(state)
 			return fmt.Sprintf("%s:%s:%s", lastState.Attributes[org_idp_utils.OrgIDVar], lastState.ID, importedSecret), nil
 		},
 		"123:456",

@@ -96,8 +96,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to create human user: %v", err)
 	}
 	d.SetId(respUser.UserId)
-
-	return nil
+	// To avoid diffs for terraform plan -refresh=false right after creation, we query and set the computed values.
+	// The acceptance tests rely on this, too.
+	return read(ctx, d, m)
 }
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

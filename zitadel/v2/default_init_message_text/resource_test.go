@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELDefaultInitMessageText(t *testing.T) {
+func TestAccDefaultInitMessageText(t *testing.T) {
 	resourceName := "zitadel_default_init_message_text"
 	initialProperty := "initialtitle"
 	updatedProperty := "updatedtitle"

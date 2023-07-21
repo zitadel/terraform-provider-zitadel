@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELDomainClaimedMessageText(t *testing.T) {
+func TestAccDomainClaimedMessageText(t *testing.T) {
 	resourceName := "zitadel_domain_claimed_message_text"
 	initialProperty := "initialtitle"
 	updatedProperty := "updatedtitle"

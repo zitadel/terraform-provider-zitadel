@@ -1,8 +1,10 @@
-package org_member_test
+package instance_member_test
 
 import (
 	"fmt"
 	"testing"
+
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -12,8 +14,8 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccOrgMember(t *testing.T) {
-	resourceName := "zitadel_org_member"
+func TestAccInstanceMember(t *testing.T) {
+	resourceName := "zitadel_instance_member"
 	initialProperty := "ORG_OWNER"
 	updatedProperty := "ORG_OWNER_VIEWER"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
@@ -41,10 +43,9 @@ func TestAccOrgMember(t *testing.T) {
 		func(cfg, _ interface{}) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
-	org_id              = "%s"
 	user_id = "%s"
   	roles   = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, userID, cfg)
+}`, resourceName, frame.UniqueResourcesID, userID, cfg)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -58,7 +59,7 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(interface{}) resource.TestCheckFunc {
 	return func(expected interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			resp, err := frame.ListOrgMembers(frame, &management.ListOrgMembersRequest{
+			resp, err := frame.Admin.ListIAMMembers(frame, &admin.ListIAMMembersRequest{
 				Queries: []*member.SearchQuery{{
 					Query: &member.SearchQuery_UserIdQuery{UserIdQuery: &member.UserIDQuery{UserId: userID}},
 				}},

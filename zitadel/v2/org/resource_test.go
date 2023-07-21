@@ -1,20 +1,23 @@
-package human_user_test
+package org_test
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/org"
+
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccHumanUser(t *testing.T) {
-	resourceName := "zitadel_human_user"
-	initialProperty := "test1@zitadel.com"
-	updatedProperty := "test2@zitadel.com"
+func TestAccOrg(t *testing.T) {
+	resourceName := "zitadel_org"
+	initialProperty := "initialorgname"
+	updatedProperty := "updatedorgname"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
@@ -22,23 +25,11 @@ func TestAccHumanUser(t *testing.T) {
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, secretProperty interface{}) string {
+		func(configProperty, _ interface{}) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
-  org_id          = "%s"
-  user_name          = "test@zitadel.com"
-  first_name         = "firstname"
-  last_name          = "lastname"
-  nick_name          = "nickname"
-  display_name       = "displayname"
-  preferred_language = "de"
-  gender             = "GENDER_MALE"
-  phone              = "+41799999999"
-  is_phone_verified  = true
-  email              = "%s"
-  is_email_verified  = true
-  initial_password   = "Password1!"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
+  name            = "%s"
+}`, resourceName, frame.UniqueResourcesID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -52,11 +43,14 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteResource, err := frame.GetUserByID(frame, &management.GetUserByIDRequest{Id: frame.State(state).ID})
+			remoteResource, err := frame.Admin.GetOrgByID(frame, &admin.GetOrgByIDRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return err
 			}
-			actual := remoteResource.GetUser().GetHuman().GetEmail().GetEmail()
+			actual := remoteResource.GetOrg().GetName()
+			if remoteResource.GetOrg().GetState() == org.OrgState_ORG_STATE_REMOVED {
+				return fmt.Errorf("org is removed: %w", test_utils.ErrNotFound)
+			}
 			if actual != expect {
 				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}

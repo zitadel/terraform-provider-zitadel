@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELPasswordlessRegistrationMessageText(t *testing.T) {
+func TestAccPasswordlessRegistrationMessageText(t *testing.T) {
 	resourceName := "zitadel_passwordless_registration_message_text"
 	initialProperty := "initialtitle"
 	updatedProperty := "updatedtitle"

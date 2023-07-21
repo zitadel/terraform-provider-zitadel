@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELLoginTexts(t *testing.T) {
+func TestAccLoginTexts(t *testing.T) {
 	resourceName := "zitadel_login_texts"
 	initialProperty := "initialtitle"
 	updatedProperty := "updatedtitle"

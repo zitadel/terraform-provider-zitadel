@@ -29,15 +29,14 @@ func RunInstanceIDPLifecyleTest(
 		CheckDestroy(frame),
 		func(state *terraform.State) error {
 			// Check the secret is imported correctly
-			currentState := state.RootModule().Resources[frame.TerraformName].Primary
-			actual := currentState.Attributes[secretAttribute]
+			actual := frame.State(state).Attributes[secretAttribute]
 			if actual != importedSecret {
 				return fmt.Errorf("expected %s to be %s, but got %s", secretAttribute, importedSecret, actual)
 			}
 			return nil
 		},
 		func(state *terraform.State) (string, error) {
-			lastState := state.RootModule().Resources[frame.TerraformName].Primary
+			lastState := frame.State(state)
 			return fmt.Sprintf("%s:%s", lastState.ID, importedSecret), nil
 		},
 		"12345",

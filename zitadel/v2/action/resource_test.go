@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELAction(t *testing.T) {
+func TestAccAction(t *testing.T) {
 	resourceName := "zitadel_action"
 	initialProperty := "initialproperty"
 	updatedProperty := "updatedproperty"
@@ -44,8 +44,7 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			rs := state.RootModule().Resources[frame.TerraformName]
-			remoteResource, err := frame.GetAction(frame, &management.GetActionRequest{Id: rs.Primary.ID})
+			remoteResource, err := frame.GetAction(frame, &management.GetActionRequest{Id: frame.StateID(state)})
 			if err != nil {
 				return err
 			}

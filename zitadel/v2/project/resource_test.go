@@ -1,11 +1,8 @@
-package domain_test
+package project_test
 
 import (
 	"fmt"
-	"regexp"
 	"testing"
-
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/org"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -14,10 +11,10 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccDomain(t *testing.T) {
-	resourceName := "zitadel_domain"
-	initialProperty := "initial.default.127.0.0.1.sslip.io"
-	updatedProperty := "updated.default.127.0.0.1.sslip.io"
+func TestAccProject(t *testing.T) {
+	resourceName := "zitadel_project"
+	initialProperty := "initialproperty"
+	updatedProperty := "updatedproperty"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
@@ -28,37 +25,33 @@ func TestAccDomain(t *testing.T) {
 		func(configProperty, _ interface{}) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
-  org_id          = "%s"
-  name      = "%s"
-  is_primary = false
+  org_id          		   = "%s"
+  name                     = "%s"
+  project_role_assertion   = true
+  project_role_check       = true
+  has_project_check        = true
+  private_labeling_setting = "PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY"
 }`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
 		checkRemoteProperty(frame),
-		regexp.MustCompile(fmt.Sprintf(`^%s$|^%s$`, initialProperty, updatedProperty)),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
+		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), updatedProperty),
 		nil, nil, "", "",
 	)
 }
 
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
-		return func(_ *terraform.State) error {
-			remoteResource, err := frame.ListOrgDomains(frame, &management.ListOrgDomainsRequest{
-				Queries: []*org.DomainSearchQuery{{
-					Query: &org.DomainSearchQuery_DomainNameQuery{
-						DomainNameQuery: &org.DomainNameQuery{
-							Name: expect.(string),
-						},
-					},
-				}},
-			})
+		return func(state *terraform.State) error {
+			remoteResource, err := frame.GetProjectByID(frame, &management.GetProjectByIDRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return err
 			}
-			if len(remoteResource.GetResult()) == 0 {
-				return fmt.Errorf("expected to find %s, but didn't: %w", expect, test_utils.ErrNotFound)
+			actual := remoteResource.GetProject().GetName()
+			if actual != expect {
+				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}
 			return nil
 		}

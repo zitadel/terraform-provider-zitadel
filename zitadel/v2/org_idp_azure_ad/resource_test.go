@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 
-func TestAccZITADELOrgIdPAzureAD(t *testing.T) {
+func TestAccOrgIdPAzureAD(t *testing.T) {
 	resourceName := "zitadel_org_idp_azure_ad"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {

@@ -1,4 +1,4 @@
-package org_member_test
+package machine_key_test
 
 import (
 	"fmt"
@@ -6,30 +6,21 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
-
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 )
 
-func TestAccOrgMember(t *testing.T) {
-	resourceName := "zitadel_org_member"
-	initialProperty := "ORG_OWNER"
-	updatedProperty := "ORG_OWNER_VIEWER"
+func TestAccMachineKey(t *testing.T) {
+	resourceName := "zitadel_machine_key"
+	initialProperty := "2050-01-01T00:00:00Z"
+	updatedProperty := "2051-01-01T00:00:00Z"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	user, err := frame.ImportHumanUser(frame, &management.ImportHumanUserRequest{
+	user, err := frame.AddMachineUser(frame, &management.AddMachineUserRequest{
 		UserName: frame.UniqueResourcesID,
-		Profile: &management.ImportHumanUserRequest_Profile{
-			FirstName: "Don't",
-			LastName:  "Care",
-		},
-		Email: &management.ImportHumanUserRequest_Email{
-			Email:           "dont@care.com",
-			IsEmailVerified: true,
-		},
+		Name:     "Don't care",
 	})
 	userID := user.GetUserId()
 	if err != nil {
@@ -43,7 +34,8 @@ func TestAccOrgMember(t *testing.T) {
 resource "%s" "%s" {
 	org_id              = "%s"
 	user_id = "%s"
-  	roles   = ["%s"]
+	key_type        = "KEY_TYPE_JSON"
+  	expiration_date = "%s"
 }`, resourceName, frame.UniqueResourcesID, frame.OrgID, userID, cfg)
 		},
 		initialProperty, updatedProperty,
@@ -58,20 +50,16 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(interface{}) resource.TestCheckFunc {
 	return func(expected interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			resp, err := frame.ListOrgMembers(frame, &management.ListOrgMembersRequest{
-				Queries: []*member.SearchQuery{{
-					Query: &member.SearchQuery_UserIdQuery{UserIdQuery: &member.UserIDQuery{UserId: userID}},
-				}},
+			resp, err := frame.GetMachineKeyByIDs(frame, &management.GetMachineKeyByIDsRequest{
+				UserId: userID,
+				KeyId:  frame.State(state).ID,
 			})
 			if err != nil {
 				return err
 			}
-			if len(resp.Result) == 0 || len(resp.Result[0].Roles) == 0 {
-				return fmt.Errorf("expected 1 user with 1 role, but got %d: %w", len(resp.Result), test_utils.ErrNotFound)
-			}
-			actual := resp.Result[0].Roles[0]
+			actual := resp.GetKey().GetExpirationDate().AsTime().Format("2006-01-02T15:04:05Z")
 			if expected != actual {
-				return fmt.Errorf("expected role %s, but got %s", expected, actual)
+				return fmt.Errorf("expected %s, but got %s", expected, actual)
 			}
 			return nil
 		}

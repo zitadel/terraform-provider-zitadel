@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELDefaultVerifyPhoneMessageText(t *testing.T) {
+func TestAccDefaultVerifyPhoneMessageText(t *testing.T) {
 	resourceName := "zitadel_default_verify_phone_message_text"
 	initialProperty := "initialtitle"
 	updatedProperty := "updatedtitle"

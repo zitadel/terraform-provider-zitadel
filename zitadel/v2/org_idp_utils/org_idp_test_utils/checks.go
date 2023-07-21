@@ -15,8 +15,7 @@ import (
 func CheckProviderName(frame test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
 	return func(expectName interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			rs := state.RootModule().Resources[frame.TerraformName]
-			remoteProvider, err := frame.GetProviderByID(frame, &management.GetProviderByIDRequest{Id: rs.Primary.ID})
+			remoteProvider, err := frame.GetProviderByID(frame, &management.GetProviderByIDRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return err
 			}

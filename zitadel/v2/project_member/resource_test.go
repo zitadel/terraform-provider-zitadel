@@ -1,4 +1,4 @@
-package org_member_test
+package project_member_test
 
 import (
 	"fmt"
@@ -12,14 +12,21 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccOrgMember(t *testing.T) {
-	resourceName := "zitadel_org_member"
-	initialProperty := "ORG_OWNER"
-	updatedProperty := "ORG_OWNER_VIEWER"
+func TestAccProjectMember(t *testing.T) {
+	resourceName := "zitadel_project_member"
+	initialProperty := "PROJECT_OWNER"
+	updatedProperty := "PROJECT_OWNER_VIEWER"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
+	project, err := frame.AddProject(frame, &management.AddProjectRequest{
+		Name: frame.UniqueResourcesID,
+	})
+	if err != nil {
+		t.Fatalf("failed to create project: %v", err)
+	}
+	projectID := project.GetId()
 	user, err := frame.ImportHumanUser(frame, &management.ImportHumanUserRequest{
 		UserName: frame.UniqueResourcesID,
 		Profile: &management.ImportHumanUserRequest_Profile{
@@ -31,10 +38,10 @@ func TestAccOrgMember(t *testing.T) {
 			IsEmailVerified: true,
 		},
 	})
-	userID := user.GetUserId()
 	if err != nil {
 		t.Fatalf("failed to create user: %v", err)
 	}
+	userID := user.GetUserId()
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
@@ -42,23 +49,25 @@ func TestAccOrgMember(t *testing.T) {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
 	org_id              = "%s"
-	user_id = "%s"
-  	roles   = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, userID, cfg)
+	project_id          = "%s"
+	user_id 			= "%s"
+  	roles  				= ["%s"]
+}`, resourceName, frame.UniqueResourcesID, frame.OrgID, projectID, userID, cfg)
 		},
 		initialProperty, updatedProperty,
 		"", "",
-		checkRemoteProperty(*frame, userID),
+		checkRemoteProperty(*frame, projectID, userID),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID, userID), ""),
 		nil, nil, "", "",
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.OrgTestFrame, projectID, userID string) func(interface{}) resource.TestCheckFunc {
 	return func(expected interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			resp, err := frame.ListOrgMembers(frame, &management.ListOrgMembersRequest{
+			resp, err := frame.ListProjectMembers(frame, &management.ListProjectMembersRequest{
+				ProjectId: projectID,
 				Queries: []*member.SearchQuery{{
 					Query: &member.SearchQuery_UserIdQuery{UserIdQuery: &member.UserIDQuery{UserId: userID}},
 				}},

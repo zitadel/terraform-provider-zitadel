@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELVerifyEmailMessageText(t *testing.T) {
+func TestAccVerifyEmailMessageText(t *testing.T) {
 	resourceName := "zitadel_verify_email_message_text"
 	initialProperty := "initialtitle"
 	updatedProperty := "updatedtitle"

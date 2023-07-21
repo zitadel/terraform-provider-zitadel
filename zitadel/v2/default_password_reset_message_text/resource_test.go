@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELDefaultPassswordResetMessageText(t *testing.T) {
+func TestAccDefaultPassswordResetMessageText(t *testing.T) {
 	resourceName := "zitadel_default_password_reset_message_text"
 	initialProperty := "initialtitle"
 	updatedProperty := "updatedtitle"

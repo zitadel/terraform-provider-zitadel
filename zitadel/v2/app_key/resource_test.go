@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELAppKey(t *testing.T) {
+func TestAccAppKey(t *testing.T) {
 	resourceName := "zitadel_application_key"
 	initialProperty := "2500-01-01T08:45:00Z"
 	updatedProperty := "2501-01-01T08:45:00Z"
@@ -56,8 +56,7 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId, appId string) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			rs := state.RootModule().Resources[frame.TerraformName]
-			remoteResource, err := frame.GetAppKey(frame, &management.GetAppKeyRequest{KeyId: rs.Primary.ID, ProjectId: projectId, AppId: appId})
+			remoteResource, err := frame.GetAppKey(frame, &management.GetAppKeyRequest{KeyId: frame.State(state).ID, ProjectId: projectId, AppId: appId})
 			if err != nil {
 				return err
 			}

@@ -1,4 +1,4 @@
-package human_user_test
+package machine_user_test
 
 import (
 	"fmt"
@@ -11,10 +11,10 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccHumanUser(t *testing.T) {
-	resourceName := "zitadel_human_user"
-	initialProperty := "test1@zitadel.com"
-	updatedProperty := "test2@zitadel.com"
+func TestAccMachineUser(t *testing.T) {
+	resourceName := "zitadel_machine_user"
+	initialProperty := "Initial Service Account"
+	updatedProperty := "Updated Service Account"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
@@ -26,19 +26,10 @@ func TestAccHumanUser(t *testing.T) {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id          = "%s"
-  user_name          = "test@zitadel.com"
-  first_name         = "firstname"
-  last_name          = "lastname"
-  nick_name          = "nickname"
-  display_name       = "displayname"
-  preferred_language = "de"
-  gender             = "GENDER_MALE"
-  phone              = "+41799999999"
-  is_phone_verified  = true
-  email              = "%s"
-  is_email_verified  = true
-  initial_password   = "Password1!"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
+  user_name   = "%s"
+  name        = "%s"
+  description = "description"
+}`, resourceName, frame.UniqueResourcesID, frame.OrgID, frame.UniqueResourcesID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -56,7 +47,7 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resou
 			if err != nil {
 				return err
 			}
-			actual := remoteResource.GetUser().GetHuman().GetEmail().GetEmail()
+			actual := remoteResource.GetUser().GetMachine().GetName()
 			if actual != expect {
 				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}

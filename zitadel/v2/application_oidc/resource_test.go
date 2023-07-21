@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func TestAccZITADELAppOIDC(t *testing.T) {
+func TestAccAppOIDC(t *testing.T) {
 	resourceName := "zitadel_application_oidc"
 	initialProperty := "initialname"
 	updatedProperty := "updatedname"
@@ -62,8 +62,7 @@ resource "%s" "%s" {
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(interface{}) resource.TestCheckFunc {
 	return func(expect interface{}) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			rs := state.RootModule().Resources[frame.TerraformName]
-			remoteResource, err := frame.GetAppByID(frame, &management.GetAppByIDRequest{AppId: rs.Primary.ID, ProjectId: projectId})
+			remoteResource, err := frame.GetAppByID(frame, &management.GetAppByIDRequest{AppId: frame.State(state).ID, ProjectId: projectId})
 			if err != nil {
 				return err
 			}

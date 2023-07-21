@@ -71,3 +71,7 @@ KEY
 	}
 	return frame, nil
 }
+
+func (b *BaseTestFrame) State(state *terraform.State) *terraform.InstanceState {
+	return state.RootModule().Resources[b.TerraformName].Primary
+}

@@ -33,7 +33,7 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "User used to communicate with your SMTP server.",
 			},
-			passwordVar: {
+			PasswordVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Password used to communicate with your SMTP server.",
