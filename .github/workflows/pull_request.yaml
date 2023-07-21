@@ -22,9 +22,6 @@ jobs:
       with:
         go-version: 1.19
 
-    - name: Download Go Modules
-      run: go mod download
-
     - name: Make Machinekey Directory Writable
       working-directory: acceptance
       run: "chmod -R 777 keys"
@@ -50,6 +47,9 @@ jobs:
         key: ${{ steps.go-cache-variables.outputs.GO_CACHE_KEY }}
         restore-keys: ${{ steps.go-cache-variables.outputs.GO_CACHE_KEY_PREFIX }}
         path: ${{ steps.go-cache-variables.outputs.GO_CACHE_PATH }}
+
+    - name: Download Go Modules
+      run: go mod download
 
     - name: Run Acceptance Tests
       run: TF_ACC=1 go test ./...
