@@ -25,6 +25,10 @@ jobs:
     - name: Download Go Modules
       run: go mod download
 
+    - name: Make Machinekey Directory Writable
+      working-directory: acceptance
+      run: "chmod -R 777 keys"
+
     - name: Setup ZITADEL
       working-directory: acceptance
       run: docker compose run setup
@@ -32,16 +36,16 @@ jobs:
     - name: Run Acceptance Tests
       run: TF_ACC=1 go test ./...
 
-    - name: Save ZITADEL Logs
+    - name: Save Docker Compose Logs
       working-directory: acceptance
       if: always()
-      run: docker compose logs zitadel > .zitadel.log
+      run: docker compose logs > .docker-compose.log
 
-    - name: Archive ZITADEL Logs
+    - name: Archive Docker Compose Logs
       if: always()
       uses: actions/upload-artifact@v3
       with:
         name: pull-request-tests
         path: |
-          acceptance/.zitadel.log
+          acceptance/.docker-compose.log
         retention-days: 30
