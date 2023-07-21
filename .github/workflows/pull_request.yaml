@@ -17,14 +17,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Make Machinekey Directory Writable
-      working-directory: acceptance
-      run: "chmod -R 777 machinekey"
-
-    - name: Set up ZITADEL
-      working-directory: acceptance
-      run: docker compose up -d zitadel
-
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
@@ -33,9 +25,9 @@ jobs:
     - name: Download Go Modules
       run: go mod download
 
-    - name: Await ZITADEL
+    - name: Setup ZITADEL
       working-directory: acceptance
-      run: docker compose run wait_for_zitadel
+      run: docker compose run setup
 
     - name: Run Acceptance Tests
       run: TF_ACC=1 go test ./...
