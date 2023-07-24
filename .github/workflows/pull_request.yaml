@@ -17,9 +17,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Restore Timestamps for Go Test Caching
-      uses: chetan/git-restore-mtime-action@v2
-
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
@@ -53,6 +50,9 @@ jobs:
 
     - name: Download Go Modules
       run: go mod download
+
+    - name: Restore Timestamps for Go Test Caching
+      uses: chetan/git-restore-mtime-action@v2
 
     - name: Run Acceptance Tests
       run: TF_ACC=1 go test -coverprofile=profile.cov ./...
