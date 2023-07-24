@@ -18,9 +18,9 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v4
       with:
-        go-version: 1.19
+        go-version: '1.19'
 
     - name: Make Machinekey Directory Writable
       working-directory: acceptance
@@ -30,29 +30,8 @@ jobs:
       working-directory: acceptance
       run: docker compose run setup
 
-    - name: Set Cache Variables
-      id: go-cache-variables
-      run: |
-        echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
-        echo "GO_CACHE_KEY_PREFIX=${GO_CACHE_KEY_PREFIX}" >> $GITHUB_OUTPUT
-        echo "GO_CACHE_KEY=${GO_CACHE_KEY_PREFIX}${{ hashFiles( 'go.*', 'acceptance', 'zitadel/**/*.go') }}" >> $GITHUB_OUTPUT
-      env:
-        GO_CACHE_KEY_PREFIX: acceptance-test-
-
-    - name: Restore Previous Results
-      uses: actions/cache/restore@v3
-      id: cache
-      timeout-minutes: 1
-      with:
-        key: ${{ steps.go-cache-variables.outputs.GO_CACHE_KEY }}
-        restore-keys: ${{ steps.go-cache-variables.outputs.GO_CACHE_KEY_PREFIX }}
-        path: ${{ steps.go-cache-variables.outputs.GO_CACHE_PATH }}
-
     - name: Download Go Modules
       run: go mod download
-
-    - name: Restore Timestamps for Go Test Caching
-      uses: chetan/git-restore-mtime-action@v2
 
     - name: Run Acceptance Tests
       run: TF_ACC=1 go test -coverprofile=profile.cov ./...
@@ -63,13 +42,6 @@ jobs:
         file: profile.cov
         name: acceptance-tests
         flags: acceptance-tests
-
-    - name: Cache Results
-      if: always()
-      uses: actions/cache/save@v3
-      with:
-        key: ${{ steps.go-cache-variables.outputs.GO_CACHE_KEY }}
-        path: ${{ steps.go-cache-variables.outputs.GO_CACHE_PATH }}
 
     - name: Save Docker Compose Logs
       if: always()
