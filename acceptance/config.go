@@ -6,9 +6,11 @@ import (
 )
 
 var (
+	//nolint:typecheck
 	//go:embed keys/instance-level-admin-sa.json
 	instanceLevelAdminSAJSON []byte
 
+	//nolint:typecheck
 	//go:embed keys/org-level-admin-sa.json
 	orgLevelAdminSAJSON []byte
 

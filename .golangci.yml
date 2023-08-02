@@ -1,6 +1,7 @@
 linters:
   disable-all: true
   enable:
+    - typecheck
     - goimports
 linters-settings:
   goimports:
