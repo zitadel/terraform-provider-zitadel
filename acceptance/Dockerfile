@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine
+FROM golang:1.20-alpine
 RUN apk add curl jq
 RUN go install github.com/zitadel/zitadel-tools@v0.4.0
 COPY setup.sh config.json /
