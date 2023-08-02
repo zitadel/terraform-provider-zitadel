@@ -3,6 +3,36 @@ name: Test Provider
 on: pull_request
 
 jobs:
+
+  lint:
+
+    runs-on: ubuntu-20.04
+
+    permissions:
+      contents: read
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+          cache: false
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.53.3
+          github-token: ${{ github.token }}
+          only-new-issues: true
+          skip-pkg-cache: true
+          skip-build-cache: true
+
   test:
 
     runs-on: ubuntu-20.04
