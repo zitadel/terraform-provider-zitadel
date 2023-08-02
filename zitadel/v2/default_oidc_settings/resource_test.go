@@ -20,17 +20,17 @@ func TestAccDefaultOIDCSettings(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(accessTokenLifetime, _ interface{}) string {
+		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
 	access_token_lifetime = "%s"
   	id_token_lifetime = "777h0m0s"
   	refresh_token_idle_expiration = "888h0m0s"
   	refresh_token_expiration = "999h0m0s"
-}`, resourceName, frame.UniqueResourcesID, accessTokenLifetime)
+}`, resourceName, frame.UniqueResourcesID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -41,8 +41,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(interface{}) resource.TestCheckFunc {
-	return func(expect interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetOIDCSettings(frame, &admin.GetOIDCSettingsRequest{})
 			if err != nil {

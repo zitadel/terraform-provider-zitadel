@@ -27,10 +27,10 @@ func TestAccProjectRole(t *testing.T) {
 		t.Fatalf("failed to create project: %v", err)
 	}
 	projectID := proj.GetId()
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(cfg, _ interface{}) string {
+		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id         = "%s"
@@ -38,7 +38,7 @@ resource "%s" "%s" {
   role_key     = "%s"
   display_name = "display_name2"
   group        = "role_group"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, projectID, cfg)
+}`, resourceName, frame.UniqueResourcesID, frame.OrgID, projectID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -49,14 +49,14 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, projectID string) func(interface{}) resource.TestCheckFunc {
-	return func(expected interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.OrgTestFrame, projectID string) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.ListProjectRoles(frame, &management.ListProjectRolesRequest{
 				ProjectId: projectID,
 				Queries: []*project.RoleQuery{{
 					Query: &project.RoleQuery_KeyQuery{
-						KeyQuery: &project.RoleKeyQuery{Key: expected.(string)},
+						KeyQuery: &project.RoleKeyQuery{Key: expect},
 					},
 				}},
 			})
@@ -71,8 +71,8 @@ func checkRemoteProperty(frame test_utils.OrgTestFrame, projectID string) func(i
 				return fmt.Errorf("expected 1 role, but got %v", actualRoles)
 			}
 			actualRole := actualRoles[0].GetKey()
-			if actualRole != expected {
-				return fmt.Errorf("expected role key %s, but got %s", expected, actualRole)
+			if actualRole != expect {
+				return fmt.Errorf("expected role key %s, but got %s", expect, actualRole)
 			}
 			return nil
 		}

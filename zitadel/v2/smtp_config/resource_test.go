@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"testing"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/smtp_config"
 
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
@@ -24,10 +27,14 @@ func TestAccSMTPConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	_, err = frame.RemoveSMTPConfig(frame, &admin.RemoveSMTPConfigRequest{})
+	if err != nil && status.Code(err) != codes.NotFound {
+		t.Fatalf("failed to remove smtp config: %v", err)
+	}
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, secretProperty interface{}) string {
+		func(configProperty, secretProperty string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   sender_address = "address"
@@ -47,8 +54,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(interface{}) resource.TestCheckFunc {
-	return func(expect interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetSMTPConfig(frame, &admin.GetSMTPConfigRequest{})
 			if err != nil {

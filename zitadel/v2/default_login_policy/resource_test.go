@@ -20,10 +20,10 @@ func TestAccDefaultLoginPolicy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[bool](
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ interface{}) string {
+		func(configProperty bool, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   user_login                    = %t
@@ -55,8 +55,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(interface{}) resource.TestCheckFunc {
-	return func(expect interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {
+	return func(expect bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetLoginPolicy(frame, &admin.GetLoginPolicyRequest{})
 			if err != nil {

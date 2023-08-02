@@ -16,12 +16,10 @@ func RunInstanceIDPLifecyleTest(
 	secretAttribute string,
 ) {
 	const importedSecret = "an_imported_secret"
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(initialProperty, initialSecret interface{}) string {
-			return resourceFunc(initialProperty.(string), initialSecret.(string))
-		},
+		resourceFunc,
 		"an initial provider name", "an updated provider name",
 		"an_initial_secret", "an_updated_secret",
 		CheckProviderName(frame),

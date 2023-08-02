@@ -33,7 +33,7 @@ func CheckAMinute(check resource.TestCheckFunc) resource.TestCheckFunc {
 
 var ErrNotFound = fmt.Errorf("not found")
 
-func CheckIsNotFoundFromPropertyCheck(checkRemoteProperty func(interface{}) resource.TestCheckFunc, validProperty interface{}) resource.TestCheckFunc {
+func CheckIsNotFoundFromPropertyCheck[P any](checkRemoteProperty func(P) resource.TestCheckFunc, validProperty P) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		err := checkRemoteProperty(validProperty)(state)
 		if status.Code(err) != codes.NotFound && !errors.Is(err, ErrNotFound) {

@@ -8,13 +8,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func RunLifecyleTest(
+func RunLifecyleTest[P comparable](
 	t *testing.T,
 	frame BaseTestFrame,
-	resourceFunc func(initialProperty, initialSecret interface{}) string,
-	initialProperty, updatedProperty,
-	initialSecret, updatedSecret interface{},
-	checkRemoteProperty func(expect interface{}) resource.TestCheckFunc,
+	resourceFunc func(initialProperty P, initialSecret string) string,
+	initialProperty, updatedProperty P,
+	initialSecret, updatedSecret string,
+	checkRemoteProperty func(expect P) resource.TestCheckFunc,
 	idPattern *regexp.Regexp,
 	checkDestroy, checkImportState resource.TestCheckFunc,
 	importStateIdFunc resource.ImportStateIdFunc,

@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func CheckProviderName(frame test_utils.InstanceTestFrame) func(interface{}) resource.TestCheckFunc {
-	return func(expectName interface{}) resource.TestCheckFunc {
+func CheckProviderName(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+	return func(expectName string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			remoteProvider, err := frame.Client.GetProviderByID(frame, &admin.GetProviderByIDRequest{Id: frame.State(state).ID})
 			if err != nil {

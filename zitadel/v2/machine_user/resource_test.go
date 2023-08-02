@@ -19,10 +19,10 @@ func TestAccMachineUser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, secretProperty interface{}) string {
+		func(configProperty, secretProperty string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id          = "%s"
@@ -40,8 +40,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
-	return func(expect interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			remoteResource, err := frame.GetUserByID(frame, &management.GetUserByIDRequest{Id: frame.State(state).ID})
 			if err != nil {

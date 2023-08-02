@@ -27,17 +27,17 @@ func TestAccMachineKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create user: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(cfg, _ interface{}) string {
+		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
 	org_id              = "%s"
 	user_id = "%s"
 	key_type        = "KEY_TYPE_JSON"
   	expiration_date = "%s"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, userID, cfg)
+}`, resourceName, frame.UniqueResourcesID, frame.OrgID, userID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -48,8 +48,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(interface{}) resource.TestCheckFunc {
-	return func(expected interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetMachineKeyByIDs(frame, &management.GetMachineKeyByIDsRequest{
 				UserId: userID,
@@ -59,8 +59,8 @@ func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(inte
 				return err
 			}
 			actual := resp.GetKey().GetExpirationDate().AsTime().Format("2006-01-02T15:04:05Z")
-			if expected != actual {
-				return fmt.Errorf("expected %s, but got %s", expected, actual)
+			if expect != actual {
+				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}
 			return nil
 		}

@@ -22,10 +22,10 @@ func TestAccLoginTexts(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ interface{}) string {
+		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id   = "%s"
@@ -329,8 +329,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame, lang string) func(interface{}) resource.TestCheckFunc {
-	return func(expect interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, lang string) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			remoteResource, err := frame.GetCustomLoginTexts(frame, &management.GetCustomLoginTextsRequest{Language: lang})
 			if err != nil {

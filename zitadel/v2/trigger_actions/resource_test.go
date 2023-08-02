@@ -35,17 +35,17 @@ func TestAccTriggerActions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create action: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(name, _ interface{}) string {
+		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
 	org_id              = "%s"
 flow_type = "%s"
   trigger_type = "%s"
   action_ids   = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, flowType, name, action.GetId())
+}`, resourceName, frame.UniqueResourcesID, frame.OrgID, flowType, configProperty, action.GetId())
 		},
 		initialTriggerType, updatedTriggerType,
 		"", "",
@@ -56,8 +56,8 @@ flow_type = "%s"
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, flowType string) func(interface{}) resource.TestCheckFunc {
-	return func(expectTriggerType interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.OrgTestFrame, flowType string) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			flowTypeValues := helper.EnumValueMap(trigger_actions.FlowTypes())
 			resp, err := frame.GetFlow(frame, &management.GetFlowRequest{Type: strconv.Itoa(int(flowTypeValues[flowType]))})
@@ -73,11 +73,11 @@ func checkRemoteProperty(frame test_utils.OrgTestFrame, flowType string) func(in
 				}
 				foundType := typesMapping[int32(idInt)]
 				foundTypes = append(foundTypes, foundType)
-				if foundType == expectTriggerType {
+				if foundType == expect {
 					return nil
 				}
 			}
-			return fmt.Errorf("expected trigger type %s not found in %v: %w", expectTriggerType, foundTypes, test_utils.ErrNotFound)
+			return fmt.Errorf("expected trigger type %s not found in %v: %w", expect, foundTypes, test_utils.ErrNotFound)
 		}
 	}
 }

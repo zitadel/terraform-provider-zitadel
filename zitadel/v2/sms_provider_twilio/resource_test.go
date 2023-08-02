@@ -24,10 +24,10 @@ func TestAccSMSProviderTwilio(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, secretProperty interface{}) string {
+		func(configProperty, secretProperty string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   sid           = "sid"
@@ -44,8 +44,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(interface{}) resource.TestCheckFunc {
-	return func(expect interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetSMSProvider(frame, &admin.GetSMSProviderRequest{Id: frame.State(state).ID})
 			if err != nil {

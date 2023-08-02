@@ -13,16 +13,16 @@ import (
 
 func TestAccHumanUser(t *testing.T) {
 	resourceName := "zitadel_human_user"
-	initialProperty := "test1@zitadel.com"
-	updatedProperty := "test2@zitadel.com"
+	initialProperty := "en"
+	updatedProperty := "de"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, secretProperty interface{}) string {
+		func(configProperty, secretProperty string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id          = "%s"
@@ -31,14 +31,14 @@ resource "%s" "%s" {
   last_name          = "lastname"
   nick_name          = "nickname"
   display_name       = "displayname"
-  preferred_language = "de"
+  preferred_language = "%s"
   gender             = "GENDER_MALE"
   phone              = "+41799999999"
   is_phone_verified  = true
-  email              = "%s"
+  email              = "%s@example.com"
   is_email_verified  = true
   initial_password   = "Password1!"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
+}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty, frame.UniqueResourcesID)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -49,14 +49,14 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
-	return func(expect interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			remoteResource, err := frame.GetUserByID(frame, &management.GetUserByIDRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return err
 			}
-			actual := remoteResource.GetUser().GetHuman().GetEmail().GetEmail()
+			actual := remoteResource.GetUser().GetHuman().GetProfile().GetPreferredLanguage()
 			if actual != expect {
 				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}

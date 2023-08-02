@@ -12,8 +12,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func CheckProviderName(frame test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
-	return func(expectName interface{}) resource.TestCheckFunc {
+func CheckProviderName(frame test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+	return func(expectName string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			remoteProvider, err := frame.GetProviderByID(frame, &management.GetProviderByIDRequest{Id: frame.State(state).ID})
 			if err != nil {

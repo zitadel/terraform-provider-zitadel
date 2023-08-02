@@ -20,10 +20,10 @@ func TestAccLockoutPolicy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[uint64](
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ interface{}) string {
+		func(configProperty uint64, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id = "%s"
@@ -39,8 +39,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame) func(interface{}) resource.TestCheckFunc {
-	return func(expect interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
+	return func(expect uint64) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetLockoutPolicy(frame, &management.GetLockoutPolicyRequest{})
 			if err != nil {

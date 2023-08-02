@@ -37,15 +37,15 @@ func TestAccInstanceMember(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create user: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(cfg, _ interface{}) string {
+		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
 	user_id = "%s"
   	roles   = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, userID, cfg)
+}`, resourceName, frame.UniqueResourcesID, userID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
@@ -56,8 +56,8 @@ resource "%s" "%s" {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(interface{}) resource.TestCheckFunc {
-	return func(expected interface{}) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.Admin.ListIAMMembers(frame, &admin.ListIAMMembersRequest{
 				Queries: []*member.SearchQuery{{
@@ -71,8 +71,8 @@ func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(inte
 				return fmt.Errorf("expected 1 user with 1 role, but got %d: %w", len(resp.Result), test_utils.ErrNotFound)
 			}
 			actual := resp.Result[0].Roles[0]
-			if expected != actual {
-				return fmt.Errorf("expected role %s, but got %s", expected, actual)
+			if expect != actual {
+				return fmt.Errorf("expected role %s, but got %s", expect, actual)
 			}
 			return nil
 		}
