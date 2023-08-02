@@ -3,9 +3,10 @@ package test_utils
 import (
 	"context"
 
+	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
+
 	"github.com/zitadel/terraform-provider-zitadel/acceptance"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
 )
 
 type InstanceTestFrame struct {
