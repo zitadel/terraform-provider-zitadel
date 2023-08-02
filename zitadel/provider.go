@@ -3,8 +3,6 @@ package zitadel
 import (
 	"context"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_oidc_settings"
-
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	fdiag "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -27,6 +25,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_login_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_login_texts"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_notification_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_oidc_settings"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_reset_message_text"

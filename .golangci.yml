@@ -4,7 +4,10 @@ linters:
   disable-all: true
   enable:
     - typecheck
-    - goimports
+    - gci
 linters-settings:
-  goimports:
-    local-prefixes: github.com/zitadel/terraform-provider-zitadel
+  gci:
+    sections:
+    - standard
+    - default
+    - prefix(github.com/zitadel/terraform-provider-zitadel)
