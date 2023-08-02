@@ -5,10 +5,9 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )

@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
-
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 )
 
 func RunOrgLifecyleTest(

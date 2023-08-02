@@ -3,13 +3,13 @@ package org_idp_test_utils
 import (
 	"fmt"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
 func CheckProviderName(frame test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {

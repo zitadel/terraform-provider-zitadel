@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/sms_provider_twilio"
-
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/sms_provider_twilio"
 )
 
 func TestAccSMSProviderTwilio(t *testing.T) {
