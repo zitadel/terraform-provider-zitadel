@@ -82,9 +82,11 @@ func RunLifecyleTest[P comparable](
 		CheckDestroy: CheckAMinute(checkDestroy),
 		Steps:        steps,
 		ErrorCheck: func(err error) error {
-			if allowNonEmptyPlan && strings.Contains(err.Error(), "Step 2/4 error: After applying this test step and performing a `terraform refresh`, the plan was not empty After applying this test step and performing a "+"`terraform refresh`"+", the plan was not empty") {
+			if err != nil && allowNonEmptyPlan {
 				t.Logf("Ignoring non-empty plan error because we can't guarantee consistency: %s", err.Error())
-				return nil
+				if strings.Contains(err.Error(), "Step 2/4 error: After applying this test step and performing a `terraform refresh`, the plan was not empty After applying this test step and performing a "+"`terraform refresh`"+", the plan was not empty") {
+					return nil
+				}
 			}
 			return err
 		},
