@@ -1,6 +1,9 @@
 package org
 
 const (
-	nameVar  = "name"
-	orgIDVar = "org_id"
+	orgIDVar         = "id"
+	nameVar          = "name"
+	domainVar        = "domain"
+	stateVar         = "state"
+	primaryDomainVar = "primary_domain"
 )
