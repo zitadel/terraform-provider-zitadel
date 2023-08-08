@@ -76,7 +76,7 @@ func RunLifecyleTest[P comparable](
 			Check:                   checkImportState,
 		})
 	}
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		CheckDestroy:             CheckAMinute(checkDestroy),
 		Steps:                    steps,
 		ProtoV6ProviderFactories: frame.v6ProviderFactories,
