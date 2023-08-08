@@ -19,9 +19,13 @@ func TestAccDomainPolicy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
+	otherFrame, err := frame.AnotherOrg("domain-policy-org")
+	if err != nil {
+		t.Fatalf("setting up test context failed: %v", err)
+	}
 	test_utils.RunLifecyleTest[bool](
 		t,
-		frame.BaseTestFrame,
+		otherFrame.BaseTestFrame,
 		func(configProperty bool, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
@@ -29,13 +33,13 @@ resource "%s" "%s" {
   user_login_must_be_domain                   = %t
   validate_org_domains                        = false
   smtp_sender_address_matches_instance_domain = false
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
+}`, resourceName, otherFrame.UniqueResourcesID, otherFrame.OrgID, configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(*otherFrame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		checkRemoteProperty(*frame)(initialProperty),
+		checkRemoteProperty(*otherFrame)(initialProperty),
 		nil, nil, "", "",
 	)
 }
