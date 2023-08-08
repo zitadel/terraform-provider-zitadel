@@ -19,7 +19,7 @@ func TestAccDomainPolicy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	otherFrame, err := frame.AnotherOrg("domain-policy-org")
+	otherFrame, err := frame.AnotherOrg("domain-policy-org-" + frame.UniqueResourcesID)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
