@@ -73,5 +73,10 @@ KEY
 }
 
 func (b *BaseTestFrame) State(state *terraform.State) *terraform.InstanceState {
-	return state.RootModule().Resources[b.TerraformName].Primary
+	resources := state.RootModule().Resources
+	resource := resources[b.TerraformName]
+	if resource != nil {
+		return resource.Primary
+	}
+	return resources["data."+b.TerraformName].Primary
 }
