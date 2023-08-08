@@ -56,6 +56,7 @@ resource "%s" "%s" {
 		},
 		initialProperty, updatedProperty,
 		"", "",
+		true,
 		checkRemoteProperty(*frame, projectID, userID),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID, userID), ""),

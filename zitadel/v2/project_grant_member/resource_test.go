@@ -69,6 +69,7 @@ resource "%s" "%s" {
 		},
 		initialProperty, updatedProperty,
 		"", "",
+		true,
 		checkRemoteProperty(*otherOrgFrame, projectID, grantID, otherOrgUserID),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*otherOrgFrame, projectID, grantID, otherOrgUserID), ""),

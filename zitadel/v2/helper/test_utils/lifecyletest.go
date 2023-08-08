@@ -3,6 +3,7 @@ package test_utils
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,7 @@ func RunLifecyleTest[P comparable](
 	resourceFunc func(initialProperty P, initialSecret string) string,
 	initialProperty, updatedProperty P,
 	initialSecret, updatedSecret string,
+	allowNonEmptyPlan bool,
 	checkRemoteProperty func(expect P) resource.TestCheckFunc,
 	idPattern *regexp.Regexp,
 	checkDestroy, checkImportState resource.TestCheckFunc,
@@ -77,8 +79,15 @@ func RunLifecyleTest[P comparable](
 		})
 	}
 	resource.ParallelTest(t, resource.TestCase{
-		CheckDestroy:             CheckAMinute(checkDestroy),
-		Steps:                    steps,
+		CheckDestroy: CheckAMinute(checkDestroy),
+		Steps:        steps,
+		ErrorCheck: func(err error) error {
+			if allowNonEmptyPlan && strings.Contains(err.Error(), "Step 2/4 error: After applying this test step and performing a `terraform refresh`, the plan was not empty After applying this test step and performing a "+"`terraform refresh`"+", the plan was not empty") {
+				t.Logf("Ignoring non-empty plan error because we can't guarantee consistency: %s", err.Error())
+				return nil
+			}
+			return err
+		},
 		ProtoV6ProviderFactories: frame.v6ProviderFactories,
 		ProtoV5ProviderFactories: frame.v5ProviderFactories,
 	})

@@ -46,6 +46,7 @@ resource "%s" "%s" {
 		},
 		initialProperty, updatedProperty,
 		"", "",
+		false,
 		checkRemoteProperty(frame, project.GetId(), app.GetAppId()),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId(), app.GetAppId()), updatedProperty),

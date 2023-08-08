@@ -37,6 +37,7 @@ resource "%s" "%s" {
 		},
 		initialProperty, updatedProperty,
 		"", "",
+		false,
 		checkRemoteProperty(*otherFrame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		checkRemoteProperty(*otherFrame)(initialProperty),

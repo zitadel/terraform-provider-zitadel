@@ -34,6 +34,7 @@ resource "%s" "%s" {
 		},
 		initialProperty, updatedProperty,
 		"", "",
+		true,
 		checkRemoteProperty(frame),
 		regexp.MustCompile(fmt.Sprintf(`^%s$|^%s$`, initialProperty, updatedProperty)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),

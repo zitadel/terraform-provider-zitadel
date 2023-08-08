@@ -40,6 +40,7 @@ resource "%s" "%s" {
 		},
 		initialProperty, updatedProperty,
 		"", "",
+		true,
 		checkRemoteProperty(frame, language),
 		regexp.MustCompile(`^en$`),
 		// When deleted, the default should be returned

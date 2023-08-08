@@ -49,6 +49,7 @@ flow_type = "%s"
 		},
 		initialTriggerType, updatedTriggerType,
 		"", "",
+		false,
 		checkRemoteProperty(*frame, flowType),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), initialTriggerType),

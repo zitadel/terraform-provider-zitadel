@@ -23,6 +23,7 @@ func RunOrgLifecyleTest(
 		resourceFunc,
 		"an initial provider name", "an updated provider name",
 		"an_initial_secret", "an_updated_secret",
+		false,
 		CheckProviderName(frame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
 		CheckDestroy(frame),
