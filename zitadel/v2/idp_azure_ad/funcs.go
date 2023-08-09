@@ -2,6 +2,7 @@ package idp_azure_ad
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -21,13 +22,17 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	tenant, err := ConstructTenant(d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	resp, err := client.AddAzureADProvider(ctx, &admin.AddAzureADProviderRequest{
 		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
 		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
 		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		Scopes:          idp_utils.ScopesValue(d),
 		ProviderOptions: idp_utils.ProviderOptionsValue(d),
-		Tenant:          ConstructTenant(d),
+		Tenant:          tenant,
 		EmailVerified:   idp_utils.BoolValue(d, EmailVerifiedVar),
 	})
 	if err != nil {
@@ -46,6 +51,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	tenant, err := ConstructTenant(d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	_, err = client.UpdateAzureADProvider(ctx, &admin.UpdateAzureADProviderRequest{
 		Id:              d.Id(),
 		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
@@ -53,7 +62,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		Scopes:          idp_utils.ScopesValue(d),
 		ProviderOptions: idp_utils.ProviderOptionsValue(d),
-		Tenant:          ConstructTenant(d),
+		Tenant:          tenant,
 		EmailVerified:   idp_utils.BoolValue(d, EmailVerifiedVar),
 	})
 	if err != nil {
@@ -105,17 +114,21 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	return nil
 }
 
-func ConstructTenant(d *schema.ResourceData) *idp.AzureADTenant {
+func ConstructTenant(d *schema.ResourceData) (*idp.AzureADTenant, error) {
 	tenant := &idp.AzureADTenant{}
 	tenantId := idp_utils.StringValue(d, TenantIDVar)
+	tenantType := idp_utils.StringValue(d, TenantTypeVar)
+	if tenantId != "" && tenantType != "" {
+		return nil, fmt.Errorf("tenant_id and tenant_type are mutually exclusive, but got id %s and type %s", tenantId, tenantType)
+	}
 	if tenantId != "" {
 		tenant.Type = &idp.AzureADTenant_TenantId{
 			TenantId: tenantId,
 		}
 	} else {
 		tenant.Type = &idp.AzureADTenant_TenantType{
-			TenantType: idp.AzureADTenantType(idp.AzureADTenantType_value[idp_utils.StringValue(d, TenantTypeVar)]),
+			TenantType: idp.AzureADTenantType(idp.AzureADTenantType_value[tenantType]),
 		}
 	}
-	return tenant
+	return tenant, nil
 }
