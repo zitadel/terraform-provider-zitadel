@@ -23,13 +23,17 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	tenant, err := idp_azure_ad.ConstructTenant(d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	resp, err := client.AddAzureADProvider(ctx, &management.AddAzureADProviderRequest{
 		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
 		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
 		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		Scopes:          idp_utils.ScopesValue(d),
 		ProviderOptions: idp_utils.ProviderOptionsValue(d),
-		Tenant:          idp_azure_ad.ConstructTenant(d),
+		Tenant:          tenant,
 		EmailVerified:   idp_utils.BoolValue(d, idp_azure_ad.EmailVerifiedVar),
 	})
 	if err != nil {
@@ -48,6 +52,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	tenant, err := idp_azure_ad.ConstructTenant(d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	_, err = client.UpdateAzureADProvider(ctx, &management.UpdateAzureADProviderRequest{
 		Id:              d.Id(),
 		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
@@ -55,7 +63,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		Scopes:          idp_utils.ScopesValue(d),
 		ProviderOptions: idp_utils.ProviderOptionsValue(d),
-		Tenant:          idp_azure_ad.ConstructTenant(d),
+		Tenant:          tenant,
 		EmailVerified:   idp_utils.BoolValue(d, idp_azure_ad.EmailVerifiedVar),
 	})
 	if err != nil {
