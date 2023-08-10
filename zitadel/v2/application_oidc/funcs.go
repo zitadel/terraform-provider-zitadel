@@ -70,7 +70,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		appTypeVar,
 		authMethodTypeVar,
 		postLogoutRedirectURIsVar,
-		versionVar,
 		devModeVar,
 		accessTokenTypeVar,
 		accessTokenRoleAssertionVar,
