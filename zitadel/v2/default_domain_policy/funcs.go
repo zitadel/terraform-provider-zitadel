@@ -79,6 +79,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		userLoginMustBeDomainVar: policy.GetUserLoginMustBeDomain(),
 		validateOrgDomainVar:     policy.GetValidateOrgDomains(),
+		smtpSenderVar:            policy.GetSmtpSenderAddressMatchesInstanceDomain(),
 	}
 
 	for k, v := range set {

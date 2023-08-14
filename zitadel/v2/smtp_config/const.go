@@ -6,5 +6,5 @@ const (
 	tlsVar           = "tls"
 	hostVar          = "host"
 	userVar          = "user"
-	passwordVar      = "password"
+	PasswordVar      = "password"
 )

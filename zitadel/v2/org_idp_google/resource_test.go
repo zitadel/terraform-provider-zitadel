@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils/org_idp_test_utils"
 )
 
-func TestAccZITADELOrgIdPGoogle(t *testing.T) {
+func TestAccOrgIdPGoogle(t *testing.T) {
 	resourceName := "zitadel_org_idp_google"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
