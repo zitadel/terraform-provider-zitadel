@@ -24,7 +24,6 @@ resource "%s" "%s" {
   client_secret       = "%s"
   scopes              = ["two", "scopes"]
   tenant_type         = "AZURE_AD_TENANT_TYPE_COMMON"
-  tenant_id           = "atenantid"
   email_verified      = true
   is_linking_allowed  = false
   is_creation_allowed = true
