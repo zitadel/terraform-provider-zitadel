@@ -1,9 +1,7 @@
 package application_oidc
 
 const (
-	appIDVar                    = "app_id"
-	orgIDVar                    = "org_id"
-	projectIDVar                = "project_id"
+	ProjectIDVar                = "project_id"
 	nameVar                     = "name"
 	redirectURIsVar             = "redirect_uris"
 	responseTypesVar            = "response_types"
@@ -19,6 +17,6 @@ const (
 	idTokenUserinfoAssertionVar = "id_token_userinfo_assertion"
 	clockSkewVar                = "clock_skew"
 	additionalOriginsVar        = "additional_origins"
-	clientID                    = "client_id"
-	clientSecret                = "client_secret"
+	ClientIDVar                 = "client_id"
+	ClientSecretVar             = "client_secret"
 )

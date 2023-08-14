@@ -19,7 +19,6 @@ import (
 )
 
 const (
-	orgIDVar    = "org_id"
 	languageVar = "language"
 )
 
@@ -208,7 +207,7 @@ func (r *passwordChangeMessageTextResource) Delete(ctx context.Context, req reso
 func setID(obj types.Object, orgID string, language string) {
 	attrs := obj.Attributes()
 	attrs["id"] = types.StringValue(orgID + "_" + language)
-	attrs[orgIDVar] = types.StringValue(orgID)
+	attrs[helper.OrgIDVar] = types.StringValue(orgID)
 	attrs[languageVar] = types.StringValue(language)
 }
 
@@ -218,12 +217,12 @@ func getID(ctx context.Context, obj types.Object) (string, string) {
 	if len(parts) == 2 {
 		return parts[0], parts[1]
 	}
-	return helper.GetStringFromAttr(ctx, obj.Attributes(), orgIDVar), helper.GetStringFromAttr(ctx, obj.Attributes(), languageVar)
+	return helper.GetStringFromAttr(ctx, obj.Attributes(), helper.OrgIDVar), helper.GetStringFromAttr(ctx, obj.Attributes(), languageVar)
 }
 
 func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) (string, string) {
 	var orgID string
-	diag.Append(plan.GetAttribute(ctx, path.Root(orgIDVar), &orgID)...)
+	diag.Append(plan.GetAttribute(ctx, path.Root(helper.OrgIDVar), &orgID)...)
 	if diag.HasError() {
 		return "", ""
 	}
@@ -238,7 +237,7 @@ func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) (
 
 func getStateAttrs(ctx context.Context, state tfsdk.State, diag diag.Diagnostics) (string, string) {
 	var orgID string
-	diag.Append(state.GetAttribute(ctx, path.Root(orgIDVar), &orgID)...)
+	diag.Append(state.GetAttribute(ctx, path.Root(helper.OrgIDVar), &orgID)...)
 	if diag.HasError() {
 		return "", ""
 	}

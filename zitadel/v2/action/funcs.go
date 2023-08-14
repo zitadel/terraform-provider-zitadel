@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/action"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -22,7 +21,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -53,7 +52,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -75,7 +74,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -106,19 +105,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.ListActions(ctx, &management.ListActionsRequest{
-		Queries: []*management.ActionQuery{
-			{Query: &management.ActionQuery_ActionIdQuery{
-				ActionIdQuery: &action.ActionIDQuery{
-					Id: helper.GetID(d, actionIDVar),
-				},
-			}},
-		},
+	resp, err := client.GetAction(ctx, &management.GetActionRequest{
+		Id: helper.GetID(d, actionIDVar),
 	})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
@@ -127,26 +120,20 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.Errorf("failed to list actions")
 	}
-
-	if len(resp.Result) == 1 {
-		action := resp.Result[0]
-		set := map[string]interface{}{
-			orgIDVar:         action.GetDetails().GetResourceOwner(),
-			nameVar:          action.GetName(),
-			stateVar:         action.GetState(),
-			scriptVar:        action.GetScript(),
-			timeoutVar:       action.GetTimeout().AsDuration().String(),
-			allowedToFailVar: action.GetAllowedToFail(),
-		}
-		for k, v := range set {
-			if err := d.Set(k, v); err != nil {
-				return diag.Errorf("failed to set %s of action: %v", k, err)
-			}
-		}
-		d.SetId(action.GetId())
-		return nil
+	action := resp.GetAction()
+	set := map[string]interface{}{
+		helper.OrgIDVar:  action.GetDetails().GetResourceOwner(),
+		nameVar:          action.GetName(),
+		stateVar:         action.GetState(),
+		scriptVar:        action.GetScript(),
+		timeoutVar:       action.GetTimeout().AsDuration().String(),
+		allowedToFailVar: action.GetAllowedToFail(),
 	}
-
-	d.SetId("")
+	for k, v := range set {
+		if err := d.Set(k, v); err != nil {
+			return diag.Errorf("failed to set %s of action: %v", k, err)
+		}
+	}
+	d.SetId(action.GetId())
 	return nil
 }

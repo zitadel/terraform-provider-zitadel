@@ -22,14 +22,14 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	_, err = client.RemoveAppKey(ctx, &management.RemoveAppKeyRequest{
-		ProjectId: d.Get(projectIDVar).(string),
-		AppId:     d.Get(appIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
+		AppId:     d.Get(AppIDVar).(string),
 		KeyId:     d.Id(),
 	})
 	if err != nil {
@@ -46,7 +46,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(orgIDVar).(string)
+	orgID := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)
@@ -54,8 +54,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	keyType := d.Get(keyTypeVar).(string)
 	req := &management.AddAppKeyRequest{
-		ProjectId: d.Get(projectIDVar).(string),
-		AppId:     d.Get(appIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
+		AppId:     d.Get(AppIDVar).(string),
 		Type:      authn.KeyType(authn.KeyType_value[keyType]),
 	}
 
@@ -72,7 +72,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	d.SetId(resp.GetId())
-	if err := d.Set(keyDetailsVar, string(resp.GetKeyDetails())); err != nil {
+	if err := d.Set(KeyDetailsVar, string(resp.GetKeyDetails())); err != nil {
 		return diag.FromErr(err)
 	}
 	return nil
@@ -85,18 +85,18 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(orgIDVar).(string)
+	orgID := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	projectID := d.Get(projectIDVar).(string)
-	appID := d.Get(appIDVar).(string)
+	projectID := d.Get(ProjectIDVar).(string)
+	appID := d.Get(AppIDVar).(string)
 	resp, err := client.GetAppKey(ctx, &management.GetAppKeyRequest{
 		ProjectId: projectID,
 		AppId:     appID,
-		KeyId:     d.Id(),
+		KeyId:     helper.GetID(d, helper.ResourceIDVar),
 	})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
@@ -108,10 +108,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	d.SetId(resp.GetKey().GetId())
 
 	set := map[string]interface{}{
+		helper.OrgIDVar:   orgID,
 		expirationDateVar: resp.GetKey().GetExpirationDate().AsTime().Format(time.RFC3339),
-		projectIDVar:      projectID,
-		appIDVar:          appID,
-		orgIDVar:          orgID,
+		ProjectIDVar:      projectID,
+		AppIDVar:          appID,
+		keyTypeVar:        authn.KeyType_name[int32(resp.GetKey().GetType())],
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

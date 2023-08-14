@@ -2,8 +2,6 @@ package idp_utils
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -27,24 +25,6 @@ func Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to delete idp: %v", err)
 	}
 	return nil
-}
-
-func ImportIDPWithSecret(secretVar string) schema.StateContextFunc {
-	return func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
-		id := data.Id()
-		if id == "" {
-			return nil, fmt.Errorf("%s is not set", IdpIDVar)
-		}
-		parts := strings.SplitN(id, ":", 2)
-		if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-			return nil, fmt.Errorf("unexpected format of ID (%s), expected %s:%s", id, IdpIDVar, secretVar)
-		}
-		data.SetId(parts[0])
-		if err := data.Set(secretVar, parts[1]); err != nil {
-			return nil, err
-		}
-		return []*schema.ResourceData{data}, nil
-	}
 }
 
 func StringValue(d *schema.ResourceData, attributeVar string) string {

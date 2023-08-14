@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
@@ -36,12 +38,12 @@ resource "%s" "%s" {
 }`, resourceName, otherFrame.UniqueResourcesID, otherFrame.OrgID, configProperty)
 		},
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*otherFrame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*otherFrame)(initialProperty),
-		nil, nil, "", "",
+		nil,
 	)
 }
 

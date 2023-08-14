@@ -2,6 +2,7 @@ package project
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetDatasource() *schema.Resource {
@@ -18,7 +19,7 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Name of the project",
 			},
-			orgIDVar: {
+			helper.OrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Organization in which the project is located",

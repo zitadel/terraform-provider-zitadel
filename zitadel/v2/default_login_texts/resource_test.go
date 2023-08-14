@@ -318,13 +318,13 @@ resource "%s" "%s" {
 }`, resourceName, frame.UniqueResourcesID, language, configProperty)
 		},
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(frame, language),
 		regexp.MustCompile(`^en$`),
 		// When deleted, the default should be returned
 		checkRemoteProperty(frame, language)(""),
-		nil, nil, "", "",
+		nil,
 	)
 }
 

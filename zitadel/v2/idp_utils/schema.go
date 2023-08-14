@@ -1,9 +1,12 @@
 package idp_utils
 
-import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+)
 
 const (
-	IdpIDVar             = "id"
+	IdpIDVar             = helper.ResourceIDVar
 	NameVar              = "name"
 	ClientIDVar          = "client_id"
 	ClientSecretVar      = "client_secret"

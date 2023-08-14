@@ -1,7 +1,6 @@
 package label_policy
 
 const (
-	orgIDVar               = "org_id"
 	primaryColorVar        = "primary_color"
 	hideLoginNameSuffixVar = "hide_login_name_suffix"
 	warnColorVar           = "warn_color"

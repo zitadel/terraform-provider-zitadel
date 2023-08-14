@@ -40,13 +40,13 @@ resource "%s" "%s" {
 }`, resourceName, frame.UniqueResourcesID, frame.OrgID, language, configProperty)
 		},
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(frame, language),
 		regexp.MustCompile(`^\d{18}_en$`),
 		// When deleted, the default should be returned
 		checkRemoteProperty(frame, language)("Zitadel - Domain has been claimed"),
-		nil, nil, "", "",
+		nil,
 	)
 }
 

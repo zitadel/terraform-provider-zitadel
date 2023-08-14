@@ -2,6 +2,7 @@ package trigger_actions_test
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"testing"
 	"time"
@@ -19,8 +20,8 @@ import (
 func TestAccTriggerActions(t *testing.T) {
 	resourceName := "zitadel_trigger_actions"
 	flowType := "FLOW_TYPE_CUSTOMISE_TOKEN"
-	initialTriggerType := "TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION"
-	updatedTriggerType := "TRIGGER_TYPE_PRE_USERINFO_CREATION"
+	initialProperty := "TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION"
+	updatedProperty := "TRIGGER_TYPE_PRE_USERINFO_CREATION"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
@@ -47,13 +48,13 @@ flow_type = "%s"
   action_ids   = ["%s"]
 }`, resourceName, frame.UniqueResourcesID, frame.OrgID, flowType, configProperty, action.GetId())
 		},
-		initialTriggerType, updatedTriggerType,
-		"", "",
+		initialProperty, updatedProperty,
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame, flowType),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), initialTriggerType),
-		nil, nil, "", "",
+		regexp.MustCompile(fmt.Sprintf("^%s_([A-Z_]+)_(%s|%s)$", helper.ZitadelGeneratedIdPattern, initialProperty, updatedProperty)),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), initialProperty),
+		nil,
 	)
 }
 

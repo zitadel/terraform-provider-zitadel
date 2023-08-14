@@ -2,23 +2,24 @@ package application_oidc
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing an OIDC application belonging to a project, with all configuration possibilities.",
 		Schema: map[string]*schema.Schema{
-			appIDVar: {
+			helper.ResourceIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of this resource.",
 			},
-			orgIDVar: {
+			helper.OrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "orgID of the application",
 			},
-			projectIDVar: {
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",

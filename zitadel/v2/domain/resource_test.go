@@ -33,12 +33,12 @@ resource "%s" "%s" {
 }`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
 		},
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(frame),
 		regexp.MustCompile(fmt.Sprintf(`^%s$|^%s$`, initialProperty, updatedProperty)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
-		nil, nil, "", "",
+		nil,
 	)
 }
 

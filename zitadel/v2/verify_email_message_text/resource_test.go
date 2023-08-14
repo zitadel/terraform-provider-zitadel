@@ -40,13 +40,13 @@ resource "%s" "%s" {
 }`, resourceName, frame.UniqueResourcesID, frame.OrgID, language, configProperty)
 		},
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(frame, language),
 		regexp.MustCompile(`^\d{18}_en$`),
 		// When deleted, the default should be returned
 		checkRemoteProperty(frame, language)("Zitadel - Verify email"),
-		nil, nil, "", "",
+		nil,
 	)
 }
 

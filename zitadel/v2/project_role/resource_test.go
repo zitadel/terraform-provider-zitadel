@@ -2,7 +2,10 @@ package project_role_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -41,12 +44,12 @@ resource "%s" "%s" {
 }`, resourceName, frame.UniqueResourcesID, frame.OrgID, projectID, configProperty)
 		},
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(*frame, projectID),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		regexp.MustCompile(fmt.Sprintf("^%s_%s_(%s|%s)$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern, initialProperty, updatedProperty)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID), ""),
-		nil, nil, "", "",
+		nil,
 	)
 }
 

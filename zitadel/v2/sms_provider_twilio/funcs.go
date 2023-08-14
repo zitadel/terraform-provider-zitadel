@@ -108,7 +108,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	resp, err := client.GetSMSProvider(ctx, &admin.GetSMSProviderRequest{
-		Id: d.Id(),
+		Id: helper.GetID(d, helper.ResourceIDVar),
 	})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")

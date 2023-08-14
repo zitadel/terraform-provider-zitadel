@@ -2,7 +2,6 @@ package org_idp_oidc
 
 const (
 	idpIDVar              = "idp_id"
-	orgIDVar              = "org_id"
 	nameVar               = "name"
 	stylingTypeVar        = "styling_type"
 	clientIDVar           = "client_id"

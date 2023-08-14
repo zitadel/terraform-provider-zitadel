@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/app_key"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
@@ -45,12 +49,12 @@ resource "%s" "%s" {
 }`, resourceName, frame.UniqueResourcesID, frame.OrgID, project.GetId(), app.GetAppId(), configProperty)
 		},
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(frame, project.GetId(), app.GetAppId()),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId(), app.GetAppId()), updatedProperty),
-		nil, nil, "", "",
+		test_utils.ImportStateId(frame.BaseTestFrame, helper.OrgIDVar, app_key.ProjectIDVar, app_key.AppIDVar, app_key.KeyDetailsVar),
 	)
 }
 

@@ -14,19 +14,16 @@ import (
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started delete")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
 	_, err = client.RemoveApp(ctx, &management.RemoveAppRequest{
-		ProjectId: d.Get(projectIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
 		AppId:     d.Id(),
 	})
 	if err != nil {
@@ -37,18 +34,15 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started update")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	projectID := d.Get(projectIDVar).(string)
+	projectID := d.Get(ProjectIDVar).(string)
 	if d.HasChange(nameVar) {
 		_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
 			ProjectId: projectID,
@@ -75,26 +69,22 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started create")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
 	resp, err := client.AddAPIApp(ctx, &management.AddAPIAppRequest{
-		ProjectId:      d.Get(projectIDVar).(string),
+		ProjectId:      d.Get(ProjectIDVar).(string),
 		Name:           d.Get(nameVar).(string),
 		AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[(d.Get(authMethodTypeVar).(string))]),
 	})
-
 	set := map[string]interface{}{
-		clientID:     resp.GetClientId(),
-		clientSecret: resp.GetClientSecret(),
+		ClientIDVar:     resp.GetClientId(),
+		ClientSecretVar: resp.GetClientSecret(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
@@ -110,18 +100,15 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started read")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: d.Get(projectIDVar).(string), AppId: helper.GetID(d, appIDVar)})
+	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: d.Get(ProjectIDVar).(string), AppId: helper.GetID(d, helper.ResourceIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -129,11 +116,10 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.Errorf("failed to get application api")
 	}
-
 	app := resp.GetApp()
 	api := app.GetApiConfig()
 	set := map[string]interface{}{
-		orgIDVar:          app.GetDetails().GetResourceOwner(),
+		helper.OrgIDVar:   app.GetDetails().GetResourceOwner(),
 		nameVar:           app.GetName(),
 		authMethodTypeVar: api.GetAuthMethodType().String(),
 	}

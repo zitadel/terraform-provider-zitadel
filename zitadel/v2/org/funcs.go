@@ -7,10 +7,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -103,7 +102,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		"orglist": resp.Result,
 	})
 
-	orgID := helper.GetID(d, orgIDVar)
+	orgID := helper.GetID(d, helper.OrgIDVar)
 	tflog.Debug(ctx, "check if org is existing", map[string]interface{}{
 		"id": orgID,
 	})

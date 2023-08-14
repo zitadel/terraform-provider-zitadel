@@ -2,6 +2,7 @@ package project_role
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
@@ -14,12 +15,7 @@ func GetResource() *schema.Resource {
 				Description: "ID of the project",
 				ForceNew:    true,
 			},
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			keyVar: {
 				Type:        schema.TypeString,
 				Required:    true,

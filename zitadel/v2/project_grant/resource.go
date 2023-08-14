@@ -2,6 +2,7 @@ package project_grant
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
@@ -28,7 +29,7 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "List of roles granted",
 			},
-			orgIDVar: {
+			helper.OrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization which owns the resource",

@@ -18,7 +18,7 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "Name of the project",
 			},
-			orgIDVar: {
+			helper.OrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Organization in which the project is located",

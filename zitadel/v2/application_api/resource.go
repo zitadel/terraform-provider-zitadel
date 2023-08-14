@@ -13,13 +13,8 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing an API application belonging to a project, with all configuration possibilities.",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "orgID of the application",
-				ForceNew:    true,
-			},
-			projectIDVar: {
+			helper.OrgIDVar: helper.OrgIDResourceField,
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
@@ -39,13 +34,13 @@ func GetResource() *schema.Resource {
 				},
 				Default: app.APIAuthMethodType_name[0],
 			},
-			clientID: {
+			ClientIDVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "generated ID for this config",
 				Sensitive:   true,
 			},
-			clientSecret: {
+			ClientSecretVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "generated secret for this config",
@@ -56,6 +51,13 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: &schema.ResourceImporter{
+			StateContext: helper.ImportWithIDAndAttributesV5(
+				helper.ImportOrgAttribute,
+				helper.ImportAttribute{Key: ProjectIDVar, ValueFromString: helper.ConvertID},
+				helper.ImportAttribute{Key: ClientIDVar, ValueFromString: helper.ConvertNonEmpty, Optional: true},
+				helper.ImportAttribute{Key: ClientSecretVar, ValueFromString: helper.ConvertNonEmpty, Optional: true},
+			),
+		},
 	}
 }

@@ -2,7 +2,6 @@ package instance_member
 
 import (
 	"context"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -72,14 +71,14 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	userID := d.Get(userIDVar).(string)
-	resp, err := client.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
+	_, err = client.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
 		UserId: userID,
 		Roles:  helper.GetOkSetToStringSlice(d, rolesVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create instance member: %v", err)
 	}
-	d.SetId(getInstanceMemberID(resp.GetDetails().GetResourceOwner(), userID))
+	d.SetId(userID)
 	return nil
 }
 
@@ -96,7 +95,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	userID := d.Get(userIDVar).(string)
+	userID := helper.GetID(d, userIDVar)
 	resp, err := client.ListIAMMembers(ctx, &admin.ListIAMMembersRequest{
 		Queries: []*member.SearchQuery{{
 			Query: &member.SearchQuery_UserIdQuery{
@@ -125,19 +124,10 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 				return diag.Errorf("failed to set %s of instance member: %v", k, err)
 			}
 		}
-		d.SetId(getInstanceMemberID(member.GetDetails().GetResourceOwner(), userID))
+		d.SetId(userID)
 		return nil
 	}
 
 	d.SetId("")
 	return nil
-}
-
-func getInstanceMemberID(instance string, userID string) string {
-	return instance + "_" + userID
-}
-
-func splitInstanceMemberID(memberID string) (string, string) {
-	parts := strings.Split(memberID, "_")
-	return parts[0], parts[1]
 }

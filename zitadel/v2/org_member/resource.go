@@ -2,18 +2,14 @@ package org_member
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the membership of a user on an organization, defined with the given role.",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "ID of the organization",
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			userIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,

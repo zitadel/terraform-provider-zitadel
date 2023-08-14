@@ -2,6 +2,7 @@ package org_idp_ldap
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
@@ -12,7 +13,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing an LDAP IdP on the organization.",
 		Schema: map[string]*schema.Schema{
-			org_idp_utils.OrgIDVar:         org_idp_utils.OrgIDResourceField,
+			helper.OrgIDVar:                helper.OrgIDResourceField,
 			idp_utils.NameVar:              idp_utils.NameResourceField,
 			idp_utils.IsLinkingAllowedVar:  idp_utils.IsLinkingAllowedResourceField,
 			idp_utils.IsCreationAllowedVar: idp_utils.IsCreationAllowedResourceField,
@@ -47,6 +48,6 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: org_idp_utils.Delete,
-		Importer:      &schema.ResourceImporter{StateContext: org_idp_utils.ImportIDPWithOrgAndSecret(idp_ldap.BindPasswordVar)},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOrgAndOptionalSecretStringV5(idp_ldap.BindPasswordVar)},
 	}
 }

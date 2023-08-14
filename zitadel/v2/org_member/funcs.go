@@ -2,7 +2,6 @@ package org_member
 
 import (
 	"context"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -21,7 +20,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -43,7 +42,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -66,7 +65,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(orgIDVar).(string)
+	org := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -80,7 +79,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to create orgmember: %v", err)
 	}
-	d.SetId(getOrgMemberID(org, userID))
+	d.SetId(userID)
 	return nil
 }
 
@@ -91,13 +90,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := d.Get(orgIDVar).(string)
+	org := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	userID := d.Get(userIDVar).(string)
+	userID := helper.GetID(d, userIDVar)
 	resp, err := client.ListOrgMembers(ctx, &management.ListOrgMembersRequest{
 		Queries: []*member.SearchQuery{{
 			Query: &member.SearchQuery_UserIdQuery{
@@ -118,28 +117,18 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if len(resp.Result) == 1 {
 		orgMember := resp.Result[0]
 		set := map[string]interface{}{
-			userIDVar: orgMember.GetUserId(),
-			orgIDVar:  orgMember.GetDetails().GetResourceOwner(),
-			rolesVar:  orgMember.GetRoles(),
+			helper.OrgIDVar: orgMember.GetDetails().GetResourceOwner(),
+			rolesVar:        orgMember.GetRoles(),
 		}
 		for k, v := range set {
 			if err := d.Set(k, v); err != nil {
 				return diag.Errorf("failed to set %s of orgmember: %v", k, err)
 			}
 		}
-		d.SetId(getOrgMemberID(org, userID))
+		d.SetId(userID)
 		return nil
 	}
 
 	d.SetId("")
 	return nil
-}
-
-func getOrgMemberID(org string, userID string) string {
-	return org + "_" + userID
-}
-
-func splitOrgMemberID(orgMemberID string) (string, string) {
-	parts := strings.Split(orgMemberID, "_")
-	return parts[0], parts[1]
 }
