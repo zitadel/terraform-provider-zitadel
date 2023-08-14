@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
-
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
