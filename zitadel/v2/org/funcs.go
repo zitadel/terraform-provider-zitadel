@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/object"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/org"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
@@ -73,8 +74,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	return nil
 }
 
-func getByID(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started getByID")
+func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started get")
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
@@ -90,24 +91,28 @@ func getByID(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Di
 	if err != nil {
 		return diag.Errorf("error while getting org by id %s: %v", orgID, err)
 	}
-	return diag.FromErr(setResourceState(d, resp.GetOrg()))
+	remoteOrg := resp.GetOrg()
+	d.SetId(remoteOrg.Id)
+	if err := d.Set(nameVar, remoteOrg.Name); err != nil {
+		return diag.Errorf("error while setting org name %s: %v", remoteOrg.Name, err)
+	}
+	if err := d.Set(primaryDomainVar, remoteOrg.PrimaryDomain); err != nil {
+		return diag.Errorf("error while setting org primary domain %s: %v", remoteOrg.PrimaryDomain, err)
+	}
+	state := org.OrgState_name[int32(remoteOrg.State)]
+	if err := d.Set(stateVar, state); err != nil {
+		return diag.Errorf("error while setting org state %s: %v", state, err)
+	}
+	return nil
 }
 
-func queryDatasource(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started queryDatasource")
-	orgID := d.Get(orgIDVar).(string)
+func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started list")
 	orgName := d.Get(nameVar).(string)
-	orgState := d.Get(stateVar).(string)
+	orgNameMethod := d.Get(nameMethodVar).(string)
 	orgDomain := d.Get(domainVar).(string)
-	if orgID != "" && (orgName != "" || orgState != "" || orgDomain != "") {
-		return diag.Errorf("only %s or one or many in %s, %s and %s are supported", orgIDVar, nameVar, stateVar, domainVar)
-	}
-	if orgID != "" {
-		if err := getByID(ctx, d, m); err != nil {
-			return err
-		}
-		return diag.FromErr(d.Set(orgIDVar, orgID))
-	}
+	orgDomainMethod := d.Get(domainMethodVar).(string)
+	orgState := d.Get(stateVar).(string)
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
@@ -120,50 +125,41 @@ func queryDatasource(ctx context.Context, d *schema.ResourceData, m interface{})
 	if orgName != "" {
 		req.Queries = append(req.Queries, &org.OrgQuery{
 			Query: &org.OrgQuery_NameQuery{
-				NameQuery: &org.OrgNameQuery{Name: orgName},
+				NameQuery: &org.OrgNameQuery{
+					Name:   orgName,
+					Method: object.TextQueryMethod(object.TextQueryMethod_value[orgNameMethod]),
+				},
 			},
 		})
 	}
 	if orgState != "" {
 		req.Queries = append(req.Queries, &org.OrgQuery{
 			Query: &org.OrgQuery_StateQuery{
-				StateQuery: &org.OrgStateQuery{State: org.OrgState(org.OrgState_value[orgState])},
+				StateQuery: &org.OrgStateQuery{
+					State: org.OrgState(org.OrgState_value[orgState]),
+				},
 			},
 		})
 	}
 	if orgDomain != "" {
 		req.Queries = append(req.Queries, &org.OrgQuery{
 			Query: &org.OrgQuery_DomainQuery{
-				DomainQuery: &org.OrgDomainQuery{Domain: orgDomain},
+				DomainQuery: &org.OrgDomainQuery{
+					Domain: orgDomain,
+					Method: object.TextQueryMethod(object.TextQueryMethod_value[orgDomainMethod]),
+				},
 			},
 		})
-	}
-	if len(req.Queries) == 0 {
-		return diag.Errorf("specify at least one filter")
 	}
 	resp, err := client.ListOrgs(ctx, req)
 	if err != nil {
 		return diag.Errorf("error while getting org by id %s: %v", orgName, err)
 	}
-	if len(resp.Result) != 1 {
-		return diag.Errorf("the filters don't match exactly 1 org, but %d orgs", len(resp.Result))
+	orgIDs := make([]string, len(resp.Result))
+	for i, org := range resp.Result {
+		orgIDs[i] = org.Id
 	}
-	if err = setResourceState(d, resp.Result[0]); err != nil {
-		return diag.FromErr(err)
-	}
-	return diag.FromErr(d.Set(orgIDVar, resp.Result[0].Id))
-}
-
-func setResourceState(d *schema.ResourceData, remoteOrg *org.Org) error {
-	d.SetId(remoteOrg.Id)
-	if err := d.Set(nameVar, remoteOrg.Name); err != nil {
-		return err
-	}
-	if err := d.Set(primaryDomainVar, remoteOrg.PrimaryDomain); err != nil {
-		return err
-	}
-	if err := d.Set(stateVar, org.OrgState_name[int32(remoteOrg.State)]); err != nil {
-		return err
-	}
-	return nil
+	// If the ID is blank, the datasource is deleted and not usable.
+	d.SetId("-")
+	return diag.FromErr(d.Set(orgIDsVar, orgIDs))
 }

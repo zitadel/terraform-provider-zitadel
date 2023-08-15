@@ -26,7 +26,7 @@ func GetResource() *schema.Resource {
 		},
 		CreateContext: create,
 		DeleteContext: delete,
-		ReadContext:   getByID,
+		ReadContext:   get,
 		UpdateContext: update,
 		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
