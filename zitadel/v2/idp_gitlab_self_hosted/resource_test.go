@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils/idp_test_utils"
 )
 
-func TestAccZITADELInstanceIdPGitLabSelfHosted(t *testing.T) {
+func TestAccInstanceIdPGitLabSelfHosted(t *testing.T) {
 	resourceName := "zitadel_idp_gitlab_self_hosted"
 	frame, err := test_utils.NewInstanceTestFrame(resourceName)
 	if err != nil {

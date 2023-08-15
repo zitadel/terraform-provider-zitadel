@@ -2,14 +2,14 @@ package idp_gitlab_test
 
 import (
 	"fmt"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"testing"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils/idp_test_utils"
 )
 
-func TestAccZITADELInstanceIdPGitLab(t *testing.T) {
+func TestAccInstanceIdPGitLab(t *testing.T) {
 	resourceName := "zitadel_idp_gitlab"
 	frame, err := test_utils.NewInstanceTestFrame(resourceName)
 	if err != nil {

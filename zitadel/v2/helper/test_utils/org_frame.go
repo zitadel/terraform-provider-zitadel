@@ -1,57 +1,57 @@
 package test_utils
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
 	mgmt "github.com/zitadel/zitadel-go/v2/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-)
 
-const (
-	orgName = "terraform-tests"
+	"github.com/zitadel/terraform-provider-zitadel/acceptance"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 type OrgTestFrame struct {
 	BaseTestFrame
 	*mgmt.Client
+	Admin *admin.Client
 	OrgID string
 }
 
+func (o *OrgTestFrame) useOrgContext(orgID string) (err error) {
+	o.Client, err = helper.GetManagementClient(o.BaseTestFrame.ClientInfo, orgID)
+	if err != nil {
+		return err
+	}
+	o.Admin, err = helper.GetAdminClient(o.BaseTestFrame.ClientInfo)
+	o.OrgID = orgID
+	return err
+}
+
 func NewOrgTestFrame(resourceType string) (*OrgTestFrame, error) {
-	baseFrame, err := NewBaseTestFrame(resourceType)
+	ctx := context.Background()
+	cfg := acceptance.GetConfig().OrgLevel
+	baseFrame, err := NewBaseTestFrame(ctx, resourceType, cfg.Domain, cfg.AdminSAJSON)
 	if err != nil {
 		return nil, err
 	}
-	mgmtClient, err := helper.GetManagementClient(baseFrame.ClientInfo, "")
-	if err != nil {
-		return nil, err
-	}
-	org, err := mgmtClient.AddOrg(baseFrame, &management.AddOrgRequest{Name: orgName})
-	alreadyExists := status.Code(err) == codes.AlreadyExists
-	if err != nil && !alreadyExists {
-		return nil, err
-	}
-	orgID := org.GetId()
-	if alreadyExists {
-		err := retryAMinute(func() error {
-			getOrgResp, getOrgErr := mgmtClient.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: fmt.Sprintf("%s.%s", orgName, domain)})
-			if getOrgErr != nil {
-				return getOrgErr
-			}
-			orgID = getOrgResp.GetOrg().GetId()
-			return nil
-		})
-		if err != nil {
-			return nil, err
-		}
-	}
-	mgmtClient, err = helper.GetManagementClient(baseFrame.ClientInfo, orgID)
-	return &OrgTestFrame{
+	orgFrame := &OrgTestFrame{
 		BaseTestFrame: *baseFrame,
-		Client:        mgmtClient,
-		OrgID:         orgID,
-	}, err
+	}
+	if err = orgFrame.useOrgContext(""); err != nil {
+		return nil, err
+	}
+	org, err := orgFrame.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: "zitadel." + cfg.Domain})
+	orgFrame.OrgID = org.GetOrg().GetId()
+	return orgFrame, err
+}
+
+func (o OrgTestFrame) AnotherOrg(name string) (*OrgTestFrame, error) {
+	org, err := o.Client.AddOrg(o, &management.AddOrgRequest{
+		Name: name,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &o, o.useOrgContext(org.GetId())
 }
