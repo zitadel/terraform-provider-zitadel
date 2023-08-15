@@ -38,7 +38,7 @@ resource "%s" "%s" {
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
-		nil,
+		test_utils.ImportNothing,
 	)
 }
 

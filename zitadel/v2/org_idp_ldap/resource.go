@@ -48,6 +48,6 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: org_idp_utils.Delete,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOrgAndOptionalSecretStringV5(idp_ldap.BindPasswordVar)},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgAndSecretV5(idp_utils.IdpIDVar, idp_ldap.BindPasswordVar)},
 	}
 }

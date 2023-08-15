@@ -38,7 +38,10 @@ resource "%s" "%s" {
 		checkRemoteProperty(frame),
 		regexp.MustCompile(fmt.Sprintf(`^%s$|^%s$`, initialProperty, updatedProperty)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
-		nil,
+		test_utils.ConcatImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

@@ -10,14 +10,14 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the project roles, which can be given as authorizations to users.",
 		Schema: map[string]*schema.Schema{
-			projectIDVar: {
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
 				ForceNew:    true,
 			},
 			helper.OrgIDVar: helper.OrgIDResourceField,
-			keyVar: {
+			KeyVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
@@ -38,6 +38,16 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: &schema.ResourceImporter{StateContext: helper.ImportWithEmptyIDV5(
+			helper.ImportAttribute{
+				Key:             ProjectIDVar,
+				ValueFromString: helper.ConvertID,
+			},
+			helper.ImportAttribute{
+				Key:             KeyVar,
+				ValueFromString: helper.ConvertNonEmpty,
+			},
+			helper.ImportOptionalOrgAttribute,
+		)},
 	}
 }

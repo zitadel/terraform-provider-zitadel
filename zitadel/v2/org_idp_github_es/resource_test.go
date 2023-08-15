@@ -15,7 +15,7 @@ func TestAccOrgIdPGitHubES(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	org_idp_test_utils.RunOrgLifecyleTest(t, *frame, func(name, secret string) string {
+	org_idp_test_utils.RunOrgLifecyleTest(t, frame, func(name, secret string) string {
 		return fmt.Sprintf(`
 resource "%s" "%s" {
   org_id              = "%s"

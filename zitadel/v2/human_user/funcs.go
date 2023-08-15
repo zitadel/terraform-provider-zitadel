@@ -58,7 +58,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			PreferredLanguage: d.Get(preferredLanguageVar).(string),
 			NickName:          d.Get(nickNameVar).(string),
 		},
-		InitialPassword: d.Get(initialPasswordVar).(string),
+		InitialPassword: d.Get(InitialPasswordVar).(string),
 	}
 
 	if displayname, ok := d.GetOk(displayNameVar); ok {
@@ -176,7 +176,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	respUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: helper.GetID(d, userIDVar)})
+	respUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: helper.GetID(d, helper.ResourceIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

@@ -25,6 +25,6 @@ func GetDatasource() *schema.Resource {
 			idp_gitlab_self_hosted.IssuerVar: idp_gitlab_self_hosted.IssuerDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOrgAndOptionalSecretStringV5(idp_utils.ClientSecretVar)},
+		Importer:    &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgAndSecretV5(idp_utils.IdpIDVar, idp_utils.ClientSecretVar)},
 	}
 }

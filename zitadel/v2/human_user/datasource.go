@@ -10,11 +10,6 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
-			userIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "The ID of this resource.",
-			},
 			helper.OrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,

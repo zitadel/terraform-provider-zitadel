@@ -66,7 +66,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if err := d.Set(tokenVar, resp.GetToken()); err != nil {
+	if err := d.Set(TokenVar, resp.GetToken()); err != nil {
 		return diag.FromErr(err)
 	}
 	d.SetId(resp.GetTokenId())

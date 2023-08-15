@@ -12,6 +12,7 @@ import (
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_member"
 )
 
 func TestAccProjectMember(t *testing.T) {
@@ -62,7 +63,11 @@ resource "%s" "%s" {
 		checkRemoteProperty(*frame, projectID, userID),
 		regexp.MustCompile(fmt.Sprintf("^%s_%s_%s$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID, userID), ""),
-		nil,
+		test_utils.ConcatImportStateIdFuncs(
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_member.ProjectIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_member.UserIDVar),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

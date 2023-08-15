@@ -2,6 +2,6 @@ package pat
 
 const (
 	userIDVar         = "user_id"
-	tokenVar          = "token"
+	TokenVar          = "token"
 	expirationDateVar = "expiration_date"
 )

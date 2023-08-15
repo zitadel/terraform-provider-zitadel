@@ -17,7 +17,7 @@ func GetResource() *schema.Resource {
 				Description: "ID of the user",
 				ForceNew:    true,
 			},
-			tokenVar: {
+			TokenVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Value of the token",
@@ -33,6 +33,6 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		CreateContext: create,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgAndSecretV5(helper.ResourceIDVar, TokenVar)},
 	}
 }

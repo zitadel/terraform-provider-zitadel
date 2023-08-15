@@ -10,12 +10,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the custom domain policy of an organization.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Id for the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			userLoginMustBeDomainVar: {
 				Type:        schema.TypeBool,
 				Required:    true,
@@ -36,6 +31,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndAttributesV5()},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithAttributesV5(helper.ImportOptionalOrgAttribute)},
 	}
 }

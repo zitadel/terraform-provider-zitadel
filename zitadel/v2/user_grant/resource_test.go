@@ -10,6 +10,7 @@ import (
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/user_grant"
 )
 
 func TestAccUserGrant(t *testing.T) {
@@ -70,7 +71,13 @@ resource "%s" "%s" {
 		checkRemoteProperty(*frame, userID),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
-		nil,
+		test_utils.ConcatImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_grant.UserIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_grant.ProjectIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_grant.ProjectGrantIDVar),
+		),
 	)
 }
 

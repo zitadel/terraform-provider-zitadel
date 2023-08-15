@@ -25,6 +25,6 @@ func GetDatasource() *schema.Resource {
 			UserEndpointVar:                UserEndpointDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalSecretStringV5(idp_utils.ClientSecretVar)},
+		Importer:    &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalSecretV5(idp_utils.IdpIDVar, idp_utils.ClientSecretVar)},
 	}
 }

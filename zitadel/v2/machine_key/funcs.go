@@ -28,7 +28,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.RemoveMachineKey(ctx, &management.RemoveMachineKeyRequest{
-		UserId: d.Get(userIDVar).(string),
+		UserId: d.Get(UserIDVar).(string),
 		KeyId:  d.Id(),
 	})
 	if err != nil {
@@ -53,7 +53,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	keyType := d.Get(keyTypeVar).(string)
 	req := &management.AddMachineKeyRequest{
-		UserId: d.Get(userIDVar).(string),
+		UserId: d.Get(UserIDVar).(string),
 		Type:   authn.KeyType(authn.KeyType_value[keyType]),
 	}
 
@@ -70,7 +70,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	d.SetId(resp.GetKeyId())
-	if err := d.Set(keyDetailsVar, string(resp.GetKeyDetails())); err != nil {
+	if err := d.Set(KeyDetailsVar, string(resp.GetKeyDetails())); err != nil {
 		return diag.FromErr(err)
 	}
 	return nil
@@ -89,7 +89,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	userID := d.Get(userIDVar).(string)
+	userID := d.Get(UserIDVar).(string)
 	resp, err := client.GetMachineKeyByIDs(ctx, &management.GetMachineKeyByIDsRequest{
 		UserId: userID,
 		KeyId:  helper.GetID(d, helper.ResourceIDVar),
@@ -105,8 +105,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	d.SetId(resp.GetKey().GetId())
 	set := map[string]interface{}{
 		expirationDateVar: resp.GetKey().GetExpirationDate().AsTime().Format(time.RFC3339),
-		userIDVar:         userID,
+		UserIDVar:         userID,
 		helper.OrgIDVar:   orgID,
+		keyTypeVar:        authn.KeyType_name[int32(resp.GetKey().GetType())],
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

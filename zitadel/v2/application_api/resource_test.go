@@ -45,7 +45,13 @@ resource "%s" "%s" {
 		checkRemoteProperty(frame, project.GetId()),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId()), updatedProperty),
-		test_utils.ImportStateId(frame.BaseTestFrame, helper.OrgIDVar, application_api.ProjectIDVar, application_api.ClientIDVar, application_api.ClientSecretVar),
+		test_utils.ConcatImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_api.ProjectIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_api.ClientIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_api.ClientSecretVar),
+		),
 	)
 }
 

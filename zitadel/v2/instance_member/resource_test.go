@@ -53,7 +53,7 @@ resource "%s" "%s" {
 		checkRemoteProperty(*frame, userID),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
-		nil,
+		test_utils.ImportResourceId(frame.BaseTestFrame),
 	)
 }
 

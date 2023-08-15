@@ -5,43 +5,48 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 var (
-	_                  schema.StateContextFunc = ImportWithIDV5
-	_                  schema.StateContextFunc = ImportWithIDAndOrgV5
-	ImportOrgAttribute                         = ImportAttribute{Key: OrgIDVar, ValueFromString: ConvertID}
+	ImportOptionalOrgAttribute = ImportAttribute{Key: OrgIDVar, ValueFromString: ConvertID, Optional: true}
 )
 
-func ImportWithIDV5(_ context.Context, data *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
-	if _, err := ConvertID(data.Id()); err != nil {
-		return nil, err
-	}
-	return []*schema.ResourceData{data}, nil
+func ImportWithIDV5(idVar string, attrs ...ImportAttribute) schema.StateContextFunc {
+	return ImportWithAttributesV5(append([]ImportAttribute{{Key: idVar, ValueFromString: ConvertID}}, attrs...)...)
 }
 
-func ImportWithIDAndOrgV5(_ context.Context, data *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
-	return ImportWithIDAndAttributesV5(ImportOrgAttribute)(context.Background(), data, nil)
+func ImportWithOrgV5(attrs ...ImportAttribute) schema.StateContextFunc {
+	return ImportWithAttributesV5(append([]ImportAttribute{{Key: OrgIDVar, ValueFromString: ConvertID}}, attrs...)...)
 }
 
-func ImportWithIDAndOptionalSecretStringV5(secretKey string) schema.StateContextFunc {
+func ImportWithIDAndOptionalOrgV5(idVar string, attrs ...ImportAttribute) schema.StateContextFunc {
 	return func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
-		return ImportWithIDAndAttributesV5(ImportAttribute{Key: secretKey, ValueFromString: ConvertNonEmpty, Optional: true})(context.Background(), data, nil)
+		return ImportWithIDV5(idVar, append([]ImportAttribute{ImportOptionalOrgAttribute}, attrs...)...)(ctx, data, nil)
 	}
 }
 
-func ImportWithIDAndOrgAndOptionalSecretStringV5(secretKey string) schema.StateContextFunc {
+func ImportWithIDAndOptionalSecretV5(idVar, secretKey string) schema.StateContextFunc {
 	return func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
-		return ImportWithIDAndAttributesV5(ImportOrgAttribute, ImportAttribute{Key: secretKey, ValueFromString: ConvertNonEmpty, Optional: true})(context.Background(), data, nil)
+		return ImportWithIDV5(idVar, ImportAttribute{Key: secretKey, ValueFromString: ConvertNonEmpty, Optional: true})(ctx, data, nil)
 	}
 }
 
-func ImportWithOptionalIDV5(idVar string) schema.StateContextFunc {
+func ImportWithIDAndOptionalOrgAndSecretV5(idVar, secretKey string) schema.StateContextFunc {
 	return func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
-		return ImportWithAttributesV5(ImportAttribute{Key: idVar, ValueFromString: ConvertOptionalID, Optional: true})(context.Background(), data, nil)
+		return ImportWithIDAndOptionalOrgV5(idVar, ImportAttribute{Key: secretKey, ValueFromString: ConvertNonEmpty, Optional: true})(ctx, data, nil)
+	}
+}
+
+func ImportWithEmptyIDV5(attrs ...ImportAttribute) schema.StateContextFunc {
+	return func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
+		return ImportWithAttributesV5(append([]ImportAttribute{{
+			Key:             `""`,
+			ValueFromString: ConvertEmpty,
+		}}, attrs...)...)(ctx, data, nil)
 	}
 }
 
@@ -51,9 +56,25 @@ type ImportAttribute struct {
 	Optional        bool
 }
 
-func ImportWithIDAndAttributesV5(attrs ...ImportAttribute) schema.StateContextFunc {
-	return ImportWithAttributesV5(append([]ImportAttribute{{Key: "id", Optional: false, ValueFromString: ConvertID}}, attrs...)...)
+type ImportAttributes []ImportAttribute
+
+// Less makes the attributes sortable by putting the optional attributes to the end
+// and the org id to the beginning of the optional attributes
+func (i ImportAttributes) Less(j, k int) bool {
+	left := (i)[j]
+	right := (i)[k]
+	if !left.Optional && right.Optional {
+		return true
+	}
+	if left.Optional && right.Optional && left.Key == OrgIDVar {
+		return true
+	}
+	return false
 }
+
+func (i ImportAttributes) Len() int { return len(i) }
+
+func (i ImportAttributes) Swap(j, k int) { (i)[j], (i)[k] = (i)[k], (i)[j] }
 
 func ImportWithAttributesV5(attrs ...ImportAttribute) schema.StateContextFunc {
 	return func(ctx context.Context, data *schema.ResourceData, i interface{}) (ret []*schema.ResourceData, err error) {
@@ -62,6 +83,7 @@ func ImportWithAttributesV5(attrs ...ImportAttribute) schema.StateContextFunc {
 			optionalKeys []string
 			requiredKeys []string
 		)
+		sort.Sort(ImportAttributes(attrs))
 		for _, attr := range attrs {
 			if attr.Optional {
 				optionalKeys = append(optionalKeys, attr.Key)
@@ -70,18 +92,7 @@ func ImportWithAttributesV5(attrs ...ImportAttribute) schema.StateContextFunc {
 			}
 		}
 		defer func() {
-			if err != nil {
-				expectFormat := fmt.Sprintf("<")
-				if len(requiredKeys) > 0 {
-					expectFormat += fmt.Sprintf(":%s", strings.Join(requiredKeys, ":"))
-				}
-				if len(optionalKeys) > 0 {
-					expectFormat += fmt.Sprintf("[:%s]", strings.Join(optionalKeys, "][:"))
-				}
-				expectFormat = strings.Replace(expectFormat, "<:", "<", 1)
-				expectFormat += ">"
-				err = fmt.Errorf("failed to import id %s by format %s: %w", id, expectFormat, err)
-			}
+			err = ImportIDValidationError(id, requiredKeys, optionalKeys, err)
 		}()
 		parts := strings.SplitN(id, ":", len(attrs))
 		minParts := len(requiredKeys)
@@ -97,7 +108,9 @@ func ImportWithAttributesV5(attrs ...ImportAttribute) schema.StateContextFunc {
 			}
 			if i == 0 {
 				data.SetId(val.(string))
-				continue
+				if attr.Key == ResourceIDVar || attr.Key == `""` {
+					continue
+				}
 			}
 			if err := data.Set(attr.Key, val); err != nil {
 				return nil, fmt.Errorf("failed to set %s=%v: %w", attr.Key, val, err)
@@ -121,11 +134,11 @@ func ConvertJSON(importValue string) (interface{}, error) {
 	return importValue, nil
 }
 
-func ConvertOptionalID(importValue string) (interface{}, error) {
-	if len(importValue) == 0 {
-		return "imported", nil
+func ConvertEmpty(importValue string) (interface{}, error) {
+	if len(importValue) > 0 {
+		return nil, fmt.Errorf("value must be empty, but got %s", importValue)
 	}
-	return ConvertID(importValue)
+	return "imported", nil
 }
 
 func ConvertNonEmpty(importValue string) (interface{}, error) {
@@ -133,4 +146,20 @@ func ConvertNonEmpty(importValue string) (interface{}, error) {
 		return nil, errors.New("value must not be empty")
 	}
 	return importValue, nil
+}
+
+func ImportIDValidationError(givenID string, requiredKeys, optionalKeys []string, err error) error {
+	if err == nil {
+		return nil
+	}
+	expectFormat := fmt.Sprintf("<")
+	if len(requiredKeys) > 0 {
+		expectFormat += fmt.Sprintf(":%s", strings.Join(requiredKeys, ":"))
+	}
+	if len(optionalKeys) > 0 {
+		expectFormat += fmt.Sprintf("[:%s]", strings.Join(optionalKeys, "][:"))
+	}
+	expectFormat = strings.Replace(expectFormat, "<:", "<", 1)
+	expectFormat += ">"
+	return fmt.Errorf("failed to import id %s by format %s: %w", givenID, expectFormat, err)
 }

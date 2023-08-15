@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -23,6 +25,10 @@ var (
 		Required:    true,
 		Description: "ID of the organization",
 		ForceNew:    true,
+		ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+			_, err := ConvertID(i.(string))
+			return diag.FromErr(err)
+		},
 	}
 
 	ResourceIDDatasourceField = &schema.Schema{

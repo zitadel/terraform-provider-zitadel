@@ -9,7 +9,7 @@ import (
 
 func RunOrgLifecyleTest(
 	t *testing.T,
-	frame test_utils.OrgTestFrame,
+	frame *test_utils.OrgTestFrame,
 	resourceFunc func(string, string) string,
 	secretAttribute string,
 ) {
@@ -20,9 +20,13 @@ func RunOrgLifecyleTest(
 		"an initial provider name", "an updated provider name",
 		secretAttribute, "an_initial_secret", "an_updated_secret",
 		false,
-		CheckProviderName(frame),
+		CheckProviderName(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		CheckDestroy(frame),
-		test_utils.ImportStateId(frame.BaseTestFrame, helper.OrgIDVar, secretAttribute),
+		CheckDestroy(*frame),
+		test_utils.ConcatImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, secretAttribute),
+		),
 	)
 }

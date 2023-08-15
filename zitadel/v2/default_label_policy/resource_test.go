@@ -45,7 +45,9 @@ resource "%s" "%s" {
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
-		nil,
+		func(state *terraform.State) (string, error) {
+			return "true", nil
+		},
 	)
 }
 

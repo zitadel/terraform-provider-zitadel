@@ -103,7 +103,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		"orglist": resp.Result,
 	})
 
-	orgID := helper.GetID(d, helper.OrgIDVar)
+	orgID := helper.GetID(d, helper.ResourceIDVar)
 	tflog.Debug(ctx, "check if org is existing", map[string]interface{}{
 		"id": orgID,
 	})

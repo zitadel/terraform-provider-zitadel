@@ -10,7 +10,7 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing the project roles, which can be given as authorizations to users.",
 		Schema: map[string]*schema.Schema{
-			projectIDVar: {
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
@@ -20,7 +20,7 @@ func GetDatasource() *schema.Resource {
 				Required:    true,
 				Description: "ID of the organization",
 			},
-			keyVar: {
+			KeyVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Key used for project role",

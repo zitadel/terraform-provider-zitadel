@@ -23,6 +23,9 @@ func RunInstanceIDPLifecyleTest(
 		CheckProviderName(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		CheckDestroy(frame),
-		test_utils.ImportStateId(frame.BaseTestFrame, secretAttribute),
+		test_utils.ConcatImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, secretAttribute),
+		),
 	)
 }

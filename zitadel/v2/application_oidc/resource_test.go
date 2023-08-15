@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
@@ -58,7 +58,13 @@ resource "%s" "%s" {
 		checkRemoteProperty(frame, project.GetId()),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId()), updatedProperty),
-		test_utils.ImportStateId(frame.BaseTestFrame, helper.OrgIDVar, application_api.ProjectIDVar, application_api.ClientIDVar, application_api.ClientSecretVar),
+		test_utils.ConcatImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ProjectIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientSecretVar),
+		),
 	)
 }
 

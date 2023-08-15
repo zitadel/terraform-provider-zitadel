@@ -40,7 +40,7 @@ resource "%s" "%s" {
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*frame)(initialProperty),
-		nil,
+		test_utils.ImportOrgId(frame),
 	)
 }
 

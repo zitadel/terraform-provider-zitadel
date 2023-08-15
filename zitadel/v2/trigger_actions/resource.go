@@ -13,21 +13,21 @@ func GetResource() *schema.Resource {
 		Description: "Resource representing triggers, when actions get started",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
-			flowTypeVar: {
+			FlowTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Type of the flow to which the action triggers belong" + helper.DescriptionEnumValuesList(FlowTypes()),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(flowTypeVar, value, helper.EnumValueMap(FlowTypes()))
+					return helper.EnumValueValidation(FlowTypeVar, value, helper.EnumValueMap(FlowTypes()))
 				},
 				ForceNew: true,
 			},
-			triggerTypeVar: {
+			TriggerTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Trigger type on when the actions get triggered" + helper.DescriptionEnumValuesList(TriggerTypes()),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(triggerTypeVar, value, helper.EnumValueMap(TriggerTypes()))
+					return helper.EnumValueValidation(TriggerTypeVar, value, helper.EnumValueMap(TriggerTypes()))
 				},
 				ForceNew: true,
 			},
@@ -44,7 +44,17 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: &schema.ResourceImporter{StateContext: helper.ImportWithEmptyIDV5(
+			helper.ImportAttribute{
+				Key:             FlowTypeVar,
+				ValueFromString: helper.ConvertID,
+			},
+			helper.ImportAttribute{
+				Key:             TriggerTypeVar,
+				ValueFromString: helper.ConvertNonEmpty,
+			},
+			helper.ImportOptionalOrgAttribute,
+		)},
 	}
 }
 

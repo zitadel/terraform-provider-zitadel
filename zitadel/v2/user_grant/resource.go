@@ -10,19 +10,19 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the authorization given to a user directly, including the given roles.",
 		Schema: map[string]*schema.Schema{
-			projectIDVar: {
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "ID of the project",
 				ForceNew:    true,
 			},
-			projectGrantIDVar: {
+			ProjectGrantIDVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "ID of the granted project",
 				ForceNew:    true,
 			},
-			userIDVar: {
+			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the user",
@@ -47,6 +47,22 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgV5(
+			helper.ResourceIDVar,
+			helper.ImportAttribute{
+				Key:             UserIDVar,
+				ValueFromString: helper.ConvertID,
+			},
+			helper.ImportAttribute{
+				Key:             ProjectIDVar,
+				ValueFromString: helper.ConvertID,
+				Optional:        true,
+			},
+			helper.ImportAttribute{
+				Key:             ProjectGrantIDVar,
+				ValueFromString: helper.ConvertID,
+				Optional:        true,
+			},
+		)},
 	}
 }

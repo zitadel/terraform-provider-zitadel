@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 
 func GetResource() *schema.Resource {
@@ -72,6 +73,6 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: delete,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOrgAndOptionalSecretStringV5(clientSecretVar)},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgAndSecretV5(idp_utils.IdpIDVar, clientSecretVar)},
 	}
 }

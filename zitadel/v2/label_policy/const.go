@@ -26,7 +26,7 @@ const (
 	fontPathVar            = "font_path"
 	fontHashVar            = "font_hash"
 	fontURLVar             = "font_url"
-	setActiveVar           = "set_active"
+	SetActiveVar           = "set_active"
 )
 
 const (

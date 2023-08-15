@@ -52,7 +52,13 @@ resource "%s" "%s" {
 		checkRemoteProperty(frame, project.GetId(), app.GetAppId()),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId(), app.GetAppId()), updatedProperty),
-		test_utils.ImportStateId(frame.BaseTestFrame, helper.OrgIDVar, app_key.ProjectIDVar, app_key.AppIDVar, app_key.KeyDetailsVar),
+		test_utils.ConcatImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, app_key.ProjectIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, app_key.AppIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, app_key.KeyDetailsVar),
+		),
 	)
 }
 

@@ -54,7 +54,11 @@ flow_type = "%s"
 		checkRemoteProperty(*frame, flowType),
 		regexp.MustCompile(fmt.Sprintf("^%s_([A-Z_]+)_(%s|%s)$", helper.ZitadelGeneratedIdPattern, initialProperty, updatedProperty)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), initialProperty),
-		nil,
+		test_utils.ConcatImportStateIdFuncs(
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, trigger_actions.FlowTypeVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, trigger_actions.TriggerTypeVar),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

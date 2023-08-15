@@ -45,6 +45,6 @@ func GetDatasource() *schema.Resource {
 			idp_ldap.ProfileAttributeVar:           idp_ldap.ProfileAttributeDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOrgAndOptionalSecretStringV5(idp_utils.ClientSecretVar)},
+		Importer:    &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgAndSecretV5(idp_utils.IdpIDVar, idp_utils.ClientSecretVar)},
 	}
 }

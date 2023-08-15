@@ -1,6 +1,9 @@
 package default_label_policy
 
 import (
+	"context"
+	"strconv"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
@@ -145,6 +148,16 @@ func GetResource() *schema.Resource {
 		CreateContext: update,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithOptionalIDV5("instance_id")},
+		Importer: &schema.ResourceImporter{StateContext: func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
+			id := data.Id()
+			active, err := strconv.ParseBool(id)
+			if err != nil {
+				return nil, helper.ImportIDValidationError(id, []string{setActiveVar}, nil, err)
+			}
+			if err := data.Set(setActiveVar, active); err != nil {
+				return nil, err
+			}
+			return []*schema.ResourceData{data}, nil
+		}},
 	}
 }

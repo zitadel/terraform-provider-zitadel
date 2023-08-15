@@ -16,19 +16,19 @@ func GetResource() *schema.Resource {
 				Description: "ID of the organization which owns the resource",
 				ForceNew:    true,
 			},
-			projectIDVar: {
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
 				ForceNew:    true,
 			},
-			grantIDVar: {
+			GrantIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the grant",
 				ForceNew:    true,
 			},
-			userIDVar: {
+			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the user",
@@ -47,6 +47,20 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgV5(
+			helper.ResourceIDVar,
+			helper.ImportAttribute{
+				Key:             ProjectIDVar,
+				ValueFromString: helper.ConvertID,
+			},
+			helper.ImportAttribute{
+				Key:             GrantIDVar,
+				ValueFromString: helper.ConvertID,
+			},
+			helper.ImportAttribute{
+				Key:             UserIDVar,
+				ValueFromString: helper.ConvertID,
+			},
+		)},
 	}
 }

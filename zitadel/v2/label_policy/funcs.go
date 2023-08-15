@@ -119,7 +119,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		iconDarkHashVar,
 		fontHashVar,
 	) {
-		if d.Get(setActiveVar).(bool) {
+		if d.Get(SetActiveVar).(bool) {
 			if _, err := client.ActivateCustomLabelPolicy(ctx, &management.ActivateCustomLabelPolicyRequest{}); err != nil {
 				return diag.Errorf("failed to activate label policy: %v", err)
 			}
@@ -185,7 +185,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.Get(setActiveVar).(bool) {
+	if d.Get(SetActiveVar).(bool) {
 		if _, err := client.ActivateCustomLabelPolicy(ctx, &management.ActivateCustomLabelPolicyRequest{}); err != nil {
 			return diag.Errorf("failed to activate label policy: %v", err)
 		}

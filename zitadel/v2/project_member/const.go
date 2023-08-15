@@ -1,7 +1,7 @@
 package project_member
 
 const (
-	projectIDVar = "project_id"
-	userIDVar    = "user_id"
+	ProjectIDVar = "project_id"
+	UserIDVar    = "user_id"
 	rolesVar     = "roles"
 )

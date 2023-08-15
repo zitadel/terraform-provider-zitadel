@@ -26,9 +26,9 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.RemoveProjectGrantMember(ctx, &management.RemoveProjectGrantMemberRequest{
-		UserId:    d.Get(userIDVar).(string),
-		ProjectId: d.Get(projectIDVar).(string),
-		GrantId:   d.Get(grantIDVar).(string),
+		UserId:    d.Get(UserIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
+		GrantId:   d.Get(GrantIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete projectmember: %v", err)
@@ -50,10 +50,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.UpdateProjectGrantMember(ctx, &management.UpdateProjectGrantMemberRequest{
-		UserId:    d.Get(userIDVar).(string),
+		UserId:    d.Get(UserIDVar).(string),
 		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
-		ProjectId: d.Get(projectIDVar).(string),
-		GrantId:   d.Get(grantIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
+		GrantId:   d.Get(GrantIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update projectmember: %v", err)
@@ -75,9 +75,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	userID := d.Get(userIDVar).(string)
-	projectID := d.Get(projectIDVar).(string)
-	grantID := d.Get(grantIDVar).(string)
+	userID := d.Get(UserIDVar).(string)
+	projectID := d.Get(ProjectIDVar).(string)
+	grantID := d.Get(GrantIDVar).(string)
 	_, err = client.AddProjectGrantMember(ctx, &management.AddProjectGrantMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
@@ -104,9 +104,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	projectID := d.Get(projectIDVar).(string)
-	grantID := d.Get(grantIDVar).(string)
-	userID := d.Get(userIDVar).(string)
+	projectID := d.Get(ProjectIDVar).(string)
+	grantID := d.Get(GrantIDVar).(string)
+	userID := d.Get(UserIDVar).(string)
 	resp, err := client.ListProjectGrantMembers(ctx, &management.ListProjectGrantMembersRequest{
 		ProjectId: projectID,
 		GrantId:   grantID,
@@ -129,11 +129,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if len(resp.Result) == 1 {
 		memberRes := resp.Result[0]
 		set := map[string]interface{}{
-			userIDVar:       userID,
+			UserIDVar:       userID,
 			helper.OrgIDVar: org,
-			projectIDVar:    projectID,
+			ProjectIDVar:    projectID,
 			rolesVar:        memberRes.GetRoles(),
-			grantIDVar:      grantID,
+			GrantIDVar:      grantID,
 		}
 		for k, v := range set {
 			if err := d.Set(k, v); err != nil {
