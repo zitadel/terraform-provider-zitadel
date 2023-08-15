@@ -43,7 +43,7 @@ func NewBaseTestFrame(ctx context.Context, resourceType, domain string, jwtProfi
 provider "zitadel" {
   domain   			= "%s"
   insecure 			= "%t"
-  port     			= "%s"
+  port     			= "%s" 
   jwt_profile_json  = <<KEY
 %s
 KEY
@@ -59,8 +59,9 @@ KEY
 		UniqueResourcesID: uniqueID,
 		TerraformName:     terraformName,
 	}
-	_, v5 := zitadelProvider.ResourcesMap[resourceType]
-	if v5 {
+	_, v5Resource := zitadelProvider.ResourcesMap[resourceType]
+	_, v5Datasource := zitadelProvider.DataSourcesMap[resourceType]
+	if v5Resource || v5Datasource {
 		frame.v5ProviderFactories = map[string]func() (tfprotov5.ProviderServer, error){"zitadel": func() (tfprotov5.ProviderServer, error) {
 			return zitadelProvider.GRPCProvider(), nil
 		}}

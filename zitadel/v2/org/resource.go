@@ -13,10 +13,20 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "Name of the org",
 			},
+			primaryDomainVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Primary domain of the org",
+			},
+			stateVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "State of the org",
+			},
 		},
 		CreateContext: create,
 		DeleteContext: delete,
-		ReadContext:   read,
+		ReadContext:   get,
 		UpdateContext: update,
 		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
