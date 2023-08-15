@@ -6,10 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/user"
-
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 )
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -97,61 +95,30 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	projectID := d.Get(ProjectIDVar)
-	projectGrantID := d.Get(ProjectGrantIDVar)
-
-	queries := []*user.UserGrantQuery{
-		{Query: &user.UserGrantQuery_UserIdQuery{
-			UserIdQuery: &user.UserGrantUserIDQuery{
-				UserId: d.Get(UserIDVar).(string),
-			},
-		}},
-	}
-	if projectID != nil {
-		queries = append(queries, &user.UserGrantQuery{Query: &user.UserGrantQuery_ProjectIdQuery{
-			ProjectIdQuery: &user.UserGrantProjectIDQuery{
-				ProjectId: projectID.(string),
-			},
-		}},
-		)
-	}
-	if projectGrantID != nil {
-		queries = append(queries, &user.UserGrantQuery{Query: &user.UserGrantQuery_ProjectGrantIdQuery{
-			ProjectGrantIdQuery: &user.UserGrantProjectGrantIDQuery{
-				ProjectGrantId: projectGrantID.(string),
-			},
-		}},
-		)
-	}
-	grants, err := client.ListUserGrants(ctx, &management.ListUserGrantRequest{
-		Queries: queries,
+	resp, err := client.GetUserGrantByID(ctx, &management.GetUserGrantByIDRequest{
+		UserId:  d.Get(UserIDVar).(string),
+		GrantId: helper.GetID(d, helper.ResourceIDVar),
 	})
 	if err != nil {
-		return diag.Errorf("failed to list usergrants")
+		return diag.Errorf("failed to get usergrants")
 	}
-
-	if len(grants.GetResult()) == 1 {
-		grant := grants.GetResult()[0]
-		set := map[string]interface{}{
-			UserIDVar:       grant.GetUserId(),
-			roleKeysVar:     grant.GetRoleKeys(),
-			helper.OrgIDVar: grant.GetDetails().GetResourceOwner(),
-		}
-		if grant.GetProjectId() != "" {
-			set[ProjectIDVar] = grant.GetProjectId()
-		}
-		if grant.GetProjectGrantId() != "" {
-			set[ProjectGrantIDVar] = grant.GetProjectGrantId()
-		}
-		for k, v := range set {
-			if err := d.Set(k, v); err != nil {
-				return diag.Errorf("failed to set %s of usergrant: %v", k, err)
-			}
-		}
-		d.SetId(grant.GetId())
-		return nil
+	grant := resp.GetUserGrant()
+	set := map[string]interface{}{
+		UserIDVar:       grant.GetUserId(),
+		roleKeysVar:     grant.GetRoleKeys(),
+		helper.OrgIDVar: grant.GetDetails().GetResourceOwner(),
 	}
-
-	d.SetId("")
+	if grant.GetProjectId() != "" {
+		set[ProjectIDVar] = grant.GetProjectId()
+	}
+	if grant.GetProjectGrantId() != "" {
+		set[ProjectGrantIDVar] = grant.GetProjectGrantId()
+	}
+	for k, v := range set {
+		if err := d.Set(k, v); err != nil {
+			return diag.Errorf("failed to set %s of usergrant: %v", k, err)
+		}
+	}
+	d.SetId(grant.GetId())
 	return nil
 }

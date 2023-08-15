@@ -48,16 +48,6 @@ func GetResource() *schema.Resource {
 				Key:             UserIDVar,
 				ValueFromString: helper.ConvertID,
 			},
-			helper.ImportAttribute{
-				Key:             ProjectIDVar,
-				ValueFromString: helper.ConvertID,
-				Optional:        true,
-			},
-			helper.ImportAttribute{
-				Key:             ProjectGrantIDVar,
-				ValueFromString: helper.ConvertID,
-				Optional:        true,
-			},
 		)},
 	}
 }

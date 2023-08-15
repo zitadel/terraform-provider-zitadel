@@ -127,18 +127,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	if len(resp.Result) == 1 {
-		memberRes := resp.Result[0]
-		set := map[string]interface{}{
-			UserIDVar:       userID,
-			helper.OrgIDVar: org,
-			ProjectIDVar:    projectID,
-			rolesVar:        memberRes.GetRoles(),
-			GrantIDVar:      grantID,
-		}
-		for k, v := range set {
-			if err := d.Set(k, v); err != nil {
-				return diag.Errorf("failed to set %s of projectgrantmember: %v", k, err)
-			}
+		roles := resp.Result[0].GetRoles()
+		if err := d.Set(rolesVar, roles); err != nil {
+			return diag.Errorf("failed to set %s %+v of projectgrantmember: %v", rolesVar, roles, err)
 		}
 		d.SetId(getProjectGrantMemberID(org, projectID, grantID, userID))
 		return nil

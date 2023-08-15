@@ -79,8 +79,8 @@ resource "%s" "%s" {
 		test_utils.ConcatImportStateIdFuncs(
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant_member.ProjectIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant_member.GrantIDVar),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant_member.UserIDVar),
-			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(otherOrgFrame.BaseTestFrame, project_grant_member.UserIDVar),
+			test_utils.ImportOrgId(otherOrgFrame),
 		),
 	)
 }

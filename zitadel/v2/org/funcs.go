@@ -2,7 +2,6 @@ package org
 
 import (
 	"context"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -95,34 +94,20 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.ListOrgs(ctx, &admin.ListOrgsRequest{})
+	id := helper.GetID(d, helper.ResourceIDVar)
+	resp, err := client.GetOrgByID(ctx, &admin.GetOrgByIDRequest{
+		Id: id,
+	})
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		return diag.Errorf("error while listing orgs: %v", err)
 	}
-	tflog.Debug(ctx, "found orgs", map[string]interface{}{
-		"orglist": resp.Result,
-	})
-
-	orgID := helper.GetID(d, helper.ResourceIDVar)
-	tflog.Debug(ctx, "check if org is existing", map[string]interface{}{
-		"id": orgID,
-	})
-
-	for i := range resp.Result {
-		org := resp.Result[i]
-		if strings.Compare(org.GetId(), orgID) == 0 {
-			d.SetId(orgID)
-			tflog.Debug(ctx, "found org", map[string]interface{}{
-				"id": orgID,
-			})
-			if err := d.Set(nameVar, org.GetName()); err != nil {
-				return diag.Errorf("failed to set %s of org: %v", nameVar, err)
-			}
-			return nil
-		}
+	d.SetId(resp.GetOrg().GetId())
+	if err := d.Set(nameVar, resp.GetOrg().GetName()); err != nil {
+		return diag.Errorf("failed to set %s of org: %v", nameVar, err)
 	}
-
-	d.SetId("")
-	tflog.Debug(ctx, "org not found", map[string]interface{}{})
 	return nil
 }

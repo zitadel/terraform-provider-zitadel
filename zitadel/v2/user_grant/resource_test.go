@@ -75,8 +75,6 @@ resource "%s" "%s" {
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_grant.UserIDVar),
 			test_utils.ImportOrgId(frame),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_grant.ProjectIDVar),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_grant.ProjectGrantIDVar),
 		),
 	)
 }

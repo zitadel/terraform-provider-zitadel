@@ -22,7 +22,7 @@ var (
 
 	OrgIDResourceField = &schema.Schema{
 		Type:        schema.TypeString,
-		Required:    true,
+		Optional:    true,
 		Description: "ID of the organization",
 		ForceNew:    true,
 		ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
@@ -38,7 +38,7 @@ var (
 	}
 	OrgIDDatasourceField = &schema.Schema{
 		Type:        schema.TypeString,
-		Required:    false,
+		Optional:    true,
 		Description: "ID of the organization",
 	}
 )
