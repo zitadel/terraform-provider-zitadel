@@ -38,7 +38,7 @@ var (
 	}
 	OrgIDDatasourceField = &schema.Schema{
 		Type:        schema.TypeString,
-		Required:    true,
+		Required:    false,
 		Description: "ID of the organization",
 	}
 )

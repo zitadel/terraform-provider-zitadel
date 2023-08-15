@@ -10,12 +10,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the membership of a user on an granted project, defined with the given role.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization which owns the resource",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,

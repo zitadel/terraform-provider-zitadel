@@ -19,12 +19,8 @@ const (
 )
 
 var (
-	IdPIDDataSourceField = &schema.Schema{
-		Type:        schema.TypeString,
-		Required:    true,
-		Description: "The ID of this resource.",
-	}
-	NameResourceField = &schema.Schema{
+	IdPIDDataSourceField = helper.ResourceIDDatasourceField
+	NameResourceField    = &schema.Schema{
 		Type:        schema.TypeString,
 		Optional:    true,
 		Description: "Name of the IDP",

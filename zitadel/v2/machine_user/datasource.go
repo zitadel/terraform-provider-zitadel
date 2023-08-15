@@ -10,16 +10,8 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
-			userIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "The ID of this resource.",
-			},
-			helper.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-			},
+			helper.ResourceIDVar: helper.ResourceIDDatasourceField,
+			helper.OrgIDVar:      helper.OrgIDDatasourceField,
 			userStateVar: {
 				Type:        schema.TypeString,
 				Computed:    true,

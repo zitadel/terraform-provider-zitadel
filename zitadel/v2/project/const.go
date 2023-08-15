@@ -3,7 +3,6 @@ package project
 import "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/project"
 
 const (
-	projectIDVar              = "project_id"
 	nameVar                   = "name"
 	stateVar                  = "state"
 	roleAssertionVar          = "project_role_assertion"

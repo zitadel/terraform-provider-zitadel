@@ -27,7 +27,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.RemovePersonalAccessToken(ctx, &management.RemovePersonalAccessTokenRequest{
-		UserId:  d.Get(userIDVar).(string),
+		UserId:  d.Get(UserIDVar).(string),
 		TokenId: d.Id(),
 	})
 	if err != nil {
@@ -51,7 +51,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	req := &management.AddPersonalAccessTokenRequest{
-		UserId: d.Get(userIDVar).(string),
+		UserId: d.Get(UserIDVar).(string),
 	}
 	if expiration, ok := d.GetOk(expirationDateVar); ok {
 		t, err := time.Parse(time.RFC3339, expiration.(string))
@@ -86,7 +86,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	userID := d.Get(userIDVar).(string)
+	userID := d.Get(UserIDVar).(string)
 	resp, err := client.GetPersonalAccessTokenByIDs(ctx, &management.GetPersonalAccessTokenByIDsRequest{
 		UserId:  userID,
 		TokenId: helper.GetID(d, helper.ResourceIDVar),
@@ -101,7 +101,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	set := map[string]interface{}{
 		expirationDateVar: resp.GetToken().GetExpirationDate().AsTime().Format(time.RFC3339),
-		userIDVar:         userID,
+		UserIDVar:         userID,
 		helper.OrgIDVar:   orgID,
 	}
 	for k, v := range set {

@@ -84,7 +84,10 @@ func ImportWithAttributesV5(attrs ...ImportAttribute) schema.StateContextFunc {
 			requiredKeys []string
 		)
 		sort.Sort(ImportAttributes(attrs))
-		for _, attr := range attrs {
+		for i, attr := range attrs {
+			if i == 0 && attr.Key == `""` {
+				continue
+			}
 			if attr.Optional {
 				optionalKeys = append(optionalKeys, attr.Key)
 			} else {
@@ -95,6 +98,10 @@ func ImportWithAttributesV5(attrs ...ImportAttribute) schema.StateContextFunc {
 			err = ImportIDValidationError(id, requiredKeys, optionalKeys, err)
 		}()
 		parts := strings.SplitN(id, ":", len(attrs))
+		// if the id should be empty and we expect an empty id, we fill the first part with an empty key
+		if len(attrs) > 1 && attrs[0].Key == `""` {
+			parts = append([]string{""}, parts...)
+		}
 		minParts := len(requiredKeys)
 		maxParts := len(attrs)
 		if len(parts) < minParts || len(parts) > maxParts {

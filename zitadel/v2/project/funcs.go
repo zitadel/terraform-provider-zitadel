@@ -103,7 +103,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetProjectByID(ctx, &management.GetProjectByIDRequest{Id: helper.GetID(d, projectIDVar)})
+	resp, err := client.GetProjectByID(ctx, &management.GetProjectByIDRequest{Id: helper.GetID(d, helper.ResourceIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

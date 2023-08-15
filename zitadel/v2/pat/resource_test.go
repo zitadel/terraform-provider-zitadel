@@ -48,6 +48,7 @@ resource "%s" "%s" {
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
 		test_utils.ConcatImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, pat.UserIDVar),
 			test_utils.ImportOrgId(frame),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, pat.TokenVar),
 		),

@@ -111,7 +111,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	resp, err := client.GetAction(ctx, &management.GetActionRequest{
-		Id: helper.GetID(d, actionIDVar),
+		Id: helper.GetID(d, helper.ResourceIDVar),
 	})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")

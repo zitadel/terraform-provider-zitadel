@@ -50,8 +50,8 @@ resource "%s" "%s" {
 		regexp.MustCompile(fmt.Sprintf("^%s_%s_(%s|%s)$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern, initialProperty, updatedProperty)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID), ""),
 		test_utils.ConcatImportStateIdFuncs(
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_role.KeyVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_role.ProjectIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_role.KeyVar),
 			test_utils.ImportOrgId(frame),
 		),
 	)

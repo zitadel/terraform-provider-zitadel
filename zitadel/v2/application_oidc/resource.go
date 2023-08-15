@@ -13,12 +13,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing an OIDC application belonging to a project, with all configuration possibilities.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "orgID of the application",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,

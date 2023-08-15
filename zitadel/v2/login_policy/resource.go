@@ -10,12 +10,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the custom login policy of an organization.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Id for the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			allowUsernamePasswordVar: {
 				Type:        schema.TypeBool,
 				Required:    true,

@@ -13,15 +13,11 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
 		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			nameVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the project",
-			},
-			helper.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Organization in which the project is located",
 			},
 			stateVar: {
 				Type:        schema.TypeString,
@@ -61,6 +57,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgV5(projectIDVar)},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgV5(helper.ResourceIDVar)},
 	}
 }

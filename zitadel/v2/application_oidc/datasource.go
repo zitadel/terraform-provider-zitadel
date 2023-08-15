@@ -10,16 +10,8 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing an OIDC application belonging to a project, with all configuration possibilities.",
 		Schema: map[string]*schema.Schema{
-			helper.ResourceIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "The ID of this resource.",
-			},
-			helper.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "orgID of the application",
-			},
+			helper.ResourceIDVar: helper.ResourceIDDatasourceField,
+			helper.OrgIDVar:      helper.OrgIDDatasourceField,
 			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,

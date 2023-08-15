@@ -11,7 +11,7 @@ func GetResource() *schema.Resource {
 		Description: "Resource representing a personal access token of a user",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
-			userIDVar: {
+			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the user",
@@ -33,6 +33,17 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		CreateContext: create,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgAndSecretV5(helper.ResourceIDVar, TokenVar)},
+		Importer: &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrgV5(
+			helper.ResourceIDVar,
+			helper.ImportAttribute{
+				Key:             UserIDVar,
+				ValueFromString: helper.ConvertID,
+			},
+			helper.ImportAttribute{
+				Key:             TokenVar,
+				ValueFromString: helper.ConvertNonEmpty,
+				Optional:        true,
+			},
+		)},
 	}
 }

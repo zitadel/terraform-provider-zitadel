@@ -10,12 +10,8 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing an action belonging to an organization.",
 		Schema: map[string]*schema.Schema{
-			actionIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "The ID of this resource.",
-			},
-			helper.OrgIDVar: helper.OrgIDResourceField,
+			helper.ResourceIDVar: helper.ResourceIDDatasourceField,
+			helper.OrgIDVar:      helper.OrgIDDatasourceField,
 			stateVar: {
 				Type:        schema.TypeInt,
 				Computed:    true,

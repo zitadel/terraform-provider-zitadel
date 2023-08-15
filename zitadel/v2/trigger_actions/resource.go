@@ -47,7 +47,7 @@ func GetResource() *schema.Resource {
 		Importer: &schema.ResourceImporter{StateContext: helper.ImportWithEmptyIDV5(
 			helper.ImportAttribute{
 				Key:             FlowTypeVar,
-				ValueFromString: helper.ConvertID,
+				ValueFromString: helper.ConvertNonEmpty,
 			},
 			helper.ImportAttribute{
 				Key:             TriggerTypeVar,
