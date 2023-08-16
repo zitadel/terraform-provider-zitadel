@@ -1,4 +1,4 @@
-resource zitadel_human_user granted_human_user {
+resource "zitadel_human_user" "granted_human_user" {
   org_id             = zitadel_org.grantedorg.id
   user_name          = "human@localhost"
   first_name         = "firstname"

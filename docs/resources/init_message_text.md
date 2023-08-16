@@ -12,7 +12,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource zitadel_init_message_text init_en {
+resource "zitadel_init_message_text" "init_en" {
   org_id   = zitadel_org.org.id
   language = "en"
 

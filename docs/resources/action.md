@@ -12,7 +12,7 @@ Resource representing an action belonging to an organization.
 ## Example Usage
 
 ```terraform
-resource zitadel_action action {
+resource "zitadel_action" "action" {
   org_id          = zitadel_org.org.id
   name            = "actionname"
   script          = "testscript"

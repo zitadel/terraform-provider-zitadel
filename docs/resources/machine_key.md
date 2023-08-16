@@ -12,7 +12,7 @@ Resource representing a machine key
 ## Example Usage
 
 ```terraform
-resource zitadel_machine_key machine_key {
+resource "zitadel_machine_key" "machine_key" {
   org_id          = zitadel_org.org.id
   user_id         = zitadel_machine_user.machine_user.id
   key_type        = "KEY_TYPE_JSON"

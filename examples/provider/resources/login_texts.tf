@@ -1,4 +1,4 @@
-resource zitadel_login_texts login_texts_en {
+resource "zitadel_login_texts" "login_texts_en" {
   org_id   = zitadel_org.org.id
   language = "en"
 

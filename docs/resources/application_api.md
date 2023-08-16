@@ -12,7 +12,7 @@ Resource representing an API application belonging to a project, with all config
 ## Example Usage
 
 ```terraform
-resource zitadel_application_api application_api {
+resource "zitadel_application_api" "application_api" {
   org_id           = zitadel_org.org.id
   project_id       = zitadel_project.project.id
   name             = "applicationapi"

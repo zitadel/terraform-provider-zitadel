@@ -12,7 +12,7 @@ Resource representing the custom label policy of an organization.
 ## Example Usage
 
 ```terraform
-resource zitadel_label_policy label_policy {
+resource "zitadel_label_policy" "label_policy" {
   org_id                 = zitadel_org.org.id
   primary_color          = "#5469d4"
   hide_login_name_suffix = true
