@@ -119,8 +119,8 @@ func importWithAttributes(state importState, attrs ...importAttribute) (err erro
 	}
 	minParts := len(requiredKeys)
 	maxParts := len(attrs)
-	if len(parts) < minParts || len(parts) > maxParts {
-		return fmt.Errorf("expected the number of semicolon separated parts to be within %d and %d, but got %s", minParts, maxParts, (parts))
+	if len(parts) < minParts || len(parts) > maxParts || minParts > 0 && len(id) == 0 {
+		return fmt.Errorf("expected the number of semicolon separated parts to be within %d and %d, but got parts %v", minParts, maxParts, parts)
 	}
 	for i, part := range parts {
 		attr := attrs[i]
