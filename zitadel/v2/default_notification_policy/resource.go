@@ -20,6 +20,6 @@ func GetResource() *schema.Resource {
 		CreateContext: update,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithEmptyIDV5()},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithEmptyID()},
 	}
 }

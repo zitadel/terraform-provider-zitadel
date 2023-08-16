@@ -38,10 +38,7 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		Importer: &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalOrg(
 			helper.ResourceIDVar,
-			helper.ImportAttribute{
-				Key:             ProjectIDVar,
-				ValueFromString: helper.ConvertID,
-			},
+			helper.NewImportAttribute(ProjectIDVar, helper.ConvertID, false),
 		)},
 	}
 }

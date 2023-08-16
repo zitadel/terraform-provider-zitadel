@@ -2,6 +2,7 @@ package test_utils
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -72,7 +73,7 @@ func RunLifecyleTest[P comparable](
 		CheckDestroy: CheckAMinute(checkDestroy),
 		Steps:        steps,
 		ErrorCheck: func(err error) error {
-			if err != nil && allowNonEmptyPlan && strings.Contains(err.Error(), "After applying this test step and performing a `terraform refresh`, the plan was not empty") {
+			if err != nil && allowNonEmptyPlan && os.Getenv("CI") == "true" && strings.Contains(err.Error(), "After applying this test step and performing a `terraform refresh`, the plan was not empty") {
 				t.Logf("Ignoring non-empty plan error because we can't guarantee consistency: %s", err.Error())
 				return nil
 			}
