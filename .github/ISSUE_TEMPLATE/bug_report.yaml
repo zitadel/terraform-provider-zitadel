@@ -1,6 +1,5 @@
 name: 🐛 Bug Report
 description: "Create a bug report to help us improve ZITADEL Terrafform Provider."
-title: ""
 labels: ["bug"]
 body:
 - type: markdown
@@ -16,13 +15,14 @@ body:
         I could not find a solution in the documentation, the existing issues or discussions
       required: true
     - label:
-        I have joined the [ZITADEL chat](https://zitadel.com/chat)
+        I have joined the [ZITADEL chat](https://zitadel.com/chat)  
 - type: input
   id: version
   attributes:
     label: Version
-    required: true
-    description: Which version of the Terrafor Provider are you using.
+    description: Which version of the Terraform Provider are you using.
+  validations:
+   required: true
 - type: input
   id: zitadelversion
   attributes:
@@ -31,8 +31,8 @@ body:
 - type: textarea
   id: impact
   attributes:
-    label: Describe the problems caused by this bug
-    description: A clear and concise description of what the problems you face and the bug you have.
+    label: Describe the problem caused by this bug
+    description: A clear and concise description of the problem you have and what the bug is.
   validations:
     required: true
 - type: textarea
@@ -42,6 +42,7 @@ body:
     description: Steps to reproduce the behaviour
     placeholder: |
       Steps to reproduce the behavior:
+      1. ...
   validations:
     required: true
 - type: textarea
