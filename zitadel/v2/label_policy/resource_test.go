@@ -10,6 +10,7 @@ import (
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/label_policy"
 )
 
 func TestAccLabelPolicy(t *testing.T) {
@@ -47,6 +48,7 @@ resource "%s" "%s" {
 		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*frame)(initialProperty),
 		test_utils.ImportOrgId(frame),
+		label_policy.SetActiveVar,
 	)
 }
 

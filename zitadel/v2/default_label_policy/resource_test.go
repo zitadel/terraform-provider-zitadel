@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
@@ -46,6 +47,7 @@ resource "%s" "%s" {
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		test_utils.ImportNothing,
+		default_label_policy.SetActiveVar,
 	)
 }
 

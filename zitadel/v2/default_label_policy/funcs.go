@@ -113,7 +113,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		iconDarkHashVar,
 		fontHashVar,
 	) {
-		if d.Get(setActiveVar).(bool) {
+		if d.Get(SetActiveVar).(bool) {
 			if _, err := client.ActivateLabelPolicy(ctx, &admin.ActivateLabelPolicyRequest{}); err != nil {
 				return diag.Errorf("failed to activate default label policy: %v", err)
 			}

@@ -20,6 +20,7 @@ func RunLifecyleTest[P comparable](
 	idPattern *regexp.Regexp,
 	checkDestroy resource.TestCheckFunc,
 	importStateIdFunc resource.ImportStateIdFunc,
+	importStateVerifyIgnore ...string,
 ) {
 	initialConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(initialProperty, initialSecret))
 	updatedPropertyConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, initialSecret))
@@ -47,11 +48,12 @@ func RunLifecyleTest[P comparable](
 	}
 	if importStateIdFunc != nil {
 		steps = append(steps, resource.TestStep{ // Expect importing works
-			Config:            updatedPropertyConfig,
-			ResourceName:      frame.TerraformName,
-			ImportState:       true,
-			ImportStateIdFunc: importStateIdFunc,
-			ImportStateVerify: true,
+			Config:                  updatedPropertyConfig,
+			ResourceName:            frame.TerraformName,
+			ImportState:             true,
+			ImportStateIdFunc:       importStateIdFunc,
+			ImportStateVerify:       true,
+			ImportStateVerifyIgnore: importStateVerifyIgnore,
 		})
 	}
 

@@ -135,7 +135,7 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "",
 			},
-			setActiveVar: {
+			SetActiveVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "set the label policy active after creating/updating",
