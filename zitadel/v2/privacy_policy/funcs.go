@@ -47,9 +47,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.UpdateCustomPrivacyPolicy(ctx, &management.UpdateCustomPrivacyPolicyRequest{
-		TosLink:     d.Get(tosLinkVar).(string),
-		PrivacyLink: d.Get(privacyLinkVar).(string),
-		HelpLink:    d.Get(helpLinkVar).(string),
+		TosLink:      d.Get(tosLinkVar).(string),
+		PrivacyLink:  d.Get(privacyLinkVar).(string),
+		HelpLink:     d.Get(helpLinkVar).(string),
+		SupportEmail: d.Get(supportEmailVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update privacy policy: %v", err)
@@ -72,9 +73,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.AddCustomPrivacyPolicy(ctx, &management.AddCustomPrivacyPolicyRequest{
-		TosLink:     d.Get(tosLinkVar).(string),
-		PrivacyLink: d.Get(privacyLinkVar).(string),
-		HelpLink:    d.Get(helpLinkVar).(string),
+		TosLink:      d.Get(tosLinkVar).(string),
+		PrivacyLink:  d.Get(privacyLinkVar).(string),
+		HelpLink:     d.Get(helpLinkVar).(string),
+		SupportEmail: d.Get(supportEmailVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create privacy policy: %v", err)
@@ -116,6 +118,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		tosLinkVar:      policy.GetTosLink(),
 		privacyLinkVar:  policy.GetPrivacyLink(),
 		helpLinkVar:     policy.GetHelpLink(),
+		supportEmailVar: policy.GetSupportEmail(),
 	}
 
 	for k, v := range set {

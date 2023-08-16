@@ -26,6 +26,7 @@ resource "zitadel_default_privacy_policy" "privacy_policy" {
 
 - `help_link` (String)
 - `privacy_link` (String)
+- `support_email` (String)
 - `tos_link` (String)
 
 ### Read-Only

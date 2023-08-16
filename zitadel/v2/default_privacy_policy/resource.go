@@ -25,6 +25,11 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "",
 			},
+			supportEmailVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "",
+			},
 		},
 		CreateContext: update,
 		DeleteContext: delete,

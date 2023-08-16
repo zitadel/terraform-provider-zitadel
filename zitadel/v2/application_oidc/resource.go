@@ -88,6 +88,7 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Version" + helper.DescriptionEnumValuesList(app.OIDCVersion_name),
 				Default:     app.OIDCVersion_name[0],
+				ForceNew:    true,
 			},
 			devModeVar: {
 				Type:        schema.TypeBool,

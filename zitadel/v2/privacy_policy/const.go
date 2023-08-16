@@ -1,7 +1,8 @@
 package privacy_policy
 
 const (
-	tosLinkVar = "tos_link"
-privacyLinkVar = "privacy_link"
-helpLinkVar = "help_link"
+	tosLinkVar      = "tos_link"
+	privacyLinkVar  = "privacy_link"
+	helpLinkVar     = "help_link"
+	supportEmailVar = "support_email"
 )
