@@ -29,6 +29,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDV5(userIDVar)},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithID(userIDVar)},
 	}
 }

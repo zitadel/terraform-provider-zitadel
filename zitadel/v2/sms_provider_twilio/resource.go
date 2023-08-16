@@ -31,6 +31,6 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalSecretV5(helper.ResourceIDVar, TokenVar)},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithIDAndOptionalSecret(helper.ResourceIDVar, TokenVar)},
 	}
 }

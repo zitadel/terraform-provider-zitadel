@@ -15,29 +15,29 @@ var (
 	ImportOptionalOrgAttribute = ImportAttribute{Key: OrgIDVar, ValueFromString: ConvertID, Optional: true}
 )
 
-func ImportWithIDV5(idVar string, attrs ...ImportAttribute) schema.StateContextFunc {
+func ImportWithID(idVar string, attrs ...ImportAttribute) schema.StateContextFunc {
 	return ImportWithAttributesV5(append([]ImportAttribute{{Key: idVar, ValueFromString: ConvertID}}, attrs...)...)
 }
 
-func ImportWithOrgV5(attrs ...ImportAttribute) schema.StateContextFunc {
-	return ImportWithAttributesV5(append([]ImportAttribute{{Key: OrgIDVar, ValueFromString: ConvertID}}, attrs...)...)
+func ImportWithOptionalOrg(attrs ...ImportAttribute) schema.StateContextFunc {
+	return ImportWithAttributesV5(append([]ImportAttribute{ImportOptionalOrgAttribute}, attrs...)...)
 }
 
-func ImportWithIDAndOptionalOrgV5(idVar string, attrs ...ImportAttribute) schema.StateContextFunc {
+func ImportWithIDAndOptionalOrg(idVar string, attrs ...ImportAttribute) schema.StateContextFunc {
 	return func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
-		return ImportWithIDV5(idVar, append([]ImportAttribute{ImportOptionalOrgAttribute}, attrs...)...)(ctx, data, nil)
+		return ImportWithID(idVar, append([]ImportAttribute{ImportOptionalOrgAttribute}, attrs...)...)(ctx, data, nil)
 	}
 }
 
-func ImportWithIDAndOptionalSecretV5(idVar, secretKey string) schema.StateContextFunc {
+func ImportWithIDAndOptionalSecret(idVar, secretKey string) schema.StateContextFunc {
 	return func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
-		return ImportWithIDV5(idVar, ImportAttribute{Key: secretKey, ValueFromString: ConvertNonEmpty, Optional: true})(ctx, data, nil)
+		return ImportWithID(idVar, ImportAttribute{Key: secretKey, ValueFromString: ConvertNonEmpty, Optional: true})(ctx, data, nil)
 	}
 }
 
 func ImportWithIDAndOptionalOrgAndSecretV5(idVar, secretKey string) schema.StateContextFunc {
 	return func(ctx context.Context, data *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
-		return ImportWithIDAndOptionalOrgV5(idVar, ImportAttribute{Key: secretKey, ValueFromString: ConvertNonEmpty, Optional: true})(ctx, data, nil)
+		return ImportWithIDAndOptionalOrg(idVar, ImportAttribute{Key: secretKey, ValueFromString: ConvertNonEmpty, Optional: true})(ctx, data, nil)
 	}
 }
 

@@ -120,6 +120,6 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		DeleteContext: delete,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithAttributesV5(helper.ImportOptionalOrgAttribute)},
+		Importer:      &schema.ResourceImporter{StateContext: helper.ImportWithOptionalOrg()},
 	}
 }

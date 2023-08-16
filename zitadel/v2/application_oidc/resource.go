@@ -150,7 +150,7 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		ReadContext:   read,
 		Importer: &schema.ResourceImporter{
-			StateContext: helper.ImportWithIDAndOptionalOrgV5(
+			StateContext: helper.ImportWithIDAndOptionalOrg(
 				helper.ResourceIDVar,
 				helper.ImportAttribute{Key: ProjectIDVar, ValueFromString: helper.ConvertID},
 				helper.ImportAttribute{Key: ClientIDVar, ValueFromString: helper.ConvertNonEmpty, Optional: true},
