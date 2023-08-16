@@ -40,3 +40,13 @@ resource zitadel_smtp_config smtp {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<[password]>`, e.g.
+
+```bash
+terraform import zitadel_smtp_config.imported 'p4ssw0rd'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

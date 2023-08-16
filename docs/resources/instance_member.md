@@ -29,3 +29,13 @@ resource zitadel_instance_member instance_member {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<user_id>`, e.g.
+
+```bash
+terraform import zitadel_instance_member.imported '123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

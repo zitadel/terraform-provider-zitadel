@@ -25,14 +25,24 @@ resource zitadel_domain domain {
 ### Required
 
 - `name` (String) Name of the domain
-- `org_id` (String) ID of the organization
 
 ### Optional
 
 - `is_primary` (Boolean) Is domain primary
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `is_verified` (Boolean) Is domain verified
 - `validation_type` (Number) Validation type
+
+## Import
+
+The resource can be imported using the ID format `name[:org_id]`, e.g.
+
+```bash
+terraform import zitadel_domain.imported 'example.com:123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

@@ -12,12 +12,12 @@ Datasource representing the project, which can then be granted to different orga
 ## Example Usage
 
 ```terraform
-data zitadel_project project {
-  org_id     = data.zitadel_org.org.id
-  project_id = "177073620768522243"
+data "zitadel_project" "project" {
+  id     = "177073620768522243"
+  org_id = data.zitadel_org.org.id
 }
 
-output project {
+output "project" {
   value = data.zitadel_project.project
 }
 ```
@@ -27,13 +27,12 @@ output project {
 
 ### Required
 
+- `id` (String) ID of the resource
 - `org_id` (String) Organization in which the project is located
-- `project_id` (String) The ID of this resource.
 
 ### Read-Only
 
 - `has_project_check` (Boolean) ZITADEL checks if the org of the user has permission to this project
-- `id` (String) The ID of this resource.
 - `name` (String) Name of the project
 - `private_labeling_setting` (String) Defines from where the private labeling should be triggered
 - `project_role_assertion` (Boolean) describes if roles of user should be added in token

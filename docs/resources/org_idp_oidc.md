@@ -37,11 +37,24 @@ resource zitadel_org_idp_oidc oidc_idp {
 - `display_name_mapping` (String) definition which field is mapped to the display name of the user
 - `issuer` (String) the oidc issuer of the identity provider
 - `name` (String) Name of the IDP
-- `org_id` (String) ID of the organization
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 - `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_UNSPECIFIED, STYLING_TYPE_GOOGLE
 - `username_mapping` (String) definition which field is mapped to the email of the user
 
+### Optional
+
+- `org_id` (String) ID of the organization
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<id[:org_id][:client_secret]>`, e.g.
+
+```bash
+terraform import zitadel_org_idp_oidc.imported '123456789012345678:123456789012345678:1234567890abcdef'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

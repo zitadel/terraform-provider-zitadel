@@ -24,10 +24,23 @@ resource zitadel_org_member org_member {
 
 ### Required
 
-- `org_id` (String) ID of the organization
 - `roles` (Set of String) List of roles granted
 - `user_id` (String) ID of the user
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<user_id[:org_id]>`, e.g.
+
+```bash
+terraform import zitadel_org_member.imported '123456789012345678:123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

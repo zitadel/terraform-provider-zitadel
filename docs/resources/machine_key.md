@@ -26,14 +26,24 @@ resource zitadel_machine_key machine_key {
 ### Required
 
 - `key_type` (String) Type of the machine key, supported values: KEY_TYPE_UNSPECIFIED, KEY_TYPE_JSON
-- `org_id` (String) ID of the organization
 - `user_id` (String) ID of the user
 
 ### Optional
 
 - `expiration_date` (String) Expiration date of the machine key in the RFC3339 format
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `key_details` (String, Sensitive) Value of the machine key
+
+## Import
+
+The resource can be imported using the ID format `<id:user_id[:org_id][:key_details]>`, e.g.
+
+```bash
+terraform import zitadel_machine_key.imported '123456789012345678:123456789012345678:123456789012345678:{"type":"serviceaccount","keyId":"123456789012345678","key":"-----BEGIN RSA PRIVATE KEY-----\nMIIEpQ...-----END RSA PRIVATE KEY-----\n","userId":"123456789012345678"}'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

@@ -40,15 +40,27 @@ resource "zitadel_org_idp_github_es" "github_es" {
 - `is_auto_update` (Boolean) enable if a the ZITADEL account fields should be updated automatically on each login
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
 - `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
-- `org_id` (String) ID of the organization
 - `token_endpoint` (String) the providers token endpoint
 - `user_endpoint` (String) the providers user endpoint
 
 ### Optional
 
 - `name` (String) Name of the IDP
+- `org_id` (String) ID of the organization
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<id[:org_id][:client_secret]>`, e.g.
+
+```bash
+terraform import zitadel_org_idp_github_es.imported '123456789012345678:123456789012345678:1234567890123456789012345678901234567890'
+```
+
+If you don't have the configuration file yet, [you can generate it](https://developer.hashicorp.com/terraform/language/import/generating-configuration).
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

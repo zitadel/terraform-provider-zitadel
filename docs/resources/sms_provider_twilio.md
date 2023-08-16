@@ -31,3 +31,13 @@ resource zitadel_sms_provider_twilio twilio {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<id[:token]>`, e.g.
+
+```bash
+terraform import zitadel_sms_provider_twilio.imported '123456789012345678:12345678901234567890123456abcdef'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

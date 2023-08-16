@@ -1,8 +1,8 @@
-data zitadel_action action {
-  org_id    = data.zitadel_org.org.id
-  action_id = "177073621691269123"
+data "zitadel_action" "action" {
+  id     = "177073621691269123"
+  org_id = data.zitadel_org.org.id
 }
 
-output action {
+output "action" {
   value = data.zitadel_action.action
 }

@@ -12,13 +12,13 @@ Resource representing triggers, when actions get started
 ## Example Usage
 
 ```terraform
-data zitadel_trigger_actions trigger_actions {
+data "zitadel_trigger_actions" "trigger_actions" {
   org_id       = data.zitadel_org.org.id
   flow_type    = "FLOW_TYPE_EXTERNAL_AUTHENTICATION"
   trigger_type = "TRIGGER_TYPE_POST_AUTHENTICATION"
 }
 
-output trigger_actions {
+output "trigger_actions" {
   value = data.zitadel_trigger_actions.trigger_actions
 }
 ```
@@ -29,8 +29,11 @@ output trigger_actions {
 ### Required
 
 - `flow_type` (String) Type of the flow to which the action triggers belong
-- `org_id` (String) ID of the organization
 - `trigger_type` (String) Trigger type on when the actions get triggered
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 

@@ -29,10 +29,23 @@ resource zitadel_application_key app_key {
 - `app_id` (String) ID of the application
 - `expiration_date` (String) Expiration date of the app key in the RFC3339 format
 - `key_type` (String) Type of the app key, supported values: KEY_TYPE_UNSPECIFIED, KEY_TYPE_JSON
-- `org_id` (String) ID of the organization
 - `project_id` (String) ID of the project
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `key_details` (String, Sensitive) Value of the app key
+
+## Import
+
+The resource can be imported using the ID format `<id:project_id:app_id[:org_id][:key_details]>`, e.g.
+
+```bash
+terraform import zitadel_application_key.imported '123456789012345678:123456789012345678:123456789012345678:123456789012345678:{"type":"application","keyId":"123456789012345678","key":"-----BEGIN RSA PRIVATE KEY-----\nMIIEpQ...-----END RSA PRIVATE KEY-----\n","userId":"123456789012345678"}'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

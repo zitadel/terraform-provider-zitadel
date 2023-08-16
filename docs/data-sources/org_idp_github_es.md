@@ -13,7 +13,8 @@ Datasource representing a GitHub Enterprise IdP of the organization.
 
 ```terraform
 data "zitadel_org_idp_github_es" "github_es" {
-  id = "177073614158299139"
+  id     = "177073614158299139"
+  org_id = data.zitadel_org.org.id
 }
 ```
 
@@ -22,7 +23,10 @@ data "zitadel_org_idp_github_es" "github_es" {
 
 ### Required
 
-- `id` (String) The ID of this resource.
+- `id` (String) ID of the resource
+
+### Optional
+
 - `org_id` (String) ID of the organization
 
 ### Read-Only
@@ -38,11 +42,3 @@ data "zitadel_org_idp_github_es" "github_es" {
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 - `token_endpoint` (String) the providers token endpoint
 - `user_endpoint` (String) the providers user endpoint
-
-## Import
-
-Organization IdP imports use semicolon-delimited identifiers. The resource can be imported using the org_id, the IdPs id and the IdPs client_secret.
-
-```
-terraform import zitadel_org_idp_github_es 210148218065912171:210210971312980331:myclientsecret
-```

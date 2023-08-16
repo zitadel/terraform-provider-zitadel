@@ -12,12 +12,12 @@ Datasource representing an action belonging to an organization.
 ## Example Usage
 
 ```terraform
-data zitadel_action action {
-  org_id    = data.zitadel_org.org.id
-  action_id = "177073621691269123"
+data "zitadel_action" "action" {
+  id     = "177073621691269123"
+  org_id = data.zitadel_org.org.id
 }
 
-output action {
+output "action" {
   value = data.zitadel_action.action
 }
 ```
@@ -27,13 +27,15 @@ output action {
 
 ### Required
 
-- `action_id` (String) The ID of this resource.
+- `id` (String) ID of the resource
+
+### Optional
+
 - `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `allowed_to_fail` (Boolean) when true, the next action will be called even if this action fails
-- `id` (String) The ID of this resource.
 - `name` (String)
 - `script` (String)
 - `state` (Number) the state of the action

@@ -25,11 +25,24 @@ resource zitadel_domain_policy domain_policy {
 
 ### Required
 
-- `org_id` (String) Id for the organization
 - `smtp_sender_address_matches_instance_domain` (Boolean)
 - `user_login_must_be_domain` (Boolean) User login must be domain
 - `validate_org_domains` (Boolean) Validate organization domains
 
+### Optional
+
+- `org_id` (String) ID of the organization
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<[org_id]>`, e.g.
+
+```bash
+terraform import zitadel_domain_policy.imported '123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

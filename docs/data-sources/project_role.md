@@ -12,13 +12,13 @@ Datasource representing the project roles, which can be given as authorizations 
 ## Example Usage
 
 ```terraform
-data zitadel_project_role project_role {
+data "zitadel_project_role" "project_role" {
   org_id     = data.zitadel_org.org.id
   project_id = data.zitadel_project.project.id
   role_key   = "key"
 }
 
-output project_role {
+output "project_role" {
   value = data.zitadel_project_role.project_role
 }
 ```
@@ -28,9 +28,12 @@ output project_role {
 
 ### Required
 
-- `org_id` (String) ID of the organization
 - `project_id` (String) ID of the project
 - `role_key` (String) Key used for project role
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 

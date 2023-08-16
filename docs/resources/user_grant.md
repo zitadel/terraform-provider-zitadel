@@ -25,11 +25,11 @@ resource zitadel_user_grant user_grant {
 
 ### Required
 
-- `org_id` (String) ID of the organization which owns the resource
 - `user_id` (String) ID of the user
 
 ### Optional
 
+- `org_id` (String) ID of the organization
 - `project_grant_id` (String) ID of the granted project
 - `project_id` (String) ID of the project
 - `role_keys` (Set of String) List of roles granted
@@ -37,3 +37,13 @@ resource zitadel_user_grant user_grant {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<flow_type:trigger_type[:org_id]>`, e.g.
+
+```bash
+terraform import zitadel_user_grant.imported '123456789012345678:123456789012345678:123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

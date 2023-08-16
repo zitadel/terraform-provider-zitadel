@@ -22,7 +22,7 @@ data "zitadel_idp_github_es" "github_es" {
 
 ### Required
 
-- `id` (String) The ID of this resource.
+- `id` (String) ID of the resource
 
 ### Read-Only
 
@@ -37,11 +37,3 @@ data "zitadel_idp_github_es" "github_es" {
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 - `token_endpoint` (String) the providers token endpoint
 - `user_endpoint` (String) the providers user endpoint
-
-## Import
-
-Instance IdP imports use semicolon-delimited identifiers. The resource can be imported using the IdPs id and the IdPs client_secret.
-
-```
-terraform import zitadel_idp_github_es 210210971312980331:myclientsecret
-```

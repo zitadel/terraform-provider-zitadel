@@ -12,13 +12,13 @@ Datasource representing an OIDC application belonging to a project, with all con
 ## Example Usage
 
 ```terraform
-data zitadel_application_oidc oidc_application {
+data "zitadel_application_oidc" "oidc_application" {
+  id         = "177073626925760515"
   org_id     = data.zitadel_org.org.id
   project_id = data.zitadel_project.project.id
-  app_id     = "177073626925760515"
 }
 
-output oidc_application {
+output "oidc_application" {
   value = data.zitadel_application_oidc.oidc_application
 }
 ```
@@ -28,9 +28,12 @@ output oidc_application {
 
 ### Required
 
-- `app_id` (String) The ID of this resource.
-- `org_id` (String) orgID of the application
+- `id` (String) ID of the resource
 - `project_id` (String) ID of the project
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
@@ -42,7 +45,6 @@ output oidc_application {
 - `clock_skew` (String) Clockskew
 - `dev_mode` (Boolean) Dev mode
 - `grant_types` (List of String) Grant types
-- `id` (String) The ID of this resource.
 - `id_token_role_assertion` (Boolean) ID token role assertion
 - `id_token_userinfo_assertion` (Boolean) Token userinfo assertion
 - `name` (String) Name of the application

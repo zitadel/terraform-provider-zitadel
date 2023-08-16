@@ -12,11 +12,11 @@ Datasource representing an organization in ZITADEL, which is the highest level a
 ## Example Usage
 
 ```terraform
-data zitadel_org org {
-  org_id = "177073608051458051"
+data "zitadel_org" "org" {
+  id = "177073608051458051"
 }
 
-output org {
+output "org" {
   value = data.zitadel_org.org
 }
 ```
@@ -26,9 +26,8 @@ output org {
 
 ### Required
 
-- `org_id` (String) The ID of this resource.
+- `id` (String) ID of the resource
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
 - `name` (String) Name of the org

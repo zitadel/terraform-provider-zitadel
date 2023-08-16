@@ -49,7 +49,6 @@ resource zitadel_label_policy label_policy {
 - `font_color` (String) hex value for font color
 - `font_color_dark` (String) hex value for font color dark theme
 - `hide_login_name_suffix` (Boolean) hides the org suffix on the login form if the scope "urn:zitadel:iam:org:domain:primary:{domainname}" is set. Details about this scope in https://zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes
-- `org_id` (String) Id for the organization
 - `primary_color` (String) hex value for primary color
 - `primary_color_dark` (String) hex value for primary color dark theme
 - `warn_color` (String) hex value for warn color
@@ -67,6 +66,7 @@ resource zitadel_label_policy label_policy {
 - `logo_dark_path` (String)
 - `logo_hash` (String)
 - `logo_path` (String)
+- `org_id` (String) ID of the organization
 - `set_active` (Boolean) set the label policy active after creating/updating
 
 ### Read-Only
@@ -77,3 +77,13 @@ resource zitadel_label_policy label_policy {
 - `id` (String) The ID of this resource.
 - `logo_url` (String)
 - `logo_url_dark` (String)
+
+## Import
+
+The resource can be imported using the ID format `<[org_id]>`, e.g.
+
+```bash
+terraform import zitadel_label_policy.imported '123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

@@ -26,10 +26,23 @@ resource zitadel_privacy_policy privacy_policy {
 ### Required
 
 - `help_link` (String)
-- `org_id` (String) Id for the organization
 - `privacy_link` (String)
 - `tos_link` (String)
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<[org_id]>`, e.g.
+
+```bash
+terraform import zitadel_privacy_policy.imported '123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

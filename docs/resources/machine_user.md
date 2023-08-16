@@ -26,13 +26,13 @@ resource zitadel_machine_user machine_user {
 ### Required
 
 - `name` (String) Name of the machine user
-- `org_id` (String) ID of the organization
 - `user_name` (String) Username
 
 ### Optional
 
 - `access_token_type` (String) Access token type, supported values: ACCESS_TOKEN_TYPE_BEARER, ACCESS_TOKEN_TYPE_JWT
 - `description` (String) Description of the user
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
@@ -40,3 +40,13 @@ resource zitadel_machine_user machine_user {
 - `login_names` (List of String) Loginnames
 - `preferred_login_name` (String) Preferred login name
 - `state` (String) State of the user
+
+## Import
+
+The resource can be imported using the ID format `<id[:org_id]>`, e.g.
+
+```bash
+terraform import zitadel_machine_user.imported '123456789012345678:123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

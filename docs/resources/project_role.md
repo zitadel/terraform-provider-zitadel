@@ -27,14 +27,24 @@ resource zitadel_project_role project_role {
 ### Required
 
 - `display_name` (String) Name used for project role
-- `org_id` (String) ID of the organization
 - `project_id` (String) ID of the project
 - `role_key` (String) Key used for project role
 
 ### Optional
 
 - `group` (String) Group used for project role
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<project_id:role_key[:org_id]>`, e.g.
+
+```bash
+terraform import zitadel_project_role.imported '123456789012345678:my-role-key:123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

@@ -12,13 +12,13 @@ Datasource representing an API application belonging to a project, with all conf
 ## Example Usage
 
 ```terraform
-data zitadel_application_api api_application {
+data "zitadel_application_api" "api_application" {
+  id         = "177073625566806019"
   org_id     = data.zitadel_org.org.id
   project_id = data.zitadel_project.project.id
-  app_id     = "177073625566806019"
 }
 
-output api_application {
+output "api_application" {
   value = data.zitadel_application_api.api_application
 }
 ```
@@ -28,12 +28,14 @@ output api_application {
 
 ### Required
 
-- `app_id` (String) The ID of this resource.
-- `org_id` (String) orgID of the application
+- `id` (String) ID of the resource
 - `project_id` (String) ID of the project
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `auth_method_type` (String) Auth method type
-- `id` (String) The ID of this resource.
 - `name` (String) Name of the application

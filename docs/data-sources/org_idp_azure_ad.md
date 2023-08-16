@@ -13,7 +13,8 @@ Datasource representing an Azure AD IdP of the organization.
 
 ```terraform
 data "zitadel_org_idp_azure_ad" "azure_ad" {
-  id = "177073614158299139"
+  id     = "177073614158299139"
+  org_id = data.zitadel_org.org.id
 }
 ```
 
@@ -22,7 +23,10 @@ data "zitadel_org_idp_azure_ad" "azure_ad" {
 
 ### Required
 
-- `id` (String) The ID of this resource.
+- `id` (String) ID of the resource
+
+### Optional
+
 - `org_id` (String) ID of the organization
 
 ### Read-Only
@@ -38,11 +42,3 @@ data "zitadel_org_idp_azure_ad" "azure_ad" {
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 - `tenant_id` (String) the azure ad tenant id
 - `tenant_type` (String) the azure ad tenant type
-
-## Import
-
-Organization IdP imports use semicolon-delimited identifiers. The resource can be imported using the org_id, the IdPs id and the IdPs client_secret.
-
-```
-terraform import zitadel_org_idp_azure_ad 210148218065912171:210210971312980331:myclientsecret
-```

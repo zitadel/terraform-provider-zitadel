@@ -32,7 +32,10 @@ resource zitadel_password_complexity_policy password_complexity_policy {
 - `has_symbol` (Boolean) defines if the password MUST contain a symbol. E.g. "$"
 - `has_uppercase` (Boolean) defines if the password MUST contain an upper case letter
 - `min_length` (Number) Minimal length for the password
-- `org_id` (String) Id for the organization
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 

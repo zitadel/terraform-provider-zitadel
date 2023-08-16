@@ -12,12 +12,12 @@ Datasource representing a serviceaccount situated under an organization, which t
 ## Example Usage
 
 ```terraform
-data zitadel_machine_user machine_user {
-  org_id  = data.zitadel_org.org.id
-  user_id = "177073617463410691"
+data "zitadel_machine_user" "machine_user" {
+  id     = "177073617463410691"
+  org_id = data.zitadel_org.org.id
 }
 
-output machine_user {
+output "machine_user" {
   value = data.zitadel_machine_user.machine_user
 }
 ```
@@ -27,14 +27,16 @@ output machine_user {
 
 ### Required
 
+- `id` (String) ID of the resource
+
+### Optional
+
 - `org_id` (String) ID of the organization
-- `user_id` (String) The ID of this resource.
 
 ### Read-Only
 
 - `access_token_type` (String) Access token type
 - `description` (String) Description of the user
-- `id` (String) The ID of this resource.
 - `login_names` (List of String) Loginnames
 - `name` (String) Name of the machine user
 - `preferred_login_name` (String) Preferred login name

@@ -22,7 +22,7 @@ data "zitadel_idp_azure_ad" "azure_ad" {
 
 ### Required
 
-- `id` (String) The ID of this resource.
+- `id` (String) ID of the resource
 
 ### Read-Only
 
@@ -37,11 +37,3 @@ data "zitadel_idp_azure_ad" "azure_ad" {
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 - `tenant_id` (String) the azure ad tenant id
 - `tenant_type` (String) the azure ad tenant type
-
-## Import
-
-Instance IdP imports use semicolon-delimited identifiers. The resource can be imported using the IdPs id and the IdPs client_secret.
-
-```
-terraform import zitadel_idp_azure_ad 210210971312980331:myclientsecret
-```
