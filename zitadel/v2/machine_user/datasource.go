@@ -52,6 +52,5 @@ func GetDatasource() *schema.Resource {
 				Description: "Access token type",
 			}},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
