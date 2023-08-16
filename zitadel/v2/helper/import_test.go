@@ -221,6 +221,22 @@ func TestImportWithAttributes(t *testing.T) {
 			expectErrorWithMinParts: 1,
 			expectErrorWithMaxParts: 2,
 		},
+	}, {
+		name: `<required_id:another_required_id[:optional_id]> with empty id and '123...' fails`,
+		args: args{
+			attrs: []importAttribute{
+				emptyIDAttribute,
+				NewImportAttribute("required_id", ConvertID, false),
+				NewImportAttribute("another_required_id", ConvertID, false),
+				NewImportAttribute("optional_id", ConvertID, true),
+			},
+			id: validID,
+		},
+		want: want{
+			expectErrorWithIDFormat: "<required_id:another_required_id[:optional_id]>",
+			expectErrorWithMinParts: 2,
+			expectErrorWithMaxParts: 3,
+		},
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -241,6 +257,9 @@ func TestImportWithAttributes(t *testing.T) {
 					t.Errorf("expected error to contain the expected format '%s', got: %v", tt.want.expectErrorWithIDFormat, err)
 				}
 				return
+			}
+			if tt.want.expectErrorWithIDFormat != "" {
+				t.Fatalf("expected error with format '%s', got state: %v", tt.want.expectErrorWithIDFormat, state)
 			}
 			if !reflect.DeepEqual(state, mockState(wantAttributes)) {
 				t.Errorf("importWithAttributes() = %v, want %v", state, wantAttributes)
