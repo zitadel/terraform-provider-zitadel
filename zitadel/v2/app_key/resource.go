@@ -56,7 +56,7 @@ func GetResource() *schema.Resource {
 				helper.ResourceIDVar,
 				helper.NewImportAttribute(ProjectIDVar, helper.ConvertID, false),
 				helper.NewImportAttribute(AppIDVar, helper.ConvertID, false),
-				helper.NewImportAttribute(KeyDetailsVar, helper.ConvertID, true),
+				helper.NewImportAttribute(KeyDetailsVar, helper.ConvertJSON, true),
 			),
 		},
 	}

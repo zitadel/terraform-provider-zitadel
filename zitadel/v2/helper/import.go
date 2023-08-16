@@ -112,15 +112,16 @@ func importWithAttributes(state importState, attrs ...importAttribute) (err erro
 	defer func() {
 		err = ImportIDValidationError(id, requiredKeys, optionalKeys, err)
 	}()
-	parts := strings.SplitN(id, ":", len(attrs))
-	// if the id should be empty and we expect an empty id, we fill the first part with an empty key
+	parts := strings.Split(id, ":")
+	// if we expect an empty id, we fill the first part with an empty key
 	if len(attrs) > 1 && attrs[0].Key == emptyIDAttribute.Key {
 		parts = append([]string{""}, parts...)
 	}
 	minParts := len(requiredKeys)
-	maxParts := len(attrs)
-	if len(parts) < minParts || len(parts) > maxParts || minParts > 0 && len(id) == 0 {
-		return fmt.Errorf("expected the number of semicolon separated parts to be within %d and %d, but got parts %v", minParts, maxParts, parts)
+	externalMaxParts := minParts + len(optionalKeys)
+	internalMaxParts := len(attrs)
+	if len(parts) < minParts || len(parts) > internalMaxParts || minParts > 0 && len(id) == 0 {
+		return fmt.Errorf("expected the number of semicolon separated parts to be between %d and %d, but got parts %v", minParts, externalMaxParts, parts)
 	}
 	for i, part := range parts {
 		attr := attrs[i]

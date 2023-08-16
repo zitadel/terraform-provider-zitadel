@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -15,6 +16,8 @@ func TestImportWithAttributes(t *testing.T) {
 	type want struct {
 		attributes              map[string]interface{}
 		expectErrorWithIDFormat string
+		expectErrorWithMinParts int
+		expectErrorWithMaxParts int
 	}
 	tests := []struct {
 		name string
@@ -38,6 +41,8 @@ func TestImportWithAttributes(t *testing.T) {
 		},
 		want: want{
 			expectErrorWithIDFormat: "<id>",
+			expectErrorWithMinParts: 1,
+			expectErrorWithMaxParts: 1,
 		},
 	}, {
 		name: `<id:required_id> with '123...:123...' works`,
@@ -65,6 +70,8 @@ func TestImportWithAttributes(t *testing.T) {
 		},
 		want: want{
 			expectErrorWithIDFormat: "<id:required_id>",
+			expectErrorWithMinParts: 2,
+			expectErrorWithMaxParts: 2,
 		},
 	}, {
 		name: `<id:required_id[:optional_id]> with '123...:123...:123...' works`,
@@ -111,6 +118,8 @@ func TestImportWithAttributes(t *testing.T) {
 		},
 		want: want{
 			expectErrorWithIDFormat: "<id:required_id[:optional_id]>",
+			expectErrorWithMinParts: 2,
+			expectErrorWithMaxParts: 3,
 		},
 	}, {
 		name: `<> with '' works`,
@@ -130,6 +139,8 @@ func TestImportWithAttributes(t *testing.T) {
 		},
 		want: want{
 			expectErrorWithIDFormat: "<>",
+			expectErrorWithMinParts: -1,
+			expectErrorWithMaxParts: -1,
 		},
 	}, {
 		name: `<[org_id]> with '123...' works`,
@@ -161,6 +172,54 @@ func TestImportWithAttributes(t *testing.T) {
 		},
 		want: want{
 			expectErrorWithIDFormat: "<[org_id]>",
+			expectErrorWithMinParts: -1,
+			expectErrorWithMaxParts: -1,
+		},
+	}, {
+		name: `<required_id[:optional_id]> with empty id and '123...:123...' works`,
+		args: args{
+			attrs: []importAttribute{
+				emptyIDAttribute,
+				NewImportAttribute("required_id", ConvertID, false),
+				NewImportAttribute("optional_id", ConvertID, true),
+			},
+			id: concat(validID, validID),
+		},
+		want: want{
+			attributes: map[string]interface{}{
+				"id":          "imported",
+				"required_id": validID,
+				"optional_id": validID,
+			},
+		},
+	}, {
+		name: `<required_id[:optional_id]> with empty id and '123...:123...:123...' fails`,
+		args: args{
+			attrs: []importAttribute{
+				emptyIDAttribute,
+				NewImportAttribute("required_id", ConvertID, false),
+				NewImportAttribute("optional_id", ConvertID, true),
+			},
+			id: concat(validID, validID, validID),
+		},
+		want: want{
+			expectErrorWithIDFormat: "<required_id[:optional_id]>",
+			expectErrorWithMinParts: 1,
+			expectErrorWithMaxParts: 2,
+		},
+	}, {
+		name: `<required_id[:optional_id]> with empty id and '' fails`,
+		args: args{
+			attrs: []importAttribute{
+				emptyIDAttribute,
+				NewImportAttribute("required_id", ConvertID, false),
+				NewImportAttribute("optional_id", ConvertID, true),
+			},
+		},
+		want: want{
+			expectErrorWithIDFormat: "<required_id[:optional_id]>",
+			expectErrorWithMinParts: 1,
+			expectErrorWithMaxParts: 2,
 		},
 	}}
 	for _, tt := range tests {
@@ -173,8 +232,13 @@ func TestImportWithAttributes(t *testing.T) {
 				if tt.want.expectErrorWithIDFormat == "" {
 					t.Fatalf("importWithAttributes() error = %v, want %v", err, wantAttributes)
 				}
+				expectBetweenError := fmt.Sprintf("between %d and %d", tt.want.expectErrorWithMinParts, tt.want.expectErrorWithMaxParts)
+				if (tt.want.expectErrorWithMinParts > -1 || tt.want.expectErrorWithMaxParts > -1) &&
+					!strings.Contains(err.Error(), expectBetweenError) {
+					t.Errorf(`expected error to contain "%s", got: %v`, expectBetweenError, err)
+				}
 				if !strings.Contains(err.Error(), tt.want.expectErrorWithIDFormat) {
-					t.Fatalf("expected error to contain the expected format '<id>', got: %v", err)
+					t.Errorf("expected error to contain the expected format '%s', got: %v", tt.want.expectErrorWithIDFormat, err)
 				}
 				return
 			}
