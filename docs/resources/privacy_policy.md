@@ -28,6 +28,7 @@ resource zitadel_privacy_policy privacy_policy {
 - `help_link` (String)
 - `org_id` (String) Id for the organization
 - `privacy_link` (String)
+- `support_email` (String)
 - `tos_link` (String)
 
 ### Read-Only
