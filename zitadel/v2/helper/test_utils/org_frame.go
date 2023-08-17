@@ -2,6 +2,7 @@ package test_utils
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
 	mgmt "github.com/zitadel/zitadel-go/v2/pkg/client/management"
@@ -14,8 +15,9 @@ import (
 type OrgTestFrame struct {
 	BaseTestFrame
 	*mgmt.Client
-	Admin *admin.Client
-	OrgID string
+	Admin                *admin.Client
+	OrgID                string
+	OrgExampleDatasource string
 }
 
 func (o *OrgTestFrame) useOrgContext(orgID string) (err error) {
@@ -43,6 +45,11 @@ func NewOrgTestFrame(resourceType string) (*OrgTestFrame, error) {
 	}
 	org, err := orgFrame.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: "zitadel." + cfg.Domain})
 	orgFrame.OrgID = org.GetOrg().GetId()
+	orgFrame.OrgExampleDatasource = fmt.Sprintf(`
+data "zitadel_org" "org" {
+	id = "%s"
+}
+`, orgFrame.OrgID)
 	return orgFrame, err
 }
 

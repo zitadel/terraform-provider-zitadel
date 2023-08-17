@@ -34,6 +34,17 @@ func TestAccAppKey(t *testing.T) {
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
+		fmt.Sprintf(`%s
+data "zitadel_project" "project" {
+  id		 = "%s"
+  org_id     = data.zitadel_org.org.id
+}
+data "zitadel_application_api" "application_api" {
+  id         = "%s"
+  org_id     = data.zitadel_org.org.id
+  project_id = data.zitadel_project.project.id
+}
+`, frame.OrgExampleDatasource, project.GetId(), app.GetAppId()),
 		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {

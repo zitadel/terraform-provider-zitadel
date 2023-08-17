@@ -23,6 +23,7 @@ type BaseTestFrame struct {
 	context.Context
 	ClientInfo                         *helper.ClientInfo
 	ProviderSnippet, UniqueResourcesID string
+	ResourceType                       string
 	TerraformName                      string
 	v6ProviderFactories                map[string]func() (tfprotov6.ProviderServer, error)
 	v5ProviderFactories                map[string]func() (tfprotov5.ProviderServer, error)
@@ -58,6 +59,7 @@ KEY
 		ClientInfo:        clientInfo,
 		UniqueResourcesID: uniqueID,
 		TerraformName:     terraformName,
+		ResourceType:      resourceType,
 	}
 	_, v5 := zitadelProvider.ResourcesMap[resourceType]
 	if v5 {

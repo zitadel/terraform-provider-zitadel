@@ -22,6 +22,7 @@ func TestAccAction(t *testing.T) {
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
+		frame.OrgExampleDatasource,
 		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {

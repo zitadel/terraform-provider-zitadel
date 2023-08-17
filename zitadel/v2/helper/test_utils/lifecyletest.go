@@ -2,6 +2,8 @@ package test_utils
 
 import (
 	"fmt"
+	"os"
+	"path"
 	"regexp"
 	"strings"
 	"testing"
@@ -12,6 +14,7 @@ import (
 func RunLifecyleTest[P comparable](
 	t *testing.T,
 	frame BaseTestFrame,
+	addedExampleConfig string,
 	resourceFunc func(initialProperty P, initialSecret string) string,
 	initialProperty, updatedProperty P,
 	initialSecret, updatedSecret string,
@@ -24,28 +27,33 @@ func RunLifecyleTest[P comparable](
 	secretAttribute string,
 ) {
 	var importStateVerifyIgnore []string
-	initialConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(initialProperty, initialSecret))
-	updatedNameConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, initialSecret))
 	updatedSecretConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, updatedSecret))
+	updatedPropertyConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, initialSecret))
+	examplePath := path.Join("..", "..", "..", "examples", "provider", "resources", strings.Replace(frame.ResourceType, "zitadel_", "", 1)+".tf")
+	rawExampleConfig, err := os.ReadFile(examplePath)
+	if err != nil {
+		t.Fatalf("error reading example file: %v", err)
+	}
+	exampleConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, addedExampleConfig, string(rawExampleConfig))
 	steps := []resource.TestStep{
 		{ // Check first plan has a diff
-			Config:             initialConfig,
+			Config:             exampleConfig,
 			ExpectNonEmptyPlan: true,
 			// ExpectNonEmptyPlan just works with PlanOnly set to true
 			PlanOnly: true,
 		}, { // Check resource is created
-			Config: initialConfig,
+			Config: exampleConfig,
 			Check: resource.ComposeAggregateTestCheckFunc(
 				CheckAMinute(checkRemoteProperty(initialProperty)),
 				CheckStateHasIDSet(frame, idPattern),
 			),
 		}, { // Check updating name has a diff
-			Config:             updatedNameConfig,
+			Config:             updatedPropertyConfig,
 			ExpectNonEmptyPlan: true,
 			// ExpectNonEmptyPlan just works with PlanOnly set to true
 			PlanOnly: true,
 		}, { // Check remote state can be updated
-			Config: updatedNameConfig,
+			Config: updatedPropertyConfig,
 			Check:  CheckAMinute(checkRemoteProperty(updatedProperty)),
 		},
 	}
