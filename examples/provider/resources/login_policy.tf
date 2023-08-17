@@ -1,4 +1,4 @@
-resource zitadel_login_policy login_policy {
+resource "zitadel_login_policy" "login_policy" {
   org_id                        = zitadel_org.org.id
   user_login                    = true
   allow_register                = true

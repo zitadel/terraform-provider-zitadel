@@ -1,4 +1,4 @@
-resource zitadel_verify_phone_message_text verify_phone_en {
+resource "zitadel_verify_phone_message_text" "verify_phone_en" {
   org_id   = zitadel_org.org.id
   language = "en"
 

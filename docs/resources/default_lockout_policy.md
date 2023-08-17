@@ -12,7 +12,7 @@ Resource representing the default lockout policy.
 ## Example Usage
 
 ```terraform
-resource zitadel_default_lockout_policy lockout_policy {
+resource "zitadel_default_lockout_policy" "lockout_policy" {
   max_password_attempts = "5"
 }
 ```

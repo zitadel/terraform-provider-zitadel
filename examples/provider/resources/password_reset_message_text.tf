@@ -1,4 +1,4 @@
-resource zitadel_password_reset_message_text password_reset_en {
+resource "zitadel_password_reset_message_text" "password_reset_en" {
   org_id   = zitadel_org.org.id
   language = "en"
 

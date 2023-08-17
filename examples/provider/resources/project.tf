@@ -1,4 +1,4 @@
-resource zitadel_project project {
+resource "zitadel_project" "project" {
   name                     = "projectname"
   org_id                   = zitadel_org.org.id
   project_role_assertion   = true
