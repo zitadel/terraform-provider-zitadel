@@ -25,7 +25,7 @@ resource "zitadel_machine_key" "machine_key" {
 
 ### Required
 
-- `key_type` (String) Type of the machine key, supported values: KEY_TYPE_JSON, KEY_TYPE_UNSPECIFIED
+- `key_type` (String) Type of the machine key, supported values: KEY_TYPE_UNSPECIFIED, KEY_TYPE_JSON
 - `org_id` (String) ID of the organization
 - `user_id` (String) ID of the user
 

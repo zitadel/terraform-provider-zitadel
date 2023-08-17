@@ -2,12 +2,12 @@
 page_title: "zitadel_org_idp_oidc Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing a OIDC IDP of the organization.
+  Resource representing a generic OIDC IdP on the organization.
 ---
 
 # zitadel_org_idp_oidc (Resource)
 
-Resource representing a OIDC IDP of the organization.
+Resource representing a generic OIDC IdP on the organization.
 
 ## Example Usage
 

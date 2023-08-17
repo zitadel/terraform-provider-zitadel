@@ -1,0 +1,24 @@
+---
+page_title: "{{.Name}} {{.Type}} - {{.ProviderName}}"
+subcategory: ""
+description: |-
+{{ .Description | plainmarkdown | trimspace | prefixlines "  " }}
+---
+
+# {{.Name}} ({{.Type}})
+
+{{ .Description | trimspace }}
+
+## Example Usage
+
+{{ tffile "examples/provider/data-sources/idp_google.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
+
+## Import
+
+Instance IdP imports use semicolon-delimited identifiers. The resource can be imported using the IdPs id and the IdPs client_secret.
+
+```
+terraform import {{.Name}} 210210971312980331:myclientsecret
+```

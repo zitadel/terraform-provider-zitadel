@@ -6,7 +6,7 @@ import (
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Datasource representing a OIDC IDP of the organization.",
+		Description: "Datasource representing a generic OIDC IdP on the organization.",
 		Schema: map[string]*schema.Schema{
 			idpIDVar: {
 				Type:        schema.TypeString,

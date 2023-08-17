@@ -13,10 +13,11 @@ Resource representing the custom privacy policy of an organization.
 
 ```terraform
 resource "zitadel_privacy_policy" "privacy_policy" {
-  org_id       = zitadel_org.org.id
-  tos_link     = "https://google.com"
-  privacy_link = "https://google.com"
-  help_link    = "https://google.com"
+  org_id        = zitadel_org.org.id
+  tos_link      = "https://google.com"
+  privacy_link  = "https://google.com"
+  help_link     = "https://google.com"
+  support_email = "support@email.com"
 }
 ```
 
@@ -28,6 +29,7 @@ resource "zitadel_privacy_policy" "privacy_policy" {
 - `help_link` (String)
 - `org_id` (String) Id for the organization
 - `privacy_link` (String)
+- `support_email` (String)
 - `tos_link` (String)
 
 ### Read-Only

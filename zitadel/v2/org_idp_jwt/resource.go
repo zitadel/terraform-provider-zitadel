@@ -7,11 +7,12 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 )
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing a domain of the organization.",
+		Description: "Resource representing a generic JWT IdP of the organization.",
 		Schema: map[string]*schema.Schema{
 			orgIDVar: {
 				Type:        schema.TypeString,
@@ -62,6 +63,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		DeleteContext: delete,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer:      &schema.ResourceImporter{StateContext: org_idp_utils.ImportIDPWithOrg()},
 	}
 }

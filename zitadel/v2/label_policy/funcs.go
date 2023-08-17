@@ -12,7 +12,7 @@ import (
 )
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started create")
+	tflog.Info(ctx, "started delete")
 
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {

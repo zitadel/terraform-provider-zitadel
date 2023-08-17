@@ -2,12 +2,12 @@
 page_title: "zitadel_org_oidc_idp Data Source - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Datasource representing a OIDC IDP of the organization.
+  Datasource representing a generic OIDC IdP on the organization.
 ---
 
 # zitadel_org_oidc_idp (Data Source)
 
-Datasource representing a OIDC IDP of the organization.
+Datasource representing a generic OIDC IdP on the organization.
 
 ## Example Usage
 

@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	zitadel_go "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/action"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/app_key"
@@ -22,7 +23,10 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_login_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_login_texts"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_notification_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_oidc_settings"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_password_reset_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_passwordless_registration_message_text"
@@ -34,6 +38,13 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_azure_ad"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_github"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_github_es"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab_self_hosted"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_google"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/init_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/instance_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/label_policy"
@@ -44,9 +55,17 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/machine_user"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/notification_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_azure_ad"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_github"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_github_es"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_gitlab"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_gitlab_self_hosted"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_google"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_jwt"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_member"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/password_reset_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/passwordless_registration_message_text"
@@ -65,15 +84,14 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/verify_phone_message_text"
 )
 
-var (
-	_ provider.Provider = &providerPV6{}
-)
+var _ provider.Provider = (*providerPV6)(nil)
 
 type providerPV6 struct {
+	customOptions []zitadel_go.Option
 }
 
-func NewProviderPV6() provider.Provider {
-	return &providerPV6{}
+func NewProviderPV6(option ...zitadel_go.Option) provider.Provider {
+	return &providerPV6{customOptions: option}
 }
 
 type providerModel struct {
@@ -159,13 +177,16 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 		init_message_text.New,
 		login_texts.New,
 		password_reset_message_text.New,
+		password_change_message_text.New,
 		verify_email_message_text.New,
 		verify_phone_message_text.New,
 		domain_claimed_message_text.New,
 		passwordless_registration_message_text.New,
 		default_domain_claimed_message_text.New,
 		default_init_message_text.New,
+		default_login_texts.New,
 		default_password_reset_message_text.New,
+		default_password_change_message_text.New,
 		default_passwordless_registration_message_text.New,
 		default_verify_email_message_text.New,
 		default_verify_phone_message_text.New,
@@ -175,17 +196,32 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
-			"zitadel_org":              org.GetDatasource(),
-			"zitadel_human_user":       human_user.GetDatasource(),
-			"zitadel_machine_user":     machine_user.GetDatasource(),
-			"zitadel_project":          project.GetDatasource(),
-			"zitadel_project_role":     project_role.GetDatasource(),
-			"zitadel_action":           action.GetDatasource(),
-			"zitadel_application_oidc": application_oidc.GetDatasource(),
-			"zitadel_application_api":  application_api.GetDatasource(),
-			"zitadel_trigger_actions":  trigger_actions.GetDatasource(),
-			"zitadel_org_jwt_idp":      org_idp_jwt.GetDatasource(),
-			"zitadel_org_oidc_idp":     org_idp_oidc.GetDatasource(),
+			"zitadel_org":                        org.GetDatasource(),
+			"zitadel_human_user":                 human_user.GetDatasource(),
+			"zitadel_machine_user":               machine_user.GetDatasource(),
+			"zitadel_project":                    project.GetDatasource(),
+			"zitadel_project_role":               project_role.GetDatasource(),
+			"zitadel_action":                     action.GetDatasource(),
+			"zitadel_application_oidc":           application_oidc.GetDatasource(),
+			"zitadel_application_api":            application_api.GetDatasource(),
+			"zitadel_trigger_actions":            trigger_actions.GetDatasource(),
+			"zitadel_idp_github":                 idp_github.GetDatasource(),
+			"zitadel_idp_github_es":              idp_github_es.GetDatasource(),
+			"zitadel_idp_gitlab":                 idp_gitlab.GetDatasource(),
+			"zitadel_idp_gitlab_self_hosted":     idp_gitlab_self_hosted.GetDatasource(),
+			"zitadel_idp_google":                 idp_google.GetDatasource(),
+			"zitadel_idp_azure_ad":               idp_azure_ad.GetDatasource(),
+			"zitadel_idp_ldap":                   idp_ldap.GetDatasource(),
+			"zitadel_org_jwt_idp":                org_idp_jwt.GetDatasource(),
+			"zitadel_org_oidc_idp":               org_idp_oidc.GetDatasource(),
+			"zitadel_org_idp_github":             org_idp_github.GetDatasource(),
+			"zitadel_org_idp_github_es":          org_idp_github_es.GetDatasource(),
+			"zitadel_org_idp_gitlab":             org_idp_gitlab.GetDatasource(),
+			"zitadel_org_idp_gitlab_self_hosted": org_idp_gitlab_self_hosted.GetDatasource(),
+			"zitadel_org_idp_google":             org_idp_google.GetDatasource(),
+			"zitadel_org_idp_azure_ad":           org_idp_azure_ad.GetDatasource(),
+			"zitadel_org_idp_ldap":               org_idp_ldap.GetDatasource(),
+			"zitadel_default_oidc_settings":      default_oidc_settings.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -245,8 +281,6 @@ func Provider() *schema.Provider {
 			"zitadel_trigger_actions":                    trigger_actions.GetResource(),
 			"zitadel_personal_access_token":              pat.GetResource(),
 			"zitadel_machine_key":                        machine_key.GetResource(),
-			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
-			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
 			"zitadel_default_label_policy":               default_label_policy.GetResource(),
 			"zitadel_default_login_policy":               default_login_policy.GetResource(),
 			"zitadel_default_lockout_policy":             default_lockout_policy.GetResource(),
@@ -257,12 +291,29 @@ func Provider() *schema.Provider {
 			"zitadel_smtp_config":                        smtp_config.GetResource(),
 			"zitadel_default_notification_policy":        default_notification_policy.GetResource(),
 			"zitadel_notification_policy":                notification_policy.GetResource(),
+			"zitadel_idp_github":                         idp_github.GetResource(),
+			"zitadel_idp_github_es":                      idp_github_es.GetResource(),
+			"zitadel_idp_gitlab":                         idp_gitlab.GetResource(),
+			"zitadel_idp_gitlab_self_hosted":             idp_gitlab_self_hosted.GetResource(),
+			"zitadel_idp_google":                         idp_google.GetResource(),
+			"zitadel_idp_azure_ad":                       idp_azure_ad.GetResource(),
+			"zitadel_idp_ldap":                           idp_ldap.GetResource(),
+			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
+			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
+			"zitadel_org_idp_github":                     org_idp_github.GetResource(),
+			"zitadel_org_idp_github_es":                  org_idp_github_es.GetResource(),
+			"zitadel_org_idp_gitlab":                     org_idp_gitlab.GetResource(),
+			"zitadel_org_idp_gitlab_self_hosted":         org_idp_gitlab_self_hosted.GetResource(),
+			"zitadel_org_idp_google":                     org_idp_google.GetResource(),
+			"zitadel_org_idp_azure_ad":                   org_idp_azure_ad.GetResource(),
+			"zitadel_org_idp_ldap":                       org_idp_ldap.GetResource(),
+			"zitadel_default_oidc_settings":              default_oidc_settings.GetResource(),
 		},
-		ConfigureContextFunc: providerConfigure,
+		ConfigureContextFunc: ProviderConfigure,
 	}
 }
 
-func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	clientinfo, err := helper.GetClientInfo(
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
