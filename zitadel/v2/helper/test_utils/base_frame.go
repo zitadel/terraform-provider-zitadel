@@ -13,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+	"github.com/hashicorp/terraform-plugin-mux/tf5to6server"
+	"github.com/hashicorp/terraform-plugin-mux/tf6muxserver"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zclconf/go-cty/cty"
@@ -34,7 +36,6 @@ type BaseTestFrame struct {
 	ResourceType                       string
 	TerraformName                      string
 	v6ProviderFactories                map[string]func() (tfprotov6.ProviderServer, error)
-	v5ProviderFactories                map[string]func() (tfprotov5.ProviderServer, error)
 }
 
 func NewBaseTestFrame(ctx context.Context, resourceType, domain string, jwtProfileJson []byte) (*BaseTestFrame, error) {
@@ -69,16 +70,25 @@ KEY
 		TerraformName:     terraformName,
 		ResourceType:      resourceType,
 	}
-	_, v5Resource := zitadelProvider.ResourcesMap[resourceType]
-	_, v5Datasource := zitadelProvider.DataSourcesMap[resourceType]
-	if v5Resource || v5Datasource {
-		frame.v5ProviderFactories = map[string]func() (tfprotov5.ProviderServer, error){"zitadel": func() (tfprotov5.ProviderServer, error) {
-			return zitadelProvider.GRPCProvider(), nil
-		}}
-	} else {
-		frame.v6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){"zitadel": func() (tfprotov6.ProviderServer, error) {
-			return providerserver.NewProtocol6(zitadel.NewProviderPV6())(), nil
-		}}
+	frame.v6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
+		"zitadel": func() (tfprotov6.ProviderServer, error) {
+			muxServer, err := tf6muxserver.NewMuxServer(frame,
+				providerserver.NewProtocol6(zitadel.NewProviderPV6()),
+				func() tfprotov6.ProviderServer {
+					upgraded, err := tf5to6server.UpgradeServer(frame, func() tfprotov5.ProviderServer {
+						return zitadelProvider.GRPCProvider()
+					})
+					if err != nil {
+						return nil
+					}
+					return upgraded
+				},
+			)
+			if err != nil {
+				return nil, err
+			}
+			return muxServer.ProviderServer(), nil
+		},
 	}
 	return frame, nil
 }

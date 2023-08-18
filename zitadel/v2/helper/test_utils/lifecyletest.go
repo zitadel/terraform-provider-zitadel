@@ -12,6 +12,7 @@ import (
 func RunLifecyleTest[P comparable](
 	t *testing.T,
 	frame BaseTestFrame,
+	datasources []string,
 	resourceFunc func(property P, secret string) string,
 	exampleProperty, updatedProperty P,
 	exampleSecret, updatedSecret string,
@@ -24,9 +25,9 @@ func RunLifecyleTest[P comparable](
 	secretAttribute string,
 ) {
 	var importStateVerifyIgnore []string
-	exampleConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(exampleProperty, exampleSecret))
-	updatedPropertyConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, exampleSecret))
-	updatedSecretConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, updatedSecret))
+	exampleConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(exampleProperty, exampleSecret))
+	updatedPropertyConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(updatedProperty, exampleSecret))
+	updatedSecretConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(updatedProperty, updatedSecret))
 	steps := []resource.TestStep{
 		{ // Check first plan has a diff
 			Config:             exampleConfig,
@@ -89,6 +90,5 @@ func RunLifecyleTest[P comparable](
 			return err
 		},
 		ProtoV6ProviderFactories: frame.v6ProviderFactories,
-		ProtoV5ProviderFactories: frame.v5ProviderFactories,
 	})
 }
