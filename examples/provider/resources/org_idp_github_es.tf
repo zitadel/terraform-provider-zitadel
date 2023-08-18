@@ -1,5 +1,5 @@
 resource "zitadel_org_idp_github_es" "default" {
-  org_id                 = zitadel_org.default.id
+  org_id                 = data.zitadel_org.default.id
   name                   = "GitHub Enterprise Server"
   client_id              = "86a165..."
   client_secret          = "*****afdbac18"

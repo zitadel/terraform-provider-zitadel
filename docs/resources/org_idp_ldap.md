@@ -13,7 +13,7 @@ Resource representing an LDAP IdP on the organization.
 
 ```terraform
 resource "zitadel_org_idp_ldap" "default" {
-  org_id               = zitadel_org.default.id
+  org_id               = data.zitadel_org.default.id
   name                 = "LDAP"
   servers              = ["ldaps://my.primary.server:389", "ldaps://my.secondary.server:389"]
   start_tls            = false

@@ -1,5 +1,5 @@
 resource "zitadel_org_idp_azure_ad" "default" {
-  org_id              = zitadel_org.default.id
+  org_id              = data.zitadel_org.default.id
   name                = "Azure AD"
   client_id           = "9065bfc8-a08a..."
   client_secret       = "H2n***"

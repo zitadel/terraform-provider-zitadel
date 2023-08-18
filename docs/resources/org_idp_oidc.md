@@ -13,7 +13,7 @@ Resource representing a generic OIDC IdP on the organization.
 
 ```terraform
 resource "zitadel_org_idp_oidc" "default" {
-  org_id               = zitadel_org.default.id
+  org_id               = data.zitadel_org.default.id
   name                 = "oidcidp"
   styling_type         = "STYLING_TYPE_UNSPECIFIED"
   client_id            = "google"

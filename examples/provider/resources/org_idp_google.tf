@@ -1,5 +1,5 @@
 resource "zitadel_org_idp_google" "default" {
-  org_id              = zitadel_org.default.id
+  org_id              = data.zitadel_org.default.id
   name                = "Google"
   client_id           = "182902..."
   client_secret       = "GOCSPX-*****"

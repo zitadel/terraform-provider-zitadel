@@ -1,5 +1,5 @@
 resource "zitadel_login_policy" "default" {
-  org_id                        = zitadel_org.default.id
+  org_id                        = data.zitadel_org.default.id
   user_login                    = true
   allow_register                = true
   allow_external_idp            = true

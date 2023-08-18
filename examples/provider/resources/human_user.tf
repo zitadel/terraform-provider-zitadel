@@ -1,5 +1,5 @@
 resource "zitadel_human_user" "default" {
-  org_id             = zitadel_org.default.id
+  org_id             = data.zitadel_org.default.id
   user_name          = "humanfull@localhost.com"
   first_name         = "firstname"
   last_name          = "lastname"

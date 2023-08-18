@@ -13,7 +13,7 @@ description: |-
 
 ```terraform
 resource "zitadel_login_texts" "default" {
-  org_id   = zitadel_org.default.id
+  org_id   = data.zitadel_org.default.id
   language = "en"
 
   email_verification_done_text = {

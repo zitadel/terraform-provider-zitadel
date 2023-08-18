@@ -13,7 +13,7 @@ Resource representing a GitLab Self Hosted IdP on the organization.
 
 ```terraform
 resource "zitadel_org_idp_gitlab_self_hosted" "default" {
-  org_id              = zitadel_org.default.id
+  org_id              = data.zitadel_org.default.id
   name                = "GitLab Self Hosted"
   client_id           = "15765e..."
   client_secret       = "*****abcxyz"

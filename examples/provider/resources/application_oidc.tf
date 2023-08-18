@@ -1,6 +1,6 @@
 resource "zitadel_application_oidc" "default" {
-  project_id = zitadel_project.default.id
-  org_id     = zitadel_org.default.id
+  project_id = data.zitadel_project.default.id
+  org_id     = data.zitadel_org.default.id
 
   name                        = "applicationoidc"
   redirect_uris               = ["https://localhost.com"]
