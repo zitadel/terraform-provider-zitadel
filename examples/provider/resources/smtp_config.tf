@@ -1,4 +1,4 @@
-resource zitadel_smtp_config smtp {
+resource "zitadel_smtp_config" "default" {
   sender_address = "address"
   sender_name    = "no-reply"
   tls            = true

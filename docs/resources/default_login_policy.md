@@ -12,7 +12,7 @@ Resource representing the default login policy.
 ## Example Usage
 
 ```terraform
-resource zitadel_default_login_policy login_policy {
+resource "zitadel_default_login_policy" "default" {
   user_login                    = true
   allow_register                = true
   allow_external_idp            = true

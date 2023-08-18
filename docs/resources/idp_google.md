@@ -12,7 +12,7 @@ Resource representing a Google IDP on the instance.
 ## Example Usage
 
 ```terraform
-resource "zitadel_idp_google" "google" {
+resource "zitadel_idp_google" "default" {
   name                = "Google"
   client_id           = "182902..."
   client_secret       = "GOCSPX-*****"

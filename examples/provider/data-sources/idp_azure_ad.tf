@@ -1,3 +1,3 @@
-data "zitadel_idp_azure_ad" "azure_ad" {
-  id = "177073614158299139"
+data "zitadel_idp_azure_ad" "default" {
+  id = "123456789012345678"
 }

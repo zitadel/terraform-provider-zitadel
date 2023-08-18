@@ -2,6 +2,7 @@ package app_key_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,8 +15,6 @@ import (
 
 func TestAccAppKey(t *testing.T) {
 	resourceName := "zitadel_application_key"
-	initialProperty := "2500-01-01T08:45:00Z"
-	updatedProperty := "2501-01-01T08:45:00Z"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
@@ -26,41 +25,30 @@ func TestAccAppKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create project: %v", err)
 	}
-	app, err := frame.AddOIDCApp(frame, &management.AddOIDCAppRequest{
+	apiApp, err := frame.AddAPIApp(frame, &management.AddAPIAppRequest{
 		ProjectId:      project.GetId(),
 		Name:           frame.UniqueResourcesID,
-		AuthMethodType: app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 	})
+	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	projectDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "project")
+	projectDatasourceExample = strings.Replace(projectDatasourceExample, "123456789012345678", project.GetId(), 1)
+	appDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "application_api")
+	appDatasourceExample = strings.Replace(appDatasourceExample, "123456789012345678", apiApp.GetAppId(), 1)
+	exampleProperty := test_utils.AttributeValue(t, "expiration_date", exampleAttributes).AsString()
+	updatedProperty := "2501-01-01T08:45:00Z"
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		fmt.Sprintf(`%s
-data "zitadel_project" "project" {
-  id		 = "%s"
-  org_id     = data.zitadel_org.org.id
-}
-data "zitadel_application_api" "application_api" {
-  id         = "%s"
-  org_id     = data.zitadel_org.org.id
-  project_id = data.zitadel_project.project.id
-}
-`, frame.OrgExampleDatasource, project.GetId(), app.GetAppId()),
 		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id          = "%s"
-  project_id      = "%s"
-  app_id          = "%s"
-  key_type        = "KEY_TYPE_JSON"
-  expiration_date = "%s"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, project.GetId(), app.GetAppId(), configProperty)
+			return fmt.Sprintf("%s\n%s\n%s\n%s", frame.OrgExampleDatasource, projectDatasourceExample, appDatasourceExample, strings.Replace(resourceExample, exampleProperty, configProperty, 1))
 		},
-		initialProperty, updatedProperty,
+		exampleProperty, updatedProperty,
 		"", "",
 		false,
-		checkRemoteProperty(frame, project.GetId(), app.GetAppId()),
+		checkRemoteProperty(frame, project.GetId(), apiApp.GetAppId()),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId(), app.GetAppId()), updatedProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId(), apiApp.GetAppId()), updatedProperty),
 		nil, nil, "", "",
 	)
 }

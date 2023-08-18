@@ -12,13 +12,13 @@ Datasource representing an action belonging to an organization.
 ## Example Usage
 
 ```terraform
-data zitadel_action action {
-  org_id    = data.zitadel_org.org.id
-  action_id = "177073621691269123"
+data "zitadel_action" "default" {
+  org_id    = data.zitadel_org.default.id
+  action_id = "123456789012345678"
 }
 
-output action {
-  value = data.zitadel_action.action
+output "action" {
+  value = data.zitadel_action.default
 }
 ```
 

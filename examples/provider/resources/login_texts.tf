@@ -1,5 +1,5 @@
-resource zitadel_login_texts login_texts_en {
-  org_id   = zitadel_org.org.id
+resource "zitadel_login_texts" "default" {
+  org_id   = zitadel_org.default.id
   language = "en"
 
   email_verification_done_text = {

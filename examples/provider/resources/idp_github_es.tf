@@ -1,4 +1,4 @@
-resource "zitadel_idp_github_es" "github_es" {
+resource "zitadel_idp_github_es" "default" {
   name                   = "GitHub Enterprise Server"
   client_id              = "86a165..."
   client_secret          = "*****afdbac18"

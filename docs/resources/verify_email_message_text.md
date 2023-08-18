@@ -12,8 +12,8 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource zitadel_verify_email_message_text verify_email_en {
-  org_id   = zitadel_org.org.id
+resource "zitadel_verify_email_message_text" "default" {
+  org_id   = zitadel_org.default.id
   language = "en"
 
   title       = "title example"

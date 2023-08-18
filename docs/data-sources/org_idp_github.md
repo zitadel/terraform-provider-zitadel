@@ -12,8 +12,8 @@ Datasource representing a GitHub IdP of the organization.
 ## Example Usage
 
 ```terraform
-data "zitadel_org_idp_github" "github" {
-  id = "177073614158299139"
+data "zitadel_org_idp_github" "default" {
+  id = "123456789012345678"
 }
 ```
 

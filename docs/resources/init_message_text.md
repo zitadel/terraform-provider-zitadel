@@ -12,8 +12,8 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource zitadel_init_message_text init_en {
-  org_id   = zitadel_org.org.id
+resource "zitadel_init_message_text" "default" {
+  org_id   = zitadel_org.default.id
   language = "en"
 
   title       = "title example"

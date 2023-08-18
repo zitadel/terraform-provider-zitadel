@@ -12,7 +12,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource zitadel_default_password_change_message_text password_change_en {
+resource "zitadel_default_password_change_message_text" "default" {
   language = "en"
 
   title       = "title example"

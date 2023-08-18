@@ -12,7 +12,7 @@ Resource representing the default password complexity policy.
 ## Example Usage
 
 ```terraform
-resource zitadel_default_password_complexity_policy password_complexity_policy {
+resource "zitadel_default_password_complexity_policy" "default" {
   min_length    = "8"
   has_uppercase = true
   has_lowercase = true

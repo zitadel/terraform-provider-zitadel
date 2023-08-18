@@ -12,8 +12,8 @@ Datasource representing a GitHub Enterprise IDP on the instance.
 ## Example Usage
 
 ```terraform
-data "zitadel_idp_github_es" "github_es" {
-  id = "177073614158299139"
+data "zitadel_idp_github_es" "default" {
+  id = "123456789012345678"
 }
 ```
 

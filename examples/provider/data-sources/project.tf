@@ -1,8 +1,8 @@
-data zitadel_project project {
-  org_id     = data.zitadel_org.org.id
-  project_id = "177073620768522243"
+data "zitadel_project" "default" {
+  org_id     = data.zitadel_org.default.id
+  project_id = "123456789012345678"
 }
 
-output project {
-  value = data.zitadel_project.project
+output "project" {
+  value = data.zitadel_project.default
 }

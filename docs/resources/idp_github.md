@@ -12,7 +12,7 @@ Resource representing a GitHub IDP on the instance.
 ## Example Usage
 
 ```terraform
-resource "zitadel_idp_github" "github" {
+resource "zitadel_idp_github" "default" {
   name                = "GitHub"
   client_id           = "86a165..."
   client_secret       = "*****afdbac18"

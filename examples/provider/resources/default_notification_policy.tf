@@ -1,3 +1,3 @@
-resource zitadel_default_notification_policy notification_policy {
+resource "zitadel_default_notification_policy" "default" {
   password_change = false
 }

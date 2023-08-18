@@ -1,5 +1,5 @@
-resource zitadel_domain_claimed_message_text domain_claimed_en {
-  org_id   = zitadel_org.org.id
+resource "zitadel_domain_claimed_message_text" "default" {
+  org_id   = zitadel_org.default.id
   language = "en"
 
   title       = "title example"

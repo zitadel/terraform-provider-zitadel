@@ -2,8 +2,6 @@ package test_utils
 
 import (
 	"fmt"
-	"os"
-	"path"
 	"regexp"
 	"strings"
 	"testing"
@@ -14,10 +12,9 @@ import (
 func RunLifecyleTest[P comparable](
 	t *testing.T,
 	frame BaseTestFrame,
-	addedExampleConfig string,
-	resourceFunc func(initialProperty P, initialSecret string) string,
-	initialProperty, updatedProperty P,
-	initialSecret, updatedSecret string,
+	resourceFunc func(property P, secret string) string,
+	exampleProperty, updatedProperty P,
+	exampleSecret, updatedSecret string,
 	allowNonEmptyPlan bool,
 	checkRemoteProperty func(expect P) resource.TestCheckFunc,
 	idPattern *regexp.Regexp,
@@ -27,14 +24,9 @@ func RunLifecyleTest[P comparable](
 	secretAttribute string,
 ) {
 	var importStateVerifyIgnore []string
+	exampleConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(exampleProperty, exampleSecret))
+	updatedPropertyConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, exampleSecret))
 	updatedSecretConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, updatedSecret))
-	updatedPropertyConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, initialSecret))
-	examplePath := path.Join("..", "..", "..", "examples", "provider", "resources", strings.Replace(frame.ResourceType, "zitadel_", "", 1)+".tf")
-	rawExampleConfig, err := os.ReadFile(examplePath)
-	if err != nil {
-		t.Fatalf("error reading example file: %v", err)
-	}
-	exampleConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, addedExampleConfig, string(rawExampleConfig))
 	steps := []resource.TestStep{
 		{ // Check first plan has a diff
 			Config:             exampleConfig,
@@ -44,7 +36,7 @@ func RunLifecyleTest[P comparable](
 		}, { // Check resource is created
 			Config: exampleConfig,
 			Check: resource.ComposeAggregateTestCheckFunc(
-				CheckAMinute(checkRemoteProperty(initialProperty)),
+				CheckAMinute(checkRemoteProperty(exampleProperty)),
 				CheckStateHasIDSet(frame, idPattern),
 			),
 		}, { // Check updating name has a diff

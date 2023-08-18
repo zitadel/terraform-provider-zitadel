@@ -2,6 +2,7 @@ package action_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,27 +14,22 @@ import (
 
 func TestAccAction(t *testing.T) {
 	resourceName := "zitadel_action"
-	initialProperty := "initialproperty"
-	updatedProperty := "updatedproperty"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
+	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	nameAttribute := test_utils.AttributeValue(t, "name", exampleAttributes).AsString()
+	resourceExample = strings.Replace(resourceExample, nameAttribute, frame.UniqueResourcesID, 1)
+	exampleProperty := test_utils.AttributeValue(t, "script", exampleAttributes).AsString()
+	updatedProperty := "updatedproperty"
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		frame.OrgExampleDatasource,
 		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id          = "%s"
-  name            = "testaction"
-  script          = "%s"
-  timeout         = "10s"
-  allowed_to_fail = true
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
+			return fmt.Sprintf("%s\n%s", frame.OrgExampleDatasource, strings.Replace(resourceExample, exampleProperty, configProperty, 1))
 		},
-		initialProperty, updatedProperty,
+		exampleProperty, updatedProperty,
 		"", "",
 		true,
 		checkRemoteProperty(frame),

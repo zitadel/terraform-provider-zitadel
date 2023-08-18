@@ -46,8 +46,8 @@ func NewOrgTestFrame(resourceType string) (*OrgTestFrame, error) {
 	org, err := orgFrame.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: "zitadel." + cfg.Domain})
 	orgFrame.OrgID = org.GetOrg().GetId()
 	orgFrame.OrgExampleDatasource = fmt.Sprintf(`
-data "zitadel_org" "org" {
-	id = "%s"
+data "zitadel_org" "default" {
+	org_id = "%s"
 }
 `, orgFrame.OrgID)
 	return orgFrame, err

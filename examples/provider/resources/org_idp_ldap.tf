@@ -1,5 +1,5 @@
-resource "zitadel_org_idp_ldap" "ldap" {
-  org_id               = zitadel_org.org.id
+resource "zitadel_org_idp_ldap" "default" {
+  org_id               = zitadel_org.default.id
   name                 = "LDAP"
   servers              = ["ldaps://my.primary.server:389", "ldaps://my.secondary.server:389"]
   start_tls            = false

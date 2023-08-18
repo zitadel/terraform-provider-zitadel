@@ -28,14 +28,15 @@ func TestAccAppAPI(t *testing.T) {
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
+		frame.OrgExampleDatasource,
 		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "%s" "my_%s" {
   org_id           = "%s"
   project_id       = "%s"
   name             = "%s"
   auth_method_type = "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, project.GetId(), configProperty)
+}`, resourceName, resourceName, frame.OrgID, project.GetId(), configProperty)
 		},
 		initialProperty, updatedProperty,
 		"", "",

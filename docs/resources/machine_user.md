@@ -12,8 +12,8 @@ Resource representing a serviceaccount situated under an organization, which the
 ## Example Usage
 
 ```terraform
-resource zitadel_machine_user machine_user {
-  org_id      = zitadel_org.org.id
+resource "zitadel_machine_user" "default" {
+  org_id      = zitadel_org.default.id
   user_name   = "machine@localhost.com"
   name        = "name"
   description = "description"

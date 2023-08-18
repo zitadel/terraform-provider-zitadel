@@ -12,11 +12,12 @@ Resource representing the custom privacy policy of an organization.
 ## Example Usage
 
 ```terraform
-resource zitadel_privacy_policy privacy_policy {
-  org_id       = zitadel_org.org.id
-  tos_link     = "https://google.com"
-  privacy_link = "https://google.com"
-  help_link    = "https://google.com"
+resource "zitadel_privacy_policy" "default" {
+  org_id        = zitadel_org.default.id
+  tos_link      = "https://google.com"
+  privacy_link  = "https://google.com"
+  help_link     = "https://google.com"
+  support_email = "support@email.com"
 }
 ```
 

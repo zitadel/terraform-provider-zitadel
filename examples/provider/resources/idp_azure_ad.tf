@@ -1,4 +1,4 @@
-resource "zitadel_idp_azure_ad" "azure_ad" {
+resource "zitadel_idp_azure_ad" "default" {
   name                = "Azure AD"
   client_id           = "9065bfc8-a08a..."
   client_secret       = "H2n***"
