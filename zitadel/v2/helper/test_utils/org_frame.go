@@ -47,7 +47,7 @@ func NewOrgTestFrame(resourceType string) (*OrgTestFrame, error) {
 	orgFrame.OrgID = org.GetOrg().GetId()
 	orgFrame.OrgExampleDatasource = fmt.Sprintf(`
 data "zitadel_org" "default" {
-	org_id = "%s"
+	id = "%s"
 }
 `, orgFrame.OrgID)
 	return orgFrame, err
