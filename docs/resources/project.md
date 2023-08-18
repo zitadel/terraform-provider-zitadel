@@ -12,7 +12,7 @@ Resource representing the project, which can then be granted to different organi
 ## Example Usage
 
 ```terraform
-resource zitadel_project project {
+resource "zitadel_project" "project" {
   name                     = "projectname"
   org_id                   = zitadel_org.org.id
   project_role_assertion   = true

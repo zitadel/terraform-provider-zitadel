@@ -1,4 +1,4 @@
-resource zitadel_passwordless_registration_message_text passwordless_registration_en {
+resource "zitadel_passwordless_registration_message_text" "passwordless_registration_en" {
   org_id   = zitadel_org.org.id
   language = "en"
 

@@ -12,7 +12,7 @@ Resource representing the custom lockout policy of an organization.
 ## Example Usage
 
 ```terraform
-resource zitadel_lockout_policy lockout_policy {
+resource "zitadel_lockout_policy" "lockout_policy" {
   org_id                = zitadel_org.org.id
   max_password_attempts = "5"
 }

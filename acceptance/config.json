@@ -1,0 +1,8 @@
+{
+  "orgLevel": {
+    "domain": "org-level-tests.default.127.0.0.1.sslip.io"
+  },
+  "instanceLevel": {
+    "domain": "instance-level-tests.default.127.0.0.1.sslip.io"
+  }
+}

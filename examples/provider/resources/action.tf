@@ -1,4 +1,4 @@
-resource zitadel_action action {
+resource "zitadel_action" "action" {
   org_id          = zitadel_org.org.id
   name            = "actionname"
   script          = "testscript"

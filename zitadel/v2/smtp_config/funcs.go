@@ -50,7 +50,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Host:          d.Get(hostVar).(string),
 		User:          d.Get(userVar).(string),
 		Tls:           d.Get(tlsVar).(bool),
-		Password:      d.Get(passwordVar).(string),
+		Password:      d.Get(PasswordVar).(string),
 	}
 
 	resp, err := client.AddSMTPConfig(ctx, req)
@@ -88,9 +88,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(passwordVar) {
+	if d.HasChange(PasswordVar) {
 		_, err = client.UpdateSMTPConfigPassword(ctx, &admin.UpdateSMTPConfigPasswordRequest{
-			Password: d.Get(passwordVar).(string),
+			Password: d.Get(PasswordVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update smtp config password: %v", err)
@@ -128,7 +128,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		tlsVar:           resp.GetSmtpConfig().GetTls(),
 		hostVar:          resp.GetSmtpConfig().GetHost(),
 		userVar:          resp.GetSmtpConfig().GetUser(),
-		passwordVar:      d.Get(passwordVar).(string),
+		PasswordVar:      d.Get(PasswordVar).(string),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

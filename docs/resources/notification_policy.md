@@ -12,7 +12,7 @@ Resource representing the custom notification policy of an organization.
 ## Example Usage
 
 ```terraform
-resource zitadel_notification_policy notification_policy {
+resource "zitadel_notification_policy" "notification_policy" {
   org_id          = zitadel_org.org.id
   password_change = false
 }

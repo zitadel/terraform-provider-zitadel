@@ -1,4 +1,4 @@
-resource zitadel_application_key app_key {
+resource "zitadel_application_key" "app_key" {
   org_id          = zitadel_org.org.id
   project_id      = zitadel_project.project.id
   app_id          = zitadel_application_api.application_api.id

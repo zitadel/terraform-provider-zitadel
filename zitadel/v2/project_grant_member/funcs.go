@@ -130,7 +130,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		memberRes := resp.Result[0]
 		set := map[string]interface{}{
 			userIDVar:    userID,
-			orgIDVar:     memberRes.GetDetails().GetResourceOwner(),
+			orgIDVar:     org,
 			projectIDVar: projectID,
 			rolesVar:     memberRes.GetRoles(),
 			grantIDVar:   grantID,

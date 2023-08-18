@@ -1,4 +1,4 @@
-resource zitadel_verify_email_message_text verify_email_en {
+resource "zitadel_verify_email_message_text" "verify_email_en" {
   org_id   = zitadel_org.org.id
   language = "en"
 

@@ -2,14 +2,14 @@ package idp_azure_ad_test
 
 import (
 	"fmt"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"testing"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils/idp_test_utils"
 )
 
-func TestAccZITADELInstanceIdPAzureAD(t *testing.T) {
+func TestAccInstanceIdPAzureAD(t *testing.T) {
 	resourceName := "zitadel_idp_azure_ad"
 	frame, err := test_utils.NewInstanceTestFrame(resourceName)
 	if err != nil {
@@ -23,7 +23,6 @@ resource "%s" "%s" {
   client_secret       = "%s"
   scopes              = ["two", "scopes"]
   tenant_type         = "AZURE_AD_TENANT_TYPE_COMMON"
-  tenant_id           = "atenantid"
   email_verified      = true
   is_linking_allowed  = false
   is_creation_allowed = true

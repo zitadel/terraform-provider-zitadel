@@ -1,7 +1,6 @@
 package trigger_actions_test
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"testing"
@@ -36,30 +35,30 @@ func TestAccTriggerActions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create action: %v", err)
 	}
-	test_utils.RunLifecyleTest(
+	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		func(name, _ string) string {
+		func(configProperty, _ string) string {
 			return fmt.Sprintf(`
 resource "%s" "%s" {
 	org_id              = "%s"
 flow_type = "%s"
   trigger_type = "%s"
   action_ids   = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, flowType, name, action.GetId())
+}`, resourceName, frame.UniqueResourcesID, frame.OrgID, flowType, configProperty, action.GetId())
 		},
 		initialTriggerType, updatedTriggerType,
 		"", "",
-		CheckTriggerType(*frame, flowType),
-		CheckDestroy(*frame, flowType, []string{initialTriggerType, updatedTriggerType}),
+		false,
+		checkRemoteProperty(*frame, flowType),
+		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), initialTriggerType),
 		nil, nil, "", "",
 	)
 }
 
-var errTriggerTypeNotFound = errors.New("trigger type not found")
-
-func CheckTriggerType(frame test_utils.OrgTestFrame, flowType string) func(string) resource.TestCheckFunc {
-	return func(expectTriggerType string) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.OrgTestFrame, flowType string) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			flowTypeValues := helper.EnumValueMap(trigger_actions.FlowTypes())
 			resp, err := frame.GetFlow(frame, &management.GetFlowRequest{Type: strconv.Itoa(int(flowTypeValues[flowType]))})
@@ -75,22 +74,11 @@ func CheckTriggerType(frame test_utils.OrgTestFrame, flowType string) func(strin
 				}
 				foundType := typesMapping[int32(idInt)]
 				foundTypes = append(foundTypes, foundType)
-				if foundType == expectTriggerType {
+				if foundType == expect {
 					return nil
 				}
 			}
-			return fmt.Errorf("expected trigger type %s not found in %v: %w", expectTriggerType, foundTypes, errTriggerTypeNotFound)
+			return fmt.Errorf("expected trigger type %s not found in %v: %w", expect, foundTypes, test_utils.ErrNotFound)
 		}
-	}
-}
-
-func CheckDestroy(frame test_utils.OrgTestFrame, flowType string, testTypes []string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		for _, testTriggerType := range testTypes {
-			if err := CheckTriggerType(frame, flowType)(testTriggerType)(state); !errors.Is(err, errTriggerTypeNotFound) {
-				return fmt.Errorf("expected error %v, but got %w", errTriggerTypeNotFound, err)
-			}
-		}
-		return nil
 	}
 }

@@ -12,7 +12,7 @@ Resource representing the membership of a user on an organization, defined with 
 ## Example Usage
 
 ```terraform
-resource zitadel_org_member org_member {
+resource "zitadel_org_member" "org_member" {
   org_id  = zitadel_org.org.id
   user_id = zitadel_human_user.human_user.id
   roles   = ["ORG_OWNER"]
