@@ -3,6 +3,7 @@ resource zitadel_default_login_policy login_policy {
   allow_register                = true
   allow_external_idp            = true
   force_mfa                     = false
+  force_mfa_local_only          = false
   passwordless_type             = "PASSWORDLESS_TYPE_ALLOWED"
   hide_password_reset           = "false"
   password_check_lifetime       = "240h0m0s"

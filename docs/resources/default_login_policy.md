@@ -17,6 +17,7 @@ resource zitadel_default_login_policy login_policy {
   allow_register                = true
   allow_external_idp            = true
   force_mfa                     = false
+  force_mfa_local_only          = false
   passwordless_type             = "PASSWORDLESS_TYPE_ALLOWED"
   hide_password_reset           = "false"
   password_check_lifetime       = "240h0m0s"
@@ -44,6 +45,7 @@ resource zitadel_default_login_policy login_policy {
 - `default_redirect_uri` (String) defines where the user will be redirected to if the login is started without app context (e.g. from mail)
 - `external_login_check_lifetime` (String)
 - `force_mfa` (Boolean) defines if a user MUST use a multi factor to log in
+- `force_mfa_local_only` (Boolean) if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login.
 - `hide_password_reset` (Boolean) defines if password reset link should be shown in the login screen
 - `ignore_unknown_usernames` (Boolean) defines if unknown username on login screen directly return an error or always display the password screen
 - `mfa_init_skip_lifetime` (String)

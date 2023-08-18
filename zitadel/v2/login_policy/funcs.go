@@ -106,7 +106,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			AllowDomainDiscovery:       d.Get(allowDomainDiscovery).(bool),
 			DisableLoginWithEmail:      d.Get(disableLoginWithEmail).(bool),
 			DisableLoginWithPhone:      d.Get(disableLoginWithPhone).(bool),
-			ForceMFALocalOnly:          d.Get(forceMFALocalOnlyVar).(bool),
+			ForceMfaLocalOnly:          d.Get(forceMFALocalOnlyVar).(bool),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update login policy: %v", err)
@@ -242,7 +242,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		AllowDomainDiscovery:       d.Get(allowDomainDiscovery).(bool),
 		DisableLoginWithEmail:      d.Get(disableLoginWithEmail).(bool),
 		DisableLoginWithPhone:      d.Get(disableLoginWithPhone).(bool),
-		ForceMFALocalOnly:          d.Get(forceMFALocalOnlyVar).(bool),
+		ForceMfaLocalOnly:          d.Get(forceMFALocalOnlyVar).(bool),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create login policy: %v", err)
