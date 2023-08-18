@@ -197,6 +197,7 @@ func Provider() *schema.Provider {
 	return &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
 			"zitadel_org":                        org.GetDatasource(),
+			"zitadel_orgs":                       org.ListDatasources(),
 			"zitadel_human_user":                 human_user.GetDatasource(),
 			"zitadel_machine_user":               machine_user.GetDatasource(),
 			"zitadel_project":                    project.GetDatasource(),

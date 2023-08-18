@@ -27,3 +27,5 @@ resource "zitadel_org" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `primary_domain` (String) Primary domain of the org
+- `state` (String) State of the org

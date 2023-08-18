@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -25,9 +26,25 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	domainName := d.Id()
+	if d.Get(isPrimaryVar).(bool) {
+		resp, err := client.ListOrgDomains(ctx, &management.ListOrgDomainsRequest{})
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		for _, domain := range resp.Result {
+			parts := strings.Split(clientinfo.Domain, ":")
+			if domain.IsVerified && domain.DomainName != domainName && strings.HasSuffix(domain.GetDomainName(), parts[0]) {
+				if _, err := client.SetPrimaryOrgDomain(ctx, &management.SetPrimaryOrgDomainRequest{Domain: domain.DomainName}); err != nil {
+					return diag.FromErr(err)
+				}
+				break
+			}
+		}
+	}
 
 	_, err = client.RemoveOrgDomain(ctx, &management.RemoveOrgDomainRequest{
-		Domain: d.Id(),
+		Domain: domainName,
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete domain: %v", err)
