@@ -2,6 +2,7 @@ package application_oidc_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,8 +14,6 @@ import (
 
 func TestAccAppOIDC(t *testing.T) {
 	resourceName := "zitadel_application_oidc"
-	initialProperty := "initialname"
-	updatedProperty := "updatedname"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
@@ -25,32 +24,18 @@ func TestAccAppOIDC(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create project: %v", err)
 	}
+	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, "name", exampleAttributes).AsString()
+	updatedProperty := "updatedproperty"
+	projectDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "project")
+	projectDatasourceExample = strings.Replace(projectDatasourceExample, test_utils.ResourceID, project.GetId(), 1)
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
 		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id           = "%s"
-  project_id       = "%s"
-  name             = "%s"
-  redirect_uris               = ["https://localhost.com"]
-  response_types              = ["OIDC_RESPONSE_TYPE_CODE"]
-  grant_types                 = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
-  post_logout_redirect_uris   = ["https://localhost.com"]
-  app_type                    = "OIDC_APP_TYPE_WEB"
-  auth_method_type            = "OIDC_AUTH_METHOD_TYPE_BASIC"
-  version                     = "OIDC_VERSION_1_0"
-  clock_skew                  = "0s"
-  dev_mode                    = true
-  access_token_type           = "OIDC_TOKEN_TYPE_BEARER"
-  access_token_role_assertion = false
-  id_token_role_assertion     = false
-  id_token_userinfo_assertion = false
-  additional_origins          = []
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, project.GetId(), configProperty)
+			return fmt.Sprintf("%s\n%s\n%s", frame.OrgExampleDatasource, projectDatasourceExample, strings.Replace(resourceExample, exampleProperty, configProperty, 1))
 		},
-		initialProperty, updatedProperty,
+		exampleProperty, updatedProperty,
 		"", "",
 		false,
 		checkRemoteProperty(frame, project.GetId()),

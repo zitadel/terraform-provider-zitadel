@@ -19,6 +19,7 @@ func TestAccAction(t *testing.T) {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
 	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	// name must be unique
 	nameAttribute := test_utils.AttributeValue(t, "name", exampleAttributes).AsString()
 	resourceExample = strings.Replace(resourceExample, nameAttribute, frame.UniqueResourcesID, 1)
 	exampleProperty := test_utils.AttributeValue(t, "script", exampleAttributes).AsString()

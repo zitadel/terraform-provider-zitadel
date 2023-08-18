@@ -31,12 +31,12 @@ func TestAccAppKey(t *testing.T) {
 		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 	})
 	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
-	projectDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "project")
-	projectDatasourceExample = strings.Replace(projectDatasourceExample, "123456789012345678", project.GetId(), 1)
-	appDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "application_api")
-	appDatasourceExample = strings.Replace(appDatasourceExample, "123456789012345678", apiApp.GetAppId(), 1)
 	exampleProperty := test_utils.AttributeValue(t, "expiration_date", exampleAttributes).AsString()
 	updatedProperty := "2501-01-01T08:45:00Z"
+	projectDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "project")
+	projectDatasourceExample = strings.Replace(projectDatasourceExample, test_utils.ResourceID, project.GetId(), 1)
+	appDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "application_api")
+	appDatasourceExample = strings.Replace(appDatasourceExample, test_utils.ResourceID, apiApp.GetAppId(), 1)
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,

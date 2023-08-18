@@ -2,6 +2,7 @@ package application_api_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,8 +14,6 @@ import (
 
 func TestAccAppAPI(t *testing.T) {
 	resourceName := "zitadel_application_api"
-	initialProperty := "initialname"
-	updatedProperty := "updatedname"
 	frame, err := test_utils.NewOrgTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
@@ -25,20 +24,18 @@ func TestAccAppAPI(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create project: %v", err)
 	}
+	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, "name", exampleAttributes).AsString()
+	updatedProperty := "updatedproperty"
+	projectDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "project")
+	projectDatasourceExample = strings.Replace(projectDatasourceExample, test_utils.ResourceID, project.GetId(), 1)
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
-		frame.OrgExampleDatasource,
 		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "my_%s" {
-  org_id           = "%s"
-  project_id       = "%s"
-  name             = "%s"
-  auth_method_type = "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
-}`, resourceName, resourceName, frame.OrgID, project.GetId(), configProperty)
+			return fmt.Sprintf("%s\n%s\n%s", frame.OrgExampleDatasource, projectDatasourceExample, strings.Replace(resourceExample, exampleProperty, configProperty, 1))
 		},
-		initialProperty, updatedProperty,
+		exampleProperty, updatedProperty,
 		"", "",
 		false,
 		checkRemoteProperty(frame, project.GetId()),

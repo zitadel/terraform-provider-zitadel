@@ -3,6 +3,7 @@ package default_domain_claimed_message_text_test
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,31 +15,21 @@ import (
 
 func TestAccDefaultDomainClaimedMessageText(t *testing.T) {
 	resourceName := "zitadel_default_domain_claimed_message_text"
-	initialProperty := "initialtitle"
-	updatedProperty := "updatedtitle"
 	language := "en"
 	frame, err := test_utils.NewInstanceTestFrame(resourceName)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
+	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, "title", exampleAttributes).AsString()
+	updatedProperty := "updatedtitle"
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,
 		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  language    = "%s"
-
-  title       = "%s"
-  pre_header  = "pre_header example"
-  subject     = "subject example"
-  greeting    = "greeting example"
-  text        = "text example"
-  button_text = "button_text example"
-  footer_text = "footer_text example"
-}`, resourceName, frame.UniqueResourcesID, language, configProperty)
+			return strings.Replace(resourceExample, exampleProperty, configProperty, 1)
 		},
-		initialProperty, updatedProperty,
+		exampleProperty, updatedProperty,
 		"", "",
 		true,
 		checkRemoteProperty(frame, language),
