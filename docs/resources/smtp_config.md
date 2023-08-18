@@ -12,7 +12,7 @@ Resource representing the SMTP configuration of an instance.
 ## Example Usage
 
 ```terraform
-resource zitadel_smtp_config smtp {
+resource "zitadel_smtp_config" "smtp" {
   sender_address = "address"
   sender_name    = "no-reply"
   tls            = true

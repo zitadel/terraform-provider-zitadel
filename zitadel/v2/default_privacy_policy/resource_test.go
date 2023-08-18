@@ -27,6 +27,7 @@ func TestAccDefaultPrivacyPolicy(t *testing.T) {
 resource "%s" "%s" {
   tos_link     = "https://google.com"
   privacy_link = "https://google.com"
+  support_email = "support@email.com"
   help_link    = "%s"
 }`, resourceName, frame.UniqueResourcesID, configProperty)
 		},

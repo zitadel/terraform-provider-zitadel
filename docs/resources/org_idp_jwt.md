@@ -12,7 +12,7 @@ Resource representing a generic JWT IdP of the organization.
 ## Example Usage
 
 ```terraform
-resource zitadel_org_idp_jwt jwt_idp {
+resource "zitadel_org_idp_jwt" "jwt_idp" {
   org_id        = zitadel_org.org.id
   name          = "jwtidp"
   styling_type  = "STYLING_TYPE_UNSPECIFIED"

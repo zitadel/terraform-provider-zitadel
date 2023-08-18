@@ -12,12 +12,12 @@ Datasource representing the project, which can then be granted to different orga
 ## Example Usage
 
 ```terraform
-data zitadel_project project {
+data "zitadel_project" "project" {
   org_id     = data.zitadel_org.org.id
   project_id = "177073620768522243"
 }
 
-output project {
+output "project" {
   value = data.zitadel_project.project
 }
 ```
