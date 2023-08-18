@@ -29,6 +29,7 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Is domain primary",
+				Default:     false,
 			},
 			validationTypeVar: {
 				Type:        schema.TypeInt,
