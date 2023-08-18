@@ -28,7 +28,7 @@ func TestAccAppAPI(t *testing.T) {
 	exampleProperty := test_utils.AttributeValue(t, "name", exampleAttributes).AsString()
 	updatedProperty := "updatedproperty"
 	projectDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "project")
-	projectDatasourceExample = strings.Replace(projectDatasourceExample, test_utils.ResourceID, project.GetId(), 1)
+	projectDatasourceExample = strings.Replace(projectDatasourceExample, test_utils.ExamplesResourceID, project.GetId(), 1)
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,

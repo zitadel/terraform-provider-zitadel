@@ -34,9 +34,9 @@ func TestAccAppKey(t *testing.T) {
 	exampleProperty := test_utils.AttributeValue(t, "expiration_date", exampleAttributes).AsString()
 	updatedProperty := "2501-01-01T08:45:00Z"
 	projectDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "project")
-	projectDatasourceExample = strings.Replace(projectDatasourceExample, test_utils.ResourceID, project.GetId(), 1)
+	projectDatasourceExample = strings.Replace(projectDatasourceExample, test_utils.ExamplesResourceID, project.GetId(), 1)
 	appDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "application_api")
-	appDatasourceExample = strings.Replace(appDatasourceExample, test_utils.ResourceID, apiApp.GetAppId(), 1)
+	appDatasourceExample = strings.Replace(appDatasourceExample, test_utils.ExamplesResourceID, apiApp.GetAppId(), 1)
 	test_utils.RunLifecyleTest[string](
 		t,
 		frame.BaseTestFrame,

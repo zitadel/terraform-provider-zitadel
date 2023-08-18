@@ -22,9 +22,9 @@ import (
 )
 
 const (
-	insecure   = true
-	port       = "8080"
-	ResourceID = "123456789012345678"
+	insecure           = true
+	port               = "8080"
+	ExamplesResourceID = "123456789012345678"
 )
 
 type BaseTestFrame struct {
