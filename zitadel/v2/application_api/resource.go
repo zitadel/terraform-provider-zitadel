@@ -25,7 +25,7 @@ func GetResource() *schema.Resource {
 				Description: "ID of the project",
 				ForceNew:    true,
 			},
-			nameVar: {
+			NameVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the application",

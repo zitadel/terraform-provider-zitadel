@@ -50,7 +50,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	firstName := d.Get(firstNameVar).(string)
 	lastName := d.Get(lastNameVar).(string)
 	addUser := &management.AddHumanUserRequest{
-		UserName: d.Get(userNameVar).(string),
+		UserName: d.Get(UserNameVar).(string),
 		Profile: &management.AddHumanUserRequest_Profile{
 			FirstName:         firstName,
 			LastName:          lastName,
@@ -61,10 +61,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		InitialPassword: d.Get(initialPasswordVar).(string),
 	}
 
-	if displayname, ok := d.GetOk(displayNameVar); ok {
+	if displayname, ok := d.GetOk(DisplayNameVar); ok {
 		addUser.Profile.DisplayName = displayname.(string)
 	} else {
-		if err := d.Set(displayNameVar, defaultDisplayName(firstName, lastName)); err != nil {
+		if err := d.Set(DisplayNameVar, defaultDisplayName(firstName, lastName)); err != nil {
 			return diag.Errorf("failed to set default display name for human user: %v", err)
 		}
 	}
@@ -114,23 +114,23 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChange(userNameVar) {
+	if d.HasChange(UserNameVar) {
 		_, err = client.UpdateUserName(ctx, &management.UpdateUserNameRequest{
 			UserId:   d.Id(),
-			UserName: d.Get(userNameVar).(string),
+			UserName: d.Get(UserNameVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update username: %v", err)
 		}
 	}
 
-	if d.HasChanges(firstNameVar, lastNameVar, nickNameVar, displayNameVar, preferredLanguageVar, genderVar) {
+	if d.HasChanges(firstNameVar, lastNameVar, nickNameVar, DisplayNameVar, preferredLanguageVar, genderVar) {
 		_, err := client.UpdateHumanProfile(ctx, &management.UpdateHumanProfileRequest{
 			UserId:            d.Id(),
 			FirstName:         d.Get(firstNameVar).(string),
 			LastName:          d.Get(lastNameVar).(string),
 			NickName:          d.Get(nickNameVar).(string),
-			DisplayName:       d.Get(displayNameVar).(string),
+			DisplayName:       d.Get(DisplayNameVar).(string),
 			PreferredLanguage: d.Get(preferredLanguageVar).(string),
 			Gender:            user.Gender(user.Gender_value[d.Get(genderVar).(string)]),
 		})
@@ -176,7 +176,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	respUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: helper.GetID(d, userIDVar)})
+	respUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: helper.GetID(d, UserIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -189,7 +189,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		orgIDVar:              user.GetDetails().GetResourceOwner(),
 		userStateVar:          user.GetState().String(),
-		userNameVar:           user.GetUserName(),
+		UserNameVar:           user.GetUserName(),
 		loginNamesVar:         user.GetLoginNames(),
 		preferredLoginNameVar: user.GetPreferredLoginName(),
 	}
@@ -198,7 +198,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		if profile := human.GetProfile(); profile != nil {
 			set[firstNameVar] = profile.GetFirstName()
 			set[lastNameVar] = profile.GetLastName()
-			set[displayNameVar] = profile.GetDisplayName()
+			set[DisplayNameVar] = profile.GetDisplayName()
 			set[nickNameVar] = profile.GetNickName()
 			set[preferredLanguageVar] = profile.GetPreferredLanguage()
 			if gender := profile.GetGender().String(); gender != "" {

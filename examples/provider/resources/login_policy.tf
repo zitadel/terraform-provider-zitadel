@@ -15,7 +15,7 @@ resource "zitadel_login_policy" "default" {
   default_redirect_uri          = "localhost:8080"
   second_factors                = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
   multi_factors                 = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
-  idps                          = [zitadel_org_idp_oidc.default.id, zitadel_org_idp_jwt.default.id]
+  idps                          = [data.zitadel_idp_google.default.id, data.zitadel_idp_azure_ad.default.id]
   allow_domain_discovery        = true
   disable_login_with_email      = true
   disable_login_with_phone      = true

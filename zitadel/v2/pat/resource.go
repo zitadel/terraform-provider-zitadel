@@ -26,7 +26,7 @@ func GetResource() *schema.Resource {
 				Description: "Value of the token",
 				Sensitive:   true,
 			},
-			expirationDateVar: {
+			ExpirationDateVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Expiration date of the token in the RFC3339 format",

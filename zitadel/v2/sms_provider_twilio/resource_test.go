@@ -13,28 +13,17 @@ import (
 )
 
 func TestAccSMSProviderTwilio(t *testing.T) {
-	resourceName := "zitadel_sms_provider_twilio"
-	initialProperty := "123456789"
-	updatedProperty := "987654321"
-	initialSecret := "initialSecret"
-	updatedSecret := "updatedSecret"
-	frame, err := test_utils.NewInstanceTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, sms_provider_twilio.SenderNumberVar, exampleAttributes).AsString()
+	exampleSecret := test_utils.AttributeValue(t, sms_provider_twilio.TokenVar, exampleAttributes).AsString()
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, secretProperty string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  sid           = "sid"
-  sender_number = "%s"
-  token         = "%s"
-}`, resourceName, frame.UniqueResourcesID, configProperty, secretProperty)
-		},
-		initialProperty, updatedProperty,
-		initialSecret, updatedSecret,
+		nil,
+		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
+		exampleProperty, "987654321",
+		exampleSecret, "updatedSecret",
 		false,
 		checkRemoteProperty(*frame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,

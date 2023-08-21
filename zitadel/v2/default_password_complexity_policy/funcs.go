@@ -30,9 +30,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(minLengthVar, hasUppercaseVar, hasLowercaseVar, hasNumberVar, hasSymbolVar) {
+	if d.HasChanges(MinLengthVar, hasUppercaseVar, hasLowercaseVar, hasNumberVar, hasSymbolVar) {
 		resp, err := client.UpdatePasswordComplexityPolicy(ctx, &admin.UpdatePasswordComplexityPolicyRequest{
-			MinLength:    uint32(d.Get(minLengthVar).(int)),
+			MinLength:    uint32(d.Get(MinLengthVar).(int)),
 			HasUppercase: d.Get(hasUppercaseVar).(bool),
 			HasLowercase: d.Get(hasLowercaseVar).(bool),
 			HasNumber:    d.Get(hasNumberVar).(bool),
@@ -80,7 +80,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	policy := resp.Policy
 	set := map[string]interface{}{
-		minLengthVar:    policy.GetMinLength(),
+		MinLengthVar:    policy.GetMinLength(),
 		hasUppercaseVar: policy.GetHasUppercase(),
 		hasLowercaseVar: policy.GetHasLowercase(),
 		hasNumberVar:    policy.GetHasNumber(),

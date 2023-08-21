@@ -7,46 +7,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user/human_user_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/instance_member"
 )
 
 func TestAccInstanceMember(t *testing.T) {
-	resourceName := "zitadel_instance_member"
-	initialProperty := "IAM_OWNER"
-	updatedProperty := "IAM_OWNER_VIEWER"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	user, err := frame.ImportHumanUser(frame, &management.ImportHumanUserRequest{
-		UserName: frame.UniqueResourcesID,
-		Profile: &management.ImportHumanUserRequest_Profile{
-			FirstName: "Don't",
-			LastName:  "Care",
-		},
-		Email: &management.ImportHumanUserRequest_Email{
-			Email:           "dont@care.com",
-			IsEmailVerified: true,
-		},
-	})
-	userID := user.GetUserId()
-	if err != nil {
-		t.Fatalf("failed to create user: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_instance_member")
+	userDep, userID := human_user_test_dep.Create(t, frame)
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, instance_member.RolesVar, exampleAttributes).AsValueSlice()[0].AsString()
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-	user_id = "%s"
-  	roles   = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, userID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency, userDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "IAM_OWNER_VIEWER",
 		"", "",
 		true,
 		checkRemoteProperty(*frame, userID),

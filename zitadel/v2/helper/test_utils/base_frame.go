@@ -3,13 +3,7 @@ package test_utils
 import (
 	"context"
 	"fmt"
-	"os"
-	"path"
-	"strings"
-	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
@@ -17,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-mux/tf6muxserver"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zclconf/go-cty/cty"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
@@ -34,6 +27,7 @@ type BaseTestFrame struct {
 	ClientInfo                         *helper.ClientInfo
 	ProviderSnippet, UniqueResourcesID string
 	ResourceType                       string
+	InstanceDomain                     string
 	TerraformName                      string
 	v6ProviderFactories                map[string]func() (tfprotov6.ProviderServer, error)
 }
@@ -69,6 +63,7 @@ KEY
 		UniqueResourcesID: uniqueID,
 		TerraformName:     terraformName,
 		ResourceType:      resourceType,
+		InstanceDomain:    domain,
 	}
 	frame.v6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
 		"zitadel": func() (tfprotov6.ProviderServer, error) {
@@ -100,45 +95,4 @@ func (b *BaseTestFrame) State(state *terraform.State) *terraform.InstanceState {
 		return resource.Primary
 	}
 	return resources["data."+b.TerraformName].Primary
-}
-
-type examplesFolder string
-
-const (
-	Datasources examplesFolder = "data-sources"
-	Resources   examplesFolder = "resources"
-)
-
-func (b *BaseTestFrame) ReadExample(t *testing.T, folder examplesFolder, exampleType string) (string, hcl.Attributes) {
-	fileName := strings.Replace(exampleType, "zitadel_", "", 1) + ".tf"
-	filePath := path.Join("..", "..", "..", "examples", "provider", string(folder), fileName)
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		t.Fatalf("error reading example file: %v", err)
-	}
-	hclFile, diags := hclparse.NewParser().ParseHCL(content, filePath)
-	if diags.HasErrors() {
-		t.Fatalf("error parsing example file: %s", diags.Error())
-	}
-	blocks := hclFile.BlocksAtPos(hcl.Pos{
-		Line:   1,
-		Column: 1,
-		Byte:   1,
-	})
-	if len(blocks) != 1 {
-		t.Fatalf("error parsing example file: %s", "unexpected number of blocks")
-	}
-	attr, diag := blocks[0].Body.JustAttributes()
-	if diag.HasErrors() {
-		t.Fatalf("error parsing example file: %s", diag.Error())
-	}
-	return string(content), attr
-}
-
-func AttributeValue(t *testing.T, key string, attributes hcl.Attributes) cty.Value {
-	val, diag := attributes[key].Expr.Value(&hcl.EvalContext{})
-	if diag.HasErrors() {
-		t.Fatalf("error parsing example file: %s", diag.Error())
-	}
-	return val
 }

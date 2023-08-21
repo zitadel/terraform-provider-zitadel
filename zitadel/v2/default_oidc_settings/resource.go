@@ -18,7 +18,7 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "lifetime duration of id tokens",
 			},
-			refreshTokenExpirationVar: {
+			RefreshTokenExpirationVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "expiration duration of refresh tokens",

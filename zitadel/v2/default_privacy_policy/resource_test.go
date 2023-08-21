@@ -8,30 +8,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_privacy_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
 func TestAccDefaultPrivacyPolicy(t *testing.T) {
-	resourceName := "zitadel_default_privacy_policy"
-	updatedProperty := "https://zitadel.com"
-	initialProperty := "https://google.com"
-	frame, err := test_utils.NewInstanceTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_privacy_policy")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, default_privacy_policy.HelpLinkVar, exampleAttributes).AsString()
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  tos_link     = "https://google.com"
-  privacy_link = "https://google.com"
-  support_email = "support@email.com"
-  help_link    = "%s"
-}`, resourceName, frame.UniqueResourcesID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		nil,
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "http://example.com/acctest",
 		"", "",
 		false,
 		checkRemoteProperty(*frame),

@@ -30,11 +30,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(tosLinkVar, privacyLinkVar, helpLinkVar, supportEmailVar) {
+	if d.HasChanges(tosLinkVar, privacyLinkVar, HelpLinkVar, supportEmailVar) {
 		resp, err := client.UpdatePrivacyPolicy(ctx, &admin.UpdatePrivacyPolicyRequest{
 			TosLink:      d.Get(tosLinkVar).(string),
 			PrivacyLink:  d.Get(privacyLinkVar).(string),
-			HelpLink:     d.Get(helpLinkVar).(string),
+			HelpLink:     d.Get(HelpLinkVar).(string),
 			SupportEmail: d.Get(supportEmailVar).(string),
 		})
 		if helper.IgnorePreconditionError(err) != nil {
@@ -81,7 +81,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		tosLinkVar:      policy.GetTosLink(),
 		privacyLinkVar:  policy.GetPrivacyLink(),
-		helpLinkVar:     policy.GetHelpLink(),
+		HelpLinkVar:     policy.GetHelpLink(),
 		supportEmailVar: policy.GetSupportEmail(),
 	}
 

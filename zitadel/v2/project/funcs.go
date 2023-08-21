@@ -49,7 +49,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.UpdateProject(ctx, &management.UpdateProjectRequest{
 		Id:                     d.Id(),
-		Name:                   d.Get(nameVar).(string),
+		Name:                   d.Get(NameVar).(string),
 		ProjectRoleCheck:       d.Get(roleCheckVar).(bool),
 		ProjectRoleAssertion:   d.Get(roleAssertionVar).(bool),
 		HasProjectCheck:        d.Get(hasProjectCheckVar).(bool),
@@ -77,7 +77,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	plSetting := d.Get(privateLabelingSettingVar).(string)
 	resp, err := client.AddProject(ctx, &management.AddProjectRequest{
-		Name:                   d.Get(nameVar).(string),
+		Name:                   d.Get(NameVar).(string),
 		ProjectRoleAssertion:   d.Get(roleAssertionVar).(bool),
 		ProjectRoleCheck:       d.Get(roleCheckVar).(bool),
 		HasProjectCheck:        d.Get(hasProjectCheckVar).(bool),
@@ -103,7 +103,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetProjectByID(ctx, &management.GetProjectByIDRequest{Id: helper.GetID(d, projectIDVar)})
+	resp, err := client.GetProjectByID(ctx, &management.GetProjectByIDRequest{Id: helper.GetID(d, ProjectIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -116,7 +116,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		orgIDVar:                  project.GetDetails().GetResourceOwner(),
 		stateVar:                  project.GetState().String(),
-		nameVar:                   project.GetName(),
+		NameVar:                   project.GetName(),
 		roleAssertionVar:          project.GetProjectRoleAssertion(),
 		roleCheckVar:              project.GetProjectRoleCheck(),
 		hasProjectCheckVar:        project.GetHasProjectCheck(),

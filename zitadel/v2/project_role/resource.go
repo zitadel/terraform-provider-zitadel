@@ -20,7 +20,7 @@ func GetResource() *schema.Resource {
 				Description: "ID of the organization",
 				ForceNew:    true,
 			},
-			keyVar: {
+			KeyVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,

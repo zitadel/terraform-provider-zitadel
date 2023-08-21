@@ -2,53 +2,36 @@ package app_key_test
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/app_key"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api/application_api_test_dep"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
 )
 
 func TestAccAppKey(t *testing.T) {
-	resourceName := "zitadel_application_key"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	project, err := frame.AddProject(frame, &management.AddProjectRequest{
-		Name: frame.UniqueResourcesID,
-	})
-	if err != nil {
-		t.Fatalf("failed to create project: %v", err)
-	}
-	apiApp, err := frame.AddAPIApp(frame, &management.AddAPIAppRequest{
-		ProjectId:      project.GetId(),
-		Name:           frame.UniqueResourcesID,
-		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
-	})
-	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
-	exampleProperty := test_utils.AttributeValue(t, "expiration_date", exampleAttributes).AsString()
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_key")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, app_key.ExpirationDateVar, exampleAttributes).AsString()
 	updatedProperty := "2501-01-01T08:45:00Z"
-	projectDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "project")
-	projectDatasourceExample = strings.Replace(projectDatasourceExample, test_utils.ExamplesResourceID, project.GetId(), 1)
-	appDatasourceExample, _ := frame.ReadExample(t, test_utils.Datasources, "application_api")
-	appDatasourceExample = strings.Replace(appDatasourceExample, test_utils.ExamplesResourceID, apiApp.GetAppId(), 1)
-	test_utils.RunLifecyleTest[string](
+	projectDep, projectID := project_test_dep.Create(t, frame)
+	appDep, appID := application_api_test_dep.Create(t, frame, projectID)
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf("%s\n%s\n%s\n%s", frame.OrgExampleDatasource, projectDatasourceExample, appDatasourceExample, strings.Replace(resourceExample, exampleProperty, configProperty, 1))
-		},
+		[]string{frame.AsOrgDefaultDependency, projectDep, appDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, updatedProperty,
 		"", "",
 		false,
-		checkRemoteProperty(frame, project.GetId(), apiApp.GetAppId()),
+		checkRemoteProperty(frame, projectID, appID),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId(), apiApp.GetAppId()), updatedProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID, appID), updatedProperty),
 		nil, nil, "", "",
 	)
 }

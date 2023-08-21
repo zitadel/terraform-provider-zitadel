@@ -18,7 +18,7 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "lifetime duration of id tokens",
 			},
-			refreshTokenExpirationVar: {
+			RefreshTokenExpirationVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "expiration duration of refresh tokens",

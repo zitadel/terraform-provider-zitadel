@@ -3,6 +3,8 @@ package test_utils
 import (
 	"context"
 	"fmt"
+	"strings"
+	"testing"
 
 	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
 	mgmt "github.com/zitadel/zitadel-go/v2/pkg/client/management"
@@ -15,9 +17,9 @@ import (
 type OrgTestFrame struct {
 	BaseTestFrame
 	*mgmt.Client
-	Admin                *admin.Client
-	OrgID                string
-	OrgExampleDatasource string
+	Admin                  *admin.Client
+	OrgID                  string
+	AsOrgDefaultDependency string
 }
 
 func (o *OrgTestFrame) useOrgContext(orgID string) (err error) {
@@ -26,39 +28,46 @@ func (o *OrgTestFrame) useOrgContext(orgID string) (err error) {
 		return err
 	}
 	o.Admin, err = helper.GetAdminClient(o.BaseTestFrame.ClientInfo)
+	o.AsOrgDefaultDependency = strings.Replace(o.AsOrgDefaultDependency, o.OrgID, orgID, 1)
 	o.OrgID = orgID
 	return err
 }
 
-func NewOrgTestFrame(resourceType string) (*OrgTestFrame, error) {
+func NewOrgTestFrame(t *testing.T, resourceType string) *OrgTestFrame {
 	ctx := context.Background()
 	cfg := acceptance.GetConfig().OrgLevel
 	baseFrame, err := NewBaseTestFrame(ctx, resourceType, cfg.Domain, cfg.AdminSAJSON)
 	if err != nil {
-		return nil, err
+		t.Fatalf("setting up test context failed: %v", err)
 	}
 	orgFrame := &OrgTestFrame{
 		BaseTestFrame: *baseFrame,
 	}
 	if err = orgFrame.useOrgContext(""); err != nil {
-		return nil, err
+		t.Fatalf("setting up test context failed: %v", err)
 	}
 	org, err := orgFrame.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: "zitadel." + cfg.Domain})
+	if err != nil {
+		t.Fatalf("failed to get org by domain: %v", err)
+	}
 	orgFrame.OrgID = org.GetOrg().GetId()
-	orgFrame.OrgExampleDatasource = fmt.Sprintf(`
+	orgFrame.AsOrgDefaultDependency = fmt.Sprintf(`
 data "zitadel_org" "default" {
 	id = "%s"
 }
 `, orgFrame.OrgID)
-	return orgFrame, err
+	return orgFrame
 }
 
-func (o OrgTestFrame) AnotherOrg(name string) (*OrgTestFrame, error) {
+func (o OrgTestFrame) AnotherOrg(t *testing.T, name string) *OrgTestFrame {
 	org, err := o.Client.AddOrg(o, &management.AddOrgRequest{
 		Name: name,
 	})
 	if err != nil {
-		return nil, err
+		t.Fatalf("failed to create org: %v", err)
 	}
-	return &o, o.useOrgContext(org.GetId())
+	if err := o.useOrgContext(org.GetId()); err != nil {
+		t.Fatalf("failed to use org context: %v", err)
+	}
+	return &o
 }

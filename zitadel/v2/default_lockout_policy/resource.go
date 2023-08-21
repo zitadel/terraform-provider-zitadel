@@ -8,7 +8,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the default lockout policy.",
 		Schema: map[string]*schema.Schema{
-			maxPasswordAttemptsVar: {
+			MaxPasswordAttemptsVar: {
 				Type:        schema.TypeInt,
 				Required:    true,
 				Description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset.",

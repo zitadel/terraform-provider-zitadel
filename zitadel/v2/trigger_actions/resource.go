@@ -18,21 +18,21 @@ func GetResource() *schema.Resource {
 				Description: "ID of the organization",
 				ForceNew:    true,
 			},
-			flowTypeVar: {
+			FlowTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Type of the flow to which the action triggers belong" + helper.DescriptionEnumValuesList(FlowTypes()),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(flowTypeVar, value, helper.EnumValueMap(FlowTypes()))
+					return helper.EnumValueValidation(FlowTypeVar, value, helper.EnumValueMap(FlowTypes()))
 				},
 				ForceNew: true,
 			},
-			triggerTypeVar: {
+			TriggerTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Trigger type on when the actions get triggered" + helper.DescriptionEnumValuesList(TriggerTypes()),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(triggerTypeVar, value, helper.EnumValueMap(TriggerTypes()))
+					return helper.EnumValueValidation(TriggerTypeVar, value, helper.EnumValueMap(TriggerTypes()))
 				},
 				ForceNew: true,
 			},

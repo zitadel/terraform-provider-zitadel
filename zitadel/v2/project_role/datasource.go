@@ -16,7 +16,7 @@ func GetDatasource() *schema.Resource {
 				Required:    true,
 				Description: "ID of the organization",
 			},
-			keyVar: {
+			KeyVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Key used for project role",

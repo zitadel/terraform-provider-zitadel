@@ -1,17 +1,17 @@
 package human_user
 
 const (
-	userIDVar             = "user_id"
+	UserIDVar             = "user_id"
 	orgIDVar              = "org_id"
 	userStateVar          = "state"
-	userNameVar           = "user_name"
+	UserNameVar           = "user_name"
 	loginNamesVar         = "login_names"
 	preferredLoginNameVar = "preferred_login_name"
 
 	firstNameVar         = "first_name"
 	lastNameVar          = "last_name"
 	nickNameVar          = "nick_name"
-	displayNameVar       = "display_name"
+	DisplayNameVar       = "display_name"
 	preferredLanguageVar = "preferred_language"
 	genderVar            = "gender"
 

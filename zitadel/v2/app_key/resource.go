@@ -40,7 +40,7 @@ func GetResource() *schema.Resource {
 					return helper.EnumValueValidation(keyTypeVar, value, authn.KeyType_value)
 				},
 			},
-			expirationDateVar: {
+			ExpirationDateVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Expiration date of the app key in the RFC3339 format",

@@ -3,39 +3,33 @@ package default_domain_claimed_message_text_test
 import (
 	"fmt"
 	"regexp"
-	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
 func TestAccDefaultDomainClaimedMessageText(t *testing.T) {
-	resourceName := "zitadel_default_domain_claimed_message_text"
-	language := "en"
-	frame, err := test_utils.NewInstanceTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_domain_claimed_message_text")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, "title", exampleAttributes).AsString()
-	updatedProperty := "updatedtitle"
-	test_utils.RunLifecyleTest[string](
+	exampleLanguage := test_utils.AttributeValue(t, default_domain_claimed_message_text.LanguageVar, exampleAttributes).AsString()
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return strings.Replace(resourceExample, exampleProperty, configProperty, 1)
-		},
-		exampleProperty, updatedProperty,
+		nil,
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "updatedtitle",
 		"", "",
 		true,
-		checkRemoteProperty(frame, language),
-		regexp.MustCompile(`^en$`),
+		checkRemoteProperty(frame, exampleLanguage),
+		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, language)("ZITADEL - Domain has been claimed"),
+		checkRemoteProperty(frame, exampleLanguage)("ZITADEL - Domain has been claimed"),
 		nil, nil, "", "",
 	)
 }

@@ -9,33 +9,28 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/action"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
 func TestAccAction(t *testing.T) {
-	resourceName := "zitadel_action"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	resourceExample, exampleAttributes := frame.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_action")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	// name must be unique
-	nameAttribute := test_utils.AttributeValue(t, "name", exampleAttributes).AsString()
+	nameAttribute := test_utils.AttributeValue(t, action.NameVar, exampleAttributes).AsString()
 	resourceExample = strings.Replace(resourceExample, nameAttribute, frame.UniqueResourcesID, 1)
-	exampleProperty := test_utils.AttributeValue(t, "script", exampleAttributes).AsString()
-	updatedProperty := "updatedproperty"
-	test_utils.RunLifecyleTest[string](
+	exampleProperty := test_utils.AttributeValue(t, action.ScriptVar, exampleAttributes).AsString()
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf("%s\n%s", frame.OrgExampleDatasource, strings.Replace(resourceExample, exampleProperty, configProperty, 1))
-		},
-		exampleProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "updatedproperty",
 		"", "",
 		true,
 		checkRemoteProperty(frame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), updatedProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		nil, nil, "", "",
 	)
 }

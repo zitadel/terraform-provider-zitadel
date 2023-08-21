@@ -2,6 +2,7 @@ package project_grant_member_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -10,69 +11,34 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user/human_user_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org/org_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_grant/project_grant_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_grant_member"
 )
 
 func TestAccProjectGrantMember(t *testing.T) {
-	resourceName := "zitadel_project_grant_member"
-	initialProperty := "PROJECT_GRANT_OWNER"
-	updatedProperty := "PROJECT_GRANT_OWNER_VIEWER"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	project, err := frame.AddProject(frame, &management.AddProjectRequest{
-		Name: frame.UniqueResourcesID,
-	})
-	if err != nil {
-		t.Fatalf("failed to create project: %v", err)
-	}
-	projectID := project.GetId()
-	otherOrgFrame, err := frame.AnotherOrg(frame.UniqueResourcesID)
-	if err != nil {
-		t.Fatalf("failed to switch to another org: %v", err)
-	}
-	grant, err := frame.AddProjectGrant(frame, &management.AddProjectGrantRequest{
-		ProjectId:    projectID,
-		GrantedOrgId: otherOrgFrame.OrgID,
-	})
-	if err != nil {
-		t.Fatalf("failed create project grant: %v", err)
-	}
-	grantID := grant.GetGrantId()
-	otherOrgUser, err := otherOrgFrame.ImportHumanUser(otherOrgFrame, &management.ImportHumanUserRequest{
-		UserName: otherOrgFrame.UniqueResourcesID,
-		Profile: &management.ImportHumanUserRequest_Profile{
-			FirstName: "Don't",
-			LastName:  "Care",
-		},
-		Email: &management.ImportHumanUserRequest_Email{
-			Email:           "dont@care.com",
-			IsEmailVerified: true,
-		},
-	})
-	otherOrgUserID := otherOrgUser.GetUserId()
-	if err != nil {
-		t.Fatalf("failed to create otherOrgUser: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_grant_member")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, project_grant_member.RolesVar, exampleAttributes).AsValueSlice()[0].AsString()
+	grantIDProperty := test_utils.AttributeValue(t, project_grant_member.GrantIDVar, exampleAttributes).AsString()
+	projectDep, projectID := project_test_dep.Create(t, frame)
+	userDep, userID := human_user_test_dep.Create(t, frame)
+	_, grantedOrgID, _ := org_test_dep.Create(t, frame, "granting_org")
+	grantID := project_grant_test_dep.Create(t, frame, projectID, grantedOrgID)
+	resourceExample = strings.Replace(resourceExample, grantIDProperty, grantID, 1)
+	test_utils.RunLifecyleTest(
 		t,
-		otherOrgFrame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id     = "%s"
-  project_id = "%s"
-  grant_id   = "%s"
-  user_id    = "%s"
-  roles      = ["%s"]
-}`, resourceName, otherOrgFrame.UniqueResourcesID, otherOrgFrame.OrgID, projectID, grantID, otherOrgUserID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency, projectDep, userDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "PROJECT_GRANT_OWNER_VIEWER",
 		"", "",
 		true,
-		checkRemoteProperty(*otherOrgFrame, projectID, grantID, otherOrgUserID),
+		checkRemoteProperty(*frame, projectID, grantID, userID),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*otherOrgFrame, projectID, grantID, otherOrgUserID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID, grantID, userID), ""),
 		nil, nil, "", "",
 	)
 }

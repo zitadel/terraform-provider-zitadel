@@ -65,7 +65,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	name := d.Get(nameVar).(string)
+	name := d.Get(NameVar).(string)
 	_, err = client.AddOrgDomain(ctx, &management.AddOrgDomainRequest{
 		Domain: name,
 	})
@@ -95,7 +95,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	name := d.Get(nameVar).(string)
+	name := d.Get(NameVar).(string)
 	d.SetId(name)
 	if d.HasChange(isPrimaryVar) {
 		if d.Get(isPrimaryVar).(bool) {
@@ -143,7 +143,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if len(resp.Result) == 1 {
 		domain := resp.Result[0]
 		set := map[string]interface{}{
-			nameVar:           domain.GetDomainName(),
+			NameVar:           domain.GetDomainName(),
 			orgIDVar:          domain.GetOrgId(),
 			isVerifiedVar:     domain.GetIsVerified(),
 			isPrimaryVar:      domain.GetIsPrimary(),

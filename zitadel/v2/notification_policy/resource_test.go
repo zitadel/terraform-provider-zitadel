@@ -12,23 +12,16 @@ import (
 )
 
 func TestAccNotificationPolicy(t *testing.T) {
-	resourceName := "zitadel_notification_policy"
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_notification_policy")
+	resourceExample, _ := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := false
 	initialProperty := true
 	updatedProperty := false
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[bool](
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty bool, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id = "%s"
-  password_change = %t
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
-		},
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		initialProperty, updatedProperty,
 		"", "",
 		false,

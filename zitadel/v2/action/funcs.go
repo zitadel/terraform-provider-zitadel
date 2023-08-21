@@ -34,8 +34,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.UpdateAction(ctx, &management.UpdateActionRequest{
 		Id:            d.Id(),
-		Name:          d.Get(nameVar).(string),
-		Script:        d.Get(scriptVar).(string),
+		Name:          d.Get(NameVar).(string),
+		Script:        d.Get(ScriptVar).(string),
 		Timeout:       durationpb.New(timeout),
 		AllowedToFail: d.Get(allowedToFailVar).(bool),
 	})
@@ -86,8 +86,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	resp, err := client.CreateAction(ctx, &management.CreateActionRequest{
-		Name:          d.Get(nameVar).(string),
-		Script:        d.Get(scriptVar).(string),
+		Name:          d.Get(NameVar).(string),
+		Script:        d.Get(ScriptVar).(string),
 		Timeout:       durationpb.New(timeout),
 		AllowedToFail: d.Get(allowedToFailVar).(bool),
 	})
@@ -115,7 +115,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		Queries: []*management.ActionQuery{
 			{Query: &management.ActionQuery_ActionIdQuery{
 				ActionIdQuery: &action.ActionIDQuery{
-					Id: helper.GetID(d, actionIDVar),
+					Id: helper.GetID(d, ActionIDVar),
 				},
 			}},
 		},
@@ -132,9 +132,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		action := resp.Result[0]
 		set := map[string]interface{}{
 			orgIDVar:         action.GetDetails().GetResourceOwner(),
-			nameVar:          action.GetName(),
+			NameVar:          action.GetName(),
 			stateVar:         action.GetState(),
-			scriptVar:        action.GetScript(),
+			ScriptVar:        action.GetScript(),
 			timeoutVar:       action.GetTimeout().AsDuration().String(),
 			allowedToFailVar: action.GetAllowedToFail(),
 		}

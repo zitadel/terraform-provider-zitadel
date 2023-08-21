@@ -1,7 +1,7 @@
 package default_label_policy
 
 const (
-	primaryColorVar        = "primary_color"
+	PrimaryColorVar        = "primary_color"
 	hideLoginNameSuffixVar = "hide_login_name_suffix"
 	warnColorVar           = "warn_color"
 	backgroundColorVar     = "background_color"

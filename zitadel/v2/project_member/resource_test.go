@@ -10,51 +10,23 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user/human_user_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_grant_member"
 )
 
 func TestAccProjectMember(t *testing.T) {
-	resourceName := "zitadel_project_member"
-	initialProperty := "PROJECT_OWNER"
-	updatedProperty := "PROJECT_OWNER_VIEWER"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	project, err := frame.AddProject(frame, &management.AddProjectRequest{
-		Name: frame.UniqueResourcesID,
-	})
-	if err != nil {
-		t.Fatalf("failed to create project: %v", err)
-	}
-	projectID := project.GetId()
-	user, err := frame.ImportHumanUser(frame, &management.ImportHumanUserRequest{
-		UserName: frame.UniqueResourcesID,
-		Profile: &management.ImportHumanUserRequest_Profile{
-			FirstName: "Don't",
-			LastName:  "Care",
-		},
-		Email: &management.ImportHumanUserRequest_Email{
-			Email:           "dont@care.com",
-			IsEmailVerified: true,
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create user: %v", err)
-	}
-	userID := user.GetUserId()
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_member")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, project_grant_member.RolesVar, exampleAttributes).AsValueSlice()[0].AsString()
+	projectDep, projectID := project_test_dep.Create(t, frame)
+	userDep, userID := human_user_test_dep.Create(t, frame)
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-	org_id              = "%s"
-	project_id          = "%s"
-	user_id 			= "%s"
-  	roles  				= ["%s"]
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, projectID, userID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency, projectDep, userDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "PROJECT_OWNER_VIEWER",
 		"", "",
 		true,
 		checkRemoteProperty(*frame, projectID, userID),

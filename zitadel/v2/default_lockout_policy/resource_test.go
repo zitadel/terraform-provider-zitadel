@@ -2,33 +2,30 @@ package default_lockout_policy_test
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
 func TestAccDefaultLockoutPolicy(t *testing.T) {
-	resourceName := "zitadel_default_lockout_policy"
-	initialProperty := uint64(3)
-	updatedProperty := uint64(5)
-	frame, err := test_utils.NewInstanceTestFrame(resourceName)
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_lockout_policy")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty, err := strconv.ParseUint(test_utils.AttributeValue(t, default_lockout_policy.MaxPasswordAttemptsVar, exampleAttributes).AsString(), 10, 64)
 	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
+		t.Fatalf("could not parse example property: %v", err)
 	}
-	test_utils.RunLifecyleTest[uint64](
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty uint64, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  max_password_attempts = "%d"
-}`, resourceName, frame.UniqueResourcesID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		nil,
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, 10,
 		"", "",
 		false,
 		checkRemoteProperty(*frame),

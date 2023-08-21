@@ -2,6 +2,7 @@ package machine_user_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -9,34 +10,26 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/machine_user"
 )
 
 func TestAccMachineUser(t *testing.T) {
-	resourceName := "zitadel_machine_user"
-	initialProperty := "Initial Service Account"
-	updatedProperty := "Updated Service Account"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_machine_user")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleUsername := test_utils.AttributeValue(t, machine_user.UserNameVar, exampleAttributes).AsString()
+	resourceExample = strings.Replace(resourceExample, exampleUsername, frame.UniqueResourcesID, 1)
+	exampleProperty := test_utils.AttributeValue(t, machine_user.DescriptionVar, exampleAttributes).AsString()
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, secretProperty string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id          = "%s"
-  user_name   = "%s"
-  name        = "%s"
-  description = "description"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, frame.UniqueResourcesID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "updatedproperty",
 		"", "",
 		false,
 		checkRemoteProperty(frame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), updatedProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		nil, nil, "", "",
 	)
 }
@@ -48,7 +41,7 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.T
 			if err != nil {
 				return err
 			}
-			actual := remoteResource.GetUser().GetMachine().GetName()
+			actual := remoteResource.GetUser().GetMachine().GetDescription()
 			if actual != expect {
 				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}

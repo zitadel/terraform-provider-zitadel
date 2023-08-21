@@ -58,7 +58,7 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "the scopes requested by ZITADEL during the request on the identity provider",
 			},
-			displayNameMappingVar: {
+			DisplayNameMappingVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "definition which field is mapped to the display name of the user",

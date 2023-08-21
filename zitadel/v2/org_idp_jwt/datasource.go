@@ -28,7 +28,7 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Some identity providers specify the styling of the button to their login",
 			},
-			jwtEndpointVar: {
+			JwtEndpointVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "the endpoint where the jwt can be extracted",

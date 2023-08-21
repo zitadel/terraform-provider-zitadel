@@ -57,7 +57,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Type:   authn.KeyType(authn.KeyType_value[keyType]),
 	}
 
-	if expiration, ok := d.GetOk(expirationDateVar); ok {
+	if expiration, ok := d.GetOk(ExpirationDateVar); ok {
 		t, err := time.Parse(time.RFC3339, expiration.(string))
 		if err != nil {
 			return diag.Errorf("failed to parse time: %v", err)
@@ -104,7 +104,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	d.SetId(resp.GetKey().GetId())
 	set := map[string]interface{}{
-		expirationDateVar: resp.GetKey().GetExpirationDate().AsTime().Format(time.RFC3339),
+		ExpirationDateVar: resp.GetKey().GetExpirationDate().AsTime().Format(time.RFC3339),
 		userIDVar:         userID,
 		orgIDVar:          orgID,
 	}

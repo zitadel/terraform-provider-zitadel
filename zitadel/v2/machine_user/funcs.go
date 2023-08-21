@@ -48,9 +48,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	respUser, err := client.AddMachineUser(ctx, &management.AddMachineUserRequest{
-		UserName:        d.Get(userNameVar).(string),
+		UserName:        d.Get(UserNameVar).(string),
 		Name:            d.Get(nameVar).(string),
-		Description:     d.Get(descriptionVar).(string),
+		Description:     d.Get(DescriptionVar).(string),
 		AccessTokenType: user.AccessTokenType(user.AccessTokenType_value[(d.Get(accessTokenTypeVar).(string))]),
 	})
 	if err != nil {
@@ -75,21 +75,21 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChange(userNameVar) {
+	if d.HasChange(UserNameVar) {
 		_, err = client.UpdateUserName(ctx, &management.UpdateUserNameRequest{
 			UserId:   d.Id(),
-			UserName: d.Get(userNameVar).(string),
+			UserName: d.Get(UserNameVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update username: %v", err)
 		}
 	}
 
-	if d.HasChanges(nameVar, descriptionVar, accessTokenTypeVar) {
+	if d.HasChanges(nameVar, DescriptionVar, accessTokenTypeVar) {
 		_, err := client.UpdateMachine(ctx, &management.UpdateMachineRequest{
 			UserId:          d.Id(),
 			Name:            d.Get(nameVar).(string),
-			Description:     d.Get(descriptionVar).(string),
+			Description:     d.Get(DescriptionVar).(string),
 			AccessTokenType: user.AccessTokenType(user.AccessTokenType_value[(d.Get(accessTokenTypeVar).(string))]),
 		})
 		if err != nil {
@@ -112,7 +112,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	respUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: helper.GetID(d, userIDVar)})
+	respUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: helper.GetID(d, UserIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -125,13 +125,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		orgIDVar:              user.GetDetails().GetResourceOwner(),
 		userStateVar:          user.GetState().String(),
-		userNameVar:           user.GetUserName(),
+		UserNameVar:           user.GetUserName(),
 		loginNamesVar:         user.GetLoginNames(),
 		preferredLoginNameVar: user.GetPreferredLoginName(),
 	}
 	if machine := user.GetMachine(); machine != nil {
 		set[nameVar] = machine.GetName()
-		set[descriptionVar] = machine.GetDescription()
+		set[DescriptionVar] = machine.GetDescription()
 		set[accessTokenTypeVar] = machine.GetAccessTokenType().String()
 	}
 	for k, v := range set {

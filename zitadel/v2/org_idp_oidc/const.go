@@ -9,7 +9,7 @@ const (
 	clientSecretVar       = "client_secret"
 	issuerVar             = "issuer"
 	scopesVar             = "scopes"
-	displayNameMappingVar = "display_name_mapping"
+	DisplayNameMappingVar = "display_name_mapping"
 	usernameMappingVar    = "username_mapping"
 	autoRegisterVar       = "auto_register"
 )
