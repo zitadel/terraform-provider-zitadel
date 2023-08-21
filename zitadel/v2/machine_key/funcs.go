@@ -22,7 +22,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -45,7 +45,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(orgIDVar).(string)
+	orgID := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)
@@ -83,7 +83,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(orgIDVar).(string)
+	orgID := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)
@@ -106,7 +106,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		ExpirationDateVar: resp.GetKey().GetExpirationDate().AsTime().Format(time.RFC3339),
 		userIDVar:         userID,
-		orgIDVar:          orgID,
+		helper.OrgIDVar:   orgID,
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

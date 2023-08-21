@@ -21,8 +21,8 @@ package text
 import (
 	context "context"
 	fmt "fmt"
-	math "math"
 	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
+	math "math"
 
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/gogo/protobuf/proto"
@@ -32,7 +32,6 @@ import (
 	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
 	github_com_hashicorp_terraform_plugin_go_tftypes "github.com/hashicorp/terraform-plugin-go/tftypes"
-	
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

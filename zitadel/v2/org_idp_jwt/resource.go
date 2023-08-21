@@ -14,12 +14,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing a generic JWT IdP of the organization.",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			nameVar: {
 				Type:        schema.TypeString,
 				Required:    true,

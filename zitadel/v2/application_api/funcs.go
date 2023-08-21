@@ -20,7 +20,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -43,7 +43,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -81,7 +81,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -116,7 +116,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -133,7 +133,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	app := resp.GetApp()
 	api := app.GetApiConfig()
 	set := map[string]interface{}{
-		orgIDVar:          app.GetDetails().GetResourceOwner(),
+		helper.OrgIDVar:   app.GetDetails().GetResourceOwner(),
 		NameVar:           app.GetName(),
 		authMethodTypeVar: api.GetAuthMethodType().String(),
 	}

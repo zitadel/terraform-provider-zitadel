@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_azure_ad"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 )
 
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -19,7 +18,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, org_idp_utils.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -48,7 +47,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, org_idp_utils.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -77,7 +76,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, org_idp_utils.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -94,7 +93,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	specificCfg := cfg.GetAzureAd()
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
-		org_idp_utils.OrgIDVar:         respIdp.GetDetails().GetResourceOwner(),
+		helper.OrgIDVar:                respIdp.GetDetails().GetResourceOwner(),
 		idp_utils.NameVar:              respIdp.GetName(),
 		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
 		idp_utils.ClientSecretVar:      idp_utils.StringValue(d, idp_utils.ClientSecretVar),

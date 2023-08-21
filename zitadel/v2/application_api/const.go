@@ -2,7 +2,6 @@ package application_api
 
 const (
 	AppIDVar          = "app_id"
-	orgIDVar          = "org_id"
 	projectIDVar      = "project_id"
 	NameVar           = "name"
 	authMethodTypeVar = "auth_method_type"

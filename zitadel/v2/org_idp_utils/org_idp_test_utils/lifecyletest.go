@@ -7,9 +7,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 )
 
 func RunOrgLifecyleTest(t *testing.T, resourceName, secretAttribute string) {
@@ -42,7 +42,7 @@ func RunOrgLifecyleTest(t *testing.T, resourceName, secretAttribute string) {
 		},
 		func(state *terraform.State) (string, error) {
 			lastState := frame.State(state)
-			return fmt.Sprintf("%s:%s:%s", lastState.Attributes[org_idp_utils.OrgIDVar], lastState.ID, importedSecret), nil
+			return fmt.Sprintf("%s:%s:%s", lastState.Attributes[helper.OrgIDVar], lastState.ID, importedSecret), nil
 		},
 		"123:456",
 		secretAttribute,

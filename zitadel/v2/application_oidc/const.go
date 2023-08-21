@@ -2,7 +2,6 @@ package application_oidc
 
 const (
 	appIDVar                    = "app_id"
-	orgIDVar                    = "org_id"
 	projectIDVar                = "project_id"
 	NameVar                     = "name"
 	redirectURIsVar             = "redirect_uris"

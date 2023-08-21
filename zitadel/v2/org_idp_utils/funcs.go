@@ -18,7 +18,7 @@ func Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -37,9 +37,9 @@ func ImportIDPWithOrg() schema.StateContextFunc {
 		}
 		parts := strings.SplitN(id, ":", 2)
 		if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-			return nil, fmt.Errorf("unexpected format of ID (%s), expected %s:%s", id, OrgIDVar, idp_utils.IdpIDVar)
+			return nil, fmt.Errorf("unexpected format of ID (%s), expected %s:%s", id, helper.OrgIDVar, idp_utils.IdpIDVar)
 		}
-		if err := data.Set(OrgIDVar, parts[0]); err != nil {
+		if err := data.Set(helper.OrgIDVar, parts[0]); err != nil {
 			return nil, err
 		}
 		data.SetId(parts[1])
@@ -55,9 +55,9 @@ func ImportIDPWithOrgAndSecret(secretVar string) schema.StateContextFunc {
 		}
 		parts := strings.SplitN(id, ":", 3)
 		if len(parts) != 3 || parts[0] == "" || parts[1] == "" || parts[2] == "" {
-			return nil, fmt.Errorf("unexpected format of ID (%s), expected %s:%s:%s", id, OrgIDVar, idp_utils.IdpIDVar, secretVar)
+			return nil, fmt.Errorf("unexpected format of ID (%s), expected %s:%s:%s", id, helper.OrgIDVar, idp_utils.IdpIDVar, secretVar)
 		}
-		if err := data.Set(OrgIDVar, parts[0]); err != nil {
+		if err := data.Set(helper.OrgIDVar, parts[0]); err != nil {
 			return nil, err
 		}
 		data.SetId(parts[1])

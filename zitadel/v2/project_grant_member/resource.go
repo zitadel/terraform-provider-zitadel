@@ -2,18 +2,14 @@ package project_grant_member
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the membership of a user on an granted project, defined with the given role.",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization which owns the resource",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			projectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,

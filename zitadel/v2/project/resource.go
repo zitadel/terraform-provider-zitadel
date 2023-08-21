@@ -13,15 +13,11 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
 		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			NameVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the project",
-			},
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Organization in which the project is located",
 			},
 			stateVar: {
 				Type:        schema.TypeString,

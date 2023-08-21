@@ -21,7 +21,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -44,7 +44,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -70,7 +70,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(orgIDVar).(string)
+	orgID := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)
@@ -100,7 +100,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(orgIDVar).(string)
+	orgID := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)
@@ -127,11 +127,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		projectRole := resp.GetResult()[0]
 		roleKey := projectRole.GetKey()
 		set := map[string]interface{}{
-			projectIDVar:   projectID,
-			orgIDVar:       orgID,
-			KeyVar:         roleKey,
-			displayNameVar: projectRole.GetDisplayName(),
-			groupVar:       projectRole.GetGroup(),
+			projectIDVar:    projectID,
+			helper.OrgIDVar: orgID,
+			KeyVar:          roleKey,
+			displayNameVar:  projectRole.GetDisplayName(),
+			groupVar:        projectRole.GetGroup(),
 		}
 		for k, v := range set {
 			if err := d.Set(k, v); err != nil {

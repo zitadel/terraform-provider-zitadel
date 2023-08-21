@@ -13,19 +13,14 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing a app key",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-				ForceNew:    true,
-			},
-			projectIDVar: {
+			helper.OrgIDVar: helper.OrgIDResourceField,
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
 				ForceNew:    true,
 			},
-			appIDVar: {
+			AppIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the application",
@@ -46,7 +41,7 @@ func GetResource() *schema.Resource {
 				Description: "Expiration date of the app key in the RFC3339 format",
 				ForceNew:    true,
 			},
-			keyDetailsVar: {
+			KeyDetailsVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Value of the app key",
@@ -56,6 +51,11 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		CreateContext: create,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: helper.ImportWithIDAndOptionalOrg(
+			"id",
+			helper.NewImportAttribute(ProjectIDVar, helper.ConvertID, false),
+			helper.NewImportAttribute(AppIDVar, helper.ConvertID, false),
+			helper.NewImportAttribute(KeyDetailsVar, helper.ConvertJSON, true),
+		),
 	}
 }

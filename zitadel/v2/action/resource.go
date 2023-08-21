@@ -2,18 +2,14 @@ package action
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing an action belonging to an organization.",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			stateVar: {
 				Type:        schema.TypeInt,
 				Computed:    true,
@@ -48,6 +44,6 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer:      helper.ImportWithIDAndOptionalOrg(ActionIDVar),
 	}
 }

@@ -2,6 +2,7 @@ package application_oidc
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetDatasource() *schema.Resource {
@@ -13,7 +14,7 @@ func GetDatasource() *schema.Resource {
 				Required:    true,
 				Description: "The ID of this resource.",
 			},
-			orgIDVar: {
+			helper.OrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "orgID of the application",
@@ -115,6 +116,5 @@ func GetDatasource() *schema.Resource {
 			},
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }

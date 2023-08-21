@@ -2,18 +2,14 @@ package trigger_actions
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing triggers, when actions get started",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			FlowTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -34,6 +30,5 @@ func GetDatasource() *schema.Resource {
 			},
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }

@@ -2,18 +2,14 @@ package domain_policy
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the custom domain policy of an organization.",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Id for the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			UserLoginMustBeDomainVar: {
 				Type:        schema.TypeBool,
 				Required:    true,

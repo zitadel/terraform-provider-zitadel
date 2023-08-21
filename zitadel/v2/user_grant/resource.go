@@ -2,12 +2,14 @@ package user_grant
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the authorization given to a user directly, including the given roles.",
 		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			projectIDVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -33,12 +35,6 @@ func GetResource() *schema.Resource {
 				},
 				Optional:    true,
 				Description: "List of roles granted",
-			},
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization which owns the resource",
-				ForceNew:    true,
 			},
 		},
 		DeleteContext: delete,
