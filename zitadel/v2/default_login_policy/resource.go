@@ -31,7 +31,7 @@ func GetResource() *schema.Resource {
 			forceMFALocalOnlyVar: {
 				Type:        schema.TypeBool,
 				Required:    true,
-				Description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login.",
+				Description: "if activated, ZITADEL only enforces MFA on local authentications. On authentications through MFA, ZITADEL won't prompt for MFA.",
 			},
 			passwordlessTypeVar: {
 				Type:        schema.TypeString,
