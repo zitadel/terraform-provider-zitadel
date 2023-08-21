@@ -15,8 +15,8 @@ Resource representing the grant of a project to a different organization, also c
 resource "zitadel_project_grant" "default" {
   org_id         = data.zitadel_org.default.id
   project_id     = data.zitadel_project.default.id
-  granted_org_id = data.zitadel_org.default.id
-  role_keys      = [data.zitadel_project_role.default.role_key]
+  granted_org_id = data.zitadel_org.granted_org.id
+  role_keys      = ["super-user"]
 }
 ```
 

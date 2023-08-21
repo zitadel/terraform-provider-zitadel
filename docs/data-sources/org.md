@@ -13,7 +13,7 @@ Datasource representing an organization in ZITADEL, which is the highest level a
 
 ```terraform
 data "zitadel_org" "default" {
-  org_id = "123456789012345678"
+  id = "123456789012345678"
 }
 
 output "org" {
