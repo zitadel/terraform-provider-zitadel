@@ -3,18 +3,21 @@ package test_utils
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func RunLifecyleTest(
+func RunLifecyleTest[P comparable](
 	t *testing.T,
 	frame BaseTestFrame,
-	resourceFunc func(initialProperty, initialSecret string) string,
-	initialProperty, updatedProperty,
+	resourceFunc func(initialProperty P, initialSecret string) string,
+	initialProperty, updatedProperty P,
 	initialSecret, updatedSecret string,
-	checkRemoteProperty func(expect string) resource.TestCheckFunc,
+	allowNonEmptyPlan bool,
+	checkRemoteProperty func(expect P) resource.TestCheckFunc,
+	idPattern *regexp.Regexp,
 	checkDestroy, checkImportState resource.TestCheckFunc,
 	importStateIdFunc resource.ImportStateIdFunc,
 	wrongImportID,
@@ -34,7 +37,7 @@ func RunLifecyleTest(
 			Config: initialConfig,
 			Check: resource.ComposeAggregateTestCheckFunc(
 				CheckAMinute(checkRemoteProperty(initialProperty)),
-				CheckStateHasIDSet(frame),
+				CheckStateHasIDSet(frame, idPattern),
 			),
 		}, { // Check updating name has a diff
 			Config:             updatedNameConfig,
@@ -75,9 +78,17 @@ func RunLifecyleTest(
 			Check:                   checkImportState,
 		})
 	}
-	resource.Test(t, resource.TestCase{
-		ProviderFactories: ZitadelProviderFactories(frame.ConfiguredProvider),
-		CheckDestroy:      CheckAMinute(checkDestroy),
-		Steps:             steps,
+	resource.ParallelTest(t, resource.TestCase{
+		CheckDestroy: CheckAMinute(checkDestroy),
+		Steps:        steps,
+		ErrorCheck: func(err error) error {
+			if err != nil && allowNonEmptyPlan && strings.Contains(err.Error(), "After applying this test step and performing a `terraform refresh`, the plan was not empty") {
+				t.Logf("Ignoring non-empty plan error because we can't guarantee consistency: %s", err.Error())
+				return nil
+			}
+			return err
+		},
+		ProtoV6ProviderFactories: frame.v6ProviderFactories,
+		ProtoV5ProviderFactories: frame.v5ProviderFactories,
 	})
 }

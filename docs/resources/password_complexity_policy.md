@@ -12,7 +12,7 @@ Resource representing the custom password complexity policy of an organization.
 ## Example Usage
 
 ```terraform
-resource zitadel_password_complexity_policy password_complexity_policy {
+resource "zitadel_password_complexity_policy" "password_complexity_policy" {
   org_id        = zitadel_org.org.id
   min_length    = "8"
   has_uppercase = true

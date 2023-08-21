@@ -23,6 +23,7 @@ func GetResource() *schema.Resource {
 			keyVar: {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Key used for project role",
 			},
 			displayNameVar: {

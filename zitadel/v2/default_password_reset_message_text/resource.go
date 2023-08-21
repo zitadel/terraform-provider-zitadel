@@ -10,9 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
-	"google.golang.org/protobuf/encoding/protojson"
-
 	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/zitadel/terraform-provider-zitadel/gen/github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"

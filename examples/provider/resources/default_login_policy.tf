@@ -1,4 +1,4 @@
-resource zitadel_default_login_policy login_policy {
+resource "zitadel_default_login_policy" "login_policy" {
   user_login                    = true
   allow_register                = true
   allow_external_idp            = true

@@ -1,4 +1,4 @@
-resource zitadel_default_password_reset_message_text password_reset_en {
+resource "zitadel_default_password_reset_message_text" "password_reset_en" {
   language = "en"
 
   title       = "title example"

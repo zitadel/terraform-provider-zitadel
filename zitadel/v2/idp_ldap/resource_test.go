@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils/idp_test_utils"
 )
 
-func TestAccZITADELInstanceIdPLDAP(t *testing.T) {
+func TestAccInstanceIdPLDAP(t *testing.T) {
 	resourceName := "zitadel_idp_ldap"
 	frame, err := test_utils.NewInstanceTestFrame(resourceName)
 	if err != nil {
