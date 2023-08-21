@@ -31,7 +31,7 @@ func TestAccPasswordChangeMessageText(t *testing.T) {
 		regexp.MustCompile(fmt.Sprintf(`^\d{18}_%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
 		checkRemoteProperty(frame, exampleLanguage)("ZITADEL - Password of user has changed"),
-		nil, nil, "", "",
+		nil, nil, "", "", "",
 	)
 }
 

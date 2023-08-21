@@ -36,12 +36,17 @@ func ImportStateAttribute(frame BaseTestFrame, attr string) resource.ImportState
 		if !ok {
 			return "", fmt.Errorf("attribute %s not found in attributes %+v", attr, primary.Attributes)
 		}
-		return fmt.Sprintf(`"%s"`, strings.ReplaceAll(val, ":", helper.SemicolonPlaceholder)), nil
+		if val != "" {
+			val = fmt.Sprintf(`"%s"`, strings.ReplaceAll(val, ":", helper.SemicolonPlaceholder))
+		}
+		return val, nil
 	}
 }
 
 func ImportNothing(_ *terraform.State) (string, error) { return "", nil }
 
+// ChainImportStateIdFuncs returns a function that composes an ID that has exactly the same
+// length of semicolon separated parts as the passed number of funcs
 func ChainImportStateIdFuncs(funcs ...resource.ImportStateIdFunc) resource.ImportStateIdFunc {
 	return func(state *terraform.State) (string, error) {
 		parts := make([]string, len(funcs))

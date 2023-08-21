@@ -52,7 +52,7 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		ReadContext:   read,
 		Importer: helper.ImportWithIDAndOptionalOrg(
-			"id",
+			keyIDVar,
 			helper.NewImportAttribute(ProjectIDVar, helper.ConvertID, false),
 			helper.NewImportAttribute(AppIDVar, helper.ConvertID, false),
 			helper.NewImportAttribute(KeyDetailsVar, helper.ConvertJSON, true),

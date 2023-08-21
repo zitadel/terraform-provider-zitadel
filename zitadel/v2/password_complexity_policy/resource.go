@@ -40,6 +40,6 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		CreateContext: create,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer:      helper.ImportWithOptionalOrg(),
 	}
 }

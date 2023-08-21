@@ -22,28 +22,41 @@ func NewImportAttribute(key string, value ConvertStringFunc, optional bool) impo
 	return importAttribute{key: key, value: value, optional: optional}
 }
 
-func ImportWithID(idVar string, attrs ...importAttribute) *schema.ResourceImporter {
-	return ImportWithAttributes(append([]importAttribute{NewImportAttribute(idVar, ConvertID, false)}, attrs...)...)
+// ImportWithID is a convenience function that calls ImportWithAttributes.
+// It returns a ResourceImporter that expects a ZITADEL ID number at the first import string position along with other given attributes.
+// idVar is only relevant for the error message, the resources SetID function is called with first argument ID
+func ImportWithID(idVar string, attributes ...importAttribute) *schema.ResourceImporter {
+	return ImportWithAttributes(append([]importAttribute{NewImportAttribute(idVar, ConvertID, false)}, attributes...)...)
 }
 
-func ImportWithOptionalOrg(attrs ...importAttribute) *schema.ResourceImporter {
-	return ImportWithAttributes(append([]importAttribute{ImportOptionalOrgAttribute}, attrs...)...)
+// ImportWithOptionalOrg is a convenience function that calls ImportWithAttributes.
+// It returns a ResourceImporter that accepts an optional organization id along with other given attributes
+func ImportWithOptionalOrg(attributes ...importAttribute) *schema.ResourceImporter {
+	return ImportWithAttributes(append([]importAttribute{ImportOptionalOrgAttribute}, attributes...)...)
 }
 
-func ImportWithIDAndOptionalOrg(idVar string, attrs ...importAttribute) *schema.ResourceImporter {
-	return ImportWithID(idVar, append(attrs, ImportOptionalOrgAttribute)...)
+// ImportWithIDAndOptionalOrg is a convenience function that calls ImportWithID
+// and passes an optional attribute for the org ID along with the other given attributes.
+func ImportWithIDAndOptionalOrg(idVar string, attributes ...importAttribute) *schema.ResourceImporter {
+	return ImportWithID(idVar, append(attributes, ImportOptionalOrgAttribute)...)
 }
 
+// ImportWithIDAndOptionalSecret is a convenience function that calls ImportWithID
+// and passes an optional attribute for the secret var at secretKey.
 func ImportWithIDAndOptionalSecret(idVar, secretKey string) *schema.ResourceImporter {
 	return ImportWithID(idVar, importAttribute{key: secretKey, value: ConvertNonEmpty, optional: true})
 }
 
-func ImportWithIDAndOptionalOrgAndSecretV5(idVar, secretKey string) *schema.ResourceImporter {
+// ImportWithIDAndOptionalOrgAndSecret is a convenience function that calls ImportWithIDAndOptionalOrg
+// and passes an optional attribute for the secret var at secretKey.
+func ImportWithIDAndOptionalOrgAndSecret(idVar, secretKey string) *schema.ResourceImporter {
 	return ImportWithIDAndOptionalOrg(idVar, importAttribute{key: secretKey, value: ConvertNonEmpty, optional: true})
 }
 
-func ImportWithEmptyID(attrs ...importAttribute) *schema.ResourceImporter {
-	return ImportWithAttributes(append([]importAttribute{emptyIDAttribute}, attrs...)...)
+// ImportWithEmptyID returns a ResourceImporter that does not use the first import string position value
+// for the states SetID call. It uses a dummy value, instead.
+func ImportWithEmptyID(attributes ...importAttribute) *schema.ResourceImporter {
+	return ImportWithAttributes(append([]importAttribute{emptyIDAttribute}, attributes...)...)
 }
 
 type ConvertStringFunc func(string) (interface{}, error)
@@ -88,6 +101,8 @@ type importState interface {
 	Set(string, interface{}) error
 }
 
+// importWithAttributes imports a resources state that is needed to query the remote resource
+// as well as state that is not readable from the ZITADEL API
 func importWithAttributes(state importState, attrs ...importAttribute) (err error) {
 	id := state.Id()
 	var (
@@ -128,10 +143,10 @@ func importWithAttributes(state importState, attrs ...importAttribute) (err erro
 		return fmt.Errorf(`expected the number of semicolon separated parts to be between %d and %d, but got %d parts: "%s"`, externalMinParts, externalMaxParts, len(parts), strings.Join(parts, `", "`))
 	}
 	for i, part := range parts {
-		part = strings.ReplaceAll(part, SemicolonPlaceholder, `:`)
+		part = strings.ReplaceAll(part, SemicolonPlaceholder, ":")
 		attr := attrs[i]
 		// if the id is optional and not given, we use the emptyIDAttribute
-		if attr.optional && part == "" {
+		if i == 0 && attr.optional && part == "" {
 			attr = emptyIDAttribute
 		}
 		val, err := attr.value(part)
@@ -141,6 +156,9 @@ func importWithAttributes(state importState, attrs ...importAttribute) (err erro
 		if i == 0 {
 			state.SetId(val.(string))
 			continue
+		}
+		if attr.optional && val == nil {
+
 		}
 		if err := state.Set(attr.key, val); err != nil {
 			return fmt.Errorf("failed to set %s=%v: %w", attr.key, val, err)
@@ -185,6 +203,7 @@ func ConvertNonEmpty(importValue string) (interface{}, error) {
 	return importValue, nil
 }
 
+// ImportIDValidationError wraps err with a help message about the expected format if it is not nil
 func ImportIDValidationError(givenID string, requiredKeys, optionalKeys []string, err error) error {
 	if err == nil {
 		return nil

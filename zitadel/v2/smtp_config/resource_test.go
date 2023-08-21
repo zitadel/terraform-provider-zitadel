@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/smtp_config"
 )
@@ -35,7 +36,7 @@ func TestAccSMTPConfig(t *testing.T) {
 		exampleSecret, "updatedSecret",
 		false,
 		checkRemoteProperty(*frame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		nil, nil, "", smtp_config.PasswordVar,
 	)

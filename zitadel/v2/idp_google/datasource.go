@@ -21,6 +21,6 @@ func GetDatasource() *schema.Resource {
 			idp_utils.IsAutoUpdateVar:      idp_utils.IsAutoUpdateDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithSecret(idp_utils.ClientSecretVar)},
-	}
+		Importer:    helper.ImportWithIDAndOptionalSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
+}
 }

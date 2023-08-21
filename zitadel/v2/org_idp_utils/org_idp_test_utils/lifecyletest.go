@@ -30,7 +30,7 @@ func RunOrgLifecyleTest(t *testing.T, resourceName, secretAttribute string) {
 		exampleSecret, "an_updated_secret",
 		false,
 		CheckCreationAllowed(*frame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		CheckDestroy(*frame),
 		func(state *terraform.State) error {
 			// Check the secretAttribute is imported correctly

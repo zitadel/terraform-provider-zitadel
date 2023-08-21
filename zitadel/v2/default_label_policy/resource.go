@@ -2,6 +2,7 @@ package default_label_policy
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
@@ -143,6 +144,6 @@ func GetResource() *schema.Resource {
 		CreateContext: update,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer:      helper.ImportWithEmptyID(),
 	}
 }

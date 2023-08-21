@@ -31,7 +31,7 @@ func TestAccPasswordResetMessageText(t *testing.T) {
 		regexp.MustCompile(fmt.Sprintf(`^\d{18}_%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
 		checkRemoteProperty(frame, exampleLanguage)("Zitadel - Reset password"),
-		nil, nil, "", "",
+		nil,
 	)
 }
 

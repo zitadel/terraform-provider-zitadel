@@ -24,13 +24,13 @@ func TestAccDefaultInitMessageText(t *testing.T) {
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "updatedtitle",
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(frame, language),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, language)),
 		// When deleted, the default should be returned
 		checkRemoteProperty(frame, language)("ZITADEL - Initialize User"),
-		nil, nil, "", "",
+		nil,
 	)
 }
 

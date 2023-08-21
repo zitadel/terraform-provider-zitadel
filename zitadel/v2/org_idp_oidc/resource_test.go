@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_oidc"
 )
@@ -30,7 +31,7 @@ func TestAccOrgIDPJWT(t *testing.T) {
 		"", "",
 		true,
 		checkRemoteProperty(*frame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame), updatedProperty),
 		nil, nil, "", "",
 	)

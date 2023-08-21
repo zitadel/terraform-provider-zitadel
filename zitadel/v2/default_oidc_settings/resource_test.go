@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_oidc_settings"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
@@ -25,7 +26,7 @@ func TestAccDefaultOIDCSettings(t *testing.T) {
 		"", "",
 		false,
 		checkRemoteProperty(*frame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		nil, nil, "", "",
 	)

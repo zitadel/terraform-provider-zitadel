@@ -24,6 +24,6 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: idp_utils.Delete,
-		Importer:      &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithSecret(idp_utils.ClientSecretVar)},
-	}
+		Importer:      helper.ImportWithIDAndOptionalSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
+}
 }

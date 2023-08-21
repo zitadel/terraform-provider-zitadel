@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user/human_user_test_dep"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
@@ -30,7 +31,7 @@ func TestAccProjectMember(t *testing.T) {
 		"", "",
 		true,
 		checkRemoteProperty(*frame, projectID, userID),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID, userID), ""),
 		nil, nil, "", "",
 	)

@@ -14,12 +14,8 @@ func GetDatasource() *schema.Resource {
 				Required:    true,
 				Description: "The ID of this resource.",
 			},
-			helper.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "orgID of the application",
-			},
-			projectIDVar: {
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",

@@ -30,7 +30,7 @@ func TestAccTriggerActions(t *testing.T) {
 		"", "",
 		false,
 		checkRemoteProperty(*frame, flowType),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), exampleProperty),
 		nil, nil, "", "",
 	)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
@@ -29,7 +30,7 @@ func RunInstanceIDPLifecyleTest(t *testing.T, resourceName, secretAttribute stri
 		exampleSecret, "an_updated_secret",
 		false,
 		CheckCreationAllowed(*frame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		CheckDestroy(*frame),
 		func(state *terraform.State) error {
 			// Check the secret is imported correctly

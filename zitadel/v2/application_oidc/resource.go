@@ -14,7 +14,7 @@ func GetResource() *schema.Resource {
 		Description: "Resource representing an OIDC application belonging to a project, with all configuration possibilities.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
-			projectIDVar: {
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
@@ -133,13 +133,13 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Additional origins",
 			},
-			clientID: {
+			ClientIDVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "generated ID for this config",
 				Sensitive:   true,
 			},
-			clientSecret: {
+			ClientSecretVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "generated secret for this config",
@@ -150,6 +150,11 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: helper.ImportWithIDAndOptionalOrg(
+			appIDVar,
+			helper.NewImportAttribute(ProjectIDVar, helper.ConvertID, false),
+			helper.NewImportAttribute(ClientIDVar, helper.ConvertNonEmpty, true),
+			helper.NewImportAttribute(ClientSecretVar, helper.ConvertNonEmpty, true),
+		),
 	}
 }

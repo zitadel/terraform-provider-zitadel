@@ -28,7 +28,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.RemoveApp(ctx, &management.RemoveAppRequest{
-		ProjectId: d.Get(projectIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
 		AppId:     d.Id(),
 	})
 	if err != nil {
@@ -50,7 +50,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	projectID := d.Get(projectIDVar).(string)
+	projectID := d.Get(ProjectIDVar).(string)
 
 	if d.HasChange(NameVar) {
 		_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
@@ -143,7 +143,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	resp, err := client.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
-		ProjectId:                d.Get(projectIDVar).(string),
+		ProjectId:                d.Get(ProjectIDVar).(string),
 		Name:                     d.Get(NameVar).(string),
 		RedirectUris:             interfaceToStringSlice(d.Get(redirectURIsVar)),
 		ResponseTypes:            respTypes,
@@ -162,8 +162,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	})
 
 	set := map[string]interface{}{
-		clientID:     resp.GetClientId(),
-		clientSecret: resp.GetClientSecret(),
+		ClientIDVar:     resp.GetClientId(),
+		ClientSecretVar: resp.GetClientSecret(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
@@ -191,7 +191,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: d.Get(projectIDVar).(string), AppId: helper.GetID(d, appIDVar)})
+	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: d.Get(ProjectIDVar).(string), AppId: helper.GetID(d, appIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

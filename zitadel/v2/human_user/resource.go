@@ -141,6 +141,6 @@ func GetResource() *schema.Resource {
 				return diff.SetNew(preferredLanguageVar, defaultPreferredLanguage)
 			}),
 		),
-		Importer: &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: helper.ImportWithIDAndOptionalOrgAndSecret(UserIDVar, initialPasswordVar),
 	}
 }

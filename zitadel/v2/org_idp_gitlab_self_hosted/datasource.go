@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_gitlab_self_hosted"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 )
 
 func GetDatasource() *schema.Resource {
@@ -26,6 +25,6 @@ func GetDatasource() *schema.Resource {
 			idp_gitlab_self_hosted.IssuerVar: idp_gitlab_self_hosted.IssuerDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: org_idp_utils.ImportIDPWithOrgAndSecret(idp_utils.ClientSecretVar)},
-	}
+		Importer:    helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
+}
 }

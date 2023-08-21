@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_azure_ad/idp_azure_ad_test_dep"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_google/idp_google_test_dep"
@@ -29,7 +30,7 @@ func TestAccLoginPolicy(t *testing.T) {
 		"", "",
 		false,
 		checkRemoteProperty(*frame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*frame)(""),
 		nil, nil, "", "",
 	)

@@ -41,6 +41,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer:      helper.ImportWithIDAndOptionalOrg(grantIDVar, helper.NewImportAttribute(userIDVar, helper.ConvertID, false)),
 	}
 }
