@@ -12,7 +12,7 @@ Resource representing an organization in ZITADEL, which is the highest level aft
 ## Example Usage
 
 ```terraform
-resource "zitadel_org" "org" {
+resource "zitadel_org" "default" {
   name = "terraform-test"
 }
 ```
@@ -27,3 +27,5 @@ resource "zitadel_org" "org" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `primary_domain` (String) Primary domain of the org
+- `state` (String) State of the org

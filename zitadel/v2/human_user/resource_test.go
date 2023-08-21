@@ -2,6 +2,7 @@ package human_user_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -9,38 +10,22 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user"
 )
 
 func TestAccHumanUser(t *testing.T) {
-	resourceName := "zitadel_human_user"
-	initialProperty := "en"
-	updatedProperty := "de"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_human_user")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleUsername := test_utils.AttributeValue(t, human_user.UserNameVar, exampleAttributes).AsString()
+	resourceExample = strings.Replace(resourceExample, exampleUsername, frame.UniqueResourcesID, 1)
+	exampleProperty := test_utils.AttributeValue(t, human_user.DisplayNameVar, exampleAttributes).AsString()
+	updatedProperty := "updatedproperty"
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, secretProperty string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id          = "%s"
-  user_name          = "test@zitadel.com"
-  first_name         = "firstname"
-  last_name          = "lastname"
-  nick_name          = "nickname"
-  display_name       = "displayname"
-  preferred_language = "%s"
-  gender             = "GENDER_MALE"
-  phone              = "+41799999999"
-  is_phone_verified  = true
-  email              = "%s@example.com"
-  is_email_verified  = true
-  initial_password   = "Password1!"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty, frame.UniqueResourcesID)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, updatedProperty,
 		"", "",
 		false,
 		checkRemoteProperty(frame),
@@ -57,7 +42,7 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.T
 			if err != nil {
 				return err
 			}
-			actual := remoteResource.GetUser().GetHuman().GetProfile().GetPreferredLanguage()
+			actual := remoteResource.GetUser().GetHuman().GetProfile().GetDisplayName()
 			if actual != expect {
 				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}

@@ -8,30 +8,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_oidc_settings"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
 func TestAccDefaultOIDCSettings(t *testing.T) {
-	resourceName := "zitadel_default_oidc_settings"
-	initialProperty := "123h0m0s"
-	updatedProperty := "456h0m0s"
-	frame, err := test_utils.NewInstanceTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_oidc_settings")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, default_oidc_settings.RefreshTokenExpirationVar, exampleAttributes).AsString()
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-	access_token_lifetime = "%s"
-  	id_token_lifetime = "777h0m0s"
-  	refresh_token_idle_expiration = "888h0m0s"
-  	refresh_token_expiration = "999h0m0s"
-}`, resourceName, frame.UniqueResourcesID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		nil,
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "456h0m0s",
 		"", "",
 		false,
 		checkRemoteProperty(*frame),
@@ -48,7 +38,7 @@ func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resour
 			if err != nil {
 				return fmt.Errorf("getting oidc settings failed: %w", err)
 			}
-			actual := resp.GetSettings().GetAccessTokenLifetime().AsDuration().String()
+			actual := resp.GetSettings().GetRefreshTokenExpiration().AsDuration().String()
 			if actual != expect {
 				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}

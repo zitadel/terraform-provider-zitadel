@@ -1,4 +1,4 @@
-resource "zitadel_idp_ldap" "ldap" {
+resource "zitadel_idp_ldap" "default" {
   name                 = "LDAP"
   servers              = ["ldaps://my.primary.server:389", "ldaps://my.secondary.server:389"]
   start_tls            = false

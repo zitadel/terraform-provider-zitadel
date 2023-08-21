@@ -11,10 +11,10 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, id func(state *terraform.State) string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteResource, err := frame.Admin.GetOrgByID(frame, &admin.GetOrgByIDRequest{Id: frame.State(state).ID})
+			remoteResource, err := frame.Admin.GetOrgByID(frame, &admin.GetOrgByIDRequest{Id: id(state)})
 			if err != nil {
 				return err
 			}

@@ -33,7 +33,7 @@ func GetResource() *schema.Resource {
 					return helper.EnumValueValidation(stylingTypeVar, value, idp.IDPStylingType_value)
 				},
 			},
-			jwtEndpointVar: {
+			JwtEndpointVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "the endpoint where the jwt can be extracted",

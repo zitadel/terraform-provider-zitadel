@@ -6,50 +6,32 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/app_key"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api/application_api_test_dep"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
 )
 
 func TestAccAppKey(t *testing.T) {
-	resourceName := "zitadel_application_key"
-	initialProperty := "2500-01-01T08:45:00Z"
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_key")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, app_key.ExpirationDateVar, exampleAttributes).AsString()
 	updatedProperty := "2501-01-01T08:45:00Z"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	project, err := frame.AddProject(frame, &management.AddProjectRequest{
-		Name: frame.UniqueResourcesID,
-	})
-	if err != nil {
-		t.Fatalf("failed to create project: %v", err)
-	}
-	app, err := frame.AddOIDCApp(frame, &management.AddOIDCAppRequest{
-		ProjectId:      project.GetId(),
-		Name:           frame.UniqueResourcesID,
-		AuthMethodType: app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
-	})
-	test_utils.RunLifecyleTest[string](
+	projectDep, projectID := project_test_dep.Create(t, frame)
+	appDep, appID := application_api_test_dep.Create(t, frame, projectID)
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id          = "%s"
-  project_id      = "%s"
-  app_id          = "%s"
-  key_type        = "KEY_TYPE_JSON"
-  expiration_date = "%s"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, project.GetId(), app.GetAppId(), configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency, projectDep, appDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, updatedProperty,
 		"", "",
 		false,
-		checkRemoteProperty(frame, project.GetId(), app.GetAppId()),
+		checkRemoteProperty(frame, projectID, appID),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId(), app.GetAppId()), updatedProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID, appID), updatedProperty),
 		nil, nil, "", "",
 	)
 }

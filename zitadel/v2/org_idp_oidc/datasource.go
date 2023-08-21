@@ -53,7 +53,7 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "the scopes requested by ZITADEL during the request on the identity provider",
 			},
-			displayNameMappingVar: {
+			DisplayNameMappingVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "definition which field is mapped to the display name of the user",

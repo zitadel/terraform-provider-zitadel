@@ -8,41 +8,27 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
 )
 
 func TestAccAppAPI(t *testing.T) {
-	resourceName := "zitadel_application_api"
-	initialProperty := "initialname"
-	updatedProperty := "updatedname"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	project, err := frame.AddProject(frame, &management.AddProjectRequest{
-		Name: frame.UniqueResourcesID,
-	})
-	if err != nil {
-		t.Fatalf("failed to create project: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_api")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, application_api.NameVar, exampleAttributes).AsString()
+	projectDep, projectID := project_test_dep.Create(t, frame)
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id           = "%s"
-  project_id       = "%s"
-  name             = "%s"
-  auth_method_type = "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, project.GetId(), configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency, projectDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "updatedproperty",
 		"", "",
 		false,
-		checkRemoteProperty(frame, project.GetId()),
+		checkRemoteProperty(frame, projectID),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, project.GetId()), updatedProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID), ""),
 		nil, nil, "", "",
 	)
 }

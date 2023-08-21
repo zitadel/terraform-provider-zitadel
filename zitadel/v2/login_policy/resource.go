@@ -49,7 +49,7 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "defines if unknown username on login screen directly return an error or always display the password screen",
 			},
-			defaultRedirectURIVar: {
+			DefaultRedirectURIVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)",

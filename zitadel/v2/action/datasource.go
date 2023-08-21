@@ -6,7 +6,7 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing an action belonging to an organization.",
 		Schema: map[string]*schema.Schema{
-			actionIDVar: {
+			ActionIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of this resource.",
@@ -22,12 +22,12 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "the state of the action",
 			},
-			nameVar: {
+			NameVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "",
 			},
-			scriptVar: {
+			ScriptVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "",

@@ -10,42 +10,27 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/passwordless_registration_message_text"
 )
 
 func TestAccPasswordlessRegistrationMessageText(t *testing.T) {
-	resourceName := "zitadel_passwordless_registration_message_text"
-	initialProperty := "initialtitle"
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_passwordless_registration_message_text")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, "title", exampleAttributes).AsString()
 	updatedProperty := "updatedtitle"
-	language := "en"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	exampleLanguage := test_utils.AttributeValue(t, passwordless_registration_message_text.LanguageVar, exampleAttributes).AsString()
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id      = "%s"
-  language    = "%s"
-
-  title       = "%s"
-  pre_header  = "pre_header example"
-  subject     = "subject example"
-  greeting    = "greeting example"
-  text        = "text example"
-  button_text = "button_text example"
-  footer_text = "footer_text example"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, language, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, updatedProperty,
 		"", "",
 		true,
-		checkRemoteProperty(frame, language),
-		regexp.MustCompile(`^\d{18}_en$`),
+		checkRemoteProperty(frame, exampleLanguage),
+		regexp.MustCompile(fmt.Sprintf(`^\d{18}_%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, language)("ZITADEL - Add Passwordless Login"),
+		checkRemoteProperty(frame, exampleLanguage)("ZITADEL - Add Passwordless Login"),
 		nil, nil, "", "",
 	)
 }

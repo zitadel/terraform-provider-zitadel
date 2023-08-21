@@ -14,12 +14,12 @@ func GetDatasource() *schema.Resource {
 				Description: "ID of the organization",
 				ForceNew:    true,
 			},
-			flowTypeVar: {
+			FlowTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Type of the flow to which the action triggers belong",
 			},
-			triggerTypeVar: {
+			TriggerTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Trigger type on when the actions get triggered",

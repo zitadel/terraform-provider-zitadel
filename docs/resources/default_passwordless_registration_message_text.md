@@ -12,7 +12,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource "zitadel_default_passwordless_registration_message_text" "passwordless_registration_en" {
+resource "zitadel_default_passwordless_registration_message_text" "default" {
   language = "en"
 
   title       = "title example"

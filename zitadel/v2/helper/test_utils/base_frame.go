@@ -7,6 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+	"github.com/hashicorp/terraform-plugin-mux/tf5to6server"
+	"github.com/hashicorp/terraform-plugin-mux/tf6muxserver"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
@@ -15,17 +17,19 @@ import (
 )
 
 const (
-	insecure = true
-	port     = "8080"
+	insecure           = true
+	port               = "8080"
+	ExamplesResourceID = "123456789012345678"
 )
 
 type BaseTestFrame struct {
 	context.Context
 	ClientInfo                         *helper.ClientInfo
 	ProviderSnippet, UniqueResourcesID string
+	ResourceType                       string
+	InstanceDomain                     string
 	TerraformName                      string
 	v6ProviderFactories                map[string]func() (tfprotov6.ProviderServer, error)
-	v5ProviderFactories                map[string]func() (tfprotov5.ProviderServer, error)
 }
 
 func NewBaseTestFrame(ctx context.Context, resourceType, domain string, jwtProfileJson []byte) (*BaseTestFrame, error) {
@@ -51,24 +55,35 @@ KEY
 `, domain, insecure, port, string(jwtProfileJson))
 	clientInfo := zitadelProvider.Meta().(*helper.ClientInfo)
 	uniqueID := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-	terraformName := fmt.Sprintf("%s.%s", resourceType, uniqueID)
+	terraformName := fmt.Sprintf("%s.default", resourceType)
 	frame := &BaseTestFrame{
 		Context:           ctx,
 		ProviderSnippet:   providerSnippet,
 		ClientInfo:        clientInfo,
 		UniqueResourcesID: uniqueID,
 		TerraformName:     terraformName,
+		ResourceType:      resourceType,
+		InstanceDomain:    domain,
 	}
-	_, v5Resource := zitadelProvider.ResourcesMap[resourceType]
-	_, v5Datasource := zitadelProvider.DataSourcesMap[resourceType]
-	if v5Resource || v5Datasource {
-		frame.v5ProviderFactories = map[string]func() (tfprotov5.ProviderServer, error){"zitadel": func() (tfprotov5.ProviderServer, error) {
-			return zitadelProvider.GRPCProvider(), nil
-		}}
-	} else {
-		frame.v6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){"zitadel": func() (tfprotov6.ProviderServer, error) {
-			return providerserver.NewProtocol6(zitadel.NewProviderPV6())(), nil
-		}}
+	frame.v6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
+		"zitadel": func() (tfprotov6.ProviderServer, error) {
+			muxServer, err := tf6muxserver.NewMuxServer(frame,
+				providerserver.NewProtocol6(zitadel.NewProviderPV6()),
+				func() tfprotov6.ProviderServer {
+					upgraded, err := tf5to6server.UpgradeServer(frame, func() tfprotov5.ProviderServer {
+						return zitadelProvider.GRPCProvider()
+					})
+					if err != nil {
+						return nil
+					}
+					return upgraded
+				},
+			)
+			if err != nil {
+				return nil, err
+			}
+			return muxServer.ProviderServer(), nil
+		},
 	}
 	return frame, nil
 }

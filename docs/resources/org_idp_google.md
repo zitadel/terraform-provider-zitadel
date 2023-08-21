@@ -12,8 +12,8 @@ Resource representing a Google IdP on the organization.
 ## Example Usage
 
 ```terraform
-resource "zitadel_org_idp_google" "google" {
-  org_id              = zitadel_org.org.id
+resource "zitadel_org_idp_google" "default" {
+  org_id              = data.zitadel_org.default.id
   name                = "Google"
   client_id           = "182902..."
   client_secret       = "GOCSPX-*****"

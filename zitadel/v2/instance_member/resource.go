@@ -14,7 +14,7 @@ func GetResource() *schema.Resource {
 				Description: "ID of the user",
 				ForceNew:    true,
 			},
-			rolesVar: {
+			RolesVar: {
 				Type: schema.TypeSet,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,

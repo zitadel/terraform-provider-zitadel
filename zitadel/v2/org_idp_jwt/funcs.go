@@ -50,7 +50,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	resp, err := client.AddOrgJWTIDP(ctx, &management.AddOrgJWTIDPRequest{
 		Name:         d.Get(nameVar).(string),
 		StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[d.Get(stylingTypeVar).(string)]),
-		JwtEndpoint:  d.Get(jwtEndpointVar).(string),
+		JwtEndpoint:  d.Get(JwtEndpointVar).(string),
 		Issuer:       d.Get(issuerVar).(string),
 		KeysEndpoint: d.Get(keysEndpointVar).(string),
 		HeaderName:   d.Get(headerNameVar).(string),
@@ -88,10 +88,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChanges(jwtEndpointVar, issuerVar, keysEndpointVar, headerNameVar) {
+	if d.HasChanges(JwtEndpointVar, issuerVar, keysEndpointVar, headerNameVar) {
 		_, err = client.UpdateOrgIDPJWTConfig(ctx, &management.UpdateOrgIDPJWTConfigRequest{
 			IdpId:        d.Id(),
-			JwtEndpoint:  d.Get(jwtEndpointVar).(string),
+			JwtEndpoint:  d.Get(JwtEndpointVar).(string),
 			Issuer:       d.Get(issuerVar).(string),
 			KeysEndpoint: d.Get(keysEndpointVar).(string),
 			HeaderName:   d.Get(headerNameVar).(string),
@@ -131,7 +131,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		orgIDVar:        idp.GetDetails().ResourceOwner,
 		nameVar:         idp.GetName(),
 		stylingTypeVar:  idp.GetStylingType().String(),
-		jwtEndpointVar:  jwt.GetJwtEndpoint(),
+		JwtEndpointVar:  jwt.GetJwtEndpoint(),
 		issuerVar:       jwt.GetIssuer(),
 		keysEndpointVar: jwt.GetKeysEndpoint(),
 		headerNameVar:   jwt.GetHeaderName(),

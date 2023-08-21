@@ -14,12 +14,12 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing an organization in ZITADEL, which is the highest level after the instance and contains several other resource including policies if the configuration differs to the default policies on the instance.",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
+			OrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "An organizations resource ID.",
 			},
-			nameVar: {
+			NameVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Name of the org.",
@@ -49,7 +49,7 @@ func ListDatasources() *schema.Resource {
 				Description: "A set of all organization IDs.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-			nameVar: {
+			NameVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Name of the org.",
@@ -63,7 +63,7 @@ func ListDatasources() *schema.Resource {
 				},
 				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
 			},
-			domainVar: {
+			DomainVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "A domain of the org.",

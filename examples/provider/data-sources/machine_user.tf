@@ -1,8 +1,8 @@
-data "zitadel_machine_user" "machine_user" {
-  org_id  = data.zitadel_org.org.id
-  user_id = "177073617463410691"
+data "zitadel_machine_user" "default" {
+  org_id  = data.zitadel_org.default.id
+  user_id = "123456789012345678"
 }
 
 output "machine_user" {
-  value = data.zitadel_machine_user.machine_user
+  value = data.zitadel_machine_user.default
 }

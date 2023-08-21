@@ -2,6 +2,7 @@ package lockout_policy_test
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -12,29 +13,23 @@ import (
 )
 
 func TestAccLockoutPolicy(t *testing.T) {
-	resourceName := "zitadel_lockout_policy"
-	initialProperty := uint64(3)
-	updatedProperty := uint64(5)
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_lockout_policy")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty, err := strconv.ParseUint(test_utils.AttributeValue(t, "max_password_attempts", exampleAttributes).AsString(), 10, 64)
 	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
+		t.Fatalf("could not parse example property: %v", err)
 	}
-	test_utils.RunLifecyleTest[uint64](
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty uint64, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id = "%s"
-  max_password_attempts = "%d"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, 10,
 		"", "",
 		false,
 		checkRemoteProperty(*frame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		checkRemoteProperty(*frame)(uint64(0)),
+		checkRemoteProperty(*frame)(0),
 		nil, nil, "", "",
 	)
 }

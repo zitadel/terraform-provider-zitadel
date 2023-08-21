@@ -31,7 +31,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	id := ""
 	if d.HasChanges(
-		primaryColorVar,
+		PrimaryColorVar,
 		hideLoginNameSuffixVar,
 		warnColorVar,
 		backgroundColorVar,
@@ -43,7 +43,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		disableWatermarkVar,
 	) {
 		resp, err := client.UpdateLabelPolicy(ctx, &admin.UpdateLabelPolicyRequest{
-			PrimaryColor:        d.Get(primaryColorVar).(string),
+			PrimaryColor:        d.Get(PrimaryColorVar).(string),
 			HideLoginNameSuffix: d.Get(hideLoginNameSuffixVar).(bool),
 			WarnColor:           d.Get(warnColorVar).(string),
 			BackgroundColor:     d.Get(backgroundColorVar).(string),
@@ -97,7 +97,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(
-		primaryColorVar,
+		PrimaryColorVar,
 		hideLoginNameSuffixVar,
 		warnColorVar,
 		backgroundColorVar,
@@ -146,7 +146,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	policy := resp.Policy
 	set := map[string]interface{}{
-		primaryColorVar:        policy.GetPrimaryColor(),
+		PrimaryColorVar:        policy.GetPrimaryColor(),
 		hideLoginNameSuffixVar: policy.GetHideLoginNameSuffix(),
 		warnColorVar:           policy.GetWarnColor(),
 		backgroundColorVar:     policy.GetBackgroundColor(),

@@ -49,11 +49,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	projectID := d.Get(projectIDVar).(string)
-	if d.HasChange(nameVar) {
+	if d.HasChange(NameVar) {
 		_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
 			ProjectId: projectID,
 			AppId:     d.Id(),
-			Name:      d.Get(nameVar).(string),
+			Name:      d.Get(NameVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update application: %v", err)
@@ -88,7 +88,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	resp, err := client.AddAPIApp(ctx, &management.AddAPIAppRequest{
 		ProjectId:      d.Get(projectIDVar).(string),
-		Name:           d.Get(nameVar).(string),
+		Name:           d.Get(NameVar).(string),
 		AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[(d.Get(authMethodTypeVar).(string))]),
 	})
 
@@ -121,7 +121,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: d.Get(projectIDVar).(string), AppId: helper.GetID(d, appIDVar)})
+	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: d.Get(projectIDVar).(string), AppId: helper.GetID(d, AppIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -134,7 +134,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	api := app.GetApiConfig()
 	set := map[string]interface{}{
 		orgIDVar:          app.GetDetails().GetResourceOwner(),
-		nameVar:           app.GetName(),
+		NameVar:           app.GetName(),
 		authMethodTypeVar: api.GetAuthMethodType().String(),
 	}
 	for k, v := range set {

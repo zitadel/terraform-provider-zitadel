@@ -12,7 +12,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource "zitadel_default_init_message_text" "init_en" {
+resource "zitadel_default_init_message_text" "default" {
   language = "en"
 
   title       = "title example"

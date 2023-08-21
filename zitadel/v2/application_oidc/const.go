@@ -4,7 +4,7 @@ const (
 	appIDVar                    = "app_id"
 	orgIDVar                    = "org_id"
 	projectIDVar                = "project_id"
-	nameVar                     = "name"
+	NameVar                     = "name"
 	redirectURIsVar             = "redirect_uris"
 	responseTypesVar            = "response_types"
 	grantTypesVar               = "grant_types"

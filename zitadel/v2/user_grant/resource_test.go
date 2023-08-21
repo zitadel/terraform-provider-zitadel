@@ -9,61 +9,26 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user/human_user_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_role/project_role_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/user_grant"
 )
 
 func TestAccUserGrant(t *testing.T) {
-	resourceName := "zitadel_user_grant"
-	initialProperty := "initialProperty"
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_user_grant")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, user_grant.RoleKeysVar, exampleAttributes).AsValueSlice()[0].AsString()
 	updatedProperty := "updatedProperty"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	project, err := frame.AddProject(frame, &management.AddProjectRequest{
-		Name: frame.UniqueResourcesID,
-	})
-	if err != nil {
-		t.Fatalf("failed to create project: %v", err)
-	}
-	projectID := project.GetId()
-	for _, role := range []string{initialProperty, updatedProperty} {
-		_, err = frame.AddProjectRole(frame, &management.AddProjectRoleRequest{
-			ProjectId:   projectID,
-			RoleKey:     role,
-			DisplayName: role,
-		})
-		if err != nil {
-			t.Fatalf("failed to create project role %s: %v", role, err)
-		}
-	}
-	user, err := frame.ImportHumanUser(frame, &management.ImportHumanUserRequest{
-		UserName: frame.UniqueResourcesID,
-		Profile: &management.ImportHumanUserRequest_Profile{
-			FirstName: "Don't",
-			LastName:  "Care",
-		},
-		Email: &management.ImportHumanUserRequest_Email{
-			Email:           "dont@care.com",
-			IsEmailVerified: true,
-		},
-	})
-	if err != nil {
-		t.Fatalf("failed to create user: %v", err)
-	}
-	userID := user.GetUserId()
-	test_utils.RunLifecyleTest[string](
+	projectDep, projectID := project_test_dep.Create(t, frame)
+	project_role_test_dep.Create(t, frame, projectID, exampleProperty, updatedProperty)
+	userDep, userID := human_user_test_dep.Create(t, frame)
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id         = "%s"
-  project_id     = "%s"
-  user_id		 = "%s"
-  role_keys      = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, projectID, userID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency, projectDep, userDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, updatedProperty,
 		"", "",
 		true,
 		checkRemoteProperty(*frame, userID),

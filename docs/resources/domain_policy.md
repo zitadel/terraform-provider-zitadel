@@ -12,11 +12,11 @@ Resource representing the custom domain policy of an organization.
 ## Example Usage
 
 ```terraform
-resource "zitadel_domain_policy" "domain_policy" {
-  org_id                                      = zitadel_org.org.id
-  user_login_must_be_domain                   = false
+resource "zitadel_domain_policy" "default" {
+  org_id                                      = data.zitadel_org.default.id
+  user_login_must_be_domain                   = true
   validate_org_domains                        = false
-  smtp_sender_address_matches_instance_domain = false
+  smtp_sender_address_matches_instance_domain = true
 }
 ```
 

@@ -1,5 +1,5 @@
-resource "zitadel_org_idp_oidc" "oidc_idp" {
-  org_id               = zitadel_org.org.id
+resource "zitadel_org_idp_oidc" "default" {
+  org_id               = data.zitadel_org.default.id
   name                 = "oidcidp"
   styling_type         = "STYLING_TYPE_UNSPECIFIED"
   client_id            = "google"

@@ -1,6 +1,6 @@
-resource "zitadel_project_grant" "project_grant" {
-  org_id         = zitadel_org.org.id
-  project_id     = zitadel_project.project.id
-  granted_org_id = zitadel_org.grantedorg.id
-  role_keys      = [zitadel_project_role.project_role.role_key]
+resource "zitadel_project_grant" "default" {
+  org_id         = data.zitadel_org.default.id
+  project_id     = data.zitadel_project.default.id
+  granted_org_id = data.zitadel_org.granted_org.id
+  role_keys      = ["super-user"]
 }

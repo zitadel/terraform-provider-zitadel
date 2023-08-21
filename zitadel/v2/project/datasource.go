@@ -8,12 +8,12 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
 		Schema: map[string]*schema.Schema{
-			projectIDVar: {
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of this resource.",
 			},
-			nameVar: {
+			NameVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Name of the project",

@@ -10,43 +10,22 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user/human_user_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_member"
 )
 
 func TestAccOrgMember(t *testing.T) {
-	resourceName := "zitadel_org_member"
-	initialProperty := "ORG_OWNER"
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_org_member")
+	userDep, userID := human_user_test_dep.Create(t, frame)
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, org_member.RolesVar, exampleAttributes).AsValueSlice()[0].AsString()
 	updatedProperty := "ORG_OWNER_VIEWER"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	user, err := frame.ImportHumanUser(frame, &management.ImportHumanUserRequest{
-		UserName: frame.UniqueResourcesID,
-		Profile: &management.ImportHumanUserRequest_Profile{
-			FirstName: "Don't",
-			LastName:  "Care",
-		},
-		Email: &management.ImportHumanUserRequest_Email{
-			Email:           "dont@care.com",
-			IsEmailVerified: true,
-		},
-	})
-	userID := user.GetUserId()
-	if err != nil {
-		t.Fatalf("failed to create user: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-	org_id              = "%s"
-	user_id = "%s"
-  	roles   = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, userID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency, userDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, updatedProperty,
 		"", "",
 		true,
 		checkRemoteProperty(*frame, userID),

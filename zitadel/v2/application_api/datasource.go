@@ -8,7 +8,7 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing an API application belonging to a project, with all configuration possibilities.",
 		Schema: map[string]*schema.Schema{
-			appIDVar: {
+			AppIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of this resource.",
@@ -23,7 +23,7 @@ func GetDatasource() *schema.Resource {
 				Required:    true,
 				Description: "ID of the project",
 			},
-			nameVar: {
+			NameVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Name of the application",

@@ -23,12 +23,12 @@ func GetResource() *schema.Resource {
 					return EnumValueValidation(actionState, value, action.ActionState_value)
 				},*/
 			},
-			nameVar: {
+			NameVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "",
 			},
-			scriptVar: {
+			ScriptVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "",

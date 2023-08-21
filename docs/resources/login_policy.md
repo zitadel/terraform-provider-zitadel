@@ -12,8 +12,8 @@ Resource representing the custom login policy of an organization.
 ## Example Usage
 
 ```terraform
-resource "zitadel_login_policy" "login_policy" {
-  org_id                        = zitadel_org.org.id
+resource "zitadel_login_policy" "default" {
+  org_id                        = data.zitadel_org.default.id
   user_login                    = true
   allow_register                = true
   allow_external_idp            = true
@@ -29,7 +29,7 @@ resource "zitadel_login_policy" "login_policy" {
   default_redirect_uri          = "localhost:8080"
   second_factors                = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
   multi_factors                 = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
-  idps                          = [zitadel_org_idp_oidc.oidc_idp.id, zitadel_org_idp_jwt.jwt_idp.id]
+  idps                          = [data.zitadel_idp_google.default.id, data.zitadel_idp_azure_ad.default.id]
   allow_domain_discovery        = true
   disable_login_with_email      = true
   disable_login_with_phone      = true

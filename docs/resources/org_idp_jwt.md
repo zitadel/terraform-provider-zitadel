@@ -12,11 +12,11 @@ Resource representing a generic JWT IdP of the organization.
 ## Example Usage
 
 ```terraform
-resource "zitadel_org_idp_jwt" "jwt_idp" {
-  org_id        = zitadel_org.org.id
+resource "zitadel_org_idp_jwt" "default" {
+  org_id        = data.zitadel_org.default.id
   name          = "jwtidp"
   styling_type  = "STYLING_TYPE_UNSPECIFIED"
-  jwt_endpoint  = "https://jwtendpoint.com"
+  jwt_endpoint  = "https://jwtendpoint.com/jwt"
   issuer        = "https://google.com"
   keys_endpoint = "https://jwtendpoint.com/keys"
   header_name   = "x-auth-token"

@@ -8,7 +8,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the default label policy.",
 		Schema: map[string]*schema.Schema{
-			primaryColorVar: {
+			PrimaryColorVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "hex value for primary color",

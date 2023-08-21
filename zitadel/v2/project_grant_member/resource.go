@@ -20,7 +20,7 @@ func GetResource() *schema.Resource {
 				Description: "ID of the project",
 				ForceNew:    true,
 			},
-			grantIDVar: {
+			GrantIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the grant",
@@ -32,7 +32,7 @@ func GetResource() *schema.Resource {
 				Description: "ID of the user",
 				ForceNew:    true,
 			},
-			rolesVar: {
+			RolesVar: {
 				Type: schema.TypeSet,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,

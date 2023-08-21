@@ -1,11 +1,11 @@
 package action
 
 const (
-	actionIDVar      = "action_id"
+	ActionIDVar      = "action_id"
 	orgIDVar         = "org_id"
 	stateVar         = "state"
-	nameVar          = "name"
-	scriptVar        = "script"
+	NameVar          = "name"
+	ScriptVar        = "script"
 	timeoutVar       = "timeout"
 	allowedToFailVar = "allowed_to_fail"
 )

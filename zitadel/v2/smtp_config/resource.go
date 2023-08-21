@@ -8,12 +8,12 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the SMTP configuration of an instance.",
 		Schema: map[string]*schema.Schema{
-			senderAddressVar: {
+			SenderAddressVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Address used to send emails.",
 			},
-			senderNameVar: {
+			SenderNameVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Sender name used to send emails.",

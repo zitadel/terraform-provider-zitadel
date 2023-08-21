@@ -2,42 +2,35 @@ package action_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/action"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
 func TestAccAction(t *testing.T) {
-	resourceName := "zitadel_action"
-	initialProperty := "initialproperty"
-	updatedProperty := "updatedproperty"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_action")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	// name must be unique
+	nameAttribute := test_utils.AttributeValue(t, action.NameVar, exampleAttributes).AsString()
+	resourceExample = strings.Replace(resourceExample, nameAttribute, frame.UniqueResourcesID, 1)
+	exampleProperty := test_utils.AttributeValue(t, action.ScriptVar, exampleAttributes).AsString()
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id          = "%s"
-  name            = "testaction"
-  script          = "%s"
-  timeout         = "10s"
-  allowed_to_fail = true
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "updatedproperty",
 		"", "",
 		true,
 		checkRemoteProperty(frame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), updatedProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		nil, nil, "", "",
 	)
 }

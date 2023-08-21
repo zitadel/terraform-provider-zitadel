@@ -2,6 +2,7 @@ package password_complexity_policy_test
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -12,47 +13,38 @@ import (
 )
 
 func TestAccPasswordComplexityPolicy(t *testing.T) {
-	resourceName := "zitadel_password_complexity_policy"
-	initialProperty := true
-	updatedProperty := false
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_password_complexity_policy")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty, err := strconv.ParseUint(test_utils.AttributeValue(t, "min_length", exampleAttributes).AsString(), 10, 64)
 	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
+		t.Fatalf("could not parse example property: %v", err)
 	}
-	test_utils.RunLifecyleTest[bool](
+	updatedProperty := uint64(10)
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty bool, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id = "%s"
-  min_length    = "8"
-  has_uppercase = true
-  has_lowercase = true
-  has_number    = true
-  has_symbol    = %t
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, updatedProperty,
 		"", "",
 		false,
 		checkRemoteProperty(*frame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		checkRemoteProperty(*frame)(initialProperty),
+		checkRemoteProperty(*frame)(exampleProperty),
 		nil, nil, "", "",
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame) func(bool) resource.TestCheckFunc {
-	return func(expect bool) resource.TestCheckFunc {
+func checkRemoteProperty(frame test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
+	return func(expect uint64) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetPasswordComplexityPolicy(frame, &management.GetPasswordComplexityPolicyRequest{})
 			if err != nil {
 				return fmt.Errorf("getting policy failed: %w", err)
 			}
-			actual := resp.GetPolicy().GetHasSymbol()
+			actual := resp.GetPolicy().GetMinLength()
 			if actual != expect {
-				return fmt.Errorf("expected %t, but got %t", expect, actual)
+				return fmt.Errorf("expected %d, but got %d", expect, actual)
 			}
 			return nil
 		}

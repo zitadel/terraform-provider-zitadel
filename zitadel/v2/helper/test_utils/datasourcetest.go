@@ -27,6 +27,5 @@ func RunDatasourceTest(
 			Check:  resource.ComposeAggregateTestCheckFunc(checks...),
 		}},
 		ProtoV6ProviderFactories: frame.v6ProviderFactories,
-		ProtoV5ProviderFactories: frame.v5ProviderFactories,
 	})
 }

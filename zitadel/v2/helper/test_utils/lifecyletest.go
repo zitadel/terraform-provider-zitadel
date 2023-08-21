@@ -12,9 +12,10 @@ import (
 func RunLifecyleTest[P comparable](
 	t *testing.T,
 	frame BaseTestFrame,
-	resourceFunc func(initialProperty P, initialSecret string) string,
-	initialProperty, updatedProperty P,
-	initialSecret, updatedSecret string,
+	datasources []string,
+	resourceFunc func(property P, secret string) string,
+	exampleProperty, updatedProperty P,
+	exampleSecret, updatedSecret string,
 	allowNonEmptyPlan bool,
 	checkRemoteProperty func(expect P) resource.TestCheckFunc,
 	idPattern *regexp.Regexp,
@@ -24,28 +25,28 @@ func RunLifecyleTest[P comparable](
 	secretAttribute string,
 ) {
 	var importStateVerifyIgnore []string
-	initialConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(initialProperty, initialSecret))
-	updatedNameConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, initialSecret))
-	updatedSecretConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, updatedSecret))
+	exampleConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(exampleProperty, exampleSecret))
+	updatedPropertyConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(updatedProperty, exampleSecret))
+	updatedSecretConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(updatedProperty, updatedSecret))
 	steps := []resource.TestStep{
 		{ // Check first plan has a diff
-			Config:             initialConfig,
+			Config:             exampleConfig,
 			ExpectNonEmptyPlan: true,
 			// ExpectNonEmptyPlan just works with PlanOnly set to true
 			PlanOnly: true,
 		}, { // Check resource is created
-			Config: initialConfig,
+			Config: exampleConfig,
 			Check: resource.ComposeAggregateTestCheckFunc(
-				CheckAMinute(checkRemoteProperty(initialProperty)),
+				CheckAMinute(checkRemoteProperty(exampleProperty)),
 				CheckStateHasIDSet(frame, idPattern),
 			),
 		}, { // Check updating name has a diff
-			Config:             updatedNameConfig,
+			Config:             updatedPropertyConfig,
 			ExpectNonEmptyPlan: true,
 			// ExpectNonEmptyPlan just works with PlanOnly set to true
 			PlanOnly: true,
 		}, { // Check remote state can be updated
-			Config: updatedNameConfig,
+			Config: updatedPropertyConfig,
 			Check:  CheckAMinute(checkRemoteProperty(updatedProperty)),
 		},
 	}
@@ -89,6 +90,5 @@ func RunLifecyleTest[P comparable](
 			return err
 		},
 		ProtoV6ProviderFactories: frame.v6ProviderFactories,
-		ProtoV5ProviderFactories: frame.v5ProviderFactories,
 	})
 }

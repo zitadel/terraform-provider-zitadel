@@ -54,7 +54,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ClientSecret:       d.Get(clientSecretVar).(string),
 		Issuer:             d.Get(issuerVar).(string),
 		Scopes:             helper.GetOkSetToStringSlice(d, scopesVar),
-		DisplayNameMapping: idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(displayNameMappingVar).(string)]),
+		DisplayNameMapping: idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(DisplayNameMappingVar).(string)]),
 		UsernameMapping:    idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(usernameMappingVar).(string)]),
 		AutoRegister:       d.Get(autoRegisterVar).(bool),
 	})
@@ -91,14 +91,14 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChanges(clientIDVar, clientSecretVar, issuerVar, displayNameMappingVar, usernameMappingVar, scopesVar) {
+	if d.HasChanges(clientIDVar, clientSecretVar, issuerVar, DisplayNameMappingVar, usernameMappingVar, scopesVar) {
 		_, err = client.UpdateOrgIDPOIDCConfig(ctx, &management.UpdateOrgIDPOIDCConfigRequest{
 			IdpId:              d.Id(),
 			ClientId:           d.Get(clientIDVar).(string),
 			ClientSecret:       d.Get(clientSecretVar).(string),
 			Issuer:             d.Get(issuerVar).(string),
 			Scopes:             helper.GetOkSetToStringSlice(d, scopesVar),
-			DisplayNameMapping: idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(displayNameMappingVar).(string)]),
+			DisplayNameMapping: idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(DisplayNameMappingVar).(string)]),
 			UsernameMapping:    idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(usernameMappingVar).(string)]),
 		})
 		if err != nil {
@@ -141,7 +141,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		clientSecretVar:       d.Get(clientSecretVar).(string),
 		issuerVar:             oidc.GetIssuer(),
 		scopesVar:             oidc.GetScopes(),
-		displayNameMappingVar: oidc.GetDisplayNameMapping().String(),
+		DisplayNameMappingVar: oidc.GetDisplayNameMapping().String(),
 		usernameMappingVar:    oidc.GetUsernameMapping().String(),
 		autoRegisterVar:       idp.GetAutoRegister(),
 	}

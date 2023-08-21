@@ -12,8 +12,8 @@ Datasource representing an LDAP IDP on the instance.
 ## Example Usage
 
 ```terraform
-data "zitadel_idp_ldap" "ldap" {
-  id = "177073614158299139"
+data "zitadel_idp_ldap" "default" {
+  id = "123456789012345678"
 }
 ```
 

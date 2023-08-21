@@ -10,33 +10,25 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/org"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
 func TestAccDomain(t *testing.T) {
-	resourceName := "zitadel_domain"
-	initialProperty := "initial.default.127.0.0.1.sslip.io"
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_domain")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, domain.NameVar, exampleAttributes).AsString()
 	updatedProperty := "updated.default.127.0.0.1.sslip.io"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id          = "%s"
-  name      = "%s"
-  is_primary = false
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, updatedProperty,
 		"", "",
 		true,
 		checkRemoteProperty(frame),
-		regexp.MustCompile(fmt.Sprintf(`^%s$|^%s$`, initialProperty, updatedProperty)),
+		regexp.MustCompile(fmt.Sprintf(`^%s$|^%s$`, exampleProperty, updatedProperty)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		nil, nil, "", "",
 	)

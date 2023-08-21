@@ -1,5 +1,5 @@
-resource "zitadel_human_user" "granted_human_user" {
-  org_id             = zitadel_org.grantedorg.id
+resource "zitadel_human_user" "default" {
+  org_id             = data.zitadel_org.default.id
   user_name          = "human@localhost"
   first_name         = "firstname"
   last_name          = "lastname"

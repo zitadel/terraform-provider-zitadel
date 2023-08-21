@@ -8,7 +8,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing a domain of the organization.",
 		Schema: map[string]*schema.Schema{
-			nameVar: {
+			NameVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the domain",

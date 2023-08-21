@@ -45,8 +45,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	req := &admin.AddSMTPConfigRequest{
-		SenderAddress: d.Get(senderAddressVar).(string),
-		SenderName:    d.Get(senderNameVar).(string),
+		SenderAddress: d.Get(SenderAddressVar).(string),
+		SenderName:    d.Get(SenderNameVar).(string),
 		Host:          d.Get(hostVar).(string),
 		User:          d.Get(userVar).(string),
 		Tls:           d.Get(tlsVar).(bool),
@@ -75,10 +75,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(senderAddressVar, senderNameVar, tlsVar, hostVar, userVar) {
+	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar) {
 		_, err = client.UpdateSMTPConfig(ctx, &admin.UpdateSMTPConfigRequest{
-			SenderAddress: d.Get(senderAddressVar).(string),
-			SenderName:    d.Get(senderNameVar).(string),
+			SenderAddress: d.Get(SenderAddressVar).(string),
+			SenderName:    d.Get(SenderNameVar).(string),
 			Host:          d.Get(hostVar).(string),
 			Tls:           d.Get(tlsVar).(bool),
 			User:          d.Get(userVar).(string),
@@ -123,8 +123,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	set := map[string]interface{}{
-		senderAddressVar: resp.GetSmtpConfig().GetSenderAddress(),
-		senderNameVar:    resp.GetSmtpConfig().GetSenderName(),
+		SenderAddressVar: resp.GetSmtpConfig().GetSenderAddress(),
+		SenderNameVar:    resp.GetSmtpConfig().GetSenderName(),
 		tlsVar:           resp.GetSmtpConfig().GetTls(),
 		hostVar:          resp.GetSmtpConfig().GetHost(),
 		userVar:          resp.GetSmtpConfig().GetUser(),

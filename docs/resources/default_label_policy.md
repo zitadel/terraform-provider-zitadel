@@ -12,7 +12,7 @@ Resource representing the default label policy.
 ## Example Usage
 
 ```terraform
-resource "zitadel_default_label_policy" "label_policy" {
+resource "zitadel_default_label_policy" "default" {
   primary_color          = "#5469d4"
   hide_login_name_suffix = true
   warn_color             = "#cd3d56"

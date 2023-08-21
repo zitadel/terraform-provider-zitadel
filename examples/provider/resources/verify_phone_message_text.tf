@@ -1,5 +1,5 @@
-resource "zitadel_verify_phone_message_text" "verify_phone_en" {
-  org_id   = zitadel_org.org.id
+resource "zitadel_verify_phone_message_text" "default" {
+  org_id   = data.zitadel_org.default.id
   language = "en"
 
   title       = "title example"

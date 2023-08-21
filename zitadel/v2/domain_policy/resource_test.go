@@ -2,45 +2,37 @@ package domain_policy_test
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
 func TestAccDomainPolicy(t *testing.T) {
-	resourceName := "zitadel_domain_policy"
-	initialProperty := false
-	updatedProperty := true
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	otherFrame, err := frame.AnotherOrg("domain-policy-org-" + frame.UniqueResourcesID)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[bool](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_domain_policy")
+	otherFrame := frame.AnotherOrg(t, "domain-policy-org-"+frame.UniqueResourcesID)
+	resourceExample, resourceAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, domain_policy.UserLoginMustBeDomainVar, resourceAttributes).True()
+	test_utils.RunLifecyleTest(
 		t,
 		otherFrame.BaseTestFrame,
-		func(configProperty bool, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id = "%s"
-  user_login_must_be_domain                   = %t
-  validate_org_domains                        = false
-  smtp_sender_address_matches_instance_domain = false
-}`, resourceName, otherFrame.UniqueResourcesID, otherFrame.OrgID, configProperty)
+		[]string{otherFrame.AsOrgDefaultDependency},
+		func(property bool, secret string) string {
+			// only replace first bool for the smtp_sender_address_matches_instance_domain property
+			return strings.Replace(resourceExample, strconv.FormatBool(exampleProperty), strconv.FormatBool(property), 1)
 		},
-		initialProperty, updatedProperty,
+		exampleProperty, !exampleProperty,
 		"", "",
 		false,
 		checkRemoteProperty(*otherFrame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		checkRemoteProperty(*otherFrame)(initialProperty),
+		checkRemoteProperty(*otherFrame)(false),
 		nil, nil, "", "",
 	)
 }

@@ -12,8 +12,8 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource "zitadel_password_reset_message_text" "password_reset_en" {
-  org_id   = zitadel_org.org.id
+resource "zitadel_password_reset_message_text" "default" {
+  org_id   = data.zitadel_org.default.id
   language = "en"
 
   title       = "title example"

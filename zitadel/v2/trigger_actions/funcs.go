@@ -25,9 +25,9 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	flowType := d.Get(flowTypeVar).(string)
+	flowType := d.Get(FlowTypeVar).(string)
 	flowTypeValues := helper.EnumValueMap(FlowTypes())
-	triggerType := d.Get(triggerTypeVar).(string)
+	triggerType := d.Get(TriggerTypeVar).(string)
 	triggerTypeValues := helper.EnumValueMap(TriggerTypes())
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
 		FlowType:    strconv.Itoa(int(flowTypeValues[flowType])),
@@ -50,9 +50,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	flowType := d.Get(flowTypeVar).(string)
+	flowType := d.Get(FlowTypeVar).(string)
 	flowTypeValues := helper.EnumValueMap(FlowTypes())
-	triggerType := d.Get(triggerTypeVar).(string)
+	triggerType := d.Get(TriggerTypeVar).(string)
 	triggerTypeValues := helper.EnumValueMap(TriggerTypes())
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
 		FlowType:    strconv.Itoa(int(flowTypeValues[flowType])),
@@ -76,9 +76,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	flowType := d.Get(flowTypeVar).(string)
+	flowType := d.Get(FlowTypeVar).(string)
 	flowTypeValues := helper.EnumValueMap(FlowTypes())
-	triggerType := d.Get(triggerTypeVar).(string)
+	triggerType := d.Get(TriggerTypeVar).(string)
 	triggerTypeValues := helper.EnumValueMap(TriggerTypes())
 	actionIDs := helper.GetOkSetToStringSlice(d, actionsVar)
 	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
@@ -100,8 +100,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 	orgID := d.Get(orgIDVar).(string)
-	flowType := d.Get(flowTypeVar).(string)
-	triggerType := d.Get(triggerTypeVar).(string)
+	flowType := d.Get(FlowTypeVar).(string)
+	triggerType := d.Get(TriggerTypeVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)

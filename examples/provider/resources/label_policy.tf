@@ -1,5 +1,5 @@
-resource "zitadel_label_policy" "label_policy" {
-  org_id                 = zitadel_org.org.id
+resource "zitadel_label_policy" "default" {
+  org_id                 = data.zitadel_org.default.id
   primary_color          = "#5469d4"
   hide_login_name_suffix = true
   warn_color             = "#cd3d56"

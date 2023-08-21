@@ -2,6 +2,7 @@ package smtp_config_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -15,35 +16,23 @@ import (
 )
 
 func TestAccSMTPConfig(t *testing.T) {
-	resourceName := "zitadel_smtp_config"
-	initialProperty := "initialProperty"
-	updatedProperty := "updatedProperty"
-	initialSecret := "initialSecret"
-	updatedSecret := "updatedSecret"
-	frame, err := test_utils.NewInstanceTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	_, err = frame.RemoveSMTPConfig(frame, &admin.RemoveSMTPConfigRequest{})
-	if err != nil && status.Code(err) != codes.NotFound {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_smtp_config")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	senderAddressProperty := test_utils.AttributeValue(t, smtp_config.SenderAddressVar, exampleAttributes).AsString()
+	resourceExample = strings.Replace(resourceExample, senderAddressProperty, fmt.Sprintf("zitadel@%s", frame.InstanceDomain), 1)
+	exampleProperty := test_utils.AttributeValue(t, smtp_config.SenderNameVar, exampleAttributes).AsString()
+	exampleSecret := test_utils.AttributeValue(t, smtp_config.PasswordVar, exampleAttributes).AsString()
+	// TODO: Does not work yet, because the smtp config is not deleted (API bug?)
+	if _, err := frame.RemoveSMTPConfig(frame, &admin.RemoveSMTPConfigRequest{}); err != nil && status.Code(err) != codes.NotFound {
 		t.Fatalf("failed to remove smtp config: %v", err)
 	}
-	test_utils.RunLifecyleTest[string](
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, secretProperty string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  sender_address = "address"
-  sender_name    = "%s"
-  tls            = true
-  host           = "localhost:25"
-  user           = "user"
-  password       = "%s"
-}`, resourceName, frame.UniqueResourcesID, configProperty, secretProperty)
-		},
-		initialProperty, updatedProperty,
-		initialSecret, updatedSecret,
+		nil,
+		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
+		exampleProperty, "updatedProperty",
+		exampleSecret, "updatedSecret",
 		false,
 		checkRemoteProperty(*frame),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,

@@ -10,37 +10,21 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/project"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_role"
 )
 
 func TestAccProjectRole(t *testing.T) {
-	resourceName := "zitadel_project_role"
-	initialProperty := "initialProperty"
-	updatedProperty := "updatedProperty"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	proj, err := frame.AddProject(frame, &management.AddProjectRequest{
-		Name: frame.UniqueResourcesID,
-	})
-	if err != nil {
-		t.Fatalf("failed to create project: %v", err)
-	}
-	projectID := proj.GetId()
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_role")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, project_role.KeyVar, exampleAttributes).AsString()
+	projectDep, projectID := project_test_dep.Create(t, frame)
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id         = "%s"
-  project_id     = "%s"
-  role_key     = "%s"
-  display_name = "display_name2"
-  group        = "role_group"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, projectID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency, projectDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "updatedProperty",
 		"", "",
 		true,
 		checkRemoteProperty(*frame, projectID),

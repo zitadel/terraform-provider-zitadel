@@ -9,31 +9,20 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project"
 )
 
 func TestAccProject(t *testing.T) {
-	resourceName := "zitadel_project"
-	initialProperty := "initialproperty"
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_project")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, project.NameVar, exampleAttributes).AsString()
 	updatedProperty := "updatedproperty"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id          		   = "%s"
-  name                     = "%s"
-  project_role_assertion   = true
-  project_role_check       = true
-  has_project_check        = true
-  private_labeling_setting = "PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY"
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, updatedProperty,
 		"", "",
 		false,
 		checkRemoteProperty(frame),

@@ -9,53 +9,26 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org/org_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_grant"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_role/project_role_test_dep"
 )
 
 func TestAccProjectGrant(t *testing.T) {
-	resourceName := "zitadel_project_grant"
-	initialProperty := "initialProperty"
-	updatedProperty := "updatedProperty"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	project, err := frame.AddProject(frame, &management.AddProjectRequest{
-		Name: frame.UniqueResourcesID,
-	})
-	if err != nil {
-		t.Fatalf("failed to create project: %v", err)
-	}
-	projectID := project.GetId()
-	for _, role := range []string{initialProperty, updatedProperty} {
-		_, err = frame.AddProjectRole(frame, &management.AddProjectRoleRequest{
-			ProjectId:   projectID,
-			RoleKey:     role,
-			DisplayName: role,
-		})
-		if err != nil {
-			t.Fatalf("failed to create project role %s: %v", role, err)
-		}
-	}
-	org, err := frame.AddOrg(frame, &management.AddOrgRequest{
-		Name: frame.UniqueResourcesID,
-	})
-	if err != nil {
-		t.Fatalf("failed to create org: %v", err)
-	}
-	grantedOrgID := org.GetId()
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_grant")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, project_grant.RoleKeysVar, exampleAttributes).AsValueSlice()[0].AsString()
+	updatedProperty := "updatedproperty"
+	projectDep, projectID := project_test_dep.Create(t, frame)
+	project_role_test_dep.Create(t, frame, projectID, exampleProperty, updatedProperty)
+	grantedOrgDep, _, _ := org_test_dep.Create(t, frame, "granted_org")
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-  org_id         = "%s"
-  project_id     = "%s"
-  granted_org_id = "%s"
-  role_keys      = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, projectID, grantedOrgID, configProperty)
-		},
-		initialProperty, updatedProperty,
+		[]string{frame.AsOrgDefaultDependency, projectDep, grantedOrgDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, updatedProperty,
 		"", "",
 		false,
 		checkRemoteProperty(*frame, projectID),

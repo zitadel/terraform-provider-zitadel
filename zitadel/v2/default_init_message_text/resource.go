@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	languageVar = "language"
+	LanguageVar = "language"
 )
 
 var (
@@ -208,7 +208,7 @@ func (r *defaultInitMessageTextResource) Delete(ctx context.Context, req resourc
 func setID(obj types.Object, language string) {
 	attrs := obj.Attributes()
 	attrs["id"] = types.StringValue(language)
-	attrs[languageVar] = types.StringValue(language)
+	attrs[LanguageVar] = types.StringValue(language)
 }
 
 func getID(ctx context.Context, obj types.Object) string {
@@ -217,7 +217,7 @@ func getID(ctx context.Context, obj types.Object) string {
 
 func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) string {
 	var language string
-	diag.Append(plan.GetAttribute(ctx, path.Root(languageVar), &language)...)
+	diag.Append(plan.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
 	if diag.HasError() {
 		return ""
 	}
@@ -226,7 +226,7 @@ func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) s
 
 func getStateAttrs(ctx context.Context, state tfsdk.State, diag diag.Diagnostics) string {
 	var language string
-	diag.Append(state.GetAttribute(ctx, path.Root(languageVar), &language)...)
+	diag.Append(state.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
 	if diag.HasError() {
 		return ""
 	}

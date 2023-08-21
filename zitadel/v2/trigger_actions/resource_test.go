@@ -4,55 +4,34 @@ import (
 	"fmt"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/action/action_test_dep"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/trigger_actions"
 )
 
 func TestAccTriggerActions(t *testing.T) {
-	resourceName := "zitadel_trigger_actions"
-	flowType := "FLOW_TYPE_CUSTOMISE_TOKEN"
-	initialTriggerType := "TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION"
-	updatedTriggerType := "TRIGGER_TYPE_PRE_USERINFO_CREATION"
-	frame, err := test_utils.NewOrgTestFrame(resourceName)
-	if err != nil {
-		t.Fatalf("setting up test context failed: %v", err)
-	}
-	// Always creates a new action
-	action, err := frame.CreateAction(frame, &management.CreateActionRequest{
-		Name:          frame.UniqueResourcesID,
-		Script:        "not a script",
-		Timeout:       durationpb.New(10 * time.Second),
-		AllowedToFail: true,
-	})
-	if err != nil {
-		t.Fatalf("failed to create action: %v", err)
-	}
-	test_utils.RunLifecyleTest[string](
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_trigger_actions")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty := test_utils.AttributeValue(t, trigger_actions.TriggerTypeVar, exampleAttributes).AsString()
+	flowType := test_utils.AttributeValue(t, trigger_actions.FlowTypeVar, exampleAttributes).AsString()
+	actionDep, _ := action_test_dep.Create(t, frame)
+	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		func(configProperty, _ string) string {
-			return fmt.Sprintf(`
-resource "%s" "%s" {
-	org_id              = "%s"
-flow_type = "%s"
-  trigger_type = "%s"
-  action_ids   = ["%s"]
-}`, resourceName, frame.UniqueResourcesID, frame.OrgID, flowType, configProperty, action.GetId())
-		},
-		initialTriggerType, updatedTriggerType,
+		[]string{frame.AsOrgDefaultDependency, actionDep},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, "TRIGGER_TYPE_PRE_USERINFO_CREATION",
 		"", "",
 		false,
 		checkRemoteProperty(*frame, flowType),
 		test_utils.ZITADEL_GENERATED_ID_REGEX,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), initialTriggerType),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), exampleProperty),
 		nil, nil, "", "",
 	)
 }

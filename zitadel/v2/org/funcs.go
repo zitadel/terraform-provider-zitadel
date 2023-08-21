@@ -45,7 +45,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	resp, err := client.AddOrg(ctx, &management.AddOrgRequest{
-		Name: d.Get(nameVar).(string),
+		Name: d.Get(NameVar).(string),
 	})
 	if err != nil {
 		return diag.FromErr(err)
@@ -66,7 +66,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.UpdateOrg(ctx, &management.UpdateOrgRequest{
-		Name: d.Get(nameVar).(string),
+		Name: d.Get(NameVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update org: %v", err)
@@ -84,7 +84,7 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	orgID := helper.GetID(d, orgIDVar)
+	orgID := helper.GetID(d, OrgIDVar)
 	resp, err := client.GetOrgByID(ctx, &admin.GetOrgByIDRequest{
 		Id: orgID,
 	})
@@ -93,7 +93,7 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 	}
 	remoteOrg := resp.GetOrg()
 	d.SetId(remoteOrg.Id)
-	if err := d.Set(nameVar, remoteOrg.Name); err != nil {
+	if err := d.Set(NameVar, remoteOrg.Name); err != nil {
 		return diag.Errorf("error while setting org name %s: %v", remoteOrg.Name, err)
 	}
 	if err := d.Set(primaryDomainVar, remoteOrg.PrimaryDomain); err != nil {
@@ -108,9 +108,9 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started list")
-	orgName := d.Get(nameVar).(string)
+	orgName := d.Get(NameVar).(string)
 	orgNameMethod := d.Get(nameMethodVar).(string)
-	orgDomain := d.Get(domainVar).(string)
+	orgDomain := d.Get(DomainVar).(string)
 	orgDomainMethod := d.Get(domainMethodVar).(string)
 	orgState := d.Get(stateVar).(string)
 	clientinfo, ok := m.(*helper.ClientInfo)

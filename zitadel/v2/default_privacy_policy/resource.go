@@ -18,7 +18,7 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "",
 			},
-			helpLinkVar: {
+			HelpLinkVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "",

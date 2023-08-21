@@ -12,10 +12,10 @@ Resource representing the project roles, which can be given as authorizations to
 ## Example Usage
 
 ```terraform
-resource "zitadel_project_role" "project_role" {
-  org_id       = zitadel_org.org.id
-  project_id   = zitadel_project.project.id
-  role_key     = "key"
+resource "zitadel_project_role" "default" {
+  org_id       = data.zitadel_org.default.id
+  project_id   = data.zitadel_project.default.id
+  role_key     = "super-user"
   display_name = "display_name2"
   group        = "role_group"
 }
