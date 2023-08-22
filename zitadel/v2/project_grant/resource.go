@@ -20,7 +20,7 @@ func GetResource() *schema.Resource {
 				Description: "ID of the organization granted the project",
 				ForceNew:    true,
 			},
-			roleKeysVar: {
+			RoleKeysVar: {
 				Type: schema.TypeSet,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,

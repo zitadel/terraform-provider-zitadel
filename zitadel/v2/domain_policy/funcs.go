@@ -51,7 +51,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.UpdateCustomDomainPolicy(ctx, &admin.UpdateCustomDomainPolicyRequest{
 		OrgId:                                  org,
-		UserLoginMustBeDomain:                  d.Get(userLoginMustBeDomainVar).(bool),
+		UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
 		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
 		SmtpSenderAddressMatchesInstanceDomain: d.Get(smtpSenderVar).(bool),
 	})
@@ -78,7 +78,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.AddCustomDomainPolicy(ctx, &admin.AddCustomDomainPolicyRequest{
 		OrgId:                                  org,
-		UserLoginMustBeDomain:                  d.Get(userLoginMustBeDomainVar).(bool),
+		UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
 		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
 		SmtpSenderAddressMatchesInstanceDomain: d.Get(smtpSenderVar).(bool),
 	})
@@ -119,7 +119,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	set := map[string]interface{}{
 		orgIDVar:                 policy.GetDetails().GetResourceOwner(),
-		userLoginMustBeDomainVar: policy.GetUserLoginMustBeDomain(),
+		UserLoginMustBeDomainVar: policy.GetUserLoginMustBeDomain(),
 		validateOrgDomainVar:     policy.GetValidateOrgDomains(),
 		smtpSenderVar:            policy.GetSmtpSenderAddressMatchesInstanceDomain(),
 	}

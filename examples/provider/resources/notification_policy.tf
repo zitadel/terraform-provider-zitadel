@@ -1,4 +1,4 @@
-resource zitadel_notification_policy notification_policy {
-  org_id          = zitadel_org.org.id
+resource "zitadel_notification_policy" "default" {
+  org_id          = data.zitadel_org.default.id
   password_change = false
 }

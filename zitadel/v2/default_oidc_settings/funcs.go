@@ -35,7 +35,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	refreshTokenExp, err := time.ParseDuration(d.Get(refreshTokenExpirationVar).(string))
+	refreshTokenExp, err := time.ParseDuration(d.Get(RefreshTokenExpirationVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -90,7 +90,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		accessTokenLifetimeVar:        resp.GetSettings().GetAccessTokenLifetime().AsDuration().String(),
 		idTokenLifetimeVar:            resp.GetSettings().GetIdTokenLifetime().AsDuration().String(),
 		refreshTokenIdleExpirationVar: resp.GetSettings().GetRefreshTokenIdleExpiration().AsDuration().String(),
-		refreshTokenExpirationVar:     resp.GetSettings().GetRefreshTokenExpiration().AsDuration().String(),
+		RefreshTokenExpirationVar:     resp.GetSettings().GetRefreshTokenExpiration().AsDuration().String(),
 	}
 
 	for k, v := range set {

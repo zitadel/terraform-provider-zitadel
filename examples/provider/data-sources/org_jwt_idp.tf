@@ -1,8 +1,8 @@
-data zitadel_org_jwt_idp org_jwt_idp {
-  org_id = data.zitadel_org.org.id
-  idp_id = "177073612581240835"
+data "zitadel_org_jwt_idp" "default" {
+  org_id = data.zitadel_org.default.id
+  idp_id = "123456789012345678"
 }
 
-output org_jwt_idp {
-  value = data.zitadel_org_jwt_idp.org_jwt_idp
+output "org_idp_org_jwt_idp" {
+  value = data.zitadel_org_jwt_idp.default
 }

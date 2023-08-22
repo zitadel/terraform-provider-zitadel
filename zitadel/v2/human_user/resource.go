@@ -31,7 +31,7 @@ func GetResource() *schema.Resource {
 					return EnumValueValidation(userStateVar, value.(string), user.UserState_value)
 				},*/
 			},
-			userNameVar: {
+			UserNameVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Username",
@@ -67,7 +67,7 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Nick name of the user",
 			},
-			displayNameVar: {
+			DisplayNameVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Display name of the user",
@@ -121,13 +121,13 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		UpdateContext: update,
 		CustomizeDiff: customdiff.All(
-			customdiff.IfValue(displayNameVar, func(ctx context.Context, value, meta interface{}) bool {
+			customdiff.IfValue(DisplayNameVar, func(ctx context.Context, value, meta interface{}) bool {
 				if value == "" {
 					return true
 				}
 				return false
 			}, func(ctx context.Context, diff *schema.ResourceDiff, meta interface{}) error {
-				return diff.SetNew(displayNameVar, defaultDisplayName(diff.Get(firstNameVar).(string), diff.Get(lastNameVar).(string)))
+				return diff.SetNew(DisplayNameVar, defaultDisplayName(diff.Get(firstNameVar).(string), diff.Get(lastNameVar).(string)))
 			}),
 			customdiff.IfValue(genderVar, func(ctx context.Context, value, meta interface{}) bool {
 				if value == "" {

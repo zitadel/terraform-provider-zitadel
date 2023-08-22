@@ -1,4 +1,4 @@
-resource zitadel_instance_member instance_member {
-  user_id = zitadel_human_user.human_user.id
+resource "zitadel_instance_member" "default" {
+  user_id = data.zitadel_human_user.default.id
   roles   = ["IAM_OWNER"]
 }

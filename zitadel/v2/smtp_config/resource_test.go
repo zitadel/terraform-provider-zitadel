@@ -1,0 +1,58 @@
+package smtp_config_test
+
+import (
+	"fmt"
+	"strings"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/smtp_config"
+)
+
+func TestAccSMTPConfig(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_smtp_config")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	senderAddressProperty := test_utils.AttributeValue(t, smtp_config.SenderAddressVar, exampleAttributes).AsString()
+	resourceExample = strings.Replace(resourceExample, senderAddressProperty, fmt.Sprintf("zitadel@%s", frame.InstanceDomain), 1)
+	exampleProperty := test_utils.AttributeValue(t, smtp_config.SenderNameVar, exampleAttributes).AsString()
+	exampleSecret := test_utils.AttributeValue(t, smtp_config.PasswordVar, exampleAttributes).AsString()
+	// TODO: Does not work yet, because the smtp config is not deleted (API bug?)
+	if _, err := frame.RemoveSMTPConfig(frame, &admin.RemoveSMTPConfigRequest{}); err != nil && status.Code(err) != codes.NotFound {
+		t.Fatalf("failed to remove smtp config: %v", err)
+	}
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		nil,
+		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
+		exampleProperty, "updatedProperty",
+		exampleSecret, "updatedSecret",
+		false,
+		checkRemoteProperty(*frame),
+		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		test_utils.CheckNothing,
+		nil, nil, "", smtp_config.PasswordVar,
+	)
+}
+
+func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
+		return func(state *terraform.State) error {
+			resp, err := frame.GetSMTPConfig(frame, &admin.GetSMTPConfigRequest{})
+			if err != nil {
+				return fmt.Errorf("getting smtp config failed: %w", err)
+			}
+			actual := resp.GetSmtpConfig().GetSenderName()
+			if actual != expect {
+				return fmt.Errorf("expected %s, but got %s", expect, actual)
+			}
+			return nil
+		}
+	}
+}

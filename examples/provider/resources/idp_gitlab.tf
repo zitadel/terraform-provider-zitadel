@@ -1,4 +1,4 @@
-resource "zitadel_idp_gitlab" "gitlab" {
+resource "zitadel_idp_gitlab" "default" {
   name                = "GitLab"
   client_id           = "15765e..."
   client_secret       = "*****abcxyz"

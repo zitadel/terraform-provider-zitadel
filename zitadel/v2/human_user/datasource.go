@@ -8,7 +8,7 @@ func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
-			userIDVar: {
+			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of this resource.",
@@ -23,7 +23,7 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "State of the user",
 			},
-			userNameVar: {
+			UserNameVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Username",
@@ -56,7 +56,7 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Nick name of the user",
 			},
-			displayNameVar: {
+			DisplayNameVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Display name of the user",

@@ -13,13 +13,13 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "SID used to communicate with Twilio.",
 			},
-			tokenVar: {
+			TokenVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Token used to communicate with Twilio.",
 				Sensitive:   true,
 			},
-			senderNumberVar: {
+			SenderNumberVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Sender number which is used to send the SMS.",

@@ -14,8 +14,8 @@ Resource representing a human user situated under an organization, which then ca
 ## Example Usage
 
 ```terraform
-resource zitadel_human_user human_user {
-  org_id             = zitadel_org.org.id
+resource "zitadel_human_user" "default" {
+  org_id             = data.zitadel_org.default.id
   user_name          = "humanfull@localhost.com"
   first_name         = "firstname"
   last_name          = "lastname"

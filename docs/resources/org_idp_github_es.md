@@ -12,8 +12,8 @@ Resource representing a GitHub Enterprise IdP on the organization.
 ## Example Usage
 
 ```terraform
-resource "zitadel_org_idp_github_es" "github_es" {
-  org_id                 = zitadel_org.org.id
+resource "zitadel_org_idp_github_es" "default" {
+  org_id                 = data.zitadel_org.default.id
   name                   = "GitHub Enterprise Server"
   client_id              = "86a165..."
   client_secret          = "*****afdbac18"

@@ -1,5 +1,5 @@
-resource "zitadel_org_idp_gitlab" "gitlab" {
-  org_id              = zitadel_org.org.id
+resource "zitadel_org_idp_gitlab" "default" {
+  org_id              = data.zitadel_org.default.id
   name                = "GitLab"
   client_id           = "15765e..."
   client_secret       = "*****abcxyz"

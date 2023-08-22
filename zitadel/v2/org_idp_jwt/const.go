@@ -7,7 +7,7 @@ const (
 	stylingTypeVar  = "styling_type"
 	issuerVar       = "issuer"
 	autoRegisterVar = "auto_register"
-	jwtEndpointVar  = "jwt_endpoint"
+	JwtEndpointVar  = "jwt_endpoint"
 	keysEndpointVar = "keys_endpoint"
 	headerNameVar   = "header_name"
 )

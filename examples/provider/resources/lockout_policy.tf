@@ -1,4 +1,4 @@
-resource zitadel_lockout_policy lockout_policy {
-  org_id                = zitadel_org.org.id
+resource "zitadel_lockout_policy" "default" {
+  org_id                = data.zitadel_org.default.id
   max_password_attempts = "5"
 }

@@ -14,7 +14,7 @@ const (
 	secondFactorCheckLifetimeVar  = "second_factor_check_lifetime"
 	multiFactorCheckLifetimeVar   = "multi_factor_check_lifetime"
 	ignoreUnknownUsernamesVar     = "ignore_unknown_usernames"
-	defaultRedirectURIVar         = "default_redirect_uri"
+	DefaultRedirectURIVar         = "default_redirect_uri"
 	secondFactorsVar              = "second_factors"
 	multiFactorsVar               = "multi_factors"
 	idpsVar                       = "idps"

@@ -11,9 +11,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	"google.golang.org/protobuf/encoding/protojson"
-
 	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/zitadel/terraform-provider-zitadel/gen/github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
@@ -21,7 +20,7 @@ import (
 
 const (
 	orgIDVar    = "org_id"
-	languageVar = "language"
+	LanguageVar = "language"
 )
 
 var (
@@ -210,7 +209,7 @@ func setID(obj types.Object, orgID string, language string) {
 	attrs := obj.Attributes()
 	attrs["id"] = types.StringValue(orgID + "_" + language)
 	attrs[orgIDVar] = types.StringValue(orgID)
-	attrs[languageVar] = types.StringValue(language)
+	attrs[LanguageVar] = types.StringValue(language)
 }
 
 func getID(ctx context.Context, obj types.Object) (string, string) {
@@ -219,7 +218,7 @@ func getID(ctx context.Context, obj types.Object) (string, string) {
 	if len(parts) == 2 {
 		return parts[0], parts[1]
 	}
-	return helper.GetStringFromAttr(ctx, obj.Attributes(), orgIDVar), helper.GetStringFromAttr(ctx, obj.Attributes(), languageVar)
+	return helper.GetStringFromAttr(ctx, obj.Attributes(), orgIDVar), helper.GetStringFromAttr(ctx, obj.Attributes(), LanguageVar)
 }
 
 func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) (string, string) {
@@ -229,7 +228,7 @@ func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) (
 		return "", ""
 	}
 	var language string
-	diag.Append(plan.GetAttribute(ctx, path.Root(languageVar), &language)...)
+	diag.Append(plan.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
 	if diag.HasError() {
 		return "", ""
 	}
@@ -244,7 +243,7 @@ func getStateAttrs(ctx context.Context, state tfsdk.State, diag diag.Diagnostics
 		return "", ""
 	}
 	var language string
-	diag.Append(state.GetAttribute(ctx, path.Root(languageVar), &language)...)
+	diag.Append(state.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
 	if diag.HasError() {
 		return "", ""
 	}

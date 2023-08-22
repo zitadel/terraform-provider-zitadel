@@ -28,7 +28,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	_, err = client.RemoveProjectGrantMember(ctx, &management.RemoveProjectGrantMemberRequest{
 		UserId:    d.Get(userIDVar).(string),
 		ProjectId: d.Get(projectIDVar).(string),
-		GrantId:   d.Get(grantIDVar).(string),
+		GrantId:   d.Get(GrantIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete projectmember: %v", err)
@@ -51,9 +51,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.UpdateProjectGrantMember(ctx, &management.UpdateProjectGrantMemberRequest{
 		UserId:    d.Get(userIDVar).(string),
-		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
+		Roles:     helper.GetOkSetToStringSlice(d, RolesVar),
 		ProjectId: d.Get(projectIDVar).(string),
-		GrantId:   d.Get(grantIDVar).(string),
+		GrantId:   d.Get(GrantIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update projectmember: %v", err)
@@ -77,12 +77,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	userID := d.Get(userIDVar).(string)
 	projectID := d.Get(projectIDVar).(string)
-	grantID := d.Get(grantIDVar).(string)
+	grantID := d.Get(GrantIDVar).(string)
 	_, err = client.AddProjectGrantMember(ctx, &management.AddProjectGrantMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 		GrantId:   grantID,
-		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
+		Roles:     helper.GetOkSetToStringSlice(d, RolesVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create projectgrantmember: %v", err)
@@ -105,7 +105,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	projectID := d.Get(projectIDVar).(string)
-	grantID := d.Get(grantIDVar).(string)
+	grantID := d.Get(GrantIDVar).(string)
 	userID := d.Get(userIDVar).(string)
 	resp, err := client.ListProjectGrantMembers(ctx, &management.ListProjectGrantMembersRequest{
 		ProjectId: projectID,
@@ -130,10 +130,10 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		memberRes := resp.Result[0]
 		set := map[string]interface{}{
 			userIDVar:    userID,
-			orgIDVar:     memberRes.GetDetails().GetResourceOwner(),
+			orgIDVar:     org,
 			projectIDVar: projectID,
-			rolesVar:     memberRes.GetRoles(),
-			grantIDVar:   grantID,
+			RolesVar:     memberRes.GetRoles(),
+			GrantIDVar:   grantID,
 		}
 		for k, v := range set {
 			if err := d.Set(k, v); err != nil {

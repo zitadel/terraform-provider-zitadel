@@ -1,4 +1,4 @@
-resource zitadel_default_login_texts login_texts_en {
+resource "zitadel_default_login_texts" "default" {
   language = "en"
 
   email_verification_done_text = {

@@ -12,9 +12,9 @@ Resource representing an API application belonging to a project, with all config
 ## Example Usage
 
 ```terraform
-resource zitadel_application_api application_api {
-  org_id           = zitadel_org.org.id
-  project_id       = zitadel_project.project.id
+resource "zitadel_application_api" "default" {
+  org_id           = data.zitadel_org.default.id
+  project_id       = data.zitadel_project.default.id
   name             = "applicationapi"
   auth_method_type = "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
 }

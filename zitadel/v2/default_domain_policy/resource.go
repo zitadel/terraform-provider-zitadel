@@ -8,7 +8,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the default domain policy.",
 		Schema: map[string]*schema.Schema{
-			userLoginMustBeDomainVar: {
+			UserLoginMustBeDomainVar: {
 				Type:        schema.TypeBool,
 				Required:    true,
 				Description: "User login must be domain",

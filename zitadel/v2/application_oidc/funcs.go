@@ -52,18 +52,21 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	projectID := d.Get(projectIDVar).(string)
 
-	if d.HasChange(nameVar) {
+	if d.HasChange(NameVar) {
 		_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
 			ProjectId: projectID,
 			AppId:     d.Id(),
-			Name:      d.Get(nameVar).(string),
+			Name:      d.Get(NameVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update application: %v", err)
 		}
 	}
 
-	if d.HasChanges(redirectURIsVar,
+	if d.HasChanges(
+		redirectURIsVar,
+		responseTypesVar,
+		grantTypesVar,
 		appTypeVar,
 		authMethodTypeVar,
 		postLogoutRedirectURIsVar,
@@ -141,7 +144,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	resp, err := client.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                d.Get(projectIDVar).(string),
-		Name:                     d.Get(nameVar).(string),
+		Name:                     d.Get(NameVar).(string),
 		RedirectUris:             interfaceToStringSlice(d.Get(redirectURIsVar)),
 		ResponseTypes:            respTypes,
 		GrantTypes:               grantTypes,
@@ -214,7 +217,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	set := map[string]interface{}{
 		orgIDVar:                    oidcApp.GetDetails().GetResourceOwner(),
-		nameVar:                     oidcApp.GetName(),
+		NameVar:                     oidcApp.GetName(),
 		redirectURIsVar:             oidc.GetRedirectUris(),
 		responseTypesVar:            responseTypes,
 		grantTypesVar:               grantTypes,

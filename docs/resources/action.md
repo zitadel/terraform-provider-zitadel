@@ -12,8 +12,8 @@ Resource representing an action belonging to an organization.
 ## Example Usage
 
 ```terraform
-resource zitadel_action action {
-  org_id          = zitadel_org.org.id
+resource "zitadel_action" "default" {
+  org_id          = data.zitadel_org.default.id
   name            = "actionname"
   script          = "testscript"
   timeout         = "10s"

@@ -12,11 +12,11 @@ Resource representing triggers, when actions get started
 ## Example Usage
 
 ```terraform
-resource zitadel_trigger_actions trigger_actions {
-  org_id       = zitadel_org.org.id
-  flow_type    = "FLOW_TYPE_EXTERNAL_AUTHENTICATION"
-  trigger_type = "TRIGGER_TYPE_POST_AUTHENTICATION"
-  action_ids   = [zitadel_action.action.id]
+resource "zitadel_trigger_actions" "default" {
+  org_id       = data.zitadel_org.default.id
+  flow_type    = "FLOW_TYPE_CUSTOMISE_TOKEN"
+  trigger_type = "TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION"
+  action_ids   = [data.zitadel_action.default.id]
 }
 ```
 

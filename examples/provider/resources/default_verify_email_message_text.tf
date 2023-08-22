@@ -1,4 +1,4 @@
-resource zitadel_default_verify_email_message_text verify_email_en {
+resource "zitadel_default_verify_email_message_text" "default" {
   language = "en"
 
   title       = "title example"

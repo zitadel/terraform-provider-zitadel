@@ -30,9 +30,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(userLoginMustBeDomainVar, validateOrgDomainVar, smtpSenderVar) {
+	if d.HasChanges(UserLoginMustBeDomainVar, validateOrgDomainVar, smtpSenderVar) {
 		resp, err := client.UpdateDomainPolicy(ctx, &admin.UpdateDomainPolicyRequest{
-			UserLoginMustBeDomain:                  d.Get(userLoginMustBeDomainVar).(bool),
+			UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
 			ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
 			SmtpSenderAddressMatchesInstanceDomain: d.Get(smtpSenderVar).(bool),
 		})
@@ -77,8 +77,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	policy := resp.Policy
 	set := map[string]interface{}{
-		userLoginMustBeDomainVar: policy.GetUserLoginMustBeDomain(),
+		UserLoginMustBeDomainVar: policy.GetUserLoginMustBeDomain(),
 		validateOrgDomainVar:     policy.GetValidateOrgDomains(),
+		smtpSenderVar:            policy.GetSmtpSenderAddressMatchesInstanceDomain(),
 	}
 
 	for k, v := range set {

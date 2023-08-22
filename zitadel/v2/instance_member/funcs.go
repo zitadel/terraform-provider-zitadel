@@ -50,7 +50,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.UpdateIAMMember(ctx, &admin.UpdateIAMMemberRequest{
 		UserId: d.Get(userIDVar).(string),
-		Roles:  helper.GetOkSetToStringSlice(d, rolesVar),
+		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update instance member: %v", err)
@@ -74,7 +74,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	userID := d.Get(userIDVar).(string)
 	resp, err := client.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
 		UserId: userID,
-		Roles:  helper.GetOkSetToStringSlice(d, rolesVar),
+		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create instance member: %v", err)
@@ -118,7 +118,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		member := resp.Result[0]
 		set := map[string]interface{}{
 			userIDVar: member.GetUserId(),
-			rolesVar:  member.GetRoles(),
+			RolesVar:  member.GetRoles(),
 		}
 		for k, v := range set {
 			if err := d.Set(k, v); err != nil {

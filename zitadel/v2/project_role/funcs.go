@@ -28,7 +28,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.RemoveProjectRole(ctx, &management.RemoveProjectRoleRequest{
 		ProjectId: d.Get(projectIDVar).(string),
-		RoleKey:   d.Get(keyVar).(string),
+		RoleKey:   d.Get(KeyVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete project role: %v", err)
@@ -51,7 +51,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.UpdateProjectRole(ctx, &management.UpdateProjectRoleRequest{
 		ProjectId:   d.Get(projectIDVar).(string),
-		RoleKey:     d.Get(keyVar).(string),
+		RoleKey:     d.Get(KeyVar).(string),
 		DisplayName: d.Get(displayNameVar).(string),
 		Group:       d.Get(groupVar).(string),
 	})
@@ -77,7 +77,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	projectID := d.Get(projectIDVar).(string)
-	roleKey := d.Get(keyVar).(string)
+	roleKey := d.Get(KeyVar).(string)
 	_, err = client.AddProjectRole(ctx, &management.AddProjectRoleRequest{
 		ProjectId:   projectID,
 		RoleKey:     roleKey,
@@ -112,7 +112,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		Queries: []*project2.RoleQuery{
 			{Query: &project2.RoleQuery_KeyQuery{
 				KeyQuery: &project2.RoleKeyQuery{
-					Key:    d.Get(keyVar).(string),
+					Key:    d.Get(KeyVar).(string),
 					Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
 				},
 			}},
@@ -129,7 +129,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		set := map[string]interface{}{
 			projectIDVar:   projectID,
 			orgIDVar:       orgID,
-			keyVar:         roleKey,
+			KeyVar:         roleKey,
 			displayNameVar: projectRole.GetDisplayName(),
 			groupVar:       projectRole.GetGroup(),
 		}

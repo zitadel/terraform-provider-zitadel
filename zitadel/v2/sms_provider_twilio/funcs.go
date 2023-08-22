@@ -46,8 +46,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	resp, err := client.AddSMSProviderTwilio(ctx, &admin.AddSMSProviderTwilioRequest{
 		Sid:          d.Get(sidVar).(string),
-		Token:        d.Get(tokenVar).(string),
-		SenderNumber: d.Get(senderNumberVar).(string),
+		Token:        d.Get(TokenVar).(string),
+		SenderNumber: d.Get(SenderNumberVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create sms provider twilio: %v", err)
@@ -70,21 +70,21 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(senderNumberVar, sidVar) {
+	if d.HasChanges(SenderNumberVar, sidVar) {
 		_, err = client.UpdateSMSProviderTwilio(ctx, &admin.UpdateSMSProviderTwilioRequest{
 			Id:           d.Id(),
 			Sid:          d.Get(sidVar).(string),
-			SenderNumber: d.Get(senderNumberVar).(string),
+			SenderNumber: d.Get(SenderNumberVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update sms provider twilio: %v", err)
 		}
 	}
 
-	if d.HasChange(tokenVar) {
+	if d.HasChange(TokenVar) {
 		_, err = client.UpdateSMSProviderTwilioToken(ctx, &admin.UpdateSMSProviderTwilioTokenRequest{
 			Id:    d.Id(),
-			Token: d.Get(tokenVar).(string),
+			Token: d.Get(TokenVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update sms provider twilio: %v", err)
@@ -120,10 +120,10 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	set := map[string]interface{}{
 		sidVar:          resp.GetConfig().GetTwilio().GetSid(),
-		senderNumberVar: resp.GetConfig().GetTwilio().GetSenderNumber(),
+		SenderNumberVar: resp.GetConfig().GetTwilio().GetSenderNumber(),
 	}
-	if token, ok := d.GetOk(tokenVar); ok {
-		set[tokenVar] = token
+	if token, ok := d.GetOk(TokenVar); ok {
+		set[TokenVar] = token
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

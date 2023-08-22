@@ -51,7 +51,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	_, err = client.UpdateUserGrant(ctx, &management.UpdateUserGrantRequest{
 		GrantId:  d.Id(),
 		UserId:   d.Get(userIDVar).(string),
-		RoleKeys: helper.GetOkSetToStringSlice(d, roleKeysVar),
+		RoleKeys: helper.GetOkSetToStringSlice(d, RoleKeysVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update usergrant: %v", err)
@@ -76,7 +76,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		UserId:         d.Get(userIDVar).(string),
 		ProjectGrantId: d.Get(projectGrantIDVar).(string),
 		ProjectId:      d.Get(projectIDVar).(string),
-		RoleKeys:       helper.GetOkSetToStringSlice(d, roleKeysVar),
+		RoleKeys:       helper.GetOkSetToStringSlice(d, RoleKeysVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create usergrant: %v", err)
@@ -134,7 +134,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		grant := grants.GetResult()[0]
 		set := map[string]interface{}{
 			userIDVar:   grant.GetUserId(),
-			roleKeysVar: grant.GetRoleKeys(),
+			RoleKeysVar: grant.GetRoleKeys(),
 			orgIDVar:    grant.GetDetails().GetResourceOwner(),
 		}
 		if grant.GetProjectId() != "" {

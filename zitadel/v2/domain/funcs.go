@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -25,9 +26,25 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	domainName := d.Id()
+	if d.Get(isPrimaryVar).(bool) {
+		resp, err := client.ListOrgDomains(ctx, &management.ListOrgDomainsRequest{})
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		for _, domain := range resp.Result {
+			parts := strings.Split(clientinfo.Domain, ":")
+			if domain.IsVerified && domain.DomainName != domainName && strings.HasSuffix(domain.GetDomainName(), parts[0]) {
+				if _, err := client.SetPrimaryOrgDomain(ctx, &management.SetPrimaryOrgDomainRequest{Domain: domain.DomainName}); err != nil {
+					return diag.FromErr(err)
+				}
+				break
+			}
+		}
+	}
 
 	_, err = client.RemoveOrgDomain(ctx, &management.RemoveOrgDomainRequest{
-		Domain: d.Id(),
+		Domain: domainName,
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete domain: %v", err)
@@ -48,7 +65,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	name := d.Get(nameVar).(string)
+	name := d.Get(NameVar).(string)
 	_, err = client.AddOrgDomain(ctx, &management.AddOrgDomainRequest{
 		Domain: name,
 	})
@@ -78,7 +95,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	name := d.Get(nameVar).(string)
+	name := d.Get(NameVar).(string)
 	d.SetId(name)
 	if d.HasChange(isPrimaryVar) {
 		if d.Get(isPrimaryVar).(bool) {
@@ -126,7 +143,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if len(resp.Result) == 1 {
 		domain := resp.Result[0]
 		set := map[string]interface{}{
-			nameVar:           domain.GetDomainName(),
+			NameVar:           domain.GetDomainName(),
 			orgIDVar:          domain.GetOrgId(),
 			isVerifiedVar:     domain.GetIsVerified(),
 			isPrimaryVar:      domain.GetIsPrimary(),

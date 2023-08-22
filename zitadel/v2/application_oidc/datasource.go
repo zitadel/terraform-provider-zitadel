@@ -23,7 +23,7 @@ func GetDatasource() *schema.Resource {
 				Required:    true,
 				Description: "ID of the project",
 			},
-			nameVar: {
+			NameVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Name of the application",

@@ -3,46 +3,50 @@ package test_utils
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func RunLifecyleTest(
+func RunLifecyleTest[P comparable](
 	t *testing.T,
 	frame BaseTestFrame,
-	resourceFunc func(initialProperty, initialSecret string) string,
-	initialProperty, updatedProperty,
-	initialSecret, updatedSecret string,
-	checkRemoteProperty func(expect string) resource.TestCheckFunc,
+	datasources []string,
+	resourceFunc func(property P, secret string) string,
+	exampleProperty, updatedProperty P,
+	exampleSecret, updatedSecret string,
+	allowNonEmptyPlan bool,
+	checkRemoteProperty func(expect P) resource.TestCheckFunc,
+	idPattern *regexp.Regexp,
 	checkDestroy, checkImportState resource.TestCheckFunc,
 	importStateIdFunc resource.ImportStateIdFunc,
 	wrongImportID,
 	secretAttribute string,
 ) {
 	var importStateVerifyIgnore []string
-	initialConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(initialProperty, initialSecret))
-	updatedNameConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, initialSecret))
-	updatedSecretConfig := fmt.Sprintf("%s\n%s", frame.ProviderSnippet, resourceFunc(updatedProperty, updatedSecret))
+	exampleConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(exampleProperty, exampleSecret))
+	updatedPropertyConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(updatedProperty, exampleSecret))
+	updatedSecretConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(updatedProperty, updatedSecret))
 	steps := []resource.TestStep{
 		{ // Check first plan has a diff
-			Config:             initialConfig,
+			Config:             exampleConfig,
 			ExpectNonEmptyPlan: true,
 			// ExpectNonEmptyPlan just works with PlanOnly set to true
 			PlanOnly: true,
 		}, { // Check resource is created
-			Config: initialConfig,
+			Config: exampleConfig,
 			Check: resource.ComposeAggregateTestCheckFunc(
-				CheckAMinute(checkRemoteProperty(initialProperty)),
-				CheckStateHasIDSet(frame),
+				CheckAMinute(checkRemoteProperty(exampleProperty)),
+				CheckStateHasIDSet(frame, idPattern),
 			),
 		}, { // Check updating name has a diff
-			Config:             updatedNameConfig,
+			Config:             updatedPropertyConfig,
 			ExpectNonEmptyPlan: true,
 			// ExpectNonEmptyPlan just works with PlanOnly set to true
 			PlanOnly: true,
 		}, { // Check remote state can be updated
-			Config: updatedNameConfig,
+			Config: updatedPropertyConfig,
 			Check:  CheckAMinute(checkRemoteProperty(updatedProperty)),
 		},
 	}
@@ -75,9 +79,16 @@ func RunLifecyleTest(
 			Check:                   checkImportState,
 		})
 	}
-	resource.Test(t, resource.TestCase{
-		ProviderFactories: ZitadelProviderFactories(frame.ConfiguredProvider),
-		CheckDestroy:      CheckAMinute(checkDestroy),
-		Steps:             steps,
+	resource.ParallelTest(t, resource.TestCase{
+		CheckDestroy: CheckAMinute(checkDestroy),
+		Steps:        steps,
+		ErrorCheck: func(err error) error {
+			if err != nil && allowNonEmptyPlan && strings.Contains(err.Error(), "After applying this test step and performing a `terraform refresh`, the plan was not empty") {
+				t.Logf("Ignoring non-empty plan error because we can't guarantee consistency: %s", err.Error())
+				return nil
+			}
+			return err
+		},
+		ProtoV6ProviderFactories: frame.v6ProviderFactories,
 	})
 }

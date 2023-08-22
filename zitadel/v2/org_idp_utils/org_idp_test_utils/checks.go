@@ -3,26 +3,25 @@ package org_idp_test_utils
 import (
 	"fmt"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
-func CheckProviderName(frame test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
-	return func(expectName string) resource.TestCheckFunc {
+func CheckCreationAllowed(frame test_utils.OrgTestFrame) func(bool) resource.TestCheckFunc {
+	return func(expectAllowed bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			rs := state.RootModule().Resources[frame.TerraformName]
-			remoteProvider, err := frame.GetProviderByID(frame, &management.GetProviderByIDRequest{Id: rs.Primary.ID})
+			remoteProvider, err := frame.GetProviderByID(frame, &management.GetProviderByIDRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return err
 			}
-			actual := remoteProvider.GetIdp().GetName()
-			if actual != expectName {
-				return fmt.Errorf("expected name %s, actual name: %s", expectName, actual)
+			actual := remoteProvider.GetIdp().GetConfig().GetOptions().GetIsCreationAllowed()
+			if actual != expectAllowed {
+				return fmt.Errorf("expected creation allowed to be %t, but got %t", expectAllowed, actual)
 			}
 			return nil
 		}
@@ -31,7 +30,7 @@ func CheckProviderName(frame test_utils.OrgTestFrame) func(string) resource.Test
 
 func CheckDestroy(frame test_utils.OrgTestFrame) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		err := CheckProviderName(frame)("")(state)
+		err := CheckCreationAllowed(frame)(false)(state)
 		if status.Code(err) != codes.NotFound {
 			return fmt.Errorf("expected not found error but got: %w", err)
 		}

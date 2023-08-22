@@ -12,7 +12,7 @@ Resource representing the default login policy.
 ## Example Usage
 
 ```terraform
-resource zitadel_default_login_policy login_policy {
+resource "zitadel_default_login_policy" "default" {
   user_login                    = true
   allow_register                = true
   allow_external_idp            = true
@@ -29,6 +29,7 @@ resource zitadel_default_login_policy login_policy {
   default_redirect_uri          = "localhost:8080"
   second_factors                = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
   multi_factors                 = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
+  idps                          = [data.zitadel_idp_google.default.id, data.zitadel_idp_azure_ad.default.id]
   allow_domain_discovery        = true
   disable_login_with_email      = true
   disable_login_with_phone      = true

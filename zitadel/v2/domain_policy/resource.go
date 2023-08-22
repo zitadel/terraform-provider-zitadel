@@ -14,7 +14,7 @@ func GetResource() *schema.Resource {
 				Description: "Id for the organization",
 				ForceNew:    true,
 			},
-			userLoginMustBeDomainVar: {
+			UserLoginMustBeDomainVar: {
 				Type:        schema.TypeBool,
 				Required:    true,
 				Description: "User login must be domain",

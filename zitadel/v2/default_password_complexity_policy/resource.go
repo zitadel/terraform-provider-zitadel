@@ -8,7 +8,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the default password complexity policy.",
 		Schema: map[string]*schema.Schema{
-			minLengthVar: {
+			MinLengthVar: {
 				Type:        schema.TypeInt,
 				Required:    true,
 				Description: "Minimal length for the password",

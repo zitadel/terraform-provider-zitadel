@@ -28,7 +28,7 @@ func GetResource() *schema.Resource {
 					return EnumValueValidation(userStateVar, value.(string), user.UserState_value)
 				},*/
 			},
-			userNameVar: {
+			UserNameVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Username",
@@ -51,7 +51,7 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "Name of the machine user",
 			},
-			descriptionVar: {
+			DescriptionVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Description of the user",

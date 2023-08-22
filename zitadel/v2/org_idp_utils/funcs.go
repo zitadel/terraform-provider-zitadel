@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
-
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 

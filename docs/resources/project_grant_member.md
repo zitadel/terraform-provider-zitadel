@@ -12,11 +12,11 @@ Resource representing the membership of a user on an granted project, defined wi
 ## Example Usage
 
 ```terraform
-resource zitadel_project_grant_member project_grant_member {
-  org_id     = zitadel_org.org.id
-  project_id = zitadel_project.project.id
-  grant_id   = zitadel_project_grant.project_grant.id
-  user_id    = zitadel_human_user.granted_human_user.id
+resource "zitadel_project_grant_member" "default" {
+  org_id     = data.zitadel_org.default.id
+  project_id = data.zitadel_project.default.id
+  user_id    = data.zitadel_human_user.default.id
+  grant_id   = "123456789012345678"
   roles      = ["PROJECT_GRANT_OWNER"]
 }
 ```
