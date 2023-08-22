@@ -16,7 +16,7 @@ resource "zitadel_application_api" "default" {
   org_id           = data.zitadel_org.default.id
   project_id       = data.zitadel_project.default.id
   name             = "applicationapi"
-  auth_method_type = "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
+  auth_method_type = "API_AUTH_METHOD_TYPE_BASIC"
 }
 ```
 
@@ -26,15 +26,25 @@ resource "zitadel_application_api" "default" {
 ### Required
 
 - `name` (String) Name of the application
-- `org_id` (String) orgID of the application
 - `project_id` (String) ID of the project
 
 ### Optional
 
 - `auth_method_type` (String) Auth method type, supported values: API_AUTH_METHOD_TYPE_BASIC, API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `client_id` (String, Sensitive) generated ID for this config
 - `client_secret` (String, Sensitive) generated secret for this config
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<id:project_id[:org_id][:client_id][:client_secret]>`, e.g.
+
+```bash
+terraform import zitadel_application_api.imported '123456789012345678:123456789012345678:123456789012345678:123456789012345678@zitadel:JuaDFFeOak5DGE655KCYPSAclSkbMVEJXXuX1lEMBT14eLMSs0A0qhafKX5SA2Df'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

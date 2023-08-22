@@ -1,4 +1,4 @@
-package app_key
+package application_key
 
 const (
 	keyIDVar          = "key_id"

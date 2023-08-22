@@ -50,7 +50,6 @@ resource "zitadel_login_policy" "default" {
 - `ignore_unknown_usernames` (Boolean) defines if unknown username on login screen directly return an error or always display the password screen
 - `mfa_init_skip_lifetime` (String)
 - `multi_factor_check_lifetime` (String)
-- `org_id` (String) Id for the organization
 - `password_check_lifetime` (String)
 - `passwordless_type` (String) defines if passwordless is allowed for users
 - `second_factor_check_lifetime` (String)
@@ -63,8 +62,19 @@ resource "zitadel_login_policy" "default" {
 - `disable_login_with_phone` (Boolean) defines if user can additionally (to the loginname) be identified by their verified phone number
 - `idps` (Set of String) allowed idps to login or register
 - `multi_factors` (Set of String) allowed multi factors
+- `org_id` (String) ID of the organization
 - `second_factors` (Set of String) allowed second factors
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<[org_id]>`, e.g.
+
+```bash
+terraform import zitadel_login_policy.imported '123456789012345678'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

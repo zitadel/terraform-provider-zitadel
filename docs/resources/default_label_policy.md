@@ -75,3 +75,13 @@ resource "zitadel_default_label_policy" "default" {
 - `id` (String) The ID of this resource.
 - `logo_url` (String)
 - `logo_url_dark` (String)
+
+## Import
+
+The resource can be imported using the ID format `<>`, e.g.
+
+```bash
+terraform import zitadel_default_label_policy.imported ''
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

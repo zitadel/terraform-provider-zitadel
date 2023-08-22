@@ -29,8 +29,11 @@ output "application_api" {
 ### Required
 
 - `app_id` (String) The ID of this resource.
-- `org_id` (String) orgID of the application
 - `project_id` (String) ID of the project
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 

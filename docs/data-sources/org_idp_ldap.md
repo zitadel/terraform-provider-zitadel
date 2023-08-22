@@ -23,6 +23,9 @@ data "zitadel_org_idp_ldap" "default" {
 ### Required
 
 - `id` (String) The ID of this resource.
+
+### Optional
+
 - `org_id` (String) ID of the organization
 
 ### Read-Only
@@ -54,11 +57,3 @@ data "zitadel_org_idp_ldap" "default" {
 - `user_base` (String) User base for LDAP connections
 - `user_filters` (Set of String) User filters for LDAP connections
 - `user_object_classes` (Set of String) User object classes for LDAP connections
-
-## Import
-
-Organization IdP imports use semicolon-delimited identifiers. The resource can be imported using the org_id, the IdPs id and the IdPs bind_password.
-
-```
-terraform import zitadel_org_idp_ldap 210148218065912171:210210971312980331:mybindpassword
-```

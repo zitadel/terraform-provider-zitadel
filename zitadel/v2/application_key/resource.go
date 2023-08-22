@@ -1,4 +1,4 @@
-package app_key
+package application_key
 
 import (
 	"github.com/hashicorp/go-cty/cty"

@@ -29,8 +29,11 @@ output "trigger_actions" {
 ### Required
 
 - `flow_type` (String) Type of the flow to which the action triggers belong
-- `org_id` (String) ID of the organization
 - `trigger_type` (String) Trigger type on when the actions get triggered
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 

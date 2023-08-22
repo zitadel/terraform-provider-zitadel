@@ -46,7 +46,6 @@ resource "zitadel_org_idp_ldap" "default" {
 - `is_auto_update` (Boolean) enable if a the ZITADEL account fields should be updated automatically on each login
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
 - `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
-- `org_id` (String) ID of the organization
 - `servers` (List of String) Servers to try in order for establishing LDAP connections
 - `start_tls` (Boolean) Wether to use StartTLS for LDAP connections
 - `timeout` (String) Timeout for LDAP connections
@@ -65,6 +64,7 @@ resource "zitadel_org_idp_ldap" "default" {
 - `last_name_attribute` (String) User attribute for the last name
 - `name` (String) Name of the IDP
 - `nick_name_attribute` (String) User attribute for the nick name
+- `org_id` (String) ID of the organization
 - `phone_attribute` (String) User attribute for the phone
 - `phone_verified_attribute` (String) User attribute for the phone verified state
 - `preferred_language_attribute` (String) User attribute for the preferred language
@@ -74,3 +74,13 @@ resource "zitadel_org_idp_ldap" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+The resource can be imported using the ID format `<id[:org_id][:bind_password]>`, e.g.
+
+```bash
+terraform import zitadel_org_idp_ldap.imported '123456789012345678:123456789012345678:b1nd_p4ssw0rd'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

@@ -14,8 +14,8 @@ import (
 	zitadel_go "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/action"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/app_key"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_key"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_domain_policy"
@@ -266,7 +266,7 @@ func Provider() *schema.Provider {
 			"zitadel_action":                             action.GetResource(),
 			"zitadel_application_oidc":                   application_oidc.GetResource(),
 			"zitadel_application_api":                    application_api.GetResource(),
-			"zitadel_application_key":                    app_key.GetResource(),
+			"zitadel_application_key":                    application_key.GetResource(),
 			"zitadel_project_grant":                      project_grant.GetResource(),
 			"zitadel_user_grant":                         user_grant.GetResource(),
 			"zitadel_org_member":                         org_member.GetResource(),

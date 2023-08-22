@@ -26,7 +26,7 @@ output "org" {
 
 ### Required
 
-- `id` (String) An organizations resource ID.
+- `id` (String) ID of the organization
 
 ### Read-Only
 

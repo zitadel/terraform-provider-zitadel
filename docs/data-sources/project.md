@@ -27,8 +27,11 @@ output "project" {
 
 ### Required
 
-- `org_id` (String) Organization in which the project is located
 - `project_id` (String) The ID of this resource.
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 

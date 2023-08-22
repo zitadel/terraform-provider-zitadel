@@ -23,6 +23,9 @@ data "zitadel_org_idp_github" "default" {
 ### Required
 
 - `id` (String) The ID of this resource.
+
+### Optional
+
 - `org_id` (String) ID of the organization
 
 ### Read-Only
@@ -35,11 +38,3 @@ data "zitadel_org_idp_github" "default" {
 - `is_linking_allowed` (Boolean) enabled if users are able to link an existing ZITADEL user with an external account
 - `name` (String) Name of the IDP
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
-
-## Import
-
-Organization IdP imports use semicolon-delimited identifiers. The resource can be imported using the org_id, the IdPs id and the IdPs client_secret.
-
-```
-terraform import zitadel_org_idp_github 210148218065912171:210210971312980331:myclientsecret
-```
