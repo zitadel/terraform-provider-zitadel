@@ -6,6 +6,7 @@ const (
 	allowRegisterVar              = "allow_register"
 	allowExternalIDPVar           = "allow_external_idp"
 	forceMFAVar                   = "force_mfa"
+	forceMFALocalOnlyVar          = "force_mfa_local_only"
 	passwordlessTypeVar           = "passwordless_type"
 	hidePasswordResetVar          = "hide_password_reset"
 	passwordCheckLifetimeVar      = "password_check_lifetime"
