@@ -27,12 +27,15 @@ func TestAccOrgIDPJWT(t *testing.T) {
 			return strings.Replace(resourceExample, exampleProperty, configProperty, 1)
 		},
 		exampleProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame), updatedProperty),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

@@ -2,6 +2,7 @@ package project_grant_member
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
@@ -10,7 +11,7 @@ func GetResource() *schema.Resource {
 		Description: "Resource representing the membership of a user on an granted project, defined with the given role.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
-			projectIDVar: {
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
@@ -22,7 +23,7 @@ func GetResource() *schema.Resource {
 				Description: "ID of the grant",
 				ForceNew:    true,
 			},
-			userIDVar: {
+			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the user",
@@ -43,9 +44,9 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		Importer: helper.ImportWithEmptyID(
 			helper.ImportOptionalOrgAttribute,
-			helper.NewImportAttribute(projectIDVar, helper.ConvertID, false),
+			helper.NewImportAttribute(ProjectIDVar, helper.ConvertID, false),
 			helper.NewImportAttribute(GrantIDVar, helper.ConvertID, false),
-			helper.NewImportAttribute(userIDVar, helper.ConvertID, false),
+			helper.NewImportAttribute(UserIDVar, helper.ConvertID, false),
 		),
 	}
 }

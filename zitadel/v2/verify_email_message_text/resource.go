@@ -4,8 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
-
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -17,6 +15,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/zitadel/terraform-provider-zitadel/gen/github.com/zitadel/zitadel/pkg/grpc/text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 const (

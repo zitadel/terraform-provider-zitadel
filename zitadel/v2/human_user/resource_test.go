@@ -27,12 +27,16 @@ func TestAccHumanUser(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), updatedProperty),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, human_user.InitialPasswordVar),
+		),
 	)
 }
 

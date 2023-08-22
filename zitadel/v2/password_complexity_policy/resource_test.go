@@ -27,12 +27,12 @@ func TestAccPasswordComplexityPolicy(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*frame)(exampleProperty),
-		nil, nil, "", "",
+		test_utils.ImportOrgId(frame),
 	)
 }
 

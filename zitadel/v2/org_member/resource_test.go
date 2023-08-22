@@ -2,6 +2,7 @@ package org_member_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -27,12 +28,15 @@ func TestAccOrgMember(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency, userDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(*frame, userID),
-		helper.ZitadelGeneratedIdOnlyRegex,
+		regexp.MustCompile(fmt.Sprintf("^%s_%s$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, org_member.UserIDVar),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

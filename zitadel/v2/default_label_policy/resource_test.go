@@ -42,6 +42,17 @@ func TestAccDefaultLabelPolicy(t *testing.T) {
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		test_utils.ImportNothing,
+		default_label_policy.SetActiveVar,
+		default_label_policy.LogoHashVar,
+		default_label_policy.LogoPathVar,
+		default_label_policy.LogoDarkHashVar,
+		default_label_policy.LogoDarkPathVar,
+		default_label_policy.IconHashVar,
+		default_label_policy.IconPathVar,
+		default_label_policy.IconDarkHashVar,
+		default_label_policy.IconDarkPathVar,
+		default_label_policy.FontHashVar,
+		default_label_policy.FontPathVar,
 	)
 }
 

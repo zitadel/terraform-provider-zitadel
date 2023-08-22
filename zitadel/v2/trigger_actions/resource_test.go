@@ -2,6 +2,7 @@ package trigger_actions_test
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"testing"
 
@@ -21,18 +22,23 @@ func TestAccTriggerActions(t *testing.T) {
 	exampleProperty := test_utils.AttributeValue(t, trigger_actions.TriggerTypeVar, exampleAttributes).AsString()
 	flowType := test_utils.AttributeValue(t, trigger_actions.FlowTypeVar, exampleAttributes).AsString()
 	actionDep, _ := action_test_dep.Create(t, frame)
+	updatedProperty := "TRIGGER_TYPE_PRE_USERINFO_CREATION"
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		[]string{frame.AsOrgDefaultDependency, actionDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
-		exampleProperty, "TRIGGER_TYPE_PRE_USERINFO_CREATION",
-		"", "",
+		exampleProperty, updatedProperty,
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame, flowType),
-		helper.ZitadelGeneratedIdOnlyRegex,
+		regexp.MustCompile(fmt.Sprintf("^%s_([A-Z_]+)_(%s|%s)$", helper.ZitadelGeneratedIdPattern, exampleProperty, updatedProperty)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), exampleProperty),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, trigger_actions.FlowTypeVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, trigger_actions.TriggerTypeVar),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

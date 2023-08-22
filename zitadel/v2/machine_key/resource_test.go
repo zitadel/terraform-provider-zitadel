@@ -25,12 +25,17 @@ func TestAccMachineKey(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency, userDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "2051-01-01T00:00:00Z",
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame, userID),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, machine_key.UserIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, machine_key.KeyDetailsVar),
+		),
 	)
 }
 

@@ -27,6 +27,5 @@ func GetDatasource() *schema.Resource {
 			idp_github_es.UserEndpointVar:          idp_github_es.UserEndpointDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
-}
+	}
 }

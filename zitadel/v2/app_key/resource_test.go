@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/app_key"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api/application_api_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
 )

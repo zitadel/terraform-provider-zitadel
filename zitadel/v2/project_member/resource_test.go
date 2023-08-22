@@ -2,6 +2,7 @@ package project_member_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user/human_user_test_dep"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_grant_member"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project_member"
 )
 
 func TestAccProjectMember(t *testing.T) {
@@ -28,12 +30,16 @@ func TestAccProjectMember(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency, projectDep, userDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "PROJECT_OWNER_VIEWER",
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(*frame, projectID, userID),
-		helper.ZitadelGeneratedIdOnlyRegex,
+		regexp.MustCompile(fmt.Sprintf("^%s_%s_%s$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID, userID), ""),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_member.ProjectIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_member.UserIDVar),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

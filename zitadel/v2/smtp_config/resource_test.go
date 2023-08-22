@@ -33,12 +33,12 @@ func TestAccSMTPConfig(t *testing.T) {
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
 		exampleProperty, "updatedProperty",
-		exampleSecret, "updatedSecret",
+		smtp_config.PasswordVar, exampleSecret, "updatedSecret",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
-		nil, nil, "", smtp_config.PasswordVar,
+		test_utils.ImportStateAttribute(frame.BaseTestFrame, smtp_config.PasswordVar),
 	)
 }
 

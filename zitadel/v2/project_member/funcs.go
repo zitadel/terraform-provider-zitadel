@@ -26,8 +26,8 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.RemoveProjectMember(ctx, &management.RemoveProjectMemberRequest{
-		UserId:    d.Get(userIDVar).(string),
-		ProjectId: d.Get(projectIDVar).(string),
+		UserId:    d.Get(UserIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete projectmember: %v", err)
@@ -49,9 +49,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.UpdateProjectMember(ctx, &management.UpdateProjectMemberRequest{
-		UserId:    d.Get(userIDVar).(string),
+		UserId:    d.Get(UserIDVar).(string),
 		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
-		ProjectId: d.Get(projectIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update projectmember: %v", err)
@@ -73,8 +73,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	userID := d.Get(userIDVar).(string)
-	projectID := d.Get(projectIDVar).(string)
+	userID := d.Get(UserIDVar).(string)
+	projectID := d.Get(ProjectIDVar).(string)
 	_, err = client.AddProjectMember(ctx, &management.AddProjectMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
@@ -100,8 +100,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	projectID := d.Get(projectIDVar).(string)
-	userID := d.Get(userIDVar).(string)
+	projectID := d.Get(ProjectIDVar).(string)
+	userID := d.Get(UserIDVar).(string)
 	resp, err := client.ListProjectMembers(ctx, &management.ListProjectMembersRequest{
 		ProjectId: projectID,
 		Queries: []*member.SearchQuery{{
@@ -123,9 +123,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if len(resp.Result) == 1 {
 		memberRes := resp.Result[0]
 		set := map[string]interface{}{
-			userIDVar:       memberRes.GetUserId(),
+			UserIDVar:       memberRes.GetUserId(),
 			helper.OrgIDVar: memberRes.GetDetails().GetResourceOwner(),
-			projectIDVar:    projectID,
+			ProjectIDVar:    projectID,
 			rolesVar:        memberRes.GetRoles(),
 		}
 		for k, v := range set {

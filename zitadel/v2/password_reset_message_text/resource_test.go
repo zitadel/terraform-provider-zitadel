@@ -25,7 +25,7 @@ func TestAccPasswordResetMessageText(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^\d{18}_%s$`, exampleLanguage)),

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 
@@ -131,15 +132,15 @@ func importWithAttributes(state importState, attrs ...importAttribute) (err erro
 	csvReader.Comma = ':'
 	csvReader.LazyQuotes = true
 	parts, err := csvReader.Read()
-	if err != nil {
+	if err != nil && err != io.EOF {
 		return fmt.Errorf("failed to parse id: %w", err)
 	}
-	// if we expect an empty id and have more than just the emptyIDAttribute, we ensure the first part is an empty key
-	if len(attrs) > 1 && attrs[0].key == emptyIDAttribute.key && parts[0] != "" {
+	// if we expect an empty id and have more than just the emptyIDAttribute, we prepend an empty part to the ID
+	if len(attrs) > 0 && attrs[0].key == emptyIDAttribute.key || attrs[0].optional && len(parts) == 0 {
 		parts = append([]string{""}, parts...)
 		internalMinParts++
 	}
-	if len(parts) < internalMinParts || len(parts) > internalMaxParts || internalMinParts > 0 && len(id) == 0 {
+	if len(parts) < internalMinParts || len(parts) > internalMaxParts {
 		return fmt.Errorf(`expected the number of semicolon separated parts to be between %d and %d, but got %d parts: "%s"`, externalMinParts, externalMaxParts, len(parts), strings.Join(parts, `", "`))
 	}
 	for i, part := range parts {
@@ -156,9 +157,6 @@ func importWithAttributes(state importState, attrs ...importAttribute) (err erro
 		if i == 0 {
 			state.SetId(val.(string))
 			continue
-		}
-		if attr.optional && val == nil {
-
 		}
 		if err := state.Set(attr.key, val); err != nil {
 			return fmt.Errorf("failed to set %s=%v: %w", attr.key, val, err)

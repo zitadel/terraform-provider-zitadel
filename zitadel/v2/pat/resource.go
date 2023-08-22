@@ -2,6 +2,7 @@ package pat
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
@@ -10,13 +11,13 @@ func GetResource() *schema.Resource {
 		Description: "Resource representing a personal access token of a user",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
-			userIDVar: {
+			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the user",
 				ForceNew:    true,
 			},
-			tokenVar: {
+			TokenVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Value of the token",
@@ -34,8 +35,8 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		Importer: helper.ImportWithIDAndOptionalOrg(
 			tokenIDVar,
-			helper.NewImportAttribute(userIDVar, helper.ConvertID, false),
-			helper.NewImportAttribute(tokenVar, helper.ConvertNonEmpty, true),
+			helper.NewImportAttribute(UserIDVar, helper.ConvertID, false),
+			helper.NewImportAttribute(TokenVar, helper.ConvertNonEmpty, true),
 		),
 	}
 }

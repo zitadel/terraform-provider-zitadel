@@ -24,12 +24,12 @@ func TestAccDefaultNotificationPolicy(t *testing.T) {
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
-		nil, nil, "", "",
+		test_utils.ImportNothing,
 	)
 }
 

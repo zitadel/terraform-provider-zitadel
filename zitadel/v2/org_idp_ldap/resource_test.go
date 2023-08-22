@@ -9,5 +9,4 @@ import (
 
 func TestAccOrgIdPLDAP(t *testing.T) {
 	org_idp_test_utils.RunOrgLifecyleTest(t, "zitadel_org_idp_ldap", idp_ldap.BindPasswordVar)
-
 }

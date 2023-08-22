@@ -27,12 +27,12 @@ func TestAccDefaultLoginPolicy(t *testing.T) {
 		[]string{azureADDep, googleDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "localhost:9090",
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
-		nil, nil, "", "",
+		test_utils.ImportNothing,
 	)
 }
 

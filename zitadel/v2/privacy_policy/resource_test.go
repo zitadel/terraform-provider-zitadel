@@ -23,12 +23,12 @@ func TestAccPrivacyPolicy(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "http://example.com/acctest",
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*frame)(""),
-		nil, nil, "", "",
+		test_utils.ImportOrgId(frame),
 	)
 }
 

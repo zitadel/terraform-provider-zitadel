@@ -58,7 +58,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			PreferredLanguage: d.Get(preferredLanguageVar).(string),
 			NickName:          d.Get(nickNameVar).(string),
 		},
-		InitialPassword: d.Get(initialPasswordVar).(string),
+		InitialPassword: d.Get(InitialPasswordVar).(string),
 	}
 
 	if displayname, ok := d.GetOk(DisplayNameVar); ok {

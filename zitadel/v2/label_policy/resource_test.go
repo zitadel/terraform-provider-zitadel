@@ -15,6 +15,7 @@ import (
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/label_policy"
 )
 
 func TestAccLabelPolicy(t *testing.T) {
@@ -35,12 +36,23 @@ func TestAccLabelPolicy(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "#5469d3",
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*frame)(exampleProperty),
-		nil, nil, "", "",
+		test_utils.ImportOrgId(frame),
+		label_policy.SetActiveVar,
+		label_policy.LogoHashVar,
+		label_policy.LogoPathVar,
+		label_policy.LogoDarkHashVar,
+		label_policy.LogoDarkPathVar,
+		label_policy.IconHashVar,
+		label_policy.IconPathVar,
+		label_policy.IconDarkHashVar,
+		label_policy.IconDarkPathVar,
+		label_policy.FontHashVar,
+		label_policy.FontPathVar,
 	)
 }
 

@@ -47,8 +47,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	org := d.Get(helper.OrgIDVar).(string)
-
+	org := helper.GetID(d, helper.OrgIDVar)
 	_, err = client.UpdateCustomDomainPolicy(ctx, &admin.UpdateCustomDomainPolicyRequest{
 		OrgId:                                  org,
 		UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
@@ -74,8 +73,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	org := d.Get(helper.OrgIDVar).(string)
-
+	org := helper.GetID(d, helper.OrgIDVar)
 	_, err = client.AddCustomDomainPolicy(ctx, &admin.AddCustomDomainPolicyRequest{
 		OrgId:                                  org,
 		UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
@@ -97,7 +95,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)

@@ -70,28 +70,28 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	d.SetId(id)
 
-	if d.HasChanges(logoHashVar, logoPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, logoURL, d.Get(logoPathVar).(string)); err != nil {
+	if d.HasChanges(LogoHashVar, LogoPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, logoURL, d.Get(LogoPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload logo: %v", err)
 		}
 	}
-	if d.HasChanges(logoDarkHashVar, logoDarkPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, logoDarkURL, d.Get(logoDarkPathVar).(string)); err != nil {
+	if d.HasChanges(LogoDarkHashVar, LogoDarkPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, logoDarkURL, d.Get(LogoDarkPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload logo dark: %v", err)
 		}
 	}
-	if d.HasChanges(iconHashVar, iconPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, iconURL, d.Get(iconPathVar).(string)); err != nil {
+	if d.HasChanges(IconHashVar, IconPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, iconURL, d.Get(IconPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload icon: %v", err)
 		}
 	}
-	if d.HasChanges(iconDarkHashVar, iconDarkPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, iconDarkURL, d.Get(iconDarkPathVar).(string)); err != nil {
+	if d.HasChanges(IconDarkHashVar, IconDarkPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, iconDarkURL, d.Get(IconDarkPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload icon dark: %v", err)
 		}
 	}
-	if d.HasChanges(fontHashVar, fontPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, fontURL, d.Get(fontPathVar).(string)); err != nil {
+	if d.HasChanges(FontHashVar, FontPathVar) {
+		if err := helper.InstanceFormFilePost(clientinfo, fontURL, d.Get(FontPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload font: %v", err)
 		}
 	}
@@ -107,13 +107,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		warnColorDarkVar,
 		fontColorDarkVar,
 		disableWatermarkVar,
-		logoHashVar,
-		logoDarkHashVar,
-		iconHashVar,
-		iconDarkHashVar,
-		fontHashVar,
+		LogoHashVar,
+		LogoDarkHashVar,
+		IconHashVar,
+		IconDarkHashVar,
+		FontHashVar,
 	) {
-		if d.Get(setActiveVar).(bool) {
+		if d.Get(SetActiveVar).(bool) {
 			if _, err := client.ActivateLabelPolicy(ctx, &admin.ActivateLabelPolicyRequest{}); err != nil {
 				return diag.Errorf("failed to activate default label policy: %v", err)
 			}

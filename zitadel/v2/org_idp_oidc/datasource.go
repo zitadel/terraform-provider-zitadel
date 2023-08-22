@@ -2,6 +2,7 @@ package org_idp_oidc
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 

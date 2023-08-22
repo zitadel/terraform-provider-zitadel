@@ -103,7 +103,7 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Is the phone verified of the user",
 			},
-			initialPasswordVar: {
+			InitialPasswordVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Initially set password for the user, not changeable after creation",
@@ -141,6 +141,6 @@ func GetResource() *schema.Resource {
 				return diff.SetNew(preferredLanguageVar, defaultPreferredLanguage)
 			}),
 		),
-		Importer: helper.ImportWithIDAndOptionalOrgAndSecret(UserIDVar, initialPasswordVar),
+		Importer: helper.ImportWithIDAndOptionalOrgAndSecret(UserIDVar, InitialPasswordVar),
 	}
 }

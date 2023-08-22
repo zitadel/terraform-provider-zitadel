@@ -24,12 +24,15 @@ func TestAccSMSProviderTwilio(t *testing.T) {
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
 		exampleProperty, "987654321",
-		exampleSecret, "updatedSecret",
+		sms_provider_twilio.TokenVar, exampleSecret, "updatedSecret",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
-		nil, nil, "", sms_provider_twilio.TokenVar,
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, sms_provider_twilio.TokenVar),
+		),
 	)
 }
 

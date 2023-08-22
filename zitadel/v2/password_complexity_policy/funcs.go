@@ -13,18 +13,15 @@ import (
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started create")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
 	_, err = client.ResetPasswordComplexityPolicyToDefault(ctx, &management.ResetPasswordComplexityPolicyToDefaultRequest{})
 	if err != nil {
 		return diag.Errorf("failed to reset password complexity policy: %v", err)
@@ -34,18 +31,15 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started update")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
 	_, err = client.UpdateCustomPasswordComplexityPolicy(ctx, &management.UpdateCustomPasswordComplexityPolicyRequest{
 		MinLength:    uint64(d.Get(minLengthVar).(int)),
 		HasUppercase: d.Get(hasUppercaseVar).(bool),
@@ -61,18 +55,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started create")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
 	org := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
 	_, err = client.AddCustomPasswordComplexityPolicy(ctx, &management.AddCustomPasswordComplexityPolicyRequest{
 		MinLength:    uint64(d.Get(minLengthVar).(int)),
 		HasUppercase: d.Get(hasUppercaseVar).(bool),
@@ -89,18 +80,15 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started read")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
 	resp, err := client.GetPasswordComplexityPolicy(ctx, &management.GetPasswordComplexityPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
@@ -109,7 +97,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.Errorf("failed to get password complexity policy")
 	}
-
 	policy := resp.Policy
 	if policy.GetIsDefault() == true {
 		d.SetId("")
@@ -123,7 +110,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		hasNumberVar:    policy.GetHasNumber(),
 		hasSymbolVar:    policy.GetHasSymbol(),
 	}
-
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of password complexity policy: %v", k, err)

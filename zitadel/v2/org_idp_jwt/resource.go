@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 
 func GetResource() *schema.Resource {
@@ -58,6 +58,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		DeleteContext: delete,
-		Importer:      &schema.ResourceImporter{StateContext: org_idp_utils.ImportIDPWithOrg()},
+		Importer:      helper.ImportWithIDAndOptionalOrg(idp_utils.IdpIDVar),
 	}
 }

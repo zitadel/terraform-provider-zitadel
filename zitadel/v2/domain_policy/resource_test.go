@@ -29,12 +29,12 @@ func TestAccDomainPolicy(t *testing.T) {
 			return strings.Replace(resourceExample, strconv.FormatBool(exampleProperty), strconv.FormatBool(property), 1)
 		},
 		exampleProperty, !exampleProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*otherFrame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*otherFrame)(false),
-		nil, nil, "", "",
+		test_utils.ImportOrgId(otherFrame),
 	)
 }
 

@@ -3,6 +3,7 @@ package idp_gitlab
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 
@@ -24,5 +25,5 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		DeleteContext: idp_utils.Delete,
 		Importer:      helper.ImportWithIDAndOptionalSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
-}
+	}
 }

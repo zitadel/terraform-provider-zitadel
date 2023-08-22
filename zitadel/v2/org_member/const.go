@@ -1,6 +1,6 @@
 package org_member
 
 const (
-	userIDVar = "user_id"
+	UserIDVar = "user_id"
 	RolesVar  = "roles"
 )

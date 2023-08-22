@@ -2,6 +2,7 @@ package project_grant_member_test
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -35,12 +36,23 @@ func TestAccProjectGrantMember(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency, projectDep, userDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "PROJECT_GRANT_OWNER_VIEWER",
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(*frame, projectID, grantID, userID),
-		helper.ZitadelGeneratedIdOnlyRegex,
+		regexp.MustCompile(fmt.Sprintf(
+			"^%s_%s_%s_%s$",
+			helper.ZitadelGeneratedIdPattern,
+			helper.ZitadelGeneratedIdPattern,
+			helper.ZitadelGeneratedIdPattern,
+			helper.ZitadelGeneratedIdPattern,
+		)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID, grantID, userID), ""),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant_member.ProjectIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant_member.GrantIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant_member.UserIDVar),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

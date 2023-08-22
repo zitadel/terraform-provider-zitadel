@@ -30,12 +30,16 @@ func TestAccProjectGrant(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency, projectDep, grantedOrgDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame, projectID),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID), ""),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant.ProjectIDVar),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

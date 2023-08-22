@@ -24,12 +24,12 @@ func TestAccNotificationPolicy(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*frame)(true),
-		nil, nil, "", "",
+		test_utils.ImportOrgId(frame),
 	)
 }
 

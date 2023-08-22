@@ -2,8 +2,8 @@ package org_idp_azure_ad
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_azure_ad"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
@@ -31,5 +31,5 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		DeleteContext: org_idp_utils.Delete,
 		Importer:      helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
-}
+	}
 }

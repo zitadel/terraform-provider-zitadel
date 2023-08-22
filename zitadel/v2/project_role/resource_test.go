@@ -2,6 +2,7 @@ package project_role_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -19,19 +20,24 @@ func TestAccProjectRole(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_role")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, project_role.KeyVar, exampleAttributes).AsString()
+	updatedProperty := "updatedProperty"
 	projectDep, projectID := project_test_dep.Create(t, frame)
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		[]string{frame.AsOrgDefaultDependency, projectDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
-		exampleProperty, "updatedProperty",
-		"", "",
+		exampleProperty, updatedProperty,
+		"", "", "",
 		true,
 		checkRemoteProperty(*frame, projectID),
-		helper.ZitadelGeneratedIdOnlyRegex,
+		regexp.MustCompile(fmt.Sprintf("^%s_%s_(%s|%s)$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern, exampleProperty, updatedProperty)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID), ""),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_role.ProjectIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_role.KeyVar),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

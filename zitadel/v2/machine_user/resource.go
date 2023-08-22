@@ -65,6 +65,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      helper.ImportWithIDAndOptionalOrg(helper.ResourceIDVar),
+		Importer:      helper.ImportWithIDAndOptionalOrg(UserIDVar),
 	}
 }

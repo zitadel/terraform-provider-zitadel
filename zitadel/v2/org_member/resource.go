@@ -2,6 +2,7 @@ package org_member
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
@@ -10,7 +11,7 @@ func GetResource() *schema.Resource {
 		Description: "Resource representing the membership of a user on an organization, defined with the given role.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
-			userIDVar: {
+			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the user",
@@ -29,6 +30,9 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      helper.ImportWithIDAndOptionalOrg(userIDVar),
+		Importer: helper.ImportWithEmptyID(
+			helper.NewImportAttribute(UserIDVar, helper.ConvertID, false),
+			helper.ImportOptionalOrgAttribute,
+		),
 	}
 }

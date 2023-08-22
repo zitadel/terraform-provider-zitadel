@@ -23,12 +23,12 @@ func TestAccDefaultOIDCSettings(t *testing.T) {
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "456h0m0s",
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
-		nil, nil, "", "",
+		test_utils.ImportNothing,
 	)
 }
 

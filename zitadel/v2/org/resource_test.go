@@ -22,12 +22,12 @@ func TestAccOrg(t *testing.T) {
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		initialProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(frame, idFromState(frame)),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, idFromState(frame)), updatedProperty),
-		nil, nil, "", "",
+		test_utils.ImportResourceId(frame.BaseTestFrame),
 	)
 }
 

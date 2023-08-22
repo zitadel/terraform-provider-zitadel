@@ -26,7 +26,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.RemoveProjectGrant(ctx, &management.RemoveProjectGrantRequest{
 		GrantId:   d.Id(),
-		ProjectId: d.Get(projectIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete projectgrant: %v", err)
@@ -49,7 +49,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	_, err = client.UpdateProjectGrant(ctx, &management.UpdateProjectGrantRequest{
 		GrantId:   d.Id(),
-		ProjectId: d.Get(projectIDVar).(string),
+		ProjectId: d.Get(ProjectIDVar).(string),
 		RoleKeys:  helper.GetOkSetToStringSlice(d, RoleKeysVar),
 	})
 	if err != nil {
@@ -73,7 +73,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	resp, err := client.AddProjectGrant(ctx, &management.AddProjectGrantRequest{
 		GrantedOrgId: d.Get(grantedOrgIDVar).(string),
-		ProjectId:    d.Get(projectIDVar).(string),
+		ProjectId:    d.Get(ProjectIDVar).(string),
 		RoleKeys:     helper.GetOkSetToStringSlice(d, RoleKeysVar),
 	})
 	if err != nil {
@@ -96,7 +96,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetProjectGrantByID(ctx, &management.GetProjectGrantByIDRequest{ProjectId: d.Get(projectIDVar).(string), GrantId: d.Id()})
+	resp, err := client.GetProjectGrantByID(ctx, &management.GetProjectGrantByIDRequest{ProjectId: d.Get(ProjectIDVar).(string), GrantId: d.Id()})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -107,7 +107,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	projectGrant := resp.GetProjectGrant()
 	set := map[string]interface{}{
-		projectIDVar:    projectGrant.GetProjectId(),
+		ProjectIDVar:    projectGrant.GetProjectId(),
 		grantedOrgIDVar: projectGrant.GetGrantedOrgId(),
 		RoleKeysVar:     projectGrant.GetGrantedRoleKeys(),
 		helper.OrgIDVar: projectGrant.GetDetails().GetResourceOwner(),

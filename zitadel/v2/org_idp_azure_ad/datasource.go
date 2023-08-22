@@ -27,6 +27,5 @@ func GetDatasource() *schema.Resource {
 			idp_azure_ad.EmailVerifiedVar:  idp_azure_ad.EmailVerifiedDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
 	}
 }

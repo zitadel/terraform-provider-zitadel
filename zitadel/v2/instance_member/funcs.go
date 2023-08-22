@@ -27,7 +27,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.RemoveIAMMember(ctx, &admin.RemoveIAMMemberRequest{
-		UserId: d.Get(userIDVar).(string),
+		UserId: d.Get(UserIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete instance member: %v", err)
@@ -49,7 +49,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.UpdateIAMMember(ctx, &admin.UpdateIAMMemberRequest{
-		UserId: d.Get(userIDVar).(string),
+		UserId: d.Get(UserIDVar).(string),
 		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
 	})
 	if err != nil {
@@ -71,7 +71,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	userID := d.Get(userIDVar).(string)
+	userID := d.Get(UserIDVar).(string)
 	resp, err := client.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
 		UserId: userID,
 		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
@@ -96,7 +96,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	userID := d.Get(userIDVar).(string)
+	userID := d.Get(UserIDVar).(string)
 	resp, err := client.ListIAMMembers(ctx, &admin.ListIAMMembersRequest{
 		Queries: []*member.SearchQuery{{
 			Query: &member.SearchQuery_UserIdQuery{
@@ -117,7 +117,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if len(resp.Result) == 1 {
 		member := resp.Result[0]
 		set := map[string]interface{}{
-			userIDVar: member.GetUserId(),
+			UserIDVar: member.GetUserId(),
 			RolesVar:  member.GetRoles(),
 		}
 		for k, v := range set {

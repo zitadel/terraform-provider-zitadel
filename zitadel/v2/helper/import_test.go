@@ -150,8 +150,7 @@ func TestImportWithAttributes(t *testing.T) {
 		},
 		want: want{
 			attributes: map[string]interface{}{
-				"id":     validID,
-				"org_id": validID,
+				"id": validID,
 			},
 		},
 	}, {

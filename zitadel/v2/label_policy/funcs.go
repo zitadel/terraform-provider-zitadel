@@ -19,7 +19,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -40,7 +40,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -76,28 +76,28 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		d.SetId(resp.Details.ResourceOwner)
 	}
 
-	if d.HasChanges(logoHashVar, logoPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, logoURL, d.Get(logoPathVar).(string), org); err != nil {
+	if d.HasChanges(LogoHashVar, LogoPathVar) {
+		if err := helper.OrgFormFilePost(clientinfo, logoURL, d.Get(LogoPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload logo: %v", err)
 		}
 	}
-	if d.HasChanges(logoDarkHashVar, logoDarkPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, logoDarkURL, d.Get(logoDarkPathVar).(string), org); err != nil {
+	if d.HasChanges(LogoDarkHashVar, LogoDarkPathVar) {
+		if err := helper.OrgFormFilePost(clientinfo, logoDarkURL, d.Get(LogoDarkPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload logo dark: %v", err)
 		}
 	}
-	if d.HasChanges(iconHashVar, iconPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, iconURL, d.Get(iconPathVar).(string), org); err != nil {
+	if d.HasChanges(IconHashVar, IconPathVar) {
+		if err := helper.OrgFormFilePost(clientinfo, iconURL, d.Get(IconPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload icon: %v", err)
 		}
 	}
-	if d.HasChanges(iconDarkHashVar, iconDarkPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, iconDarkURL, d.Get(iconDarkPathVar).(string), org); err != nil {
+	if d.HasChanges(IconDarkHashVar, IconDarkPathVar) {
+		if err := helper.OrgFormFilePost(clientinfo, iconDarkURL, d.Get(IconDarkPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload icon dark: %v", err)
 		}
 	}
-	if d.HasChanges(fontHashVar, fontPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, fontURL, d.Get(fontPathVar).(string), org); err != nil {
+	if d.HasChanges(FontHashVar, FontPathVar) {
+		if err := helper.OrgFormFilePost(clientinfo, fontURL, d.Get(FontPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload font: %v", err)
 		}
 	}
@@ -113,13 +113,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		warnColorDarkVar,
 		fontColorDarkVar,
 		disableWatermarkVar,
-		logoHashVar,
-		logoDarkHashVar,
-		iconHashVar,
-		iconDarkHashVar,
-		fontHashVar,
+		LogoHashVar,
+		LogoDarkHashVar,
+		IconHashVar,
+		IconDarkHashVar,
+		FontHashVar,
 	) {
-		if d.Get(setActiveVar).(bool) {
+		if d.Get(SetActiveVar).(bool) {
 			if _, err := client.ActivateCustomLabelPolicy(ctx, &management.ActivateCustomLabelPolicyRequest{}); err != nil {
 				return diag.Errorf("failed to activate label policy: %v", err)
 			}
@@ -159,33 +159,33 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	d.SetId(org)
 
-	if d.Get(logoHashVar) != "" && d.Get(logoPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, logoURL, d.Get(logoPathVar).(string), org); err != nil {
+	if d.Get(LogoHashVar) != "" && d.Get(LogoPathVar) != "" {
+		if err := helper.OrgFormFilePost(clientinfo, logoURL, d.Get(LogoPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload logo: %v", err)
 		}
 	}
-	if d.Get(logoDarkHashVar) != "" && d.Get(logoDarkPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, logoDarkURL, d.Get(logoDarkPathVar).(string), org); err != nil {
+	if d.Get(LogoDarkHashVar) != "" && d.Get(LogoDarkPathVar) != "" {
+		if err := helper.OrgFormFilePost(clientinfo, logoDarkURL, d.Get(LogoDarkPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload logo dark: %v", err)
 		}
 	}
-	if d.Get(iconHashVar) != "" && d.Get(iconPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, iconURL, d.Get(iconPathVar).(string), org); err != nil {
+	if d.Get(IconHashVar) != "" && d.Get(IconPathVar) != "" {
+		if err := helper.OrgFormFilePost(clientinfo, iconURL, d.Get(IconPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload icon: %v", err)
 		}
 	}
-	if d.Get(iconDarkHashVar) != "" && d.Get(iconDarkPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, iconDarkURL, d.Get(iconDarkPathVar).(string), org); err != nil {
+	if d.Get(IconDarkHashVar) != "" && d.Get(IconDarkPathVar) != "" {
+		if err := helper.OrgFormFilePost(clientinfo, iconDarkURL, d.Get(IconDarkPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload icon dark: %v", err)
 		}
 	}
-	if d.Get(fontHashVar) != "" && d.Get(fontPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, fontURL, d.Get(fontPathVar).(string), org); err != nil {
+	if d.Get(FontHashVar) != "" && d.Get(FontPathVar) != "" {
+		if err := helper.OrgFormFilePost(clientinfo, fontURL, d.Get(FontPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload font: %v", err)
 		}
 	}
 
-	if d.Get(setActiveVar).(bool) {
+	if d.Get(SetActiveVar).(bool) {
 		if _, err := client.ActivateCustomLabelPolicy(ctx, &management.ActivateCustomLabelPolicyRequest{}); err != nil {
 			return diag.Errorf("failed to activate label policy: %v", err)
 		}
@@ -202,7 +202,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -223,6 +223,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	set := map[string]interface{}{
+		helper.OrgIDVar:        policy.GetDetails().GetResourceOwner(),
 		primaryColorVar:        policy.GetPrimaryColor(),
 		hideLoginNameSuffixVar: policy.GetHideLoginNameSuffix(),
 		warnColorVar:           policy.GetWarnColor(),

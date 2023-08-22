@@ -26,12 +26,15 @@ func TestAccMachineUser(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "updatedproperty",
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

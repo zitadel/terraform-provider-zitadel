@@ -18,18 +18,15 @@ import (
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started create")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
 	_, err = client.ResetLoginPolicyToDefault(ctx, &management.ResetLoginPolicyToDefaultRequest{})
 	if err != nil {
 		return diag.Errorf("failed to reset login policy: %v", err)
@@ -45,7 +42,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
@@ -286,18 +283,15 @@ func getIDPOwnerType(ctx context.Context, client *mgmtclient.Client, id string) 
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started read")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	org := d.Get(helper.OrgIDVar).(string)
+	org := helper.GetID(d, helper.OrgIDVar)
 	client, err := helper.GetManagementClient(clientinfo, org)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
 	resp, err := client.GetLoginPolicy(ctx, &management.GetLoginPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
@@ -306,7 +300,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.Errorf("failed to get login policy")
 	}
-
 	policy := resp.Policy
 	if policy.GetIsDefault() == true {
 		d.SetId("")
@@ -331,7 +324,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		disableLoginWithEmail:         policy.GetDisableLoginWithEmail(),
 		disableLoginWithPhone:         policy.GetDisableLoginWithPhone(),
 	}
-
 	respSecond, err := client.ListLoginPolicySecondFactors(ctx, &management.ListLoginPolicySecondFactorsRequest{})
 	if err != nil {
 		return diag.Errorf("failed to get login policy secondfactors: %v", err)
@@ -343,7 +335,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 		set[secondFactorsVar] = factors
 	}
-
 	respMulti, err := client.ListLoginPolicyMultiFactors(ctx, &management.ListLoginPolicyMultiFactorsRequest{})
 	if err != nil {
 		return diag.Errorf("failed to get login policy multifactors: %v", err)
@@ -355,7 +346,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 		set[multiFactorsVar] = factors
 	}
-
 	respIDPs, err := client.ListLoginPolicyIDPs(ctx, &management.ListLoginPolicyIDPsRequest{})
 	if err != nil {
 		return diag.Errorf("failed to get login policy idps: %v", err)
@@ -367,7 +357,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 		set[idpsVar] = idps
 	}
-
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of login policy: %v", k, err)

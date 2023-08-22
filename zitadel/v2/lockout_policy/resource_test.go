@@ -26,12 +26,12 @@ func TestAccLockoutPolicy(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, 10,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*frame)(0),
-		nil, nil, "", "",
+		test_utils.ImportOrgId(frame),
 	)
 }
 
