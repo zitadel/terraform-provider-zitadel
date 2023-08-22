@@ -11,6 +11,16 @@ description: |-
 
 ## Example Usage
 
-{{ tffile "examples/provider/resources/application_key.tf" }}
+{{ tffile "examples/provider/resources/app_key.tf" }}
 
 {{ .SchemaMarkdown | trimspace }}
+
+## Import
+
+The resource can be imported using the ID format `<id:project_id:app_id[:org_id][:key_details]>`, e.g.
+
+```bash
+terraform import {{ .Name }}.imported '123456789012345678:123456789012345678:123456789012345678:123456789012345678:import zitadel_application_key.imported "123456789012345678:123456789012345678:123456789012345678:123456789012345678:$(cat ~/Downloads/123456789012345678.json | sed -e 's/:/__SEMICOLON__/g')'
+```
+
+You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).
