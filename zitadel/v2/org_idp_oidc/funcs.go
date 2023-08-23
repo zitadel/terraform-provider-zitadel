@@ -3,13 +3,12 @@ package org_idp_oidc
 import (
 	"context"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
