@@ -14,7 +14,7 @@ Datasource representing a generic JWT IdP on the organization.
 ```terraform
 data "zitadel_org_jwt_idp" "default" {
   org_id = data.zitadel_org.default.id
-  idp_id = "123456789012345678"
+  id     = "123456789012345678"
 }
 
 output "org_idp_org_jwt_idp" {
