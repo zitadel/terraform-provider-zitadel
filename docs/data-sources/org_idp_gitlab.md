@@ -13,7 +13,8 @@ Datasource representing a GitLab IdP of the organization.
 
 ```terraform
 data "zitadel_org_idp_gitlab" "default" {
-  id = "123456789012345678"
+  org_id = data.zitadel_org.default.id
+  id     = "123456789012345678"
 }
 ```
 

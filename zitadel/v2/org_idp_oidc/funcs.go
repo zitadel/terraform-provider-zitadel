@@ -3,147 +3,97 @@ package org_idp_oidc
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 )
 
-func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started delete")
-
-	clientinfo, ok := m.(*helper.ClientInfo)
-	if !ok {
-		return diag.Errorf("failed to get client")
-	}
-
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	_, err = client.RemoveOrgIDP(ctx, &management.RemoveOrgIDPRequest{
-		IdpId: d.Id(),
-	})
-	if err != nil {
-		return diag.Errorf("failed to delete oidc idp: %v", err)
-	}
-	return nil
-}
-
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started create")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	resp, err := client.AddOrgOIDCIDP(ctx, &management.AddOrgOIDCIDPRequest{
-		Name:               d.Get(nameVar).(string),
-		StylingType:        idp.IDPStylingType(idp.IDPStylingType_value[d.Get(stylingTypeVar).(string)]),
-		ClientId:           d.Get(clientIDVar).(string),
-		ClientSecret:       d.Get(clientSecretVar).(string),
-		Issuer:             d.Get(issuerVar).(string),
-		Scopes:             helper.GetOkSetToStringSlice(d, scopesVar),
-		DisplayNameMapping: idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(DisplayNameMappingVar).(string)]),
-		UsernameMapping:    idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(usernameMappingVar).(string)]),
-		AutoRegister:       d.Get(autoRegisterVar).(bool),
+	resp, err := client.AddGenericOIDCProvider(ctx, &management.AddGenericOIDCProviderRequest{
+		Name:             idp_utils.StringValue(d, idp_utils.NameVar),
+		ClientId:         idp_utils.StringValue(d, idp_utils.ClientIDVar),
+		ClientSecret:     idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		Scopes:           idp_utils.ScopesValue(d),
+		ProviderOptions:  idp_utils.ProviderOptionsValue(d),
+		Issuer:           idp_utils.StringValue(d, IssuerVar),
+		IsIdTokenMapping: idp_utils.BoolValue(d, IsIdTokenMappingVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create oidc idp: %v", err)
 	}
-	d.SetId(resp.GetIdpId())
-
+	d.SetId(resp.GetId())
 	return nil
 }
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started update")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	if d.HasChanges(nameVar, stylingTypeVar, autoRegisterVar) {
-		_, err := client.UpdateOrgIDP(ctx, &management.UpdateOrgIDPRequest{
-			IdpId:        d.Id(),
-			Name:         d.Get(nameVar).(string),
-			StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[d.Get(stylingTypeVar).(string)]),
-			AutoRegister: d.Get(autoRegisterVar).(bool),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update oidc idp: %v", err)
-		}
-	}
-
-	if d.HasChanges(clientIDVar, clientSecretVar, issuerVar, DisplayNameMappingVar, usernameMappingVar, scopesVar) {
-		_, err = client.UpdateOrgIDPOIDCConfig(ctx, &management.UpdateOrgIDPOIDCConfigRequest{
-			IdpId:              d.Id(),
-			ClientId:           d.Get(clientIDVar).(string),
-			ClientSecret:       d.Get(clientSecretVar).(string),
-			Issuer:             d.Get(issuerVar).(string),
-			Scopes:             helper.GetOkSetToStringSlice(d, scopesVar),
-			DisplayNameMapping: idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(DisplayNameMappingVar).(string)]),
-			UsernameMapping:    idp.OIDCMappingField(idp.OIDCMappingField_value[d.Get(usernameMappingVar).(string)]),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update oidc idp config: %v", err)
-		}
-
+	_, err = client.UpdateGenericOIDCProvider(ctx, &management.UpdateGenericOIDCProviderRequest{
+		Id:               d.Id(),
+		Name:             idp_utils.StringValue(d, idp_utils.NameVar),
+		Issuer:           idp_utils.StringValue(d, IssuerVar),
+		ClientId:         idp_utils.StringValue(d, idp_utils.ClientIDVar),
+		ClientSecret:     idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		Scopes:           idp_utils.ScopesValue(d),
+		ProviderOptions:  idp_utils.ProviderOptionsValue(d),
+		IsIdTokenMapping: idp_utils.BoolValue(d, IsIdTokenMappingVar),
+	})
+	if err != nil {
+		return diag.Errorf("failed to update idp: %v", err)
 	}
 	return nil
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started read")
-
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-
 	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	resp, err := client.GetOrgIDPByID(ctx, &management.GetOrgIDPByIDRequest{Id: helper.GetID(d, idpIDVar)})
+	resp, err := client.GetProviderByID(ctx, &management.GetProviderByIDRequest{Id: helper.GetID(d, idp_utils.IdpIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get org idp oidc")
+		return diag.Errorf("failed to get idp")
 	}
-
 	idp := resp.GetIdp()
-	oidc := idp.GetOidcConfig()
+	cfg := idp.GetConfig()
+	specificCfg := cfg.GetOidc()
+	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
-		helper.OrgIDVar:       idp.GetDetails().GetResourceOwner(),
-		nameVar:               idp.GetName(),
-		stylingTypeVar:        idp.GetStylingType().String(),
-		clientIDVar:           oidc.GetClientId(),
-		clientSecretVar:       d.Get(clientSecretVar).(string),
-		issuerVar:             oidc.GetIssuer(),
-		scopesVar:             oidc.GetScopes(),
-		DisplayNameMappingVar: oidc.GetDisplayNameMapping().String(),
-		usernameMappingVar:    oidc.GetUsernameMapping().String(),
-		autoRegisterVar:       idp.GetAutoRegister(),
+		helper.OrgIDVar:                idp.GetDetails().GetResourceOwner(),
+		idp_utils.NameVar:              idp.GetName(),
+		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
+		idp_utils.ClientSecretVar:      idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		idp_utils.ScopesVar:            specificCfg.GetScopes(),
+		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
+		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
+		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
+		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
+		IssuerVar:                      specificCfg.GetIssuer(),
+		IsIdTokenMappingVar:            specificCfg.GetIsIdTokenMapping(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
@@ -151,6 +101,5 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 	}
 	d.SetId(idp.Id)
-
 	return nil
 }

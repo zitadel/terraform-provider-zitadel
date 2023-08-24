@@ -1,12 +1,13 @@
 resource "zitadel_org_idp_oidc" "default" {
-  org_id               = data.zitadel_org.default.id
-  name                 = "oidcidp"
-  styling_type         = "STYLING_TYPE_UNSPECIFIED"
-  client_id            = "a_client_id"
-  client_secret        = "a_client_secret"
-  issuer               = "https://google.com"
-  scopes               = ["openid", "profile", "email"]
-  display_name_mapping = "OIDC_MAPPING_FIELD_PREFERRED_USERNAME"
-  username_mapping     = "OIDC_MAPPING_FIELD_PREFERRED_USERNAME"
-  auto_register        = false
+  org_id              = data.zitadel_org.default.id
+  name                = "My Generic OIDC IDP"
+  client_id           = "a_client_id"
+  client_secret       = "a_client_secret"
+  scopes              = ["openid", "profile", "email"]
+  issuer              = "https://example.com"
+  is_linking_allowed  = false
+  is_creation_allowed = true
+  is_auto_creation    = false
+  is_auto_update      = true
+  is_id_token_mapping = true
 }

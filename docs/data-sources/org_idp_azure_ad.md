@@ -13,7 +13,8 @@ Datasource representing an Azure AD IdP of the organization.
 
 ```terraform
 data "zitadel_org_idp_azure_ad" "default" {
-  id = "123456789012345678"
+  org_id = data.zitadel_org.default.id
+  id     = "123456789012345678"
 }
 ```
 
