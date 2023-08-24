@@ -39,10 +39,7 @@ resource "zitadel_trigger_actions" "default" {
 
 ## Import
 
-The resource can be imported using the ID format `<flow_type:trigger_type[:org_id]>`, e.g.
-
-```bash
-terraform import zitadel_trigger_actions.imported 'FLOW_TYPE_EXTERNAL_AUTHENTICATION:TRIGGER_TYPE_POST_CREATION:123456789012345678'
+```terraform
+# The resource can be imported using the ID format `<flow_type:trigger_type[:org_id]>`, e.g.
+terraform import trigger_actions.imported 'FLOW_TYPE_EXTERNAL_AUTHENTICATION:TRIGGER_TYPE_POST_CREATION:123456789012345678'
 ```
-
-You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

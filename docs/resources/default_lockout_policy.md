@@ -30,10 +30,8 @@ resource "zitadel_default_lockout_policy" "default" {
 
 ## Import
 
-The resource can be imported using the ID format `<>`, e.g.
 
-```bash
-terraform import zitadel_default_lockout_policy.imported ''
+```terraform
+# The resource can be imported using the ID format `<>`, e.g.
+terraform import default_lockout_policy.imported ''
 ```
-
-You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

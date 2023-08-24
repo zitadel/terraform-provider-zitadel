@@ -17,10 +17,4 @@ description: |-
 
 ## Import
 
-The resource can be imported using the ID format `<id[:org_id][:client_secret]>`, e.g.
-
-```bash
-terraform import {{ .Name }}.imported '123456789012345678:123456789012345678:G1234567890123'
-```
-
-You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).
+{{ tffile "examples/provider/resources/org_idp_google-import.sh" }}

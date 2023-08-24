@@ -53,10 +53,7 @@ resource "zitadel_idp_github_es" "default" {
 
 ## Import
 
-The resource can be imported using the ID format `<id[:client_secret]>`, e.g.
-
-```bash
-terraform import zitadel_idp_github_es.imported '123456789012345678:1234567890123456781234567890123456787890'
+```terraform
+# The resource can be imported using the ID format `<id[:client_secret]>`, e.g.
+terraform import idp_github_es.imported '123456789012345678:1234567890123456781234567890123456787890'
 ```
-
-You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

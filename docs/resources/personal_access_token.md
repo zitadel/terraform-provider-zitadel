@@ -38,10 +38,7 @@ resource "zitadel_personal_access_token" "default" {
 
 ## Import
 
-The resource can be imported using the ID format `<id:user_id[:org_id][:token]>`, e.g.
-
-```bash
-terraform import zitadel_personal_access_token.imported '123456789012345678:123456789012345678:123456789012345678:LHt79...'
+```terraform
+# The resource can be imported using the ID format `<id:user_id[:org_id][:token]>`, e.g.
+terraform import personal_access_token.imported '123456789012345678:123456789012345678:123456789012345678:LHt79...'
 ```
-
-You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).
