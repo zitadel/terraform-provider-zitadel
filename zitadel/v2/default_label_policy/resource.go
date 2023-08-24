@@ -2,6 +2,8 @@ package default_label_policy
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
@@ -58,12 +60,12 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "disable watermark",
 			},
-			logoPathVar: {
+			LogoPathVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
 			},
-			logoHashVar: {
+			LogoHashVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
@@ -73,12 +75,12 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "",
 			},
-			iconPathVar: {
+			IconPathVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
 			},
-			iconHashVar: {
+			IconHashVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
@@ -88,12 +90,12 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "",
 			},
-			logoDarkPathVar: {
+			LogoDarkPathVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
 			},
-			logoDarkHashVar: {
+			LogoDarkHashVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
@@ -103,12 +105,12 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "",
 			},
-			iconDarkPathVar: {
+			IconDarkPathVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
 			},
-			iconDarkHashVar: {
+			IconDarkHashVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
@@ -118,12 +120,12 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "",
 			},
-			fontPathVar: {
+			FontPathVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
 			},
-			fontHashVar: {
+			FontHashVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "",
@@ -133,7 +135,7 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "",
 			},
-			setActiveVar: {
+			SetActiveVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "set the label policy active after creating/updating",
@@ -143,6 +145,6 @@ func GetResource() *schema.Resource {
 		CreateContext: update,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer:      helper.ImportWithEmptyID(),
 	}
 }

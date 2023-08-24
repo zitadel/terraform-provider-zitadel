@@ -16,12 +16,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			userStateVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -108,7 +103,7 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Is the phone verified of the user",
 			},
-			initialPasswordVar: {
+			InitialPasswordVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Initially set password for the user, not changeable after creation",
@@ -146,6 +141,6 @@ func GetResource() *schema.Resource {
 				return diff.SetNew(preferredLanguageVar, defaultPreferredLanguage)
 			}),
 		),
-		Importer: &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: helper.ImportWithIDAndOptionalOrgAndSecret(UserIDVar, InitialPasswordVar),
 	}
 }

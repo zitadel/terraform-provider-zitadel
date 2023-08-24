@@ -14,8 +14,8 @@ Resource representing the custom domain policy of an organization.
 ```terraform
 resource "zitadel_domain_policy" "default" {
   org_id                                      = data.zitadel_org.default.id
-  user_login_must_be_domain                   = true
-  validate_org_domains                        = false
+  user_login_must_be_domain                   = false
+  validate_org_domains                        = true
   smtp_sender_address_matches_instance_domain = true
 }
 ```
@@ -25,11 +25,21 @@ resource "zitadel_domain_policy" "default" {
 
 ### Required
 
-- `org_id` (String) Id for the organization
 - `smtp_sender_address_matches_instance_domain` (Boolean)
 - `user_login_must_be_domain` (Boolean) User login must be domain
 - `validate_org_domains` (Boolean) Validate organization domains
 
+### Optional
+
+- `org_id` (String) ID of the organization
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<[org_id]>`, e.g.
+terraform import domain_policy.imported '123456789012345678'
+```

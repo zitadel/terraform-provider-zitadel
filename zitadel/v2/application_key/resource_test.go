@@ -1,4 +1,4 @@
-package app_key_test
+package application_key_test
 
 import (
 	"fmt"
@@ -8,8 +8,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/app_key"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api/application_api_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_key"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
 )
@@ -17,7 +18,7 @@ import (
 func TestAccAppKey(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_key")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
-	exampleProperty := test_utils.AttributeValue(t, app_key.ExpirationDateVar, exampleAttributes).AsString()
+	exampleProperty := test_utils.AttributeValue(t, application_key.ExpirationDateVar, exampleAttributes).AsString()
 	updatedProperty := "2501-01-01T08:45:00Z"
 	projectDep, projectID := project_test_dep.Create(t, frame)
 	appDep, appID := application_api_test_dep.Create(t, frame, projectID)
@@ -27,12 +28,18 @@ func TestAccAppKey(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency, projectDep, appDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, updatedProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(frame, projectID, appID),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID, appID), updatedProperty),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_key.ProjectIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_key.AppIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_key.KeyDetailsVar),
+		),
 	)
 }
 

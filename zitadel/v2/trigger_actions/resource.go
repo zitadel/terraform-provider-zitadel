@@ -12,12 +12,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing triggers, when actions get started",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			FlowTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -49,7 +44,11 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: helper.ImportWithEmptyID(
+			helper.NewImportAttribute(FlowTypeVar, helper.ConvertNonEmpty, false),
+			helper.NewImportAttribute(TriggerTypeVar, helper.ConvertNonEmpty, false),
+			helper.ImportOptionalOrgAttribute,
+		),
 	}
 }
 

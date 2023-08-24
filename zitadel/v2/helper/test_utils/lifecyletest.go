@@ -2,6 +2,7 @@ package test_utils
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -15,19 +16,16 @@ func RunLifecyleTest[P comparable](
 	datasources []string,
 	resourceFunc func(property P, secret string) string,
 	exampleProperty, updatedProperty P,
-	exampleSecret, updatedSecret string,
+	secretAttribute, exampleSecret, updatedSecret string,
 	allowNonEmptyPlan bool,
 	checkRemoteProperty func(expect P) resource.TestCheckFunc,
 	idPattern *regexp.Regexp,
-	checkDestroy, checkImportState resource.TestCheckFunc,
+	checkDestroy resource.TestCheckFunc,
 	importStateIdFunc resource.ImportStateIdFunc,
-	wrongImportID,
-	secretAttribute string,
+	importStateVerifyIgnore ...string,
 ) {
-	var importStateVerifyIgnore []string
 	exampleConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(exampleProperty, exampleSecret))
 	updatedPropertyConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(updatedProperty, exampleSecret))
-	updatedSecretConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(updatedProperty, updatedSecret))
 	steps := []resource.TestStep{
 		{ // Check first plan has a diff
 			Config:             exampleConfig,
@@ -50,7 +48,18 @@ func RunLifecyleTest[P comparable](
 			Check:  CheckAMinute(checkRemoteProperty(updatedProperty)),
 		},
 	}
+	if importStateIdFunc != nil {
+		steps = append(steps, resource.TestStep{ // Expect importing works
+			Config:                  updatedPropertyConfig,
+			ResourceName:            frame.TerraformName,
+			ImportState:             true,
+			ImportStateIdFunc:       importStateIdFunc,
+			ImportStateVerify:       true,
+			ImportStateVerifyIgnore: importStateVerifyIgnore,
+		})
+	}
 	if secretAttribute != "" {
+		updatedSecretConfig := fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(datasources, "\n"), resourceFunc(updatedProperty, updatedSecret))
 		steps = append(steps, resource.TestStep{ // Check that secret has a diff
 			Config:             updatedSecretConfig,
 			ExpectNonEmptyPlan: true,
@@ -61,29 +70,11 @@ func RunLifecyleTest[P comparable](
 		})
 		importStateVerifyIgnore = []string{secretAttribute}
 	}
-	if wrongImportID != "" {
-		steps = append(steps, resource.TestStep{ // Expect import error if secret is not given
-			ResourceName:  frame.TerraformName,
-			ImportState:   true,
-			ImportStateId: wrongImportID,
-			ExpectError:   regexp.MustCompile(wrongImportID),
-		})
-	}
-	if checkImportState != nil {
-		steps = append(steps, resource.TestStep{ // Expect importing works
-			ResourceName:            frame.TerraformName,
-			ImportState:             true,
-			ImportStateIdFunc:       importStateIdFunc,
-			ImportStateVerify:       true,
-			ImportStateVerifyIgnore: importStateVerifyIgnore,
-			Check:                   checkImportState,
-		})
-	}
 	resource.ParallelTest(t, resource.TestCase{
 		CheckDestroy: CheckAMinute(checkDestroy),
 		Steps:        steps,
 		ErrorCheck: func(err error) error {
-			if err != nil && allowNonEmptyPlan && strings.Contains(err.Error(), "After applying this test step and performing a `terraform refresh`, the plan was not empty") {
+			if err != nil && allowNonEmptyPlan && os.Getenv("CI") == "true" && strings.Contains(err.Error(), "After applying this test step and performing a `terraform refresh`, the plan was not empty") {
 				t.Logf("Ignoring non-empty plan error because we can't guarantee consistency: %s", err.Error())
 				return nil
 			}

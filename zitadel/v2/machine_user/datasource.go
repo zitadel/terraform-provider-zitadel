@@ -1,20 +1,20 @@
 package machine_user
 
-import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+)
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
 			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of this resource.",
-			},
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
 			},
 			userStateVar: {
 				Type:        schema.TypeString,
@@ -56,6 +56,5 @@ func GetDatasource() *schema.Resource {
 				Description: "Access token type",
 			}},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }

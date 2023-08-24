@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/domain_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
@@ -28,12 +29,12 @@ func TestAccDomainPolicy(t *testing.T) {
 			return strings.Replace(resourceExample, strconv.FormatBool(exampleProperty), strconv.FormatBool(property), 1)
 		},
 		exampleProperty, !exampleProperty,
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*otherFrame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		checkRemoteProperty(*otherFrame)(false),
-		nil, nil, "", "",
+		test_utils.ImportOrgId(otherFrame),
 	)
 }
 

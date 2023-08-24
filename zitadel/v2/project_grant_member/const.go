@@ -1,9 +1,8 @@
 package project_grant_member
 
 const (
-	orgIDVar     = "org_id"
-	projectIDVar = "project_id"
+	ProjectIDVar = "project_id"
 	GrantIDVar   = "grant_id"
-	userIDVar    = "user_id"
+	UserIDVar    = "user_id"
 	RolesVar     = "roles"
 )

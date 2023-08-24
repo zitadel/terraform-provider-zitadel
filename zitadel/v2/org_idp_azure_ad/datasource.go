@@ -3,9 +3,9 @@ package org_idp_azure_ad
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_azure_ad"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
 )
 
 func GetDatasource() *schema.Resource {
@@ -13,7 +13,7 @@ func GetDatasource() *schema.Resource {
 		Description: "Datasource representing an Azure AD IdP of the organization.",
 		Schema: map[string]*schema.Schema{
 			idp_utils.IdpIDVar:             idp_utils.IdPIDDataSourceField,
-			org_idp_utils.OrgIDVar:         org_idp_utils.OrgIDDatasourceField,
+			helper.OrgIDVar:                helper.OrgIDDatasourceField,
 			idp_utils.NameVar:              idp_utils.NameDataSourceField,
 			idp_utils.ClientIDVar:          idp_utils.ClientIDDataSourceField,
 			idp_utils.ClientSecretVar:      idp_utils.ClientSecretDataSourceField,
@@ -27,6 +27,5 @@ func GetDatasource() *schema.Resource {
 			idp_azure_ad.EmailVerifiedVar:  idp_azure_ad.EmailVerifiedDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: org_idp_utils.ImportIDPWithOrgAndSecret(idp_utils.ClientSecretVar)},
 	}
 }

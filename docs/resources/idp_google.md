@@ -44,3 +44,10 @@ resource "zitadel_idp_google" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id[:client_secret]>`, e.g.
+terraform import idp_google.imported '123456789012345678:G1234567890123'
+```

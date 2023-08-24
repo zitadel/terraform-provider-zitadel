@@ -26,13 +26,20 @@ resource "zitadel_project_grant" "default" {
 ### Required
 
 - `granted_org_id` (String) ID of the organization granted the project
-- `org_id` (String) ID of the organization which owns the resource
 - `project_id` (String) ID of the project
 
 ### Optional
 
+- `org_id` (String) ID of the organization
 - `role_keys` (Set of String) List of roles granted
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id:project_id[:org_id]>`, e.g.
+terraform import project_grant.imported '123456789012345678:123456789012345678:123456789012345678'
+```

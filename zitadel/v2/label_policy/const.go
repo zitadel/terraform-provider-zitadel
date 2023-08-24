@@ -1,7 +1,6 @@
 package label_policy
 
 const (
-	orgIDVar               = "org_id"
 	primaryColorVar        = "primary_color"
 	hideLoginNameSuffixVar = "hide_login_name_suffix"
 	warnColorVar           = "warn_color"
@@ -12,22 +11,22 @@ const (
 	warnColorDarkVar       = "warn_color_dark"
 	fontColorDarkVar       = "font_color_dark"
 	disableWatermarkVar    = "disable_watermark"
-	logoPathVar            = "logo_path"
-	logoHashVar            = "logo_hash"
+	LogoPathVar            = "logo_path"
+	LogoHashVar            = "logo_hash"
 	logoURLVar             = "logo_url"
-	iconPathVar            = "icon_path"
-	iconHashVar            = "icon_hash"
+	IconPathVar            = "icon_path"
+	IconHashVar            = "icon_hash"
 	iconURLVar             = "icon_url"
-	logoDarkPathVar        = "logo_dark_path"
-	logoDarkHashVar        = "logo_dark_hash"
+	LogoDarkPathVar        = "logo_dark_path"
+	LogoDarkHashVar        = "logo_dark_hash"
 	logoURLDarkVar         = "logo_url_dark"
-	iconDarkPathVar        = "icon_dark_path"
-	iconDarkHashVar        = "icon_dark_hash"
+	IconDarkPathVar        = "icon_dark_path"
+	IconDarkHashVar        = "icon_dark_hash"
 	iconURLDarkVar         = "icon_url_dark"
-	fontPathVar            = "font_path"
-	fontHashVar            = "font_hash"
+	FontPathVar            = "font_path"
+	FontHashVar            = "font_hash"
 	fontURLVar             = "font_url"
-	setActiveVar           = "set_active"
+	SetActiveVar           = "set_active"
 )
 
 const (

@@ -2,6 +2,8 @@ package application_api
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetDatasource() *schema.Resource {
@@ -13,12 +15,8 @@ func GetDatasource() *schema.Resource {
 				Required:    true,
 				Description: "The ID of this resource.",
 			},
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "orgID of the application",
-			},
-			projectIDVar: {
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
@@ -35,6 +33,5 @@ func GetDatasource() *schema.Resource {
 			},
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }

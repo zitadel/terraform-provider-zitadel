@@ -38,13 +38,20 @@ resource "zitadel_org_idp_gitlab_self_hosted" "default" {
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
 - `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
 - `issuer` (String) the providers issuer
-- `org_id` (String) ID of the organization
 
 ### Optional
 
 - `name` (String) Name of the IDP
+- `org_id` (String) ID of the organization
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id[:org_id][:client_secret]>`, e.g.
+terraform import org_idp_gitlab_self_hosted.imported '123456789012345678:123456789012345678:1234567890abcdef'
+```

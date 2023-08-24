@@ -28,11 +28,21 @@ resource "zitadel_action" "default" {
 
 - `allowed_to_fail` (Boolean) when true, the next action will be called even if this action fails
 - `name` (String)
-- `org_id` (String) ID of the organization
 - `script` (String)
 - `timeout` (String) after which time the action will be terminated if not finished
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `state` (Number) the state of the action
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id[:org_id]>`, e.g.
+terraform import action.imported '123456789012345678:123456789012345678'
+```

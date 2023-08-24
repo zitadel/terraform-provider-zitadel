@@ -2,7 +2,6 @@ package org_idp_oidc_test
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -10,29 +9,34 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_oidc"
 )
 
-func TestAccOrgIDPJWT(t *testing.T) {
+func TestAccOrgIDPOIDC(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_org_idp_oidc")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, org_idp_oidc.DisplayNameMappingVar, exampleAttributes).AsString()
 	updatedProperty := idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL.String()
+	exampleSecret := test_utils.AttributeValue(t, idp_utils.ClientSecretVar, exampleAttributes).AsString()
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		[]string{frame.AsOrgDefaultDependency},
-		func(configProperty, _ string) string {
-			return strings.Replace(resourceExample, exampleProperty, configProperty, 1)
-		},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
 		exampleProperty, updatedProperty,
-		"", "",
+		idp_utils.ClientSecretVar, exampleSecret, "an updated secret",
 		true,
 		checkRemoteProperty(*frame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame), updatedProperty),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, idp_utils.ClientSecretVar),
+		),
 	)
 }
 

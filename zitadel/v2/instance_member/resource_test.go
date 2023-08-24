@@ -2,6 +2,7 @@ package instance_member_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -9,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/member"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/human_user/human_user_test_dep"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/instance_member"
@@ -25,12 +27,12 @@ func TestAccInstanceMember(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency, userDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "IAM_OWNER_VIEWER",
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(*frame, userID),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		regexp.MustCompile(fmt.Sprintf("^%s_%s$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern)),
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
-		nil, nil, "", "",
+		test_utils.ImportStateAttribute(frame.BaseTestFrame, instance_member.UserIDVar),
 	)
 }
 

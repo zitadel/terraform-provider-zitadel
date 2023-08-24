@@ -33,3 +33,10 @@ resource "zitadel_default_privacy_policy" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<>`, e.g.
+terraform import default_privacy_policy.imported ''
+```

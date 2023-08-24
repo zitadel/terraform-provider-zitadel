@@ -24,6 +24,5 @@ func GetDatasource() *schema.Resource {
 			EmailVerifiedVar:               EmailVerifiedDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithSecret(idp_utils.ClientSecretVar)},
 	}
 }

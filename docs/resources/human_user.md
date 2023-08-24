@@ -39,7 +39,6 @@ resource "zitadel_human_user" "default" {
 - `email` (String) Email of the user
 - `first_name` (String) First name of the user
 - `last_name` (String) Last name of the user
-- `org_id` (String) ID of the organization
 - `user_name` (String) Username
 
 ### Optional
@@ -50,6 +49,7 @@ resource "zitadel_human_user" "default" {
 - `is_email_verified` (Boolean) Is the email verified of the user, can only be true if password of the user is set
 - `is_phone_verified` (Boolean) Is the phone verified of the user
 - `nick_name` (String) Nick name of the user
+- `org_id` (String) ID of the organization
 - `phone` (String) Phone of the user
 - `preferred_language` (String) Preferred language of the user
 
@@ -59,3 +59,10 @@ resource "zitadel_human_user" "default" {
 - `login_names` (List of String) Loginnames
 - `preferred_login_name` (String) Preferred login name
 - `state` (String) State of the user
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `id[:org_id][:initial_password]>`, e.g.
+terraform import human_user.imported '123456789012345678:123456789012345678:Password1!'
+```

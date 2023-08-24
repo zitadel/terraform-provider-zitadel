@@ -2,13 +2,16 @@ package project_grant
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the grant of a project to a different organization, also containing the available roles which can be given to the members of the projectgrant.",
 		Schema: map[string]*schema.Schema{
-			projectIDVar: {
+			helper.OrgIDVar: helper.OrgIDResourceField,
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
@@ -28,16 +31,14 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "List of roles granted",
 			},
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization which owns the resource",
-			},
 		},
 		DeleteContext: delete,
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: helper.ImportWithIDAndOptionalOrg(
+			"",
+			helper.NewImportAttribute(ProjectIDVar, helper.ConvertID, false),
+		),
 	}
 }

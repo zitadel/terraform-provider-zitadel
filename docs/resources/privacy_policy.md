@@ -27,11 +27,21 @@ resource "zitadel_privacy_policy" "default" {
 ### Required
 
 - `help_link` (String)
-- `org_id` (String) Id for the organization
 - `privacy_link` (String)
 - `support_email` (String)
 - `tos_link` (String)
 
+### Optional
+
+- `org_id` (String) ID of the organization
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<[org_id]>`, e.g.
+terraform import privacy_policy.imported '123456789012345678'
+```

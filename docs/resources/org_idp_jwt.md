@@ -35,9 +35,19 @@ resource "zitadel_org_idp_jwt" "default" {
 - `jwt_endpoint` (String) the endpoint where the jwt can be extracted
 - `keys_endpoint` (String) the endpoint to the key (JWK) which are used to sign the JWT with
 - `name` (String) Name of the IDP
-- `org_id` (String) ID of the organization
 - `styling_type` (String) Some identity providers specify the styling of the button to their login, supported values: STYLING_TYPE_UNSPECIFIED, STYLING_TYPE_GOOGLE
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id[:org_id]>`, e.g.
+terraform import org_idp_jwt.imported '123456789012345678:123456789012345678'
+```

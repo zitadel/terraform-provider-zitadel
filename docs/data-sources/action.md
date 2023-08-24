@@ -28,6 +28,9 @@ output "action" {
 ### Required
 
 - `action_id` (String) The ID of this resource.
+
+### Optional
+
 - `org_id` (String) ID of the organization
 
 ### Read-Only

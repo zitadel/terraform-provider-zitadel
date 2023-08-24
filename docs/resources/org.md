@@ -29,3 +29,10 @@ resource "zitadel_org" "default" {
 - `id` (String) The ID of this resource.
 - `primary_domain` (String) Primary domain of the org
 - `state` (String) State of the org
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id>`, e.g.
+terraform import org.imported '123456789012345678'
+```

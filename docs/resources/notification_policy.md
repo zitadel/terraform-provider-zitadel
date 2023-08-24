@@ -23,9 +23,19 @@ resource "zitadel_notification_policy" "default" {
 
 ### Required
 
-- `org_id` (String) Id for the organization
 - `password_change` (Boolean) Send notification if a user changes his password
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<[org_id]>`, e.g.
+terraform import notification_policy.imported '123456789012345678'
+```

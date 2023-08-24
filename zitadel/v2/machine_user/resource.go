@@ -13,12 +13,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-				ForceNew:    true,
-			},
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			userStateVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -70,6 +65,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer:      helper.ImportWithIDAndOptionalOrg(UserIDVar),
 	}
 }

@@ -25,11 +25,11 @@ resource "zitadel_user_grant" "default" {
 
 ### Required
 
-- `org_id` (String) ID of the organization which owns the resource
 - `user_id` (String) ID of the user
 
 ### Optional
 
+- `org_id` (String) ID of the organization
 - `project_grant_id` (String) ID of the granted project
 - `project_id` (String) ID of the project
 - `role_keys` (Set of String) List of roles granted
@@ -37,3 +37,10 @@ resource "zitadel_user_grant" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<flow_type:trigger_type[:org_id]>`, e.g.
+terraform import user_grant.imported '123456789012345678:123456789012345678:123456789012345678'
+```

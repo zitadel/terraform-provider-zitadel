@@ -1,7 +1,6 @@
 package login_policy
 
 const (
-	orgIDVar                      = "org_id"
 	allowUsernamePasswordVar      = "user_login"
 	allowRegisterVar              = "allow_register"
 	allowExternalIDPVar           = "allow_external_idp"

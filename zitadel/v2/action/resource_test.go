@@ -26,12 +26,15 @@ func TestAccAction(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "updatedproperty",
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(frame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		test_utils.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportOrgId(frame),
+		),
 	)
 }
 

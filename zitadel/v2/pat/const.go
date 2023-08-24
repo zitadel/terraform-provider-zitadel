@@ -1,8 +1,8 @@
 package pat
 
 const (
-	orgIDVar          = "org_id"
-	userIDVar         = "user_id"
-	tokenVar          = "token"
+	tokenIDVar        = "token_id"
+	UserIDVar         = "user_id"
+	TokenVar          = "token"
 	ExpirationDateVar = "expiration_date"
 )

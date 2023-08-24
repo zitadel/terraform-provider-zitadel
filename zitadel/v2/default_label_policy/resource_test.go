@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/default_label_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 )
 
@@ -35,12 +36,23 @@ func TestAccDefaultLabelPolicy(t *testing.T) {
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "#5469d3",
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
-		nil, nil, "", "",
+		test_utils.ImportNothing,
+		default_label_policy.SetActiveVar,
+		default_label_policy.LogoHashVar,
+		default_label_policy.LogoPathVar,
+		default_label_policy.LogoDarkHashVar,
+		default_label_policy.LogoDarkPathVar,
+		default_label_policy.IconHashVar,
+		default_label_policy.IconPathVar,
+		default_label_policy.IconDarkHashVar,
+		default_label_policy.IconDarkPathVar,
+		default_label_policy.FontHashVar,
+		default_label_policy.FontPathVar,
 	)
 }
 

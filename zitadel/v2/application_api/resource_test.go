@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/application_api"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/project/project_test_dep"
 )
@@ -24,12 +25,18 @@ func TestAccAppAPI(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency, projectDep},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "updatedproperty",
-		"", "",
+		"", "", "",
 		false,
 		checkRemoteProperty(frame, projectID),
-		test_utils.ZITADEL_GENERATED_ID_REGEX,
+		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID), ""),
-		nil, nil, "", "",
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_api.ProjectIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_api.ClientIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_api.ClientSecretVar),
+		),
 	)
 }
 

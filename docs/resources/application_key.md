@@ -29,10 +29,21 @@ resource "zitadel_application_key" "default" {
 - `app_id` (String) ID of the application
 - `expiration_date` (String) Expiration date of the app key in the RFC3339 format
 - `key_type` (String) Type of the app key, supported values: KEY_TYPE_UNSPECIFIED, KEY_TYPE_JSON
-- `org_id` (String) ID of the organization
 - `project_id` (String) ID of the project
+
+### Optional
+
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `key_details` (String, Sensitive) Value of the app key
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id:project_id:app_id[:org_id][:key_details]>`.
+# You can use __SEMICOLON__ to escape :, e.g.
+terraform import application_key.imported "123456789012345678:123456789012345678:123456789012345678:123456789012345678:$(cat ~/Downloads/123456789012345678.json | sed -e 's/:/__SEMICOLON__/g')"
+```

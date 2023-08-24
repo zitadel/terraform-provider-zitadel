@@ -13,13 +13,8 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing a machine key",
 		Schema: map[string]*schema.Schema{
-			orgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the organization",
-				ForceNew:    true,
-			},
-			userIDVar: {
+			helper.OrgIDVar: helper.OrgIDResourceField,
+			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the user",
@@ -41,7 +36,7 @@ func GetResource() *schema.Resource {
 				ForceNew:    true,
 				Computed:    true,
 			},
-			keyDetailsVar: {
+			KeyDetailsVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Value of the machine key",
@@ -51,6 +46,10 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		CreateContext: create,
 		ReadContext:   read,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer: helper.ImportWithIDAndOptionalOrg(
+			keyIDVar,
+			helper.NewImportAttribute(UserIDVar, helper.ConvertID, false),
+			helper.NewImportAttribute(KeyDetailsVar, helper.ConvertJSON, true),
+		),
 	}
 }

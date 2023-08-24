@@ -24,14 +24,21 @@ resource "zitadel_personal_access_token" "default" {
 
 ### Required
 
-- `org_id` (String) ID of the organization
 - `user_id` (String) ID of the user
 
 ### Optional
 
 - `expiration_date` (String) Expiration date of the token in the RFC3339 format
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `token` (String, Sensitive) Value of the token
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id:user_id[:org_id][:token]>`, e.g.
+terraform import personal_access_token.imported '123456789012345678:123456789012345678:123456789012345678:LHt79...'
+```

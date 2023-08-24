@@ -21,13 +21,13 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(orgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	_, err = client.RemovePersonalAccessToken(ctx, &management.RemovePersonalAccessTokenRequest{
-		UserId:  d.Get(userIDVar).(string),
+		UserId:  d.Get(UserIDVar).(string),
 		TokenId: d.Id(),
 	})
 	if err != nil {
@@ -44,14 +44,14 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(orgIDVar).(string)
+	orgID := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	req := &management.AddPersonalAccessTokenRequest{
-		UserId: d.Get(userIDVar).(string),
+		UserId: d.Get(UserIDVar).(string),
 	}
 	if expiration, ok := d.GetOk(ExpirationDateVar); ok {
 		t, err := time.Parse(time.RFC3339, expiration.(string))
@@ -66,7 +66,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if err := d.Set(tokenVar, resp.GetToken()); err != nil {
+	if err := d.Set(TokenVar, resp.GetToken()); err != nil {
 		return diag.FromErr(err)
 	}
 	d.SetId(resp.GetTokenId())
@@ -80,13 +80,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(orgIDVar).(string)
+	orgID := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(clientinfo, orgID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	userID := d.Get(userIDVar).(string)
+	userID := d.Get(UserIDVar).(string)
 	resp, err := client.GetPersonalAccessTokenByIDs(ctx, &management.GetPersonalAccessTokenByIDsRequest{
 		UserId:  userID,
 		TokenId: d.Id(),
@@ -101,8 +101,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	set := map[string]interface{}{
 		ExpirationDateVar: resp.GetToken().GetExpirationDate().AsTime().Format(time.RFC3339),
-		userIDVar:         userID,
-		orgIDVar:          orgID,
+		UserIDVar:         userID,
+		helper.OrgIDVar:   orgID,
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

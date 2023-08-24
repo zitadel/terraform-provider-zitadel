@@ -25,14 +25,21 @@ resource "zitadel_domain" "default" {
 ### Required
 
 - `name` (String) Name of the domain
-- `org_id` (String) ID of the organization
 
 ### Optional
 
 - `is_primary` (Boolean) Is domain primary
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `is_verified` (Boolean) Is domain verified
 - `validation_type` (Number) Validation type
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `name[:org_id]`, e.g.
+terraform import domain.imported 'example.com:123456789012345678'
+```

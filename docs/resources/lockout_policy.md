@@ -27,8 +27,15 @@ resource "zitadel_lockout_policy" "default" {
 
 ### Optional
 
-- `org_id` (String) Id for the organization
+- `org_id` (String) ID of the organization
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<[org_id]>`, e.g.
+terraform import lockout_policy.imported '123456789012345678'
+```

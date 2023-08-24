@@ -29,3 +29,10 @@ resource "zitadel_instance_member" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<user_id>`, e.g.
+terraform import instance_member.imported '123456789012345678'
+```

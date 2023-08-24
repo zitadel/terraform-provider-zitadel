@@ -75,3 +75,11 @@ resource "zitadel_default_label_policy" "default" {
 - `id` (String) The ID of this resource.
 - `logo_url` (String)
 - `logo_url_dark` (String)
+
+## Import
+
+
+```terraform
+# The resource can be imported using the ID format `<>`, e.g.
+terraform import default_label_policy.imported ''
+```

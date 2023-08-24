@@ -3,6 +3,7 @@ package org_idp_azure_ad
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_azure_ad"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/idp_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/org_idp_utils"
@@ -12,7 +13,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing an Azure AD IdP on the organization.",
 		Schema: map[string]*schema.Schema{
-			org_idp_utils.OrgIDVar:         org_idp_utils.OrgIDResourceField,
+			helper.OrgIDVar:                helper.OrgIDResourceField,
 			idp_utils.NameVar:              idp_utils.NameResourceField,
 			idp_utils.ClientIDVar:          idp_utils.ClientIDResourceField,
 			idp_utils.ClientSecretVar:      idp_utils.ClientSecretResourceField,
@@ -29,6 +30,6 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: org_idp_utils.Delete,
-		Importer:      &schema.ResourceImporter{StateContext: org_idp_utils.ImportIDPWithOrgAndSecret(idp_utils.ClientSecretVar)},
+		Importer:      helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
 	}
 }

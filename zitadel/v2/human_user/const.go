@@ -2,7 +2,6 @@ package human_user
 
 const (
 	UserIDVar             = "user_id"
-	orgIDVar              = "org_id"
 	userStateVar          = "state"
 	UserNameVar           = "user_name"
 	loginNamesVar         = "login_names"
@@ -21,7 +20,7 @@ const (
 	isPhoneVerifiedVar = "is_phone_verified"
 	phoneVar           = "phone"
 
-	initialPasswordVar = "initial_password"
+	InitialPasswordVar = "initial_password"
 
 	defaultGenderString      = "GENDER_UNSPECIFIED"
 	defaultPreferredLanguage = "und"

@@ -39,11 +39,11 @@ resource "zitadel_org_idp_azure_ad" "default" {
 - `is_auto_update` (Boolean) enable if a the ZITADEL account fields should be updated automatically on each login
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
 - `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
-- `org_id` (String) ID of the organization
 
 ### Optional
 
 - `name` (String) Name of the IDP
+- `org_id` (String) ID of the organization
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 - `tenant_id` (String) if tenant_id is not set, the tenant_type is used
 - `tenant_type` (String) the azure ad tenant type
@@ -51,3 +51,10 @@ resource "zitadel_org_idp_azure_ad" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id[:org_id][:client_secret]>`, e.g.
+terraform import org_idp_azure_ad.imported '123456789012345678:123456789012345678:12345678-1234-1234-1234-123456789012'
+```

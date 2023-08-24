@@ -28,11 +28,11 @@ resource "zitadel_project" "default" {
 ### Required
 
 - `name` (String) Name of the project
-- `org_id` (String) Organization in which the project is located
 
 ### Optional
 
 - `has_project_check` (Boolean) ZITADEL checks if the org of the user has permission to this project
+- `org_id` (String) ID of the organization
 - `private_labeling_setting` (String) Defines from where the private labeling should be triggered, supported values: PRIVATE_LABELING_SETTING_UNSPECIFIED, PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY, PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY
 - `project_role_assertion` (Boolean) describes if roles of user should be added in token
 - `project_role_check` (Boolean) ZITADEL checks if the user has at least one on this project
@@ -41,3 +41,10 @@ resource "zitadel_project" "default" {
 
 - `id` (String) The ID of this resource.
 - `state` (String) State of the project
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id[:org_id]>`, e.g.
+terraform import project.imported '123456789012345678:123456789012345678'
+```

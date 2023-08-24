@@ -2,6 +2,8 @@ package default_password_complexity_policy
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
 )
 
 func GetResource() *schema.Resource {
@@ -38,6 +40,6 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		CreateContext: update,
 		UpdateContext: update,
-		Importer:      &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
+		Importer:      helper.ImportWithEmptyID(),
 	}
 }

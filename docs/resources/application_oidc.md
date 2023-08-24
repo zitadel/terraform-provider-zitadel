@@ -41,7 +41,6 @@ resource "zitadel_application_oidc" "default" {
 
 - `grant_types` (List of String) Grant types, supported values: OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDC_GRANT_TYPE_IMPLICIT, OIDC_GRANT_TYPE_REFRESH_TOKEN, OIDC_GRANT_TYPE_DEVICE_CODE
 - `name` (String) Name of the application
-- `org_id` (String) orgID of the application
 - `project_id` (String) ID of the project
 - `redirect_uris` (List of String) RedirectURIs
 - `response_types` (List of String) Response type, supported values: OIDC_RESPONSE_TYPE_CODE, OIDC_RESPONSE_TYPE_ID_TOKEN, OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN
@@ -57,6 +56,7 @@ resource "zitadel_application_oidc" "default" {
 - `dev_mode` (Boolean) Dev mode
 - `id_token_role_assertion` (Boolean) ID token role assertion
 - `id_token_userinfo_assertion` (Boolean) Token userinfo assertion
+- `org_id` (String) ID of the organization
 - `post_logout_redirect_uris` (List of String) Post logout redirect URIs
 - `version` (String) Version, supported values: OIDC_VERSION_1_0
 
@@ -65,3 +65,10 @@ resource "zitadel_application_oidc" "default" {
 - `client_id` (String, Sensitive) generated ID for this config
 - `client_secret` (String, Sensitive) generated secret for this config
 - `id` (String) The ID of this resource.
+
+## Import
+
+```terraform
+# The resource can be imported using the ID format `<id:project_id[:org_id][:client_id][:client_secret]>`, e.g.
+terraform import application_oidc.imported '123456789012345678:123456789012345678:123456789012345678:123456789012345678@zitadel:JuaDFFeOak5DGE655KCYPSAclSkbMVEJXXuX1lEMBT14eLMSs0A0qhafKX5SA2Df'
+```

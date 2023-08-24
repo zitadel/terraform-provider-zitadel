@@ -6,7 +6,6 @@ import (
 
 const (
 	UserIDVar             = "user_id"
-	orgIDVar              = "org_id"
 	userStateVar          = "state"
 	UserNameVar           = "user_name"
 	loginNamesVar         = "login_names"

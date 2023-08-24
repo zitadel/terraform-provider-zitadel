@@ -42,6 +42,5 @@ func GetDatasource() *schema.Resource {
 			ProfileAttributeVar:           ProfileAttributeDataSourceField,
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: idp_utils.ImportIDPWithSecret(BindPasswordVar)},
 	}
 }

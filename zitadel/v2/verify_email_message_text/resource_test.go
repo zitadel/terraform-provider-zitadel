@@ -25,13 +25,13 @@ func TestAccVerifyEmailMessageText(t *testing.T) {
 		[]string{frame.AsOrgDefaultDependency},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "updatedtitle",
-		"", "",
+		"", "", "",
 		true,
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^\d{18}_%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
 		checkRemoteProperty(frame, exampleLanguage)("Zitadel - Verify email"),
-		nil, nil, "", "",
+		nil,
 	)
 }
 

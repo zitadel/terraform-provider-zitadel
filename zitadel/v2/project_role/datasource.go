@@ -1,17 +1,21 @@
 package project_role
 
-import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/v2/helper"
+)
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing the project roles, which can be given as authorizations to users.",
 		Schema: map[string]*schema.Schema{
-			projectIDVar: {
+			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the project",
 			},
-			orgIDVar: {
+			helper.OrgIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization",
@@ -33,6 +37,5 @@ func GetDatasource() *schema.Resource {
 			},
 		},
 		ReadContext: read,
-		Importer:    &schema.ResourceImporter{StateContext: schema.ImportStatePassthroughContext},
 	}
 }
