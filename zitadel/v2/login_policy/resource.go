@@ -31,6 +31,11 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "defines if a user MUST use a multi factor to log in",
 			},
+			forceMFALocalOnlyVar: {
+				Type:        schema.TypeBool,
+				Required:    true,
+				Description: "if activated, ZITADEL only enforces MFA on local authentications. On authentications through MFA, ZITADEL won't prompt for MFA.",
+			},
 			passwordlessTypeVar: {
 				Type:        schema.TypeString,
 				Required:    true,

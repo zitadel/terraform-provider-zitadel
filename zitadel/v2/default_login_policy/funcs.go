@@ -42,6 +42,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		allowRegisterVar,
 		allowExternalIDPVar,
 		forceMFAVar,
+		forceMFALocalOnlyVar,
 		passwordlessTypeVar,
 		hidePasswordResetVar,
 		ignoreUnknownUsernamesVar,
@@ -87,6 +88,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			AllowDomainDiscovery:       d.Get(allowDomainDiscovery).(bool),
 			DisableLoginWithEmail:      d.Get(disableLoginWithEmail).(bool),
 			DisableLoginWithPhone:      d.Get(disableLoginWithPhone).(bool),
+			ForceMfaLocalOnly:          d.Get(forceMFALocalOnlyVar).(bool),
 		})
 		if helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to update login policy: %v", err)
@@ -224,6 +226,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		allowDomainDiscovery:          resp.Policy.GetAllowDomainDiscovery(),
 		disableLoginWithEmail:         resp.Policy.GetDisableLoginWithEmail(),
 		disableLoginWithPhone:         resp.Policy.GetDisableLoginWithPhone(),
+		forceMFALocalOnlyVar:          resp.Policy.GetForceMfaLocalOnly(),
 	}
 
 	respSecond, err := client.ListLoginPolicySecondFactors(ctx, &admin.ListLoginPolicySecondFactorsRequest{})
