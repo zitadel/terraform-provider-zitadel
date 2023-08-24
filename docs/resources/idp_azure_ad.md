@@ -52,10 +52,7 @@ resource "zitadel_idp_azure_ad" "default" {
 
 ## Import
 
-The resource can be imported using the ID format `<id[:client_secret]>`, e.g.
-
-```bash
-terraform import zitadel_idp_azure_ad.imported '123456789012345678:12345678-1234-1234-1234-123456789012'
+```terraform
+# The resource can be imported using the ID format `<id[:client_secret]>`, e.g.
+terraform import idp_azure_ad.imported '123456789012345678:12345678-1234-1234-1234-123456789012'
 ```
-
-You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

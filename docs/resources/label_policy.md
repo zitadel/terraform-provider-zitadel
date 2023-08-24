@@ -80,10 +80,7 @@ resource "zitadel_label_policy" "default" {
 
 ## Import
 
-The resource can be imported using the ID format `<[org_id]>`, e.g.
-
-```bash
-terraform import zitadel_label_policy.imported '123456789012345678'
+```terraform
+# The resource can be imported using the ID format `<[org_id]>`, e.g.
+terraform import label_policy.imported '123456789012345678'
 ```
-
-You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

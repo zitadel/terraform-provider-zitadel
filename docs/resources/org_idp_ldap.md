@@ -77,10 +77,7 @@ resource "zitadel_org_idp_ldap" "default" {
 
 ## Import
 
-The resource can be imported using the ID format `<id[:org_id][:bind_password]>`, e.g.
-
-```bash
-terraform import zitadel_org_idp_ldap.imported '123456789012345678:123456789012345678:b1nd_p4ssw0rd'
+```terraform
+# The resource can be imported using the ID format `<id[:org_id][:bind_password]>`, e.g.
+terraform import org_idp_ldap.imported '123456789012345678:123456789012345678:b1nd_p4ssw0rd'
 ```
-
-You can also declare an import block, for example if you'd like [to generate the configuration file](https://developer.hashicorp.com/terraform/language/import/generating-configuration).
