@@ -10,7 +10,7 @@ Learn more about ZITADEL by checking out the [source repository on GitHub](https
 ## About this Terraform Provider
 
 This is the official ZITADEL Terraform provider.
-It lets you declare ZITADEL resources declaratively and apply the resources to any ZITADEL instance.
+It lets you declare ZITADEL resources and apply the resources to any ZITADEL instance.
 Importing existing resources to the Terraform state is supported.
 
 ## Usage
