@@ -1,0 +1,12 @@
+package org_idp_jwt
+
+const (
+	idpIDVar        = "idp_id"
+	nameVar         = "name"
+	stylingTypeVar  = "styling_type"
+	issuerVar       = "issuer"
+	autoRegisterVar = "auto_register"
+	JwtEndpointVar  = "jwt_endpoint"
+	keysEndpointVar = "keys_endpoint"
+	headerNameVar   = "header_name"
+)

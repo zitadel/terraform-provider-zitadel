@@ -1,0 +1,63 @@
+package org_idp_jwt
+
+import (
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_utils"
+)
+
+func GetResource() *schema.Resource {
+	return &schema.Resource{
+		Description: "Resource representing a generic JWT IdP of the organization.",
+		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDResourceField,
+			nameVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the IDP",
+			},
+			stylingTypeVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Some identity providers specify the styling of the button to their login" + helper.DescriptionEnumValuesList(idp.IDPStylingType_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(stylingTypeVar, value, idp.IDPStylingType_value)
+				},
+			},
+			JwtEndpointVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "the endpoint where the jwt can be extracted",
+			},
+			keysEndpointVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "the endpoint to the key (JWK) which are used to sign the JWT with",
+			},
+			issuerVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "the issuer of the jwt (for validation)",
+			},
+			headerNameVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "the name of the header where the JWT is sent in, default is authorization",
+			},
+			autoRegisterVar: {
+				Type:        schema.TypeBool,
+				Required:    true,
+				Description: "auto register for users from this idp",
+			},
+		},
+		ReadContext:   read,
+		CreateContext: create,
+		UpdateContext: update,
+		DeleteContext: delete,
+		Importer:      helper.ImportWithIDAndOptionalOrg(idp_utils.IdpIDVar),
+	}
+}

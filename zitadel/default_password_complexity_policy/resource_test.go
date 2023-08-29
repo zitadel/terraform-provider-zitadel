@@ -1,0 +1,53 @@
+package default_password_complexity_policy_test
+
+import (
+	"fmt"
+	"strconv"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
+
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_password_complexity_policy"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
+)
+
+func TestAccDefaultPasswordComplexityPolicy(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_password_complexity_policy")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleProperty, err := strconv.ParseUint(test_utils.AttributeValue(t, default_password_complexity_policy.MinLengthVar, exampleAttributes).AsString(), 10, 64)
+	if err != nil {
+		t.Fatalf("could not parse example property: %v", err)
+	}
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		nil,
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		exampleProperty, 10,
+		"", "", "",
+		false,
+		checkRemoteProperty(*frame),
+		helper.ZitadelGeneratedIdOnlyRegex,
+		test_utils.CheckNothing,
+		test_utils.ImportNothing,
+	)
+}
+
+func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(uint64) resource.TestCheckFunc {
+	return func(expect uint64) resource.TestCheckFunc {
+		return func(state *terraform.State) error {
+			resp, err := frame.GetPasswordComplexityPolicy(frame, &admin.GetPasswordComplexityPolicyRequest{})
+			if err != nil {
+				return fmt.Errorf("getting policy failed: %w", err)
+			}
+			actual := resp.GetPolicy().GetMinLength()
+			if actual != expect {
+				return fmt.Errorf("expected %d, but got %d", expect, actual)
+			}
+			return nil
+		}
+	}
+}
