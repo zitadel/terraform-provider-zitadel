@@ -92,6 +92,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	cfg := respIdp.GetConfig()
 	specificCfg := cfg.GetAzureAd()
 	generalCfg := cfg.GetOptions()
+	tenantID := specificCfg.GetTenant().GetTenantId()
 	set := map[string]interface{}{
 		helper.OrgIDVar:                respIdp.GetDetails().GetResourceOwner(),
 		idp_utils.NameVar:              respIdp.GetName(),
@@ -103,8 +104,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
 		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
 		idp_azure_ad.EmailVerifiedVar:  specificCfg.GetEmailVerified(),
-		idp_azure_ad.TenantTypeVar:     idp.AzureADTenantType_name[int32(specificCfg.GetTenant().GetTenantType())],
-		idp_azure_ad.TenantIDVar:       specificCfg.GetTenant().GetTenantId(),
+		idp_azure_ad.TenantIDVar:       tenantID,
+	}
+
+	if tenantID == "" {
+		set[idp_azure_ad.TenantTypeVar] = idp.AzureADTenantType_name[int32(specificCfg.GetTenant().GetTenantType())]
+	} else {
+		set[idp_azure_ad.TenantTypeVar] = ""
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
