@@ -92,6 +92,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	cfg := respIdp.GetConfig()
 	specificCfg := cfg.GetAzureAd()
 	generalCfg := cfg.GetOptions()
+	tenantID := specificCfg.GetTenant().GetTenantId()
 	set := map[string]interface{}{
 		idp_utils.NameVar:              respIdp.GetName(),
 		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
@@ -102,9 +103,15 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
 		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
 		EmailVerifiedVar:               specificCfg.GetEmailVerified(),
-		TenantTypeVar:                  idp.AzureADTenantType_name[int32(specificCfg.GetTenant().GetTenantType())],
-		TenantIDVar:                    specificCfg.GetTenant().GetTenantId(),
+		TenantIDVar:                    tenantID,
 	}
+
+	if tenantID == "" {
+		set[TenantTypeVar] = idp.AzureADTenantType_name[int32(specificCfg.GetTenant().GetTenantType())]
+	} else {
+		set[TenantTypeVar] = ""
+	}
+
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of oidc idp: %v", k, err)
@@ -118,6 +125,9 @@ func ConstructTenant(d *schema.ResourceData) (*idp.AzureADTenant, error) {
 	tenant := &idp.AzureADTenant{}
 	tenantId := idp_utils.StringValue(d, TenantIDVar)
 	tenantType := idp_utils.StringValue(d, TenantTypeVar)
+	if tenantId == "" && tenantType == "" {
+		return nil, fmt.Errorf("tenant_id or tenant_type are required, but both were empty")
+	}
 	if tenantId != "" && tenantType != "" {
 		return nil, fmt.Errorf("tenant_id and tenant_type are mutually exclusive, but got id %s and type %s", tenantId, tenantType)
 	}
