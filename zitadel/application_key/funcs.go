@@ -22,12 +22,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveAppKey(ctx, &management.RemoveAppKeyRequest{
+	_, err = client.RemoveAppKey(helper.CtxWithOrgID(ctx, d), &management.RemoveAppKeyRequest{
 		ProjectId: d.Get(ProjectIDVar).(string),
 		AppId:     d.Get(AppIDVar).(string),
 		KeyId:     d.Id(),
@@ -46,8 +46,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -67,7 +66,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		req.ExpirationDate = timestamppb.New(t)
 	}
 
-	resp, err := client.AddAppKey(ctx, req)
+	resp, err := client.AddAppKey(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -85,15 +84,14 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	projectID := d.Get(ProjectIDVar).(string)
 	appID := d.Get(AppIDVar).(string)
-	resp, err := client.GetAppKey(ctx, &management.GetAppKeyRequest{
+	resp, err := client.GetAppKey(helper.CtxWithOrgID(ctx, d), &management.GetAppKeyRequest{
 		ProjectId: projectID,
 		AppId:     appID,
 		KeyId:     d.Id(),
@@ -111,7 +109,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		ExpirationDateVar: resp.GetKey().GetExpirationDate().AsTime().Format(time.RFC3339),
 		ProjectIDVar:      projectID,
 		AppIDVar:          appID,
-		helper.OrgIDVar:   orgID,
+		helper.OrgIDVar:   d.Get(helper.OrgIDVar).(string),
 		keyTypeVar:        resp.GetKey().GetType().String(),
 	}
 	for k, v := range set {

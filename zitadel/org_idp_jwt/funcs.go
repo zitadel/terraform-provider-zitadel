@@ -20,12 +20,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveOrgIDP(ctx, &management.RemoveOrgIDPRequest{
+	_, err = client.RemoveOrgIDP(helper.CtxWithOrgID(ctx, d), &management.RemoveOrgIDPRequest{
 		IdpId: d.Id(),
 	})
 	if err != nil {
@@ -42,12 +42,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.AddOrgJWTIDP(ctx, &management.AddOrgJWTIDPRequest{
+	resp, err := client.AddOrgJWTIDP(helper.CtxWithOrgID(ctx, d), &management.AddOrgJWTIDPRequest{
 		Name:         d.Get(nameVar).(string),
 		StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[d.Get(stylingTypeVar).(string)]),
 		JwtEndpoint:  d.Get(JwtEndpointVar).(string),
@@ -71,13 +71,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	if d.HasChanges(nameVar, stylingTypeVar, autoRegisterVar) {
-		_, err := client.UpdateOrgIDP(ctx, &management.UpdateOrgIDPRequest{
+		_, err := client.UpdateOrgIDP(helper.CtxWithOrgID(ctx, d), &management.UpdateOrgIDPRequest{
 			IdpId:        d.Id(),
 			Name:         d.Get(nameVar).(string),
 			StylingType:  idp.IDPStylingType(idp.IDPStylingType_value[d.Get(stylingTypeVar).(string)]),
@@ -89,7 +89,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(JwtEndpointVar, issuerVar, keysEndpointVar, headerNameVar) {
-		_, err = client.UpdateOrgIDPJWTConfig(ctx, &management.UpdateOrgIDPJWTConfigRequest{
+		_, err = client.UpdateOrgIDPJWTConfig(helper.CtxWithOrgID(ctx, d), &management.UpdateOrgIDPJWTConfigRequest{
 			IdpId:        d.Id(),
 			JwtEndpoint:  d.Get(JwtEndpointVar).(string),
 			Issuer:       d.Get(issuerVar).(string),
@@ -111,12 +111,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetOrgIDPByID(ctx, &management.GetOrgIDPByIDRequest{Id: helper.GetID(d, idpIDVar)})
+	resp, err := client.GetOrgIDPByID(helper.CtxWithOrgID(ctx, d), &management.GetOrgIDPByIDRequest{Id: helper.GetID(d, idpIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

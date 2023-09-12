@@ -20,12 +20,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveProject(ctx, &management.RemoveProjectRequest{
+	_, err = client.RemoveProject(helper.CtxWithOrgID(ctx, d), &management.RemoveProjectRequest{
 		Id: d.Id(),
 	})
 	if err != nil {
@@ -42,12 +42,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateProject(ctx, &management.UpdateProjectRequest{
+	_, err = client.UpdateProject(helper.CtxWithOrgID(ctx, d), &management.UpdateProjectRequest{
 		Id:                     d.Id(),
 		Name:                   d.Get(NameVar).(string),
 		ProjectRoleCheck:       d.Get(roleCheckVar).(bool),
@@ -70,13 +70,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	plSetting := d.Get(privateLabelingSettingVar).(string)
-	resp, err := client.AddProject(ctx, &management.AddProjectRequest{
+	resp, err := client.AddProject(helper.CtxWithOrgID(ctx, d), &management.AddProjectRequest{
 		Name:                   d.Get(NameVar).(string),
 		ProjectRoleAssertion:   d.Get(roleAssertionVar).(bool),
 		ProjectRoleCheck:       d.Get(roleCheckVar).(bool),
@@ -98,12 +98,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetProjectByID(ctx, &management.GetProjectByIDRequest{Id: helper.GetID(d, ProjectIDVar)})
+	resp, err := client.GetProjectByID(helper.CtxWithOrgID(ctx, d), &management.GetProjectByIDRequest{Id: helper.GetID(d, ProjectIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

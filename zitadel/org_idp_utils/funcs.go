@@ -15,11 +15,11 @@ func Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.DeleteProvider(ctx, &management.DeleteProviderRequest{Id: d.Id()})
+	_, err = client.DeleteProvider(helper.CtxWithOrgID(ctx, d), &management.DeleteProviderRequest{Id: d.Id()})
 	if err != nil {
 		return diag.Errorf("failed to delete idp: %v", err)
 	}

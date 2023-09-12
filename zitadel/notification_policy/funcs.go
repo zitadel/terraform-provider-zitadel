@@ -17,12 +17,11 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.ResetNotificationPolicyToDefault(ctx, &management.ResetNotificationPolicyToDefaultRequest{})
+	_, err = client.ResetNotificationPolicyToDefault(helper.CtxWithOrgID(ctx, d), &management.ResetNotificationPolicyToDefaultRequest{})
 	if err != nil {
 		return diag.Errorf("failed to reset notification policy: %v", err)
 	}
@@ -35,13 +34,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	org := helper.GetID(d, helper.OrgIDVar)
 	if d.HasChanges(passwordChangeVar) {
-		_, err = client.UpdateCustomNotificationPolicy(ctx, &management.UpdateCustomNotificationPolicyRequest{
+		_, err = client.UpdateCustomNotificationPolicy(helper.CtxWithOrgID(ctx, d), &management.UpdateCustomNotificationPolicyRequest{
 			PasswordChange: d.Get(passwordChangeVar).(bool),
 		})
 		if err != nil {
@@ -58,12 +57,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	org := d.Get(helper.OrgIDVar).(string)
-	_, err = client.AddCustomNotificationPolicy(ctx, &management.AddCustomNotificationPolicyRequest{
+	_, err = client.AddCustomNotificationPolicy(helper.CtxWithOrgID(ctx, d), &management.AddCustomNotificationPolicyRequest{
 		PasswordChange: d.Get(passwordChangeVar).(bool),
 	})
 	if err != nil {
@@ -79,12 +78,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetNotificationPolicy(ctx, &management.GetNotificationPolicyRequest{})
+	resp, err := client.GetNotificationPolicy(helper.CtxWithOrgID(ctx, d), &management.GetNotificationPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

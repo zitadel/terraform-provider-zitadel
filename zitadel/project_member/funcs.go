@@ -20,12 +20,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveProjectMember(ctx, &management.RemoveProjectMemberRequest{
+	_, err = client.RemoveProjectMember(helper.CtxWithOrgID(ctx, d), &management.RemoveProjectMemberRequest{
 		UserId:    d.Get(UserIDVar).(string),
 		ProjectId: d.Get(ProjectIDVar).(string),
 	})
@@ -43,12 +43,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateProjectMember(ctx, &management.UpdateProjectMemberRequest{
+	_, err = client.UpdateProjectMember(helper.CtxWithOrgID(ctx, d), &management.UpdateProjectMemberRequest{
 		UserId:    d.Get(UserIDVar).(string),
 		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
 		ProjectId: d.Get(ProjectIDVar).(string),
@@ -68,14 +68,14 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	userID := d.Get(UserIDVar).(string)
 	projectID := d.Get(ProjectIDVar).(string)
-	_, err = client.AddProjectMember(ctx, &management.AddProjectMemberRequest{
+	_, err = client.AddProjectMember(helper.CtxWithOrgID(ctx, d), &management.AddProjectMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
@@ -95,14 +95,14 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	projectID := d.Get(ProjectIDVar).(string)
 	userID := d.Get(UserIDVar).(string)
-	resp, err := client.ListProjectMembers(ctx, &management.ListProjectMembersRequest{
+	resp, err := client.ListProjectMembers(helper.CtxWithOrgID(ctx, d), &management.ListProjectMembersRequest{
 		ProjectId: projectID,
 		Queries: []*member.SearchQuery{{
 			Query: &member.SearchQuery_UserIdQuery{

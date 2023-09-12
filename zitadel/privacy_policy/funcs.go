@@ -19,13 +19,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.ResetPrivacyPolicyToDefault(ctx, &management.ResetPrivacyPolicyToDefaultRequest{})
+	_, err = client.ResetPrivacyPolicyToDefault(helper.CtxWithOrgID(ctx, d), &management.ResetPrivacyPolicyToDefaultRequest{})
 	if err != nil {
 		return diag.Errorf("failed to reset privacy policy: %v", err)
 	}
@@ -40,13 +39,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateCustomPrivacyPolicy(ctx, &management.UpdateCustomPrivacyPolicyRequest{
+	_, err = client.UpdateCustomPrivacyPolicy(helper.CtxWithOrgID(ctx, d), &management.UpdateCustomPrivacyPolicyRequest{
 		TosLink:      d.Get(tosLinkVar).(string),
 		PrivacyLink:  d.Get(privacyLinkVar).(string),
 		HelpLink:     d.Get(HelpLinkVar).(string),
@@ -67,12 +65,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.AddCustomPrivacyPolicy(ctx, &management.AddCustomPrivacyPolicyRequest{
+	_, err = client.AddCustomPrivacyPolicy(helper.CtxWithOrgID(ctx, d), &management.AddCustomPrivacyPolicyRequest{
 		TosLink:      d.Get(tosLinkVar).(string),
 		PrivacyLink:  d.Get(privacyLinkVar).(string),
 		HelpLink:     d.Get(HelpLinkVar).(string),
@@ -93,13 +91,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetPrivacyPolicy(ctx, &management.GetPrivacyPolicyRequest{})
+	resp, err := client.GetPrivacyPolicy(helper.CtxWithOrgID(ctx, d), &management.GetPrivacyPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

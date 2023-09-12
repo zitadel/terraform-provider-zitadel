@@ -21,12 +21,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveProjectRole(ctx, &management.RemoveProjectRoleRequest{
+	_, err = client.RemoveProjectRole(helper.CtxWithOrgID(ctx, d), &management.RemoveProjectRoleRequest{
 		ProjectId: d.Get(ProjectIDVar).(string),
 		RoleKey:   d.Get(KeyVar).(string),
 	})
@@ -44,12 +44,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateProjectRole(ctx, &management.UpdateProjectRoleRequest{
+	_, err = client.UpdateProjectRole(helper.CtxWithOrgID(ctx, d), &management.UpdateProjectRoleRequest{
 		ProjectId:   d.Get(ProjectIDVar).(string),
 		RoleKey:     d.Get(KeyVar).(string),
 		DisplayName: d.Get(displayNameVar).(string),
@@ -71,14 +71,14 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	orgID := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	projectID := d.Get(ProjectIDVar).(string)
 	roleKey := d.Get(KeyVar).(string)
-	_, err = client.AddProjectRole(ctx, &management.AddProjectRoleRequest{
+	_, err = client.AddProjectRole(helper.CtxWithOrgID(ctx, d), &management.AddProjectRoleRequest{
 		ProjectId:   projectID,
 		RoleKey:     roleKey,
 		DisplayName: d.Get(displayNameVar).(string),
@@ -101,13 +101,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	orgID := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	projectID := d.Get(ProjectIDVar).(string)
-	resp, err := client.ListProjectRoles(ctx, &management.ListProjectRolesRequest{
+	resp, err := client.ListProjectRoles(helper.CtxWithOrgID(ctx, d), &management.ListProjectRolesRequest{
 		ProjectId: projectID,
 		Queries: []*project2.RoleQuery{
 			{Query: &project2.RoleQuery_KeyQuery{

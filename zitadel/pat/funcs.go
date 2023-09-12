@@ -21,12 +21,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemovePersonalAccessToken(ctx, &management.RemovePersonalAccessTokenRequest{
+	_, err = client.RemovePersonalAccessToken(helper.CtxWithOrgID(ctx, d), &management.RemovePersonalAccessTokenRequest{
 		UserId:  d.Get(UserIDVar).(string),
 		TokenId: d.Id(),
 	})
@@ -44,8 +44,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -61,7 +60,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		req.ExpirationDate = timestamppb.New(t)
 	}
 
-	resp, err := client.AddPersonalAccessToken(ctx, req)
+	resp, err := client.AddPersonalAccessToken(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -81,13 +80,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	orgID := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	userID := d.Get(UserIDVar).(string)
-	resp, err := client.GetPersonalAccessTokenByIDs(ctx, &management.GetPersonalAccessTokenByIDsRequest{
+	resp, err := client.GetPersonalAccessTokenByIDs(helper.CtxWithOrgID(ctx, d), &management.GetPersonalAccessTokenByIDsRequest{
 		UserId:  userID,
 		TokenId: d.Id(),
 	})

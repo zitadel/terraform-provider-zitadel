@@ -20,7 +20,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -29,7 +29,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	flowTypeValues := helper.EnumValueMap(FlowTypes())
 	triggerType := d.Get(TriggerTypeVar).(string)
 	triggerTypeValues := helper.EnumValueMap(TriggerTypes())
-	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
+	_, err = client.SetTriggerActions(helper.CtxWithOrgID(ctx, d), &management.SetTriggerActionsRequest{
 		FlowType:    strconv.Itoa(int(flowTypeValues[flowType])),
 		TriggerType: strconv.Itoa(int(triggerTypeValues[triggerType])),
 		ActionIds:   []string{},
@@ -46,7 +46,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -54,7 +54,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	flowTypeValues := helper.EnumValueMap(FlowTypes())
 	triggerType := d.Get(TriggerTypeVar).(string)
 	triggerTypeValues := helper.EnumValueMap(TriggerTypes())
-	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
+	_, err = client.SetTriggerActions(helper.CtxWithOrgID(ctx, d), &management.SetTriggerActionsRequest{
 		FlowType:    strconv.Itoa(int(flowTypeValues[flowType])),
 		TriggerType: strconv.Itoa(int(triggerTypeValues[triggerType])),
 		ActionIds:   helper.GetOkSetToStringSlice(d, actionsVar),
@@ -72,7 +72,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 	orgID := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -81,7 +81,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	triggerType := d.Get(TriggerTypeVar).(string)
 	triggerTypeValues := helper.EnumValueMap(TriggerTypes())
 	actionIDs := helper.GetOkSetToStringSlice(d, actionsVar)
-	_, err = client.SetTriggerActions(ctx, &management.SetTriggerActionsRequest{
+	_, err = client.SetTriggerActions(helper.CtxWithOrgID(ctx, d), &management.SetTriggerActionsRequest{
 		FlowType:    strconv.Itoa(int(flowTypeValues[flowType])),
 		TriggerType: strconv.Itoa(int(triggerTypeValues[triggerType])),
 		ActionIds:   actionIDs,
@@ -102,13 +102,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	orgID := d.Get(helper.OrgIDVar).(string)
 	flowType := d.Get(FlowTypeVar).(string)
 	triggerType := d.Get(TriggerTypeVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	flowTypeValues := helper.EnumValueMap(FlowTypes())
 	triggerTypeNames := TriggerTypes()
-	resp, err := client.GetFlow(ctx, &management.GetFlowRequest{Type: strconv.Itoa(int(flowTypeValues[flowType]))})
+	resp, err := client.GetFlow(helper.CtxWithOrgID(ctx, d), &management.GetFlowRequest{Type: strconv.Itoa(int(flowTypeValues[flowType]))})
 	if err != nil {
 		return diag.FromErr(err)
 	}

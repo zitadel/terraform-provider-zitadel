@@ -85,13 +85,13 @@ func (r *loginTextsResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomLoginText(ctx, zReq)
+	_, err = client.SetCustomLoginText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create login texts", err.Error())
 		return
@@ -111,13 +111,13 @@ func (r *loginTextsResource) Read(ctx context.Context, req resource.ReadRequest,
 
 	orgID, language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	zResp, err := client.GetCustomLoginTexts(ctx, &management.GetCustomLoginTextsRequest{Language: language})
+	zResp, err := client.GetCustomLoginTexts(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomLoginTextsRequest{Language: language})
 	if err != nil {
 		return
 	}
@@ -169,13 +169,13 @@ func (r *loginTextsResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomLoginText(ctx, zReq)
+	_, err = client.SetCustomLoginText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update login texts", err.Error())
 		return
@@ -191,13 +191,13 @@ func (r *loginTextsResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.ResetCustomLoginTextToDefault(ctx, &management.ResetCustomLoginTextsToDefaultRequest{Language: language})
+	_, err = client.ResetCustomLoginTextToDefault(helper.CtxSetOrgID(ctx, orgID), &management.ResetCustomLoginTextsToDefaultRequest{Language: language})
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete login texts", err.Error())
 		return

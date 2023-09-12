@@ -85,13 +85,13 @@ func (r *initMessageTextResource) Create(ctx context.Context, req resource.Creat
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomInitMessageText(ctx, zReq)
+	_, err = client.SetCustomInitMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create", err.Error())
 		return
@@ -111,13 +111,13 @@ func (r *initMessageTextResource) Read(ctx context.Context, req resource.ReadReq
 
 	orgID, language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	zResp, err := client.GetCustomInitMessageText(ctx, &management.GetCustomInitMessageTextRequest{Language: language})
+	zResp, err := client.GetCustomInitMessageText(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomInitMessageTextRequest{Language: language})
 	if err != nil {
 		return
 	}
@@ -169,13 +169,13 @@ func (r *initMessageTextResource) Update(ctx context.Context, req resource.Updat
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomInitMessageText(ctx, zReq)
+	_, err = client.SetCustomInitMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update", err.Error())
 		return
@@ -191,13 +191,13 @@ func (r *initMessageTextResource) Delete(ctx context.Context, req resource.Delet
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.ResetCustomInitMessageTextToDefault(ctx, &management.ResetCustomInitMessageTextToDefaultRequest{Language: language})
+	_, err = client.ResetCustomInitMessageTextToDefault(helper.CtxSetOrgID(ctx, orgID), &management.ResetCustomInitMessageTextToDefaultRequest{Language: language})
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete", err.Error())
 		return

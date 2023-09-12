@@ -20,12 +20,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveProjectGrantMember(ctx, &management.RemoveProjectGrantMemberRequest{
+	_, err = client.RemoveProjectGrantMember(helper.CtxWithOrgID(ctx, d), &management.RemoveProjectGrantMemberRequest{
 		UserId:    d.Get(UserIDVar).(string),
 		ProjectId: d.Get(ProjectIDVar).(string),
 		GrantId:   d.Get(GrantIDVar).(string),
@@ -44,12 +44,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateProjectGrantMember(ctx, &management.UpdateProjectGrantMemberRequest{
+	_, err = client.UpdateProjectGrantMember(helper.CtxWithOrgID(ctx, d), &management.UpdateProjectGrantMemberRequest{
 		UserId:    d.Get(UserIDVar).(string),
 		Roles:     helper.GetOkSetToStringSlice(d, RolesVar),
 		ProjectId: d.Get(ProjectIDVar).(string),
@@ -70,7 +70,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -78,7 +78,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	userID := d.Get(UserIDVar).(string)
 	projectID := d.Get(ProjectIDVar).(string)
 	grantID := d.Get(GrantIDVar).(string)
-	_, err = client.AddProjectGrantMember(ctx, &management.AddProjectGrantMemberRequest{
+	_, err = client.AddProjectGrantMember(helper.CtxWithOrgID(ctx, d), &management.AddProjectGrantMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 		GrantId:   grantID,
@@ -99,7 +99,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -107,7 +107,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	projectID := d.Get(ProjectIDVar).(string)
 	grantID := d.Get(GrantIDVar).(string)
 	userID := d.Get(UserIDVar).(string)
-	resp, err := client.ListProjectGrantMembers(ctx, &management.ListProjectGrantMembersRequest{
+	resp, err := client.ListProjectGrantMembers(helper.CtxWithOrgID(ctx, d), &management.ListProjectGrantMembersRequest{
 		ProjectId: projectID,
 		GrantId:   grantID,
 		Queries: []*member.SearchQuery{{

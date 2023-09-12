@@ -95,13 +95,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetDomainPolicy(ctx, &management.GetDomainPolicyRequest{})
+	resp, err := client.GetDomainPolicy(helper.CtxWithOrgID(ctx, d), &management.GetDomainPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

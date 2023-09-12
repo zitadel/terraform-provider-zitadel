@@ -20,12 +20,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveUser(ctx, &management.RemoveUserRequest{
+	_, err = client.RemoveUser(helper.CtxWithOrgID(ctx, d), &management.RemoveUserRequest{
 		Id: d.Id(),
 	})
 	if err != nil {
@@ -42,12 +42,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	respUser, err := client.AddMachineUser(ctx, &management.AddMachineUserRequest{
+	respUser, err := client.AddMachineUser(helper.CtxWithOrgID(ctx, d), &management.AddMachineUserRequest{
 		UserName:        d.Get(UserNameVar).(string),
 		Name:            d.Get(nameVar).(string),
 		Description:     d.Get(DescriptionVar).(string),
@@ -70,13 +70,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	if d.HasChange(UserNameVar) {
-		_, err = client.UpdateUserName(ctx, &management.UpdateUserNameRequest{
+		_, err = client.UpdateUserName(helper.CtxWithOrgID(ctx, d), &management.UpdateUserNameRequest{
 			UserId:   d.Id(),
 			UserName: d.Get(UserNameVar).(string),
 		})
@@ -86,7 +86,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(nameVar, DescriptionVar, accessTokenTypeVar) {
-		_, err := client.UpdateMachine(ctx, &management.UpdateMachineRequest{
+		_, err := client.UpdateMachine(helper.CtxWithOrgID(ctx, d), &management.UpdateMachineRequest{
 			UserId:          d.Id(),
 			Name:            d.Get(nameVar).(string),
 			Description:     d.Get(DescriptionVar).(string),
@@ -107,12 +107,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	respUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: helper.GetID(d, UserIDVar)})
+	respUser, err := client.GetUserByID(helper.CtxWithOrgID(ctx, d), &management.GetUserByIDRequest{Id: helper.GetID(d, UserIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

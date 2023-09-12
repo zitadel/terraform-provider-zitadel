@@ -16,11 +16,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.AddGitHubProvider(ctx, &management.AddGitHubProviderRequest{
+	resp, err := client.AddGitHubProvider(helper.CtxWithOrgID(ctx, d), &management.AddGitHubProviderRequest{
 		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
 		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
 		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
@@ -39,11 +39,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.UpdateGitHubProvider(ctx, &management.UpdateGitHubProviderRequest{
+	_, err = client.UpdateGitHubProvider(helper.CtxWithOrgID(ctx, d), &management.UpdateGitHubProviderRequest{
 		Id:              d.Id(),
 		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
 		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
@@ -62,11 +62,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetProviderByID(ctx, &management.GetProviderByIDRequest{Id: helper.GetID(d, idp_utils.IdpIDVar)})
+	resp, err := client.GetProviderByID(helper.CtxWithOrgID(ctx, d), &management.GetProviderByIDRequest{Id: helper.GetID(d, idp_utils.IdpIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
