@@ -85,13 +85,13 @@ func (r *verifyEmailMessageTextResource) Create(ctx context.Context, req resourc
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomVerifyEmailMessageText(ctx, zReq)
+	_, err = client.SetCustomVerifyEmailMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create", err.Error())
 		return
@@ -111,13 +111,13 @@ func (r *verifyEmailMessageTextResource) Read(ctx context.Context, req resource.
 
 	orgID, language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	zResp, err := client.GetCustomVerifyEmailMessageText(ctx, &management.GetCustomVerifyEmailMessageTextRequest{Language: language})
+	zResp, err := client.GetCustomVerifyEmailMessageText(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomVerifyEmailMessageTextRequest{Language: language})
 	if err != nil {
 		return
 	}
@@ -169,13 +169,13 @@ func (r *verifyEmailMessageTextResource) Update(ctx context.Context, req resourc
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomVerifyEmailMessageText(ctx, zReq)
+	_, err = client.SetCustomVerifyEmailMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update", err.Error())
 		return
@@ -191,13 +191,13 @@ func (r *verifyEmailMessageTextResource) Delete(ctx context.Context, req resourc
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.ResetCustomVerifyEmailMessageTextToDefault(ctx, &management.ResetCustomVerifyEmailMessageTextToDefaultRequest{Language: language})
+	_, err = client.ResetCustomVerifyEmailMessageTextToDefault(helper.CtxSetOrgID(ctx, orgID), &management.ResetCustomVerifyEmailMessageTextToDefaultRequest{Language: language})
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete", err.Error())
 		return

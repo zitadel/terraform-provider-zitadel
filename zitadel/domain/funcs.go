@@ -22,20 +22,20 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	domainName := d.Id()
 	if d.Get(isPrimaryVar).(bool) {
-		resp, err := client.ListOrgDomains(ctx, &management.ListOrgDomainsRequest{})
+		resp, err := client.ListOrgDomains(helper.CtxWithOrgID(ctx, d), &management.ListOrgDomainsRequest{})
 		if err != nil {
 			return diag.FromErr(err)
 		}
 		for _, domain := range resp.Result {
 			parts := strings.Split(clientinfo.Domain, ":")
 			if domain.IsVerified && domain.DomainName != domainName && strings.HasSuffix(domain.GetDomainName(), parts[0]) {
-				if _, err := client.SetPrimaryOrgDomain(ctx, &management.SetPrimaryOrgDomainRequest{Domain: domain.DomainName}); err != nil {
+				if _, err := client.SetPrimaryOrgDomain(helper.CtxWithOrgID(ctx, d), &management.SetPrimaryOrgDomainRequest{Domain: domain.DomainName}); err != nil {
 					return diag.FromErr(err)
 				}
 				break
@@ -43,7 +43,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	_, err = client.RemoveOrgDomain(ctx, &management.RemoveOrgDomainRequest{
+	_, err = client.RemoveOrgDomain(helper.CtxWithOrgID(ctx, d), &management.RemoveOrgDomainRequest{
 		Domain: domainName,
 	})
 	if err != nil {
@@ -60,13 +60,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	name := d.Get(NameVar).(string)
-	_, err = client.AddOrgDomain(ctx, &management.AddOrgDomainRequest{
+	_, err = client.AddOrgDomain(helper.CtxWithOrgID(ctx, d), &management.AddOrgDomainRequest{
 		Domain: name,
 	})
 	if err != nil {
@@ -74,7 +74,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	d.SetId(name)
 	if d.Get(isPrimaryVar).(bool) {
-		_, err = client.SetPrimaryOrgDomain(ctx, &management.SetPrimaryOrgDomainRequest{Domain: name})
+		_, err = client.SetPrimaryOrgDomain(helper.CtxWithOrgID(ctx, d), &management.SetPrimaryOrgDomainRequest{Domain: name})
 		if err != nil {
 			return diag.Errorf("failed to set domain primary: %v", err)
 		}
@@ -90,7 +90,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -99,7 +99,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	d.SetId(name)
 	if d.HasChange(isPrimaryVar) {
 		if d.Get(isPrimaryVar).(bool) {
-			_, err = client.SetPrimaryOrgDomain(ctx, &management.SetPrimaryOrgDomainRequest{Domain: name})
+			_, err = client.SetPrimaryOrgDomain(helper.CtxWithOrgID(ctx, d), &management.SetPrimaryOrgDomainRequest{Domain: name})
 			if err != nil {
 				return diag.Errorf("failed to set domain primary: %v", err)
 			}
@@ -116,12 +116,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.ListOrgDomains(ctx, &management.ListOrgDomainsRequest{
+	resp, err := client.ListOrgDomains(helper.CtxWithOrgID(ctx, d), &management.ListOrgDomainsRequest{
 		Queries: []*org.DomainSearchQuery{
 			{Query: &org.DomainSearchQuery_DomainNameQuery{
 				DomainNameQuery: &org.DomainNameQuery{

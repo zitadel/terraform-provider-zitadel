@@ -22,7 +22,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -32,7 +32,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateAction(ctx, &management.UpdateActionRequest{
+	_, err = client.UpdateAction(helper.CtxWithOrgID(ctx, d), &management.UpdateActionRequest{
 		Id:            d.Id(),
 		Name:          d.Get(NameVar).(string),
 		Script:        d.Get(ScriptVar).(string),
@@ -53,12 +53,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.DeleteAction(ctx, &management.DeleteActionRequest{
+	_, err = client.DeleteAction(helper.CtxWithOrgID(ctx, d), &management.DeleteActionRequest{
 		Id: d.Id(),
 	})
 	if err != nil {
@@ -75,7 +75,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -85,7 +85,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.CreateAction(ctx, &management.CreateActionRequest{
+	resp, err := client.CreateAction(helper.CtxWithOrgID(ctx, d), &management.CreateActionRequest{
 		Name:          d.Get(NameVar).(string),
 		Script:        d.Get(ScriptVar).(string),
 		Timeout:       durationpb.New(timeout),
@@ -106,12 +106,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.ListActions(ctx, &management.ListActionsRequest{
+	resp, err := client.ListActions(helper.CtxWithOrgID(ctx, d), &management.ListActionsRequest{
 		Queries: []*management.ActionQuery{
 			{Query: &management.ActionQuery_ActionIdQuery{
 				ActionIdQuery: &action.ActionIDQuery{

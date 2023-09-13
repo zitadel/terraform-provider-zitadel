@@ -85,13 +85,13 @@ func (r *domainClaimedMessageTextResource) Create(ctx context.Context, req resou
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomDomainClaimedMessageCustomText(ctx, zReq)
+	_, err = client.SetCustomDomainClaimedMessageCustomText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create", err.Error())
 		return
@@ -111,13 +111,13 @@ func (r *domainClaimedMessageTextResource) Read(ctx context.Context, req resourc
 
 	orgID, language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	zResp, err := client.GetCustomDomainClaimedMessageText(ctx, &management.GetCustomDomainClaimedMessageTextRequest{Language: language})
+	zResp, err := client.GetCustomDomainClaimedMessageText(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomDomainClaimedMessageTextRequest{Language: language})
 	if err != nil {
 		return
 	}
@@ -169,13 +169,13 @@ func (r *domainClaimedMessageTextResource) Update(ctx context.Context, req resou
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomDomainClaimedMessageCustomText(ctx, zReq)
+	_, err = client.SetCustomDomainClaimedMessageCustomText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update", err.Error())
 		return
@@ -191,13 +191,13 @@ func (r *domainClaimedMessageTextResource) Delete(ctx context.Context, req resou
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.ResetCustomDomainClaimedMessageTextToDefault(ctx, &management.ResetCustomDomainClaimedMessageTextToDefaultRequest{Language: language})
+	_, err = client.ResetCustomDomainClaimedMessageTextToDefault(helper.CtxSetOrgID(ctx, orgID), &management.ResetCustomDomainClaimedMessageTextToDefaultRequest{Language: language})
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete", err.Error())
 		return

@@ -17,12 +17,11 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.ResetPasswordComplexityPolicyToDefault(ctx, &management.ResetPasswordComplexityPolicyToDefaultRequest{})
+	_, err = client.ResetPasswordComplexityPolicyToDefault(helper.CtxWithID(ctx, d), &management.ResetPasswordComplexityPolicyToDefaultRequest{})
 	if err != nil {
 		return diag.Errorf("failed to reset password complexity policy: %v", err)
 	}
@@ -35,12 +34,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.UpdateCustomPasswordComplexityPolicy(ctx, &management.UpdateCustomPasswordComplexityPolicyRequest{
+	_, err = client.UpdateCustomPasswordComplexityPolicy(helper.CtxWithID(ctx, d), &management.UpdateCustomPasswordComplexityPolicyRequest{
 		MinLength:    uint64(d.Get(minLengthVar).(int)),
 		HasUppercase: d.Get(hasUppercaseVar).(bool),
 		HasLowercase: d.Get(hasLowercaseVar).(bool),
@@ -60,11 +58,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.AddCustomPasswordComplexityPolicy(ctx, &management.AddCustomPasswordComplexityPolicyRequest{
+	_, err = client.AddCustomPasswordComplexityPolicy(helper.CtxWithID(ctx, d), &management.AddCustomPasswordComplexityPolicyRequest{
 		MinLength:    uint64(d.Get(minLengthVar).(int)),
 		HasUppercase: d.Get(hasUppercaseVar).(bool),
 		HasLowercase: d.Get(hasLowercaseVar).(bool),
@@ -84,12 +82,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetPasswordComplexityPolicy(ctx, &management.GetPasswordComplexityPolicyRequest{})
+	resp, err := client.GetPasswordComplexityPolicy(helper.CtxWithID(ctx, d), &management.GetPasswordComplexityPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

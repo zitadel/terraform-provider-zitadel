@@ -85,13 +85,13 @@ func (r *passwordlessRegistrationMessageTextResource) Create(ctx context.Context
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomPasswordlessRegistrationMessageCustomText(ctx, zReq)
+	_, err = client.SetCustomPasswordlessRegistrationMessageCustomText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create", err.Error())
 		return
@@ -111,13 +111,13 @@ func (r *passwordlessRegistrationMessageTextResource) Read(ctx context.Context, 
 
 	orgID, language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	zResp, err := client.GetCustomPasswordlessRegistrationMessageText(ctx, &management.GetCustomPasswordlessRegistrationMessageTextRequest{Language: language})
+	zResp, err := client.GetCustomPasswordlessRegistrationMessageText(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomPasswordlessRegistrationMessageTextRequest{Language: language})
 	if err != nil {
 		return
 	}
@@ -169,13 +169,13 @@ func (r *passwordlessRegistrationMessageTextResource) Update(ctx context.Context
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomPasswordlessRegistrationMessageCustomText(ctx, zReq)
+	_, err = client.SetCustomPasswordlessRegistrationMessageCustomText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update", err.Error())
 		return
@@ -191,13 +191,13 @@ func (r *passwordlessRegistrationMessageTextResource) Delete(ctx context.Context
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.ResetCustomPasswordlessRegistrationMessageTextToDefault(ctx, &management.ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest{Language: language})
+	_, err = client.ResetCustomPasswordlessRegistrationMessageTextToDefault(helper.CtxSetOrgID(ctx, orgID), &management.ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest{Language: language})
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete", err.Error())
 		return

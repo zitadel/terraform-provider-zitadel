@@ -85,13 +85,13 @@ func (r *verifyPhoneMessageTextResource) Create(ctx context.Context, req resourc
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomVerifyPhoneMessageText(ctx, zReq)
+	_, err = client.SetCustomVerifyPhoneMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create", err.Error())
 		return
@@ -111,13 +111,13 @@ func (r *verifyPhoneMessageTextResource) Read(ctx context.Context, req resource.
 
 	orgID, language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	zResp, err := client.GetCustomVerifyPhoneMessageText(ctx, &management.GetCustomVerifyPhoneMessageTextRequest{Language: language})
+	zResp, err := client.GetCustomVerifyPhoneMessageText(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomVerifyPhoneMessageTextRequest{Language: language})
 	if err != nil {
 		return
 	}
@@ -169,13 +169,13 @@ func (r *verifyPhoneMessageTextResource) Update(ctx context.Context, req resourc
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomVerifyPhoneMessageText(ctx, zReq)
+	_, err = client.SetCustomVerifyPhoneMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update", err.Error())
 		return
@@ -191,13 +191,13 @@ func (r *verifyPhoneMessageTextResource) Delete(ctx context.Context, req resourc
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.ResetCustomVerifyPhoneMessageTextToDefault(ctx, &management.ResetCustomVerifyPhoneMessageTextToDefaultRequest{Language: language})
+	_, err = client.ResetCustomVerifyPhoneMessageTextToDefault(helper.CtxSetOrgID(ctx, orgID), &management.ResetCustomVerifyPhoneMessageTextToDefaultRequest{Language: language})
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete", err.Error())
 		return

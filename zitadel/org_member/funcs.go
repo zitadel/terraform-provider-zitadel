@@ -2,7 +2,6 @@ package org_member
 
 import (
 	"context"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -21,12 +20,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveOrgMember(ctx, &management.RemoveOrgMemberRequest{
+	_, err = client.RemoveOrgMember(helper.CtxWithOrgID(ctx, d), &management.RemoveOrgMemberRequest{
 		UserId: d.Get(UserIDVar).(string),
 	})
 	if err != nil {
@@ -43,12 +42,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateOrgMember(ctx, &management.UpdateOrgMemberRequest{
+	_, err = client.UpdateOrgMember(helper.CtxWithOrgID(ctx, d), &management.UpdateOrgMemberRequest{
 		UserId: d.Get(UserIDVar).(string),
 		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
 	})
@@ -67,13 +66,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	userID := d.Get(UserIDVar).(string)
-	_, err = client.AddOrgMember(ctx, &management.AddOrgMemberRequest{
+	_, err = client.AddOrgMember(helper.CtxWithOrgID(ctx, d), &management.AddOrgMemberRequest{
 		UserId: userID,
 		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
 	})
@@ -92,13 +91,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	userID := d.Get(UserIDVar).(string)
-	resp, err := client.ListOrgMembers(ctx, &management.ListOrgMembersRequest{
+	resp, err := client.ListOrgMembers(helper.CtxWithOrgID(ctx, d), &management.ListOrgMembersRequest{
 		Queries: []*member.SearchQuery{{
 			Query: &member.SearchQuery_UserIdQuery{
 				UserIdQuery: &member.UserIDQuery{
@@ -137,9 +136,4 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 func getOrgMemberID(org string, userID string) string {
 	return org + "_" + userID
-}
-
-func splitOrgMemberID(orgMemberID string) (string, string) {
-	parts := strings.Split(orgMemberID, "_")
-	return parts[0], parts[1]
 }

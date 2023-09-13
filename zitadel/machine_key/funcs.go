@@ -22,12 +22,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveMachineKey(ctx, &management.RemoveMachineKeyRequest{
+	_, err = client.RemoveMachineKey(helper.CtxWithOrgID(ctx, d), &management.RemoveMachineKeyRequest{
 		UserId: d.Get(UserIDVar).(string),
 		KeyId:  d.Id(),
 	})
@@ -45,8 +45,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	orgID := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -65,7 +64,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		req.ExpirationDate = timestamppb.New(t)
 	}
 
-	resp, err := client.AddMachineKey(ctx, req)
+	resp, err := client.AddMachineKey(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -84,13 +83,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	orgID := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, orgID)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	userID := d.Get(UserIDVar).(string)
-	resp, err := client.GetMachineKeyByIDs(ctx, &management.GetMachineKeyByIDsRequest{
+	resp, err := client.GetMachineKeyByIDs(helper.CtxWithOrgID(ctx, d), &management.GetMachineKeyByIDsRequest{
 		UserId: userID,
 		KeyId:  d.Id(),
 	})

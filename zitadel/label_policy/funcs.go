@@ -19,13 +19,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.ResetLabelPolicyToDefault(ctx, &management.ResetLabelPolicyToDefaultRequest{})
+	_, err = client.ResetLabelPolicyToDefault(helper.CtxWithID(ctx, d), &management.ResetLabelPolicyToDefaultRequest{})
 	if err != nil {
 		return diag.Errorf("failed to reset label policy: %v", err)
 	}
@@ -41,7 +40,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -58,7 +57,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		fontColorDarkVar,
 		disableWatermarkVar,
 	) {
-		resp, err := client.UpdateCustomLabelPolicy(ctx, &management.UpdateCustomLabelPolicyRequest{
+		resp, err := client.UpdateCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.UpdateCustomLabelPolicyRequest{
 			PrimaryColor:        d.Get(primaryColorVar).(string),
 			HideLoginNameSuffix: d.Get(hideLoginNameSuffixVar).(bool),
 			WarnColor:           d.Get(warnColorVar).(string),
@@ -120,7 +119,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		FontHashVar,
 	) {
 		if d.Get(SetActiveVar).(bool) {
-			if _, err := client.ActivateCustomLabelPolicy(ctx, &management.ActivateCustomLabelPolicyRequest{}); err != nil {
+			if _, err := client.ActivateCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.ActivateCustomLabelPolicyRequest{}); err != nil {
 				return diag.Errorf("failed to activate label policy: %v", err)
 			}
 		}
@@ -137,12 +136,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.AddCustomLabelPolicy(ctx, &management.AddCustomLabelPolicyRequest{
+	_, err = client.AddCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.AddCustomLabelPolicyRequest{
 		PrimaryColor:        d.Get(primaryColorVar).(string),
 		HideLoginNameSuffix: d.Get(hideLoginNameSuffixVar).(bool),
 		WarnColor:           d.Get(warnColorVar).(string),
@@ -186,7 +185,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.Get(SetActiveVar).(bool) {
-		if _, err := client.ActivateCustomLabelPolicy(ctx, &management.ActivateCustomLabelPolicyRequest{}); err != nil {
+		if _, err := client.ActivateCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.ActivateCustomLabelPolicyRequest{}); err != nil {
 			return diag.Errorf("failed to activate label policy: %v", err)
 		}
 	}
@@ -202,13 +201,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetPreviewLabelPolicy(ctx, &management.GetPreviewLabelPolicyRequest{})
+	resp, err := client.GetPreviewLabelPolicy(helper.CtxWithID(ctx, d), &management.GetPreviewLabelPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

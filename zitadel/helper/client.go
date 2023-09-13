@@ -1,8 +1,12 @@
 package helper
 
 import (
+	"context"
 	"fmt"
+	"sync"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/pkg/oidc"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
@@ -30,7 +34,7 @@ type ClientInfo struct {
 }
 
 func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
-	options := []zitadel.Option{}
+	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if token != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(token)))
@@ -77,34 +81,62 @@ func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile st
 	}, nil
 }
 
-func GetAdminClient(info *ClientInfo) (*admin.Client, error) {
-	client, err := admin.NewClient(
-		info.Issuer, info.Domain,
-		[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-		info.Options...,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to start zitadel client: %v", err)
-	}
+var adminClientLock = &sync.Mutex{}
+var adminClient *admin.Client
 
-	return client, nil
+func GetAdminClient(info *ClientInfo) (*admin.Client, error) {
+	if adminClient == nil {
+		adminClientLock.Lock()
+		defer adminClientLock.Unlock()
+		if adminClient == nil {
+			client, err := admin.NewClient(
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			adminClient = client
+		}
+	}
+	return adminClient, nil
 }
 
-func GetManagementClient(info *ClientInfo, orgID string) (*management.Client, error) {
-	options := info.Options
-	if orgID != "" {
-		options = append(options, zitadel.WithOrgID(orgID))
-	}
+var mgmtClientLock = &sync.Mutex{}
+var mgmtClient *management.Client
 
-	client, err := management.NewClient(
-		info.Issuer, info.Domain,
-		[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-		options...,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+func GetManagementClient(info *ClientInfo) (*management.Client, error) {
+	if mgmtClient == nil {
+		mgmtClientLock.Lock()
+		defer mgmtClientLock.Unlock()
+		if mgmtClient == nil {
+			client, err := management.NewClient(
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			mgmtClient = client
+		}
 	}
-	return client, nil
+	return mgmtClient, nil
+}
+
+func CtxWithID(ctx context.Context, d *schema.ResourceData) context.Context {
+	return CtxSetOrgID(ctx, GetID(d, OrgIDVar))
+}
+
+func CtxWithOrgID(ctx context.Context, d *schema.ResourceData) context.Context {
+	return CtxSetOrgID(ctx, d.Get(OrgIDVar).(string))
+}
+
+func CtxSetOrgID(ctx context.Context, orgID string) context.Context {
+	return middleware.SetOrgID(ctx, orgID)
 }
 
 func IgnoreIfNotFoundError(err error) error {

@@ -20,12 +20,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveUser(ctx, &management.RemoveUserRequest{
+	_, err = client.RemoveUser(helper.CtxWithOrgID(ctx, d), &management.RemoveUserRequest{
 		Id: d.Id(),
 	})
 	if err != nil {
@@ -42,7 +42,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -91,7 +91,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	respUser, err := client.AddHumanUser(ctx, addUser)
+	respUser, err := client.AddHumanUser(helper.CtxWithOrgID(ctx, d), addUser)
 	if err != nil {
 		return diag.Errorf("failed to create human user: %v", err)
 	}
@@ -109,13 +109,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	if d.HasChange(UserNameVar) {
-		_, err = client.UpdateUserName(ctx, &management.UpdateUserNameRequest{
+		_, err = client.UpdateUserName(helper.CtxWithOrgID(ctx, d), &management.UpdateUserNameRequest{
 			UserId:   d.Id(),
 			UserName: d.Get(UserNameVar).(string),
 		})
@@ -125,7 +125,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(firstNameVar, lastNameVar, nickNameVar, DisplayNameVar, preferredLanguageVar, genderVar) {
-		_, err := client.UpdateHumanProfile(ctx, &management.UpdateHumanProfileRequest{
+		_, err := client.UpdateHumanProfile(helper.CtxWithOrgID(ctx, d), &management.UpdateHumanProfileRequest{
 			UserId:            d.Id(),
 			FirstName:         d.Get(firstNameVar).(string),
 			LastName:          d.Get(lastNameVar).(string),
@@ -140,7 +140,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(emailVar, isEmailVerifiedVar) {
-		_, err = client.UpdateHumanEmail(ctx, &management.UpdateHumanEmailRequest{
+		_, err = client.UpdateHumanEmail(helper.CtxWithOrgID(ctx, d), &management.UpdateHumanEmailRequest{
 			UserId:          d.Id(),
 			Email:           d.Get(emailVar).(string),
 			IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
@@ -151,7 +151,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(phoneVar, isPhoneVerifiedVar) {
-		_, err = client.UpdateHumanPhone(ctx, &management.UpdateHumanPhoneRequest{
+		_, err = client.UpdateHumanPhone(helper.CtxWithOrgID(ctx, d), &management.UpdateHumanPhoneRequest{
 			UserId:          d.Id(),
 			Phone:           d.Get(phoneVar).(string),
 			IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
@@ -171,12 +171,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	respUser, err := client.GetUserByID(ctx, &management.GetUserByIDRequest{Id: helper.GetID(d, UserIDVar)})
+	respUser, err := client.GetUserByID(helper.CtxWithOrgID(ctx, d), &management.GetUserByIDRequest{Id: helper.GetID(d, UserIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

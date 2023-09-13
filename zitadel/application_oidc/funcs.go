@@ -22,12 +22,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveApp(ctx, &management.RemoveAppRequest{
+	_, err = client.RemoveApp(helper.CtxWithOrgID(ctx, d), &management.RemoveAppRequest{
 		ProjectId: d.Get(ProjectIDVar).(string),
 		AppId:     d.Id(),
 	})
@@ -45,7 +45,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -53,7 +53,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	projectID := d.Get(ProjectIDVar).(string)
 
 	if d.HasChange(NameVar) {
-		_, err = client.UpdateApp(ctx, &management.UpdateAppRequest{
+		_, err = client.UpdateApp(helper.CtxWithOrgID(ctx, d), &management.UpdateAppRequest{
 			ProjectId: projectID,
 			AppId:     d.Id(),
 			Name:      d.Get(NameVar).(string),
@@ -91,7 +91,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			return diag.FromErr(err)
 		}
 
-		_, err = client.UpdateOIDCAppConfig(ctx, &management.UpdateOIDCAppConfigRequest{
+		_, err = client.UpdateOIDCAppConfig(helper.CtxWithOrgID(ctx, d), &management.UpdateOIDCAppConfigRequest{
 			ProjectId:                projectID,
 			AppId:                    d.Id(),
 			RedirectUris:             interfaceToStringSlice(d.Get(redirectURIsVar)),
@@ -123,7 +123,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -142,7 +142,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
+	resp, err := client.AddOIDCApp(helper.CtxWithOrgID(ctx, d), &management.AddOIDCAppRequest{
 		ProjectId:                d.Get(ProjectIDVar).(string),
 		Name:                     d.Get(NameVar).(string),
 		RedirectUris:             interfaceToStringSlice(d.Get(redirectURIsVar)),
@@ -186,12 +186,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetAppByID(ctx, &management.GetAppByIDRequest{ProjectId: d.Get(ProjectIDVar).(string), AppId: helper.GetID(d, appIDVar)})
+	resp, err := client.GetAppByID(helper.CtxWithOrgID(ctx, d), &management.GetAppByIDRequest{ProjectId: d.Get(ProjectIDVar).(string), AppId: helper.GetID(d, appIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

@@ -16,11 +16,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.AddGoogleProvider(ctx, &management.AddGoogleProviderRequest{
+	resp, err := client.AddGoogleProvider(helper.CtxWithOrgID(ctx, d), &management.AddGoogleProviderRequest{
 		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
 		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
 		ClientSecret:    idp_utils.StringValue(d, idp_utils.ClientSecretVar),
@@ -39,11 +39,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.UpdateGoogleProvider(ctx, &management.UpdateGoogleProviderRequest{
+	_, err = client.UpdateGoogleProvider(helper.CtxWithOrgID(ctx, d), &management.UpdateGoogleProviderRequest{
 		Id:              d.Id(),
 		Name:            idp_utils.StringValue(d, idp_utils.NameVar),
 		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
@@ -62,11 +62,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetProviderByID(ctx, &management.GetProviderByIDRequest{Id: helper.GetID(d, idp_utils.IdpIDVar)})
+	resp, err := client.GetProviderByID(helper.CtxWithOrgID(ctx, d), &management.GetProviderByIDRequest{Id: helper.GetID(d, idp_utils.IdpIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

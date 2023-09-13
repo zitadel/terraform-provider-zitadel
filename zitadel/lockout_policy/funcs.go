@@ -17,12 +17,11 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.ResetLockoutPolicyToDefault(ctx, &management.ResetLockoutPolicyToDefaultRequest{})
+	_, err = client.ResetLockoutPolicyToDefault(helper.CtxWithID(ctx, d), &management.ResetLockoutPolicyToDefaultRequest{})
 	if err != nil {
 		return diag.Errorf("failed to reset lockout policy: %v", err)
 	}
@@ -35,12 +34,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.UpdateCustomLockoutPolicy(ctx, &management.UpdateCustomLockoutPolicyRequest{
+	_, err = client.UpdateCustomLockoutPolicy(helper.CtxWithID(ctx, d), &management.UpdateCustomLockoutPolicyRequest{
 		MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
 	})
 	if err != nil {
@@ -56,11 +54,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 	org := d.Get(helper.OrgIDVar).(string)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.AddCustomLockoutPolicy(ctx, &management.AddCustomLockoutPolicyRequest{
+	_, err = client.AddCustomLockoutPolicy(helper.CtxWithID(ctx, d), &management.AddCustomLockoutPolicyRequest{
 		MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
 	})
 	if err != nil {
@@ -76,12 +74,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := helper.GetID(d, helper.OrgIDVar)
-	client, err := helper.GetManagementClient(clientinfo, org)
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetLockoutPolicy(ctx, &management.GetLockoutPolicyRequest{})
+	resp, err := client.GetLockoutPolicy(helper.CtxWithID(ctx, d), &management.GetLockoutPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

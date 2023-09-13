@@ -16,11 +16,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.AddGenericOIDCProvider(ctx, &management.AddGenericOIDCProviderRequest{
+	resp, err := client.AddGenericOIDCProvider(helper.CtxWithOrgID(ctx, d), &management.AddGenericOIDCProviderRequest{
 		Name:             idp_utils.StringValue(d, idp_utils.NameVar),
 		ClientId:         idp_utils.StringValue(d, idp_utils.ClientIDVar),
 		ClientSecret:     idp_utils.StringValue(d, idp_utils.ClientSecretVar),
@@ -41,11 +41,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, idp_utils.StringValue(d, helper.OrgIDVar))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.UpdateGenericOIDCProvider(ctx, &management.UpdateGenericOIDCProviderRequest{
+	_, err = client.UpdateGenericOIDCProvider(helper.CtxWithOrgID(ctx, d), &management.UpdateGenericOIDCProviderRequest{
 		Id:               d.Id(),
 		Name:             idp_utils.StringValue(d, idp_utils.NameVar),
 		Issuer:           idp_utils.StringValue(d, IssuerVar),
@@ -66,11 +66,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo, d.Get(helper.OrgIDVar).(string))
+	client, err := helper.GetManagementClient(clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetProviderByID(ctx, &management.GetProviderByIDRequest{Id: helper.GetID(d, idp_utils.IdpIDVar)})
+	resp, err := client.GetProviderByID(helper.CtxWithOrgID(ctx, d), &management.GetProviderByIDRequest{Id: helper.GetID(d, idp_utils.IdpIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

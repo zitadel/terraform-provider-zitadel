@@ -85,13 +85,13 @@ func (r *passwordResetMessageTextResource) Create(ctx context.Context, req resou
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomPasswordResetMessageText(ctx, zReq)
+	_, err = client.SetCustomPasswordResetMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create", err.Error())
 		return
@@ -111,13 +111,13 @@ func (r *passwordResetMessageTextResource) Read(ctx context.Context, req resourc
 
 	orgID, language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	zResp, err := client.GetCustomPasswordResetMessageText(ctx, &management.GetCustomPasswordResetMessageTextRequest{Language: language})
+	zResp, err := client.GetCustomPasswordResetMessageText(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomPasswordResetMessageTextRequest{Language: language})
 	if err != nil {
 		return
 	}
@@ -169,13 +169,13 @@ func (r *passwordResetMessageTextResource) Update(ctx context.Context, req resou
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomPasswordResetMessageText(ctx, zReq)
+	_, err = client.SetCustomPasswordResetMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update", err.Error())
 		return
@@ -191,13 +191,13 @@ func (r *passwordResetMessageTextResource) Delete(ctx context.Context, req resou
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo, orgID)
+	client, err := helper.GetManagementClient(r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.ResetCustomPasswordResetMessageTextToDefault(ctx, &management.ResetCustomPasswordResetMessageTextToDefaultRequest{Language: language})
+	_, err = client.ResetCustomPasswordResetMessageTextToDefault(helper.CtxSetOrgID(ctx, orgID), &management.ResetCustomPasswordResetMessageTextToDefaultRequest{Language: language})
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete", err.Error())
 		return
