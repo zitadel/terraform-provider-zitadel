@@ -17,13 +17,12 @@ import (
 
 func TestAccDomainPolicy(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_domain_policy")
-	otherFrame := frame.AnotherOrg(t, "domain-policy-org-"+frame.UniqueResourcesID)
 	resourceExample, resourceAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, domain_policy.UserLoginMustBeDomainVar, resourceAttributes).True()
 	test_utils.RunLifecyleTest(
 		t,
-		otherFrame.BaseTestFrame,
-		[]string{otherFrame.AsOrgDefaultDependency},
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency},
 		func(property bool, secret string) string {
 			// only replace first bool for the smtp_sender_address_matches_instance_domain property
 			return strings.Replace(resourceExample, strconv.FormatBool(exampleProperty), strconv.FormatBool(property), 1)
@@ -31,10 +30,10 @@ func TestAccDomainPolicy(t *testing.T) {
 		exampleProperty, !exampleProperty,
 		"", "", "",
 		false,
-		checkRemoteProperty(*otherFrame),
+		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		checkRemoteProperty(*otherFrame)(false),
-		test_utils.ImportOrgId(otherFrame),
+		checkRemoteProperty(*frame)(false),
+		test_utils.ImportOrgId(frame),
 	)
 }
 

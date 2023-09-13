@@ -26,7 +26,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	org := d.Get(helper.OrgIDVar).(string)
 
-	_, err = client.ResetCustomDomainPolicyToDefault(ctx, &admin.ResetCustomDomainPolicyToDefaultRequest{
+	_, err = client.ResetCustomDomainPolicyToDefault(helper.CtxWithOrgID(ctx, d), &admin.ResetCustomDomainPolicyToDefaultRequest{
 		OrgId: org,
 	})
 	if err != nil {
@@ -48,7 +48,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	org := helper.GetID(d, helper.OrgIDVar)
-	_, err = client.UpdateCustomDomainPolicy(ctx, &admin.UpdateCustomDomainPolicyRequest{
+	_, err = client.UpdateCustomDomainPolicy(helper.CtxWithOrgID(ctx, d), &admin.UpdateCustomDomainPolicyRequest{
 		OrgId:                                  org,
 		UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
 		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
@@ -74,7 +74,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	org := helper.GetID(d, helper.OrgIDVar)
-	_, err = client.AddCustomDomainPolicy(ctx, &admin.AddCustomDomainPolicyRequest{
+	_, err = client.AddCustomDomainPolicy(helper.CtxWithOrgID(ctx, d), &admin.AddCustomDomainPolicyRequest{
 		OrgId:                                  org,
 		UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
 		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
