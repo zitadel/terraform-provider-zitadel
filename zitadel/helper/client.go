@@ -127,6 +127,10 @@ func GetManagementClient(info *ClientInfo) (*management.Client, error) {
 	return mgmtClient, nil
 }
 
+func CtxWithID(ctx context.Context, d *schema.ResourceData) context.Context {
+	return CtxSetOrgID(ctx, GetID(d, OrgIDVar))
+}
+
 func CtxWithOrgID(ctx context.Context, d *schema.ResourceData) context.Context {
 	return CtxSetOrgID(ctx, d.Get(OrgIDVar).(string))
 }

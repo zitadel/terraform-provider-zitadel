@@ -21,7 +21,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.ResetPasswordComplexityPolicyToDefault(helper.CtxWithOrgID(ctx, d), &management.ResetPasswordComplexityPolicyToDefaultRequest{})
+	_, err = client.ResetPasswordComplexityPolicyToDefault(helper.CtxWithID(ctx, d), &management.ResetPasswordComplexityPolicyToDefaultRequest{})
 	if err != nil {
 		return diag.Errorf("failed to reset password complexity policy: %v", err)
 	}
@@ -38,7 +38,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.UpdateCustomPasswordComplexityPolicy(helper.CtxWithOrgID(ctx, d), &management.UpdateCustomPasswordComplexityPolicyRequest{
+	_, err = client.UpdateCustomPasswordComplexityPolicy(helper.CtxWithID(ctx, d), &management.UpdateCustomPasswordComplexityPolicyRequest{
 		MinLength:    uint64(d.Get(minLengthVar).(int)),
 		HasUppercase: d.Get(hasUppercaseVar).(bool),
 		HasLowercase: d.Get(hasLowercaseVar).(bool),
@@ -62,7 +62,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.AddCustomPasswordComplexityPolicy(helper.CtxWithOrgID(ctx, d), &management.AddCustomPasswordComplexityPolicyRequest{
+	_, err = client.AddCustomPasswordComplexityPolicy(helper.CtxWithID(ctx, d), &management.AddCustomPasswordComplexityPolicyRequest{
 		MinLength:    uint64(d.Get(minLengthVar).(int)),
 		HasUppercase: d.Get(hasUppercaseVar).(bool),
 		HasLowercase: d.Get(hasLowercaseVar).(bool),
@@ -86,7 +86,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetPasswordComplexityPolicy(helper.CtxWithOrgID(ctx, d), &management.GetPasswordComplexityPolicyRequest{})
+	resp, err := client.GetPasswordComplexityPolicy(helper.CtxWithID(ctx, d), &management.GetPasswordComplexityPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

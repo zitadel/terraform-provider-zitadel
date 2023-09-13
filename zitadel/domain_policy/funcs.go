@@ -48,7 +48,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	org := helper.GetID(d, helper.OrgIDVar)
-	_, err = client.UpdateCustomDomainPolicy(helper.CtxWithOrgID(ctx, d), &admin.UpdateCustomDomainPolicyRequest{
+	_, err = client.UpdateCustomDomainPolicy(ctx, &admin.UpdateCustomDomainPolicyRequest{
 		OrgId:                                  org,
 		UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
 		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
@@ -74,7 +74,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	org := helper.GetID(d, helper.OrgIDVar)
-	_, err = client.AddCustomDomainPolicy(helper.CtxWithOrgID(ctx, d), &admin.AddCustomDomainPolicyRequest{
+	_, err = client.AddCustomDomainPolicy(ctx, &admin.AddCustomDomainPolicyRequest{
 		OrgId:                                  org,
 		UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
 		ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),
@@ -100,7 +100,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetDomainPolicy(helper.CtxWithOrgID(ctx, d), &management.GetDomainPolicyRequest{})
+	org := helper.GetID(d, helper.OrgIDVar)
+	resp, err := client.GetDomainPolicy(helper.CtxSetOrgID(ctx, org), &management.GetDomainPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil

@@ -21,7 +21,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.ResetLockoutPolicyToDefault(helper.CtxWithOrgID(ctx, d), &management.ResetLockoutPolicyToDefaultRequest{})
+	_, err = client.ResetLockoutPolicyToDefault(helper.CtxWithID(ctx, d), &management.ResetLockoutPolicyToDefaultRequest{})
 	if err != nil {
 		return diag.Errorf("failed to reset lockout policy: %v", err)
 	}
@@ -38,7 +38,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.UpdateCustomLockoutPolicy(helper.CtxWithOrgID(ctx, d), &management.UpdateCustomLockoutPolicyRequest{
+	_, err = client.UpdateCustomLockoutPolicy(helper.CtxWithID(ctx, d), &management.UpdateCustomLockoutPolicyRequest{
 		MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
 	})
 	if err != nil {
@@ -58,7 +58,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.AddCustomLockoutPolicy(helper.CtxWithOrgID(ctx, d), &management.AddCustomLockoutPolicyRequest{
+	_, err = client.AddCustomLockoutPolicy(helper.CtxWithID(ctx, d), &management.AddCustomLockoutPolicyRequest{
 		MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
 	})
 	if err != nil {
@@ -78,7 +78,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.GetLockoutPolicy(helper.CtxWithOrgID(ctx, d), &management.GetLockoutPolicyRequest{})
+	resp, err := client.GetLockoutPolicy(helper.CtxWithID(ctx, d), &management.GetLockoutPolicyRequest{})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
