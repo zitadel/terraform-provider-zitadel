@@ -163,8 +163,6 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		resp.Diagnostics.AddError("failed to handle provider config", err.Error())
 		return
 	}
-	helper.ClearMgmtClient()
-	helper.ClearAdminClient()
 
 	resp.DataSourceData = info
 	resp.ResourceData = info
@@ -328,8 +326,6 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
-	helper.ClearMgmtClient()
-	helper.ClearAdminClient()
 
 	return clientinfo, nil
 }

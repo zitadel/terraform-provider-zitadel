@@ -34,7 +34,7 @@ type ClientInfo struct {
 }
 
 func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
-	options := []zitadel.Option{}
+	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if token != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(token)))
@@ -84,10 +84,6 @@ func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile st
 var adminClientLock = &sync.Mutex{}
 var adminClient *admin.Client
 
-func ClearAdminClient() {
-	adminClient = nil
-}
-
 func GetAdminClient(info *ClientInfo) (*admin.Client, error) {
 	if adminClient == nil {
 		adminClientLock.Lock()
@@ -110,10 +106,6 @@ func GetAdminClient(info *ClientInfo) (*admin.Client, error) {
 
 var mgmtClientLock = &sync.Mutex{}
 var mgmtClient *management.Client
-
-func ClearMgmtClient() {
-	mgmtClient = nil
-}
 
 func GetManagementClient(info *ClientInfo) (*management.Client, error) {
 	if mgmtClient == nil {
