@@ -32,7 +32,9 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_passwordless_registration_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_privacy_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_verify_email_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_verify_email_otp_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_verify_phone_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_verify_sms_otp_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/domain"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/domain_policy"
@@ -81,7 +83,9 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/trigger_actions"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/user_grant"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_email_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_email_otp_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_phone_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_sms_otp_message_text"
 )
 
 var _ provider.Provider = (*providerPV6)(nil)
@@ -190,6 +194,10 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 		default_passwordless_registration_message_text.New,
 		default_verify_email_message_text.New,
 		default_verify_phone_message_text.New,
+		default_verify_email_otp_message_text.New,
+		default_verify_sms_otp_message_text.New,
+		verify_email_otp_message_text.New,
+		verify_sms_otp_message_text.New,
 	}
 }
 
