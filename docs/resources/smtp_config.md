@@ -13,12 +13,13 @@ Resource representing the SMTP configuration of an instance.
 
 ```terraform
 resource "zitadel_smtp_config" "default" {
-  sender_address = "sender@example.com"
-  sender_name    = "no-reply"
-  tls            = true
-  host           = "localhost:25"
-  user           = "user"
-  password       = "secret_password"
+  sender_address   = "sender@example.com"
+  sender_name      = "no-reply"
+  tls              = true
+  host             = "localhost:25"
+  user             = "user"
+  password         = "secret_password"
+  reply_to_address = "replyto@example.com"
 }
 ```
 
@@ -34,6 +35,7 @@ resource "zitadel_smtp_config" "default" {
 ### Optional
 
 - `password` (String, Sensitive) Password used to communicate with your SMTP server.
+- `reply_to_address` (String) Address to reply to.
 - `tls` (Boolean) TLS used to communicate with your SMTP server.
 - `user` (String) User used to communicate with your SMTP server.
 

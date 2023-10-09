@@ -41,6 +41,11 @@ func GetResource() *schema.Resource {
 				Description: "Password used to communicate with your SMTP server.",
 				Sensitive:   true,
 			},
+			replyToAddressVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Address to reply to.",
+			},
 		},
 		CreateContext: create,
 		DeleteContext: delete,
