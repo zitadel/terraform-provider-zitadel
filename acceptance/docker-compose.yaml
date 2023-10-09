@@ -15,7 +15,7 @@ services:
 
   zitadel:
     user: '${ZITADEL_DEV_UID}'
-    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v2.32.1}'
+    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v2.38.0}'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"
