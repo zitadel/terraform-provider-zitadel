@@ -12,22 +12,22 @@ func GetResource() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			tosLinkVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "",
 			},
 			privacyLinkVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "",
 			},
 			HelpLinkVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "",
 			},
 			supportEmailVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "",
 			},
 		},
