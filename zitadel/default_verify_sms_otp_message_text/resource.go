@@ -13,7 +13,6 @@ import (
 	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/zitadel/terraform-provider-zitadel/gen"
 	"github.com/zitadel/terraform-provider-zitadel/gen/github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )
@@ -41,7 +40,6 @@ func (r *defaultVerifySMSOTPMessageTextResource) Metadata(_ context.Context, req
 func (r *defaultVerifySMSOTPMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	s, d := text.GenSchemaMessageCustomText(ctx)
 	delete(s.Attributes, "org_id")
-	gen.DeleteSMSAttributes(s)
 	return s, d
 }
 
@@ -64,7 +62,6 @@ func (r *defaultVerifySMSOTPMessageTextResource) Create(ctx context.Context, req
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	gen.SetEmptySMSAttrs(plan)
 
 	obj := textpb.MessageCustomText{}
 	resp.Diagnostics.Append(text.CopyMessageCustomTextFromTerraform(ctx, plan, &obj)...)
@@ -149,7 +146,6 @@ func (r *defaultVerifySMSOTPMessageTextResource) Update(ctx context.Context, req
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	gen.SetEmptySMSAttrs(plan)
 
 	obj := textpb.MessageCustomText{}
 	resp.Diagnostics.Append(text.CopyMessageCustomTextFromTerraform(ctx, plan, &obj)...)

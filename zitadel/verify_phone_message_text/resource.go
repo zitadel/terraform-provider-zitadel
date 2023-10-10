@@ -14,7 +14,6 @@ import (
 	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/zitadel/terraform-provider-zitadel/gen"
 	"github.com/zitadel/terraform-provider-zitadel/gen/github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )
@@ -40,9 +39,7 @@ func (r *verifyPhoneMessageTextResource) Metadata(_ context.Context, req resourc
 }
 
 func (r *verifyPhoneMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	s, d := text.GenSchemaMessageCustomText(ctx)
-	gen.DeleteSMSAttributes(s)
-	return s, d
+	return text.GenSchemaMessageCustomText(ctx)
 }
 
 func (r *verifyPhoneMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -64,7 +61,6 @@ func (r *verifyPhoneMessageTextResource) Create(ctx context.Context, req resourc
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	gen.SetEmptySMSAttrs(plan)
 
 	obj := textpb.MessageCustomText{}
 	resp.Diagnostics.Append(text.CopyMessageCustomTextFromTerraform(ctx, plan, &obj)...)
@@ -149,7 +145,6 @@ func (r *verifyPhoneMessageTextResource) Update(ctx context.Context, req resourc
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	gen.SetEmptySMSAttrs(plan)
 
 	obj := textpb.MessageCustomText{}
 	resp.Diagnostics.Append(text.CopyMessageCustomTextFromTerraform(ctx, plan, &obj)...)

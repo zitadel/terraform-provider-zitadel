@@ -30,7 +30,13 @@ resource "zitadel_verify_phone_message_text" "default" {
 
 ### Optional
 
+- `button_text` (String)
+- `footer_text` (String)
+- `greeting` (String)
+- `pre_header` (String)
+- `subject` (String)
 - `text` (String)
+- `title` (String)
 
 ### Read-Only
 
