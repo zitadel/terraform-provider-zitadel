@@ -40,6 +40,13 @@ func (r *defaultVerifyPhoneMessageTextResource) Metadata(_ context.Context, req 
 func (r *defaultVerifyPhoneMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	s, d := text.GenSchemaMessageCustomText(ctx)
 	delete(s.Attributes, "org_id")
+	//only sms message
+	delete(s.Attributes, "title")
+	delete(s.Attributes, "pre_header")
+	delete(s.Attributes, "subject")
+	delete(s.Attributes, "greeting")
+	delete(s.Attributes, "button_text")
+	delete(s.Attributes, "footer_text")
 	return s, d
 }
 

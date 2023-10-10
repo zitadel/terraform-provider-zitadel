@@ -39,7 +39,15 @@ func (r *verifyPhoneMessageTextResource) Metadata(_ context.Context, req resourc
 }
 
 func (r *verifyPhoneMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaMessageCustomText(ctx)
+	s, d := text.GenSchemaMessageCustomText(ctx)
+	//only sms message
+	delete(s.Attributes, "title")
+	delete(s.Attributes, "pre_header")
+	delete(s.Attributes, "subject")
+	delete(s.Attributes, "greeting")
+	delete(s.Attributes, "button_text")
+	delete(s.Attributes, "footer_text")
+	return s, d
 }
 
 func (r *verifyPhoneMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {

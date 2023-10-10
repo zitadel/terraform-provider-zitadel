@@ -15,13 +15,7 @@ description: |-
 resource "zitadel_default_verify_phone_message_text" "default" {
   language = "en"
 
-  title       = "title example"
-  pre_header  = "pre_header example"
-  subject     = "subject example"
-  greeting    = "greeting example"
   text        = "text example"
-  button_text = "button_text example"
-  footer_text = "footer_text example"
 }
 ```
 
@@ -34,13 +28,7 @@ resource "zitadel_default_verify_phone_message_text" "default" {
 
 ### Optional
 
-- `button_text` (String)
-- `footer_text` (String)
-- `greeting` (String)
-- `pre_header` (String)
-- `subject` (String)
 - `text` (String)
-- `title` (String)
 
 ### Read-Only
 
