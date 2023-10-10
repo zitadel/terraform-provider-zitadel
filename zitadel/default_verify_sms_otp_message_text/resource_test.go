@@ -30,7 +30,7 @@ func TestAccDefaultVerifySMSOTPMessageText(t *testing.T) {
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, exampleLanguage)("ZITADEL - Password of user has changed"),
+		checkRemoteProperty(frame, exampleLanguage)("Password of user has changed"),
 		nil,
 	)
 }

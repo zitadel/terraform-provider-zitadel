@@ -29,7 +29,7 @@ func TestAccDefaultDomainClaimedMessageText(t *testing.T) {
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, exampleLanguage)("ZITADEL - Domain has been claimed"),
+		checkRemoteProperty(frame, exampleLanguage)("Domain has been claimed"),
 		nil, // Import not supported
 	)
 }

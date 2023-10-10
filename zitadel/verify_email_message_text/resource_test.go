@@ -30,7 +30,7 @@ func TestAccVerifyEmailMessageText(t *testing.T) {
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^\d{18}_%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, exampleLanguage)("Zitadel - Verify email"),
+		checkRemoteProperty(frame, exampleLanguage)("Verify email"),
 		nil,
 	)
 }
