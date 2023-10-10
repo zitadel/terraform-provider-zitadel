@@ -16,20 +16,20 @@ import (
 func TestAccDefaultVerifyPhoneMessageText(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_verify_phone_message_text")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
-	exampleProperty := test_utils.AttributeValue(t, "title", exampleAttributes).AsString()
+	exampleProperty := test_utils.AttributeValue(t, "text", exampleAttributes).AsString()
 	exampleLanguage := test_utils.AttributeValue(t, default_verify_phone_message_text.LanguageVar, exampleAttributes).AsString()
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
-		exampleProperty, "updatedtitle",
+		exampleProperty, "updatedtext",
 		"", "", "",
 		true,
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, exampleLanguage)("Verify phone"),
+		checkRemotePropertyNotEmpty(frame, exampleLanguage),
 		nil,
 	)
 }
@@ -41,11 +41,24 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame, lang string) func(
 			if err != nil {
 				return err
 			}
-			actual := remoteResource.GetCustomText().GetTitle()
+			actual := remoteResource.GetCustomText().GetText()
 			if actual != expect {
 				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}
 			return nil
 		}
+	}
+}
+
+func checkRemotePropertyNotEmpty(frame *test_utils.InstanceTestFrame, lang string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		remoteResource, err := frame.GetCustomVerifyPhoneMessageText(frame, &admin.GetCustomVerifyPhoneMessageTextRequest{Language: lang})
+		if err != nil {
+			return err
+		}
+		if remoteResource.GetCustomText().GetText() == "" {
+			return fmt.Errorf("expected text not empty, but got empty")
+		}
+		return nil
 	}
 }
