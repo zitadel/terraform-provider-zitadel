@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_verify_email_otp_message_text"
-
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
 )
 
@@ -30,7 +29,7 @@ func TestAccDefaultVerifyEmailOTPMessageText(t *testing.T) {
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, exampleLanguage)("Password of user has changed"),
+		checkRemoteProperty(frame, exampleLanguage)("Verify One-Time Password"),
 		nil,
 	)
 }
