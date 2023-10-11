@@ -45,12 +45,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	req := &admin.AddSMTPConfigRequest{
-		SenderAddress: d.Get(SenderAddressVar).(string),
-		SenderName:    d.Get(SenderNameVar).(string),
-		Host:          d.Get(hostVar).(string),
-		User:          d.Get(userVar).(string),
-		Tls:           d.Get(tlsVar).(bool),
-		Password:      d.Get(PasswordVar).(string),
+		SenderAddress:  d.Get(SenderAddressVar).(string),
+		SenderName:     d.Get(SenderNameVar).(string),
+		Host:           d.Get(hostVar).(string),
+		User:           d.Get(userVar).(string),
+		Tls:            d.Get(tlsVar).(bool),
+		Password:       d.Get(PasswordVar).(string),
+		ReplyToAddress: d.Get(replyToAddressVar).(string),
 	}
 
 	resp, err := client.AddSMTPConfig(ctx, req)
@@ -75,13 +76,14 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar) {
+	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar, replyToAddressVar) {
 		_, err = client.UpdateSMTPConfig(ctx, &admin.UpdateSMTPConfigRequest{
-			SenderAddress: d.Get(SenderAddressVar).(string),
-			SenderName:    d.Get(SenderNameVar).(string),
-			Host:          d.Get(hostVar).(string),
-			Tls:           d.Get(tlsVar).(bool),
-			User:          d.Get(userVar).(string),
+			SenderAddress:  d.Get(SenderAddressVar).(string),
+			SenderName:     d.Get(SenderNameVar).(string),
+			Host:           d.Get(hostVar).(string),
+			Tls:            d.Get(tlsVar).(bool),
+			User:           d.Get(userVar).(string),
+			ReplyToAddress: d.Get(replyToAddressVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update smtp config: %v", err)
@@ -123,12 +125,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	set := map[string]interface{}{
-		SenderAddressVar: resp.GetSmtpConfig().GetSenderAddress(),
-		SenderNameVar:    resp.GetSmtpConfig().GetSenderName(),
-		tlsVar:           resp.GetSmtpConfig().GetTls(),
-		hostVar:          resp.GetSmtpConfig().GetHost(),
-		userVar:          resp.GetSmtpConfig().GetUser(),
-		PasswordVar:      d.Get(PasswordVar).(string),
+		SenderAddressVar:  resp.GetSmtpConfig().GetSenderAddress(),
+		SenderNameVar:     resp.GetSmtpConfig().GetSenderName(),
+		tlsVar:            resp.GetSmtpConfig().GetTls(),
+		hostVar:           resp.GetSmtpConfig().GetHost(),
+		userVar:           resp.GetSmtpConfig().GetUser(),
+		PasswordVar:       d.Get(PasswordVar).(string),
+		replyToAddressVar: resp.GetSmtpConfig().GetReplyToAddress(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
