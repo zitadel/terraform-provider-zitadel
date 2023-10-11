@@ -29,7 +29,7 @@ func TestAccDefaultPasswordlessRegistrationMessageText(t *testing.T) {
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, exampleLanguage)("ZITADEL - Add Passwordless Login"),
+		checkRemoteProperty(frame, exampleLanguage)("Add Passwordless Login"),
 		nil,
 	)
 }

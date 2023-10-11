@@ -1,4 +1,4 @@
-package verify_phone_message_text_test
+package default_verify_sms_otp_message_text_test
 
 import (
 	"fmt"
@@ -7,37 +7,37 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_verify_sms_otp_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_phone_message_text"
 )
 
-func TestAccVerifyPhoneMessageText(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_verify_phone_message_text")
+func TestAccDefaultVerifySMSOTPMessageText(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_verify_sms_otp_message_text")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, "text", exampleAttributes).AsString()
-	exampleLanguage := test_utils.AttributeValue(t, verify_phone_message_text.LanguageVar, exampleAttributes).AsString()
+	exampleLanguage := test_utils.AttributeValue(t, default_verify_sms_otp_message_text.LanguageVar, exampleAttributes).AsString()
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		[]string{frame.AsOrgDefaultDependency},
+		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, "updatedtext",
 		"", "", "",
 		true,
 		checkRemoteProperty(frame, exampleLanguage),
-		regexp.MustCompile(fmt.Sprintf(`^\d{18}_%s$`, exampleLanguage)),
+		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
 		checkRemotePropertyNotEmpty(frame, exampleLanguage),
 		nil,
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame, lang string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame, lang string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteResource, err := frame.GetCustomVerifyPhoneMessageText(frame, &management.GetCustomVerifyPhoneMessageTextRequest{Language: lang})
+			remoteResource, err := frame.GetCustomVerifySMSOTPMessageText(frame, &admin.GetCustomVerifySMSOTPMessageTextRequest{Language: lang})
 			if err != nil {
 				return err
 			}
@@ -49,10 +49,9 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame, lang string) func(strin
 		}
 	}
 }
-
-func checkRemotePropertyNotEmpty(frame *test_utils.OrgTestFrame, lang string) resource.TestCheckFunc {
+func checkRemotePropertyNotEmpty(frame *test_utils.InstanceTestFrame, lang string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		remoteResource, err := frame.GetCustomVerifyPhoneMessageText(frame, &management.GetCustomVerifyPhoneMessageTextRequest{Language: lang})
+		remoteResource, err := frame.GetCustomVerifySMSOTPMessageText(frame, &admin.GetCustomVerifySMSOTPMessageTextRequest{Language: lang})
 		if err != nil {
 			return err
 		}

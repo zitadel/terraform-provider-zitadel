@@ -1,4 +1,4 @@
-package default_password_reset_message_text_test
+package default_verify_email_otp_message_text_test
 
 import (
 	"fmt"
@@ -9,15 +9,15 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_password_reset_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/default_verify_email_otp_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
 )
 
-func TestAccDefaultPassswordResetMessageText(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_password_reset_message_text")
+func TestAccDefaultVerifyEmailOTPMessageText(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_verify_email_otp_message_text")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, "title", exampleAttributes).AsString()
-	exampleLanguage := test_utils.AttributeValue(t, default_password_reset_message_text.LanguageVar, exampleAttributes).AsString()
+	exampleLanguage := test_utils.AttributeValue(t, default_verify_email_otp_message_text.LanguageVar, exampleAttributes).AsString()
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
@@ -29,7 +29,7 @@ func TestAccDefaultPassswordResetMessageText(t *testing.T) {
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, exampleLanguage)("Reset password"),
+		checkRemoteProperty(frame, exampleLanguage)("Verify One-Time Password"),
 		nil,
 	)
 }
@@ -37,7 +37,7 @@ func TestAccDefaultPassswordResetMessageText(t *testing.T) {
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame, lang string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteResource, err := frame.GetCustomPasswordResetMessageText(frame, &admin.GetCustomPasswordResetMessageTextRequest{Language: lang})
+			remoteResource, err := frame.GetCustomVerifyEmailOTPMessageText(frame, &admin.GetCustomVerifyEmailOTPMessageTextRequest{Language: lang})
 			if err != nil {
 				return err
 			}
