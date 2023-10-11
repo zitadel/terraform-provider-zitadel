@@ -29,7 +29,7 @@ func TestAccDefaultInitMessageText(t *testing.T) {
 		checkRemoteProperty(frame, language),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, language)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, language)("ZITADEL - Initialize User"),
+		checkRemoteProperty(frame, language)("Initialize User"),
 		nil,
 	)
 }

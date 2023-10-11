@@ -1,4 +1,4 @@
-package verify_phone_message_text_test
+package verify_sms_otp_message_text_test
 
 import (
 	"fmt"
@@ -10,14 +10,15 @@ import (
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_phone_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_sms_otp_message_text"
 )
 
-func TestAccVerifyPhoneMessageText(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_verify_phone_message_text")
+func TestAccVerifySMSOTPMessageText(t *testing.T) {
+	resourceName := "zitadel_verify_sms_otp_message_text"
+	frame := test_utils.NewOrgTestFrame(t, resourceName)
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, "text", exampleAttributes).AsString()
-	exampleLanguage := test_utils.AttributeValue(t, verify_phone_message_text.LanguageVar, exampleAttributes).AsString()
+	exampleLanguage := test_utils.AttributeValue(t, verify_sms_otp_message_text.LanguageVar, exampleAttributes).AsString()
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
@@ -37,7 +38,7 @@ func TestAccVerifyPhoneMessageText(t *testing.T) {
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, lang string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteResource, err := frame.GetCustomVerifyPhoneMessageText(frame, &management.GetCustomVerifyPhoneMessageTextRequest{Language: lang})
+			remoteResource, err := frame.GetCustomVerifySMSOTPMessageText(frame, &management.GetCustomVerifySMSOTPMessageTextRequest{Language: lang})
 			if err != nil {
 				return err
 			}
@@ -52,7 +53,7 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame, lang string) func(strin
 
 func checkRemotePropertyNotEmpty(frame *test_utils.OrgTestFrame, lang string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		remoteResource, err := frame.GetCustomVerifyPhoneMessageText(frame, &management.GetCustomVerifyPhoneMessageTextRequest{Language: lang})
+		remoteResource, err := frame.GetCustomVerifySMSOTPMessageText(frame, &management.GetCustomVerifySMSOTPMessageTextRequest{Language: lang})
 		if err != nil {
 			return err
 		}

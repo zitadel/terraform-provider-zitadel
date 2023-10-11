@@ -1,19 +1,18 @@
 ---
-page_title: "zitadel_verify_phone_message_text Resource - terraform-provider-zitadel"
+page_title: "zitadel_default_verify_sms_otp_message_text Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
   
 ---
 
-# zitadel_verify_phone_message_text (Resource)
+# zitadel_default_verify_sms_otp_message_text (Resource)
 
 
 
 ## Example Usage
 
 ```terraform
-resource "zitadel_verify_phone_message_text" "default" {
-  org_id   = data.zitadel_org.default.id
+resource "zitadel_default_verify_sms_otp_message_text" "default" {
   language = "en"
 
   text        = "text example"
@@ -26,7 +25,6 @@ resource "zitadel_verify_phone_message_text" "default" {
 ### Required
 
 - `language` (String)
-- `org_id` (String)
 
 ### Optional
 

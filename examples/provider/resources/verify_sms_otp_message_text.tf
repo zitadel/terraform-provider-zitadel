@@ -1,4 +1,4 @@
-resource "zitadel_verify_phone_message_text" "default" {
+resource "zitadel_verify_sms_otp_message_text" "default" {
   org_id   = data.zitadel_org.default.id
   language = "en"
 
