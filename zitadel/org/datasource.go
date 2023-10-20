@@ -28,6 +28,11 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Name of the org.",
 			},
+			IsDefaultVar: {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "Indicates whether the org is the default org of the instance.",
+			},
 			stateVar: {
 				Type:        schema.TypeString,
 				Computed:    true,

@@ -15,6 +15,11 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "Name of the org",
 			},
+			IsDefaultVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "True sets the org as default org for the instance. Only one org can be default org. Nothing happens if you set it to false until you set another org as default org.",
+			},
 			primaryDomainVar: {
 				Type:        schema.TypeString,
 				Computed:    true,

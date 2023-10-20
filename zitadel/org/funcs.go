@@ -50,7 +50,20 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.SetId(resp.GetId())
+	orgId := resp.GetId()
+	d.SetId(orgId)
+	if val, ok := d.GetOk(IsDefaultVar); ok && val.(bool) {
+		adminClient, err := helper.GetAdminClient(clientinfo)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		_, err = adminClient.SetDefaultOrg(ctx, &admin.SetDefaultOrgRequest{
+			OrgId: orgId,
+		})
+		if err != nil {
+			return diag.Errorf("error while setting default org id %s: %v", orgId, err)
+		}
+	}
 	return nil
 }
 
@@ -70,6 +83,19 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	})
 	if err != nil {
 		return diag.Errorf("failed to update org: %v", err)
+	}
+	// To unset the default org, we need to set another org as default org.
+	if isDefault, ok := d.GetOk(IsDefaultVar); ok && isDefault.(bool) && d.HasChange(IsDefaultVar) {
+		adminClient, err := helper.GetAdminClient(clientinfo)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		_, err = adminClient.SetDefaultOrg(ctx, &admin.SetDefaultOrgRequest{
+			OrgId: d.Id(),
+		})
+		if err != nil {
+			return diag.Errorf("error while setting default org id %s: %v", d.Id(), err)
+		}
 	}
 	return nil
 }
@@ -102,6 +128,19 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 	state := org.OrgState_name[int32(remoteOrg.State)]
 	if err := d.Set(stateVar, state); err != nil {
 		return diag.Errorf("error while setting org state %s: %v", state, err)
+	}
+	adminClient, err := helper.GetAdminClient(clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	defaultOrg, err := adminClient.GetDefaultOrg(ctx, &admin.GetDefaultOrgRequest{})
+	if err != nil {
+		return diag.Errorf("error while getting default instance org: %v", err)
+	}
+	if defaultOrg.Org.Id == remoteOrg.Id {
+		if err := d.Set(IsDefaultVar, true); err != nil {
+			return diag.Errorf("error while setting org is_default: %v", err)
+		}
 	}
 	return nil
 }
@@ -159,6 +198,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	for i, org := range resp.Result {
 		orgIDs[i] = org.Id
 	}
+
 	// If the ID is blank, the datasource is deleted and not usable.
 	d.SetId("-")
 	return diag.FromErr(d.Set(orgIDsVar, orgIDs))
