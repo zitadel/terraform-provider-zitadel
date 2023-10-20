@@ -73,16 +73,19 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo)
-	if err != nil {
-		return diag.FromErr(err)
-	}
+	// If try updating the name to the same value API will return an error.
+	if d.HasChange(NameVar) {
+		client, err := helper.GetManagementClient(clientinfo)
+		if err != nil {
+			return diag.FromErr(err)
+		}
 
-	_, err = client.UpdateOrg(helper.CtxSetOrgID(ctx, d.Id()), &management.UpdateOrgRequest{
-		Name: d.Get(NameVar).(string),
-	})
-	if err != nil {
-		return diag.Errorf("failed to update org: %v", err)
+		_, err = client.UpdateOrg(helper.CtxSetOrgID(ctx, d.Id()), &management.UpdateOrgRequest{
+			Name: d.Get(NameVar).(string),
+		})
+		if err != nil {
+			return diag.Errorf("failed to update org: %v", err)
+		}
 	}
 	// To unset the default org, we need to set another org as default org.
 	if isDefault, ok := d.GetOk(IsDefaultVar); ok && isDefault.(bool) && d.HasChange(IsDefaultVar) {
@@ -198,7 +201,6 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	for i, org := range resp.Result {
 		orgIDs[i] = org.Id
 	}
-
 	// If the ID is blank, the datasource is deleted and not usable.
 	d.SetId("-")
 	return diag.FromErr(d.Set(orgIDsVar, orgIDs))
