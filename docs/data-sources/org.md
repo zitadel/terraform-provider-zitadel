@@ -30,6 +30,7 @@ output "org" {
 
 ### Read-Only
 
+- `is_default` (Boolean) Indicates whether the org is the default org of the instance.
 - `name` (String) Name of the org.
 - `primary_domain` (String) Primary domain of the org
 - `state` (String) State of the org, supported values: ORG_STATE_UNSPECIFIED, ORG_STATE_ACTIVE, ORG_STATE_INACTIVE, ORG_STATE_REMOVED
