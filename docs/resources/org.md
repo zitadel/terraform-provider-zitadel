@@ -24,6 +24,10 @@ resource "zitadel_org" "default" {
 
 - `name` (String) Name of the org
 
+### Optional
+
+- `is_default` (Boolean) True sets the org as default org for the instance. Only one org can be default org. Nothing happens if you set it to false until you set another org as default org.
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.

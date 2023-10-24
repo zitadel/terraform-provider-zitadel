@@ -4,6 +4,7 @@ const (
 	OrgIDVar         = "id"
 	orgIDsVar        = "ids"
 	NameVar          = "name"
+	IsDefaultVar     = "is_default"
 	nameMethodVar    = "name_method"
 	DomainVar        = "domain"
 	domainMethodVar  = "domain_method"
