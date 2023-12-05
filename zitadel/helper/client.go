@@ -140,8 +140,7 @@ func CtxSetOrgID(ctx context.Context, orgID string) context.Context {
 }
 
 func IgnoreIfNotFoundError(err error) error {
-	//permission denied included as nothing can be found then as well
-	if code := status.Code(err); code == codes.NotFound || code == codes.PermissionDenied {
+	if code := status.Code(err); code == codes.NotFound {
 		return nil
 	}
 	return err
