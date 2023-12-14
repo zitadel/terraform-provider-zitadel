@@ -2,6 +2,7 @@ package zitadel
 
 import (
 	"context"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/application_saml"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	fdiag "github.com/hashicorp/terraform-plugin-framework/diag"
@@ -212,6 +213,7 @@ func Provider() *schema.Provider {
 			"zitadel_project_role":               project_role.GetDatasource(),
 			"zitadel_action":                     action.GetDatasource(),
 			"zitadel_application_oidc":           application_oidc.GetDatasource(),
+			"zitadel_application_saml":           application_saml.GetDatasource(),
 			"zitadel_application_api":            application_api.GetDatasource(),
 			"zitadel_trigger_actions":            trigger_actions.GetDatasource(),
 			"zitadel_idp_github":                 idp_github.GetDatasource(),
@@ -273,6 +275,7 @@ func Provider() *schema.Provider {
 			"zitadel_domain":                             domain.GetResource(),
 			"zitadel_action":                             action.GetResource(),
 			"zitadel_application_oidc":                   application_oidc.GetResource(),
+			"zitadel_application_saml":                   application_saml.GetResource(),
 			"zitadel_application_api":                    application_api.GetResource(),
 			"zitadel_application_key":                    application_key.GetResource(),
 			"zitadel_project_grant":                      project_grant.GetResource(),
