@@ -4,7 +4,9 @@ import "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/project"
 
 const (
 	ProjectIDVar              = "project_id"
+	projectIDsVar             = "project_ids"
 	NameVar                   = "name"
+	nameMethodVar             = "name_method"
 	stateVar                  = "state"
 	roleAssertionVar          = "project_role_assertion"
 	roleCheckVar              = "project_role_check"
