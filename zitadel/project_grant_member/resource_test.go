@@ -25,7 +25,7 @@ func TestAccProjectGrantMember(t *testing.T) {
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, project_grant_member.RolesVar, exampleAttributes).AsValueSlice()[0].AsString()
 	grantIDProperty := test_utils.AttributeValue(t, project_grant_member.GrantIDVar, exampleAttributes).AsString()
-	projectDep, projectID := project_test_dep.Create(t, frame)
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	userDep, userID := human_user_test_dep.Create(t, frame)
 	_, grantedOrgID, _ := org_test_dep.Create(t, frame, "granting_org")
 	grantID := project_grant_test_dep.Create(t, frame, projectID, grantedOrgID)

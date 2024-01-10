@@ -20,8 +20,8 @@ func TestAccAppKey(t *testing.T) {
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, application_key.ExpirationDateVar, exampleAttributes).AsString()
 	updatedProperty := "2501-01-01T08:45:00Z"
-	projectDep, projectID := project_test_dep.Create(t, frame)
-	appDep, appID := application_api_test_dep.Create(t, frame, projectID)
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
+	appDep, appID := application_api_test_dep.Create(t, frame, projectID, frame.UniqueResourcesID)
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,

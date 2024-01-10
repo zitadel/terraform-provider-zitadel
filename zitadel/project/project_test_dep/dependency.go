@@ -9,9 +9,13 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/project"
 )
 
-func Create(t *testing.T, frame *test_utils.OrgTestFrame) (string, string) {
-	return test_utils.CreateDefaultDependency(t, "zitadel_project", project.ProjectIDVar, func() (string, error) {
-		p, err := frame.AddProject(frame, &management.AddProjectRequest{Name: frame.UniqueResourcesID})
-		return p.GetId(), err
-	})
+func Create(t *testing.T, frame *test_utils.OrgTestFrame, name string) (string, string) {
+	return test_utils.CreateOrgDefaultDependency(t,
+		"zitadel_project",
+		frame.OrgID,
+		project.ProjectIDVar,
+		func() (string, error) {
+			p, err := frame.AddProject(frame, &management.AddProjectRequest{Name: name})
+			return p.GetId(), err
+		})
 }

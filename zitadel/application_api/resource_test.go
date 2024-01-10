@@ -18,7 +18,7 @@ func TestAccAppAPI(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_api")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, application_api.NameVar, exampleAttributes).AsString()
-	projectDep, projectID := project_test_dep.Create(t, frame)
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,

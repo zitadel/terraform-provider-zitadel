@@ -16,7 +16,7 @@ import (
 
 func TestAccMachineKey(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_machine_key")
-	userDep, userID := machine_user_test_dep.Create(t, frame)
+	userDep, userID := machine_user_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, machine_key.ExpirationDateVar, exampleAttributes).AsString()
 	test_utils.RunLifecyleTest(

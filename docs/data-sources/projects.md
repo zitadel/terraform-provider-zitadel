@@ -13,8 +13,9 @@ Datasource representing the project, which can then be granted to different orga
 
 ```terraform
 data "zitadel_projects" "default" {
-  name          = "example-name"
-  name_method   = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
+  org_id      = "123456789012345678"
+  name        = "example-name"
+  name_method = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
 }
 
 data "zitadel_project" "default" {
@@ -43,10 +44,5 @@ output "project_names" {
 
 ### Read-Only
 
-- `has_project_check` (Boolean) ZITADEL checks if the org of the user has permission to this project
 - `id` (String) The ID of this resource.
-- `private_labeling_setting` (String) Defines from where the private labeling should be triggered
 - `project_ids` (List of String) A set of all project IDs.
-- `project_role_assertion` (Boolean) describes if roles of user should be added in token
-- `project_role_check` (Boolean) ZITADEL checks if the user has at least one on this project
-- `state` (String) State of the project

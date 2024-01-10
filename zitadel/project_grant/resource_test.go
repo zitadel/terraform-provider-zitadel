@@ -21,7 +21,7 @@ func TestAccProjectGrant(t *testing.T) {
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, project_grant.RoleKeysVar, exampleAttributes).AsValueSlice()[0].AsString()
 	updatedProperty := "updatedproperty"
-	projectDep, projectID := project_test_dep.Create(t, frame)
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	project_role_test_dep.Create(t, frame, projectID, exampleProperty, updatedProperty)
 	grantedOrgDep, _, _ := org_test_dep.Create(t, frame, "granted_org")
 	test_utils.RunLifecyleTest(

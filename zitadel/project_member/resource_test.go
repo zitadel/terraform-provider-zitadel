@@ -22,7 +22,7 @@ func TestAccProjectMember(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_member")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, project_grant_member.RolesVar, exampleAttributes).AsValueSlice()[0].AsString()
-	projectDep, projectID := project_test_dep.Create(t, frame)
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	userDep, userID := human_user_test_dep.Create(t, frame)
 	test_utils.RunLifecyleTest(
 		t,

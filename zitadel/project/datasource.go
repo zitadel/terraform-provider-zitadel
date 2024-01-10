@@ -58,6 +58,7 @@ func ListDatasources() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
 		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDResourceField,
 			projectIDsVar: {
 				Type:        schema.TypeList,
 				Computed:    true,
@@ -77,32 +78,6 @@ func ListDatasources() *schema.Resource {
 					return helper.EnumValueValidation(nameMethodVar, value, object.TextQueryMethod_value)
 				},
 				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
-			},
-			helper.OrgIDVar: helper.OrgIDResourceField,
-			stateVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "State of the project",
-			},
-			roleAssertionVar: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "describes if roles of user should be added in token",
-			},
-			roleCheckVar: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "ZITADEL checks if the user has at least one on this project",
-			},
-			hasProjectCheckVar: {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "ZITADEL checks if the org of the user has permission to this project",
-			},
-			privateLabelingSettingVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Defines from where the private labeling should be triggered",
 			},
 		},
 		ReadContext: list,

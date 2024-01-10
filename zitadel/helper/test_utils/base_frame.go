@@ -94,5 +94,9 @@ func (b *BaseTestFrame) State(state *terraform.State) *terraform.InstanceState {
 	if resource != nil {
 		return resource.Primary
 	}
-	return resources["data."+b.TerraformName].Primary
+	resource = resources["data."+b.TerraformName]
+	if resource != nil {
+		return resource.Primary
+	}
+	return &terraform.InstanceState{}
 }

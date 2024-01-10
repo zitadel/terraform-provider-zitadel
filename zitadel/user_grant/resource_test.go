@@ -21,7 +21,7 @@ func TestAccUserGrant(t *testing.T) {
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, user_grant.RoleKeysVar, exampleAttributes).AsValueSlice()[0].AsString()
 	updatedProperty := "updatedProperty"
-	projectDep, projectID := project_test_dep.Create(t, frame)
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	project_role_test_dep.Create(t, frame, projectID, exampleProperty, updatedProperty)
 	userDep, userID := human_user_test_dep.Create(t, frame)
 	test_utils.RunLifecyleTest(
