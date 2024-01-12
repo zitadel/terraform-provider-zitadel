@@ -23,7 +23,7 @@ services:
       - ./keys:/keys
       - ./zitadel.yaml:/zitadel.yaml
     healthcheck:
-      test: ['CMD', '/app/zitadel', 'ready']
+      test: ['CMD', '/app/zitadel', 'ready', "--config", "/zitadel.yaml"]
       interval: '2s'
       timeout: '30s'
       retries: 5
