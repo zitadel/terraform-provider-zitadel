@@ -10,7 +10,7 @@ import (
 )
 
 func Create(t *testing.T, frame *test_utils.OrgTestFrame, projectID, name string) (string, string) {
-	return test_utils.CreateProjectDefaultDependency(t, "zitadel_application_oidc", frame.OrgID, application_oidc.ProjectIDVar, projectID, application_oidc.AppIDVar, func() (string, error) {
+	return test_utils.CreateDefaultDependency(t, "zitadel_application_oidc", application_oidc.AppIDVar, func() (string, error) {
 		oidcApp, err := frame.AddOIDCApp(frame, &management.AddOIDCAppRequest{
 			ProjectId: projectID,
 			Name:      name,

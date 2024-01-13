@@ -1,5 +1,5 @@
 data "zitadel_machine_users" "default" {
-  org_id           = "123456789012345678"
+  org_id           = data.zitadel_org.default.id
   user_name        = "example-name"
   user_name_method = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
 }
