@@ -12,13 +12,18 @@ import (
 )
 
 func TestAccOrgDatasource_ID(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_org")
+	datasourceName := "zitadel_org"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
+	config, attributes := test_utils.ReadExample(t, test_utils.Datasources, datasourceName)
+	exampleID := test_utils.AttributeValue(t, org.OrgIDVar, attributes).AsString()
 	orgName := "org_datasource_" + frame.UniqueResourcesID
 	otherFrame := frame.AnotherOrg(t, orgName)
+	config = strings.Replace(config, exampleID, otherFrame.OrgID, 1)
 	test_utils.RunDatasourceTest(
 		t,
 		otherFrame.BaseTestFrame,
-		otherFrame.AsOrgDefaultDependency,
+		config,
+		nil,
 		nil,
 		map[string]string{
 			"id":    otherFrame.OrgID,
@@ -45,6 +50,7 @@ func TestAccOrgsDatasources_ID_Name_Match(t *testing.T) {
 		t,
 		otherFrame.BaseTestFrame,
 		config,
+		nil,
 		checkRemoteProperty(otherFrame, idFromFrame(otherFrame))(orgName),
 		map[string]string{
 			"ids.0": otherFrame.OrgID,
@@ -63,6 +69,7 @@ func TestAccOrgsDatasources_ID_Name_Mismatch(t *testing.T) {
 		t,
 		otherFrame.BaseTestFrame,
 		config,
+		nil,
 		checkRemoteProperty(otherFrame, idFromFrame(otherFrame))(orgName),
 		map[string]string{"ids.#": "0"},
 	)
