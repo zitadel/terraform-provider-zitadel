@@ -10,9 +10,8 @@ import (
 )
 
 func Create(t *testing.T, frame *test_utils.OrgTestFrame, name string) (string, string) {
-	return test_utils.CreateOrgDefaultDependency(t,
+	return test_utils.CreateDefaultDependency(t,
 		"zitadel_project",
-		frame.OrgID,
 		project.ProjectIDVar,
 		func() (string, error) {
 			p, err := frame.AddProject(frame, &management.AddProjectRequest{Name: name})
