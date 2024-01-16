@@ -1,7 +1,10 @@
 package machine_user
 
 import (
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/object"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )
@@ -56,5 +59,35 @@ func GetDatasource() *schema.Resource {
 				Description: "Access token type",
 			}},
 		ReadContext: read,
+	}
+}
+
+func ListDatasources() *schema.Resource {
+	return &schema.Resource{
+		Description: "Datasource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
+		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
+			userIDsVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "A set of all IDs.",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
+			UserNameVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Username",
+			},
+			userNameMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying machine users by username" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(userNameMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+		},
+		ReadContext: list,
 	}
 }

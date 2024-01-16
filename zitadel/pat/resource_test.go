@@ -16,7 +16,7 @@ import (
 
 func TestAccPersonalAccessToken(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_personal_access_token")
-	userDep, userID := machine_user_test_dep.Create(t, frame)
+	userDep, userID := machine_user_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, pat.ExpirationDateVar, exampleAttributes).AsString()
 	updatedProperty := "2051-01-01T00:00:00Z"

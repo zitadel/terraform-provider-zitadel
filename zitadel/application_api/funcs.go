@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/object"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )
@@ -144,4 +145,43 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	d.SetId(app.GetId())
 	return nil
+}
+
+func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started list")
+	name := d.Get(NameVar).(string)
+	nameMethod := d.Get(nameMethodVar).(string)
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+	client, err := helper.GetManagementClient(clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	req := &management.ListAppsRequest{
+		ProjectId: d.Get(ProjectIDVar).(string),
+	}
+	if name != "" {
+		req.Queries = append(req.Queries,
+			&app.AppQuery{
+				Query: &app.AppQuery_NameQuery{
+					NameQuery: &app.AppNameQuery{
+						Name:   name,
+						Method: object.TextQueryMethod(object.TextQueryMethod_value[nameMethod]),
+					},
+				},
+			})
+	}
+	resp, err := client.ListApps(helper.CtxWithOrgID(ctx, d), req)
+	if err != nil {
+		return diag.Errorf("error while getting app by name %s: %v", name, err)
+	}
+	ids := make([]string, len(resp.Result))
+	for i, res := range resp.Result {
+		ids[i] = res.Id
+	}
+	// If the ID is blank, the datasource is deleted and not usable.
+	d.SetId("-")
+	return diag.FromErr(d.Set(appIDsVar, ids))
 }

@@ -18,7 +18,7 @@ func TestAccAppOIDC(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_oidc")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, application_oidc.NameVar, exampleAttributes).AsString()
-	projectDep, projectID := project_test_dep.Create(t, frame)
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,

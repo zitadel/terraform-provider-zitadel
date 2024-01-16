@@ -2,6 +2,7 @@ package test_utils
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -11,6 +12,7 @@ func RunDatasourceTest(
 	t *testing.T,
 	frame BaseTestFrame,
 	config string,
+	dependencies []string,
 	awaitRemoteResource resource.TestCheckFunc,
 	expectProperties map[string]string,
 ) {
@@ -23,7 +25,7 @@ func RunDatasourceTest(
 	}
 	resource.ParallelTest(t, resource.TestCase{
 		Steps: []resource.TestStep{{
-			Config: fmt.Sprintf("%s\n%s", frame.ProviderSnippet, config),
+			Config: fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(dependencies, "\n"), config),
 			Check:  resource.ComposeAggregateTestCheckFunc(checks...),
 		}},
 		ProtoV6ProviderFactories: frame.v6ProviderFactories,

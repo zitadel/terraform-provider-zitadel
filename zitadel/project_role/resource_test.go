@@ -21,7 +21,7 @@ func TestAccProjectRole(t *testing.T) {
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, project_role.KeyVar, exampleAttributes).AsString()
 	updatedProperty := "updatedProperty"
-	projectDep, projectID := project_test_dep.Create(t, frame)
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,

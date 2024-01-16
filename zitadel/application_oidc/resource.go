@@ -151,7 +151,7 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		ReadContext:   read,
 		Importer: helper.ImportWithIDAndOptionalOrg(
-			appIDVar,
+			AppIDVar,
 			helper.NewImportAttribute(ProjectIDVar, helper.ConvertID, false),
 			helper.NewImportAttribute(ClientIDVar, helper.ConvertNonEmpty, true),
 			helper.NewImportAttribute(ClientSecretVar, helper.ConvertNonEmpty, true),
