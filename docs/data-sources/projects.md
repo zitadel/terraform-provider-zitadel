@@ -13,7 +13,7 @@ Datasource representing the project, which can then be granted to different orga
 
 ```terraform
 data "zitadel_projects" "default" {
-  org_id      = "123456789012345678"
+  org_id      = data.zitadel_org.default.id
   name        = "example-name"
   name_method = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
 }

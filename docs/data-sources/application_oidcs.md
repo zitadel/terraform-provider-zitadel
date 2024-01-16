@@ -13,8 +13,8 @@ Datasource representing an OIDC application belonging to a project, with all con
 
 ```terraform
 data "zitadel_application_oidcs" "default" {
-  org_id      = "123456789012345678"
-  project_id = "234567890123456789"
+  org_id      = data.zitadel_org.default.id
+  project_id  = data.zitadel_project.default.id
   name        = "example-name"
   name_method = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
 }
