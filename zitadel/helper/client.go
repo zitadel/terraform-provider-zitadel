@@ -41,7 +41,7 @@ func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile st
 		keyPath = token
 	} else if jwtProfileFile != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(jwtProfileFile)))
-		keyPath = token
+		keyPath = jwtProfileFile
 	} else if jwtProfileJSON != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData([]byte(jwtProfileJSON))))
 	} else {
