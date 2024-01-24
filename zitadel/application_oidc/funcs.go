@@ -284,6 +284,9 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	ids := make([]string, len(resp.Result))
 	for i, res := range resp.Result {
+		if res.GetOidcConfig() == nil {
+			continue
+		}
 		ids[i] = res.Id
 	}
 	// If the ID is blank, the datasource is deleted and not usable.

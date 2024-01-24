@@ -121,7 +121,7 @@ func GetDatasource() *schema.Resource {
 
 func ListDatasources() *schema.Resource {
 	return &schema.Resource{
-		Description: "Datasource representing an OIDC application belonging to a project, with all configuration possibilities.",
+		Description: "Datasource representing multiple OIDC applications belonging to a project.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDDatasourceField,
 			appIDsVar: {

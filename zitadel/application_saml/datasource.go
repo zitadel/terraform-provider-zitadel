@@ -1,4 +1,4 @@
-package application_api
+package application_saml
 
 import (
 	"github.com/hashicorp/go-cty/cty"
@@ -11,7 +11,7 @@ import (
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Datasource representing an API application belonging to a project, with all configuration possibilities.",
+		Description: "Datasource representing a SAML application belonging to a project, with all configuration possibilities.",
 		Schema: map[string]*schema.Schema{
 			AppIDVar: {
 				Type:        schema.TypeString,
@@ -29,10 +29,10 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Name of the application",
 			},
-			authMethodTypeVar: {
+			MetadataXMLVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Auth method type",
+				Description: "Metadata as XML file",
 			},
 		},
 		ReadContext: read,
@@ -41,7 +41,7 @@ func GetDatasource() *schema.Resource {
 
 func ListDatasources() *schema.Resource {
 	return &schema.Resource{
-		Description: "Datasource representing multiple API applications belonging to a project.",
+		Description: "Datasource representing multiple SAML applications belonging to a project.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDDatasourceField,
 			appIDsVar: {
