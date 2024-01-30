@@ -3,7 +3,6 @@
 ## A Better Identity and Access Management Solution
 
 Identity infrastructure, simplified for you.
-It is built for the serverless era.
 
 Learn more about ZITADEL by checking out the [source repository on GitHub](https://github.com/zitadel/zitadel)
 
