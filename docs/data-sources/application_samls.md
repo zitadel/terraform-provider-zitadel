@@ -1,32 +1,32 @@
 ---
-page_title: "zitadel_application_apis Data Source - terraform-provider-zitadel"
+page_title: "zitadel_application_samls Data Source - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Datasource representing multiple API applications belonging to a project.
+  Datasource representing multiple SAML applications belonging to a project.
 ---
 
-# zitadel_application_apis (Data Source)
+# zitadel_application_samls (Data Source)
 
-Datasource representing multiple API applications belonging to a project.
+Datasource representing multiple SAML applications belonging to a project.
 
 ## Example Usage
 
 ```terraform
-data "zitadel_application_apis" "default" {
+data "zitadel_application_samls" "default" {
   org_id      = data.zitadel_org.default.id
   project_id  = data.zitadel_project.default.id
   name        = "example-name"
   name_method = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
 }
 
-data "zitadel_application_api" "default" {
-  for_each = toset(data.zitadel_application_apis.default.app_ids)
+data "zitadel_application_saml" "default" {
+  for_each = toset(data.zitadel_application_samls.default.app_ids)
   id       = each.value
 }
 
-output "app_api_names" {
+output "app_saml_names" {
   value = toset([
-    for app in data.zitadel_application_api.default : app.name
+    for app in data.zitadel_application_saml.default : app.name
   ])
 }
 ```

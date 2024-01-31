@@ -1,4 +1,4 @@
-package application_api
+package application_saml
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		AppId:     d.Id(),
 	})
 	if err != nil {
-		return diag.Errorf("failed to delete applicationAPI: %v", err)
+		return diag.Errorf("failed to delete applicationSAML: %v", err)
 	}
 	return nil
 }
@@ -61,14 +61,16 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChanges(authMethodTypeVar) {
-		_, err = client.UpdateAPIAppConfig(helper.CtxWithOrgID(ctx, d), &management.UpdateAPIAppConfigRequest{
-			ProjectId:      projectID,
-			AppId:          d.Id(),
-			AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[d.Get(authMethodTypeVar).(string)]),
+	if d.HasChanges(MetadataXMLVar) {
+		_, err = client.UpdateSAMLAppConfig(helper.CtxWithOrgID(ctx, d), &management.UpdateSAMLAppConfigRequest{
+			ProjectId: projectID,
+			AppId:     d.Id(),
+			Metadata: &management.UpdateSAMLAppConfigRequest_MetadataXml{
+				MetadataXml: []byte(d.Get(MetadataXMLVar).(string)),
+			},
 		})
 		if err != nil {
-			return diag.Errorf("failed to update applicationAPI: %v", err)
+			return diag.Errorf("failed to update applicationSAML: %v", err)
 		}
 	}
 	return nil
@@ -87,23 +89,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.AddAPIApp(helper.CtxWithOrgID(ctx, d), &management.AddAPIAppRequest{
-		ProjectId:      d.Get(ProjectIDVar).(string),
-		Name:           d.Get(NameVar).(string),
-		AuthMethodType: app.APIAuthMethodType(app.APIAuthMethodType_value[(d.Get(authMethodTypeVar).(string))]),
+	resp, err := client.AddSAMLApp(helper.CtxWithOrgID(ctx, d), &management.AddSAMLAppRequest{
+		ProjectId: d.Get(ProjectIDVar).(string),
+		Name:      d.Get(NameVar).(string),
+		Metadata:  &management.AddSAMLAppRequest_MetadataXml{MetadataXml: []byte(d.Get(MetadataXMLVar).(string))},
 	})
-
-	set := map[string]interface{}{
-		ClientIDVar:     resp.GetClientId(),
-		ClientSecretVar: resp.GetClientSecret(),
-	}
-	for k, v := range set {
-		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of applicationAPI: %v", k, err)
-		}
-	}
 	if err != nil {
-		return diag.Errorf("failed to create applicationAPI: %v", err)
+		return diag.Errorf("failed to create applicationSAML: %v", err)
 	}
 	d.SetId(resp.GetAppId())
 	return nil
@@ -128,19 +120,18 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get application api")
+		return diag.Errorf("failed to get application saml")
 	}
 
 	app := resp.GetApp()
-	api := app.GetApiConfig()
 	set := map[string]interface{}{
-		helper.OrgIDVar:   app.GetDetails().GetResourceOwner(),
-		NameVar:           app.GetName(),
-		authMethodTypeVar: api.GetAuthMethodType().String(),
+		helper.OrgIDVar: app.GetDetails().GetResourceOwner(),
+		NameVar:         app.GetName(),
+		MetadataXMLVar:  string(app.GetSamlConfig().GetMetadataXml()),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of applicationAPI: %v", k, err)
+			return diag.Errorf("failed to set %s of applicationSAML: %v", k, err)
 		}
 	}
 	d.SetId(app.GetId())
@@ -179,7 +170,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	ids := make([]string, len(resp.Result))
 	for i, res := range resp.Result {
-		if res.GetApiConfig() == nil {
+		if res.GetSamlConfig() == nil {
 			continue
 		}
 		ids[i] = res.Id

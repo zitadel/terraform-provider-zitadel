@@ -2,12 +2,12 @@
 page_title: "zitadel_application_oidcs Data Source - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Datasource representing an OIDC application belonging to a project, with all configuration possibilities.
+  Datasource representing multiple OIDC applications belonging to a project.
 ---
 
 # zitadel_application_oidcs (Data Source)
 
-Datasource representing an OIDC application belonging to a project, with all configuration possibilities.
+Datasource representing multiple OIDC applications belonging to a project.
 
 ## Example Usage
 
