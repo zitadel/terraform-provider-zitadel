@@ -9,7 +9,7 @@ description: |-
 
 This provider allows the management of different resources on a ZITADEL instance.
 
-Through this provider it is possible to interact with the [ZITADEL API](https://docs.zitadel.com/docs/apis/introduction) to configure different aspects of the instance.
+Through this provider it is possible to interact with the [ZITADEL API](https://zitadel.com/docs/apis/introduction) to configure different aspects of the instance.
 
 Currently does not contain, but could be included in the future if demand exists:
 
