@@ -13,10 +13,11 @@ Resource representing a serviceaccount situated under an organization, which the
 
 ```terraform
 resource "zitadel_machine_user" "default" {
-  org_id      = data.zitadel_org.default.id
-  user_name   = "machine@example.com"
-  name        = "name"
-  description = "a machine user"
+  org_id          = data.zitadel_org.default.id
+  user_name       = "machine@example.com"
+  name            = "name"
+  description     = "a machine user"
+  generate_secret = true
 }
 ```
 
@@ -25,6 +26,7 @@ resource "zitadel_machine_user" "default" {
 
 ### Required
 
+- `generate_secret` (Boolean) Generate machine secret, only applicable if creation or change from false
 - `name` (String) Name of the machine user
 - `user_name` (String) Username
 
@@ -36,6 +38,8 @@ resource "zitadel_machine_user" "default" {
 
 ### Read-Only
 
+- `client_id` (String, Sensitive) Value of the client ID
+- `client_secret` (String, Sensitive) Value of the client secret
 - `id` (String) The ID of this resource.
 - `login_names` (List of String) Loginnames
 - `preferred_login_name` (String) Preferred login name

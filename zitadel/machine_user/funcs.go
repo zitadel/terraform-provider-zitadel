@@ -58,6 +58,22 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to create machine user: %v", err)
 	}
 	d.SetId(respUser.UserId)
+
+	if d.Get(generateSecretVar).(bool) {
+		resp, err := client.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
+			UserId: respUser.UserId,
+		})
+		if err != nil {
+			return diag.Errorf("failed to generate machine user secret: %v", err)
+		}
+		if err := d.Set(clientIDVar, resp.GetClientId()); err != nil {
+			return diag.Errorf("failed to set %s of user: %v", clientIDVar, err)
+		}
+		if err := d.Set(clientSecretVar, resp.GetClientSecret()); err != nil {
+			return diag.Errorf("failed to set %s of user: %v", clientSecretVar, err)
+		}
+	}
+
 	// To avoid diffs for terraform plan -refresh=false right after creation, we query and set the computed values.
 	// The acceptance tests rely on this, too.
 	return read(ctx, d, m)
@@ -95,6 +111,21 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		})
 		if err != nil {
 			return diag.Errorf("failed to update machine user: %v", err)
+		}
+	}
+
+	if d.HasChange(generateSecretVar) && d.Get(generateSecretVar).(bool) {
+		resp, err := client.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
+			UserId: d.Id(),
+		})
+		if err != nil {
+			return diag.Errorf("failed to generate machine user secret: %v", err)
+		}
+		if err := d.Set(clientIDVar, resp.GetClientId()); err != nil {
+			return diag.Errorf("failed to set %s of user: %v", clientIDVar, err)
+		}
+		if err := d.Set(clientSecretVar, resp.GetClientSecret()); err != nil {
+			return diag.Errorf("failed to set %s of user: %v", clientSecretVar, err)
 		}
 	}
 	return nil
