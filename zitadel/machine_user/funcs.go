@@ -114,18 +114,33 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(generateSecretVar) && d.Get(generateSecretVar).(bool) {
-		resp, err := client.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
-			UserId: d.Id(),
-		})
-		if err != nil {
-			return diag.Errorf("failed to generate machine user secret: %v", err)
-		}
-		if err := d.Set(clientIDVar, resp.GetClientId()); err != nil {
-			return diag.Errorf("failed to set %s of user: %v", clientIDVar, err)
-		}
-		if err := d.Set(clientSecretVar, resp.GetClientSecret()); err != nil {
-			return diag.Errorf("failed to set %s of user: %v", clientSecretVar, err)
+	if d.HasChange(generateSecretVar) {
+		if d.Get(generateSecretVar).(bool) {
+			resp, err := client.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
+				UserId: d.Id(),
+			})
+			if err != nil {
+				return diag.Errorf("failed to generate machine user secret: %v", err)
+			}
+			if err := d.Set(clientIDVar, resp.GetClientId()); err != nil {
+				return diag.Errorf("failed to set %s of user: %v", clientIDVar, err)
+			}
+			if err := d.Set(clientSecretVar, resp.GetClientSecret()); err != nil {
+				return diag.Errorf("failed to set %s of user: %v", clientSecretVar, err)
+			}
+		} else {
+			_, err := client.RemoveMachineSecret(helper.CtxWithOrgID(ctx, d), &management.RemoveMachineSecretRequest{
+				UserId: d.Id(),
+			})
+			if err != nil {
+				return diag.Errorf("failed to remove machine user secret: %v", err)
+			}
+			if err := d.Set(clientIDVar, ""); err != nil {
+				return diag.Errorf("failed to set %s of user: %v", clientIDVar, err)
+			}
+			if err := d.Set(clientSecretVar, ""); err != nil {
+				return diag.Errorf("failed to set %s of user: %v", clientSecretVar, err)
+			}
 		}
 	}
 	return nil

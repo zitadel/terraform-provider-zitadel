@@ -26,7 +26,6 @@ resource "zitadel_machine_user" "default" {
 
 ### Required
 
-- `generate_secret` (Boolean) Generate machine secret, only applicable if creation or change from false
 - `name` (String) Name of the machine user
 - `user_name` (String) Username
 
@@ -34,6 +33,7 @@ resource "zitadel_machine_user" "default" {
 
 - `access_token_type` (String) Access token type, supported values: ACCESS_TOKEN_TYPE_BEARER, ACCESS_TOKEN_TYPE_JWT
 - `description` (String) Description of the user
+- `generate_secret` (Boolean) Generate machine secret, only applicable if creation or change from false
 - `org_id` (String) ID of the organization
 
 ### Read-Only

@@ -62,7 +62,7 @@ func GetResource() *schema.Resource {
 			},
 			generateSecretVar: {
 				Type:        schema.TypeBool,
-				Required:    true,
+				Optional:    true,
 				Default:     false,
 				Description: "Generate machine secret, only applicable if creation or change from false",
 			},
