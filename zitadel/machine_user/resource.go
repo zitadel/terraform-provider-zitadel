@@ -60,7 +60,7 @@ func GetResource() *schema.Resource {
 				},
 				Default: defaultAccessTokenType,
 			},
-			generateSecretVar: {
+			withSecretVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
@@ -69,13 +69,13 @@ func GetResource() *schema.Resource {
 			clientIDVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Value of the client ID",
+				Description: "Value of the client ID if withSecret is true",
 				Sensitive:   true,
 			},
 			clientSecretVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Value of the client secret",
+				Description: "Value of the client secret if withSecret is true",
 				Sensitive:   true,
 			},
 		},

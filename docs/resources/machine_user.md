@@ -17,7 +17,6 @@ resource "zitadel_machine_user" "default" {
   user_name       = "machine@example.com"
   name            = "name"
   description     = "a machine user"
-  generate_secret = true
 }
 ```
 
@@ -33,13 +32,13 @@ resource "zitadel_machine_user" "default" {
 
 - `access_token_type` (String) Access token type, supported values: ACCESS_TOKEN_TYPE_BEARER, ACCESS_TOKEN_TYPE_JWT
 - `description` (String) Description of the user
-- `generate_secret` (Boolean) Generate machine secret, only applicable if creation or change from false
 - `org_id` (String) ID of the organization
+- `with_secret` (Boolean) Generate machine secret, only applicable if creation or change from false
 
 ### Read-Only
 
-- `client_id` (String, Sensitive) Value of the client ID
-- `client_secret` (String, Sensitive) Value of the client secret
+- `client_id` (String, Sensitive) Value of the client ID if withSecret is true
+- `client_secret` (String, Sensitive) Value of the client secret if withSecret is true
 - `id` (String) The ID of this resource.
 - `login_names` (List of String) Loginnames
 - `preferred_login_name` (String) Preferred login name
