@@ -3,5 +3,4 @@ resource "zitadel_machine_user" "default" {
   user_name       = "machine@example.com"
   name            = "name"
   description     = "a machine user"
-  generate_secret = true
 }
