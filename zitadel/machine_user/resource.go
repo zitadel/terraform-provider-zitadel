@@ -60,7 +60,7 @@ func GetResource() *schema.Resource {
 				},
 				Default: defaultAccessTokenType,
 			},
-			withSecretVar: {
+			WithSecretVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
@@ -83,6 +83,11 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      helper.ImportWithIDAndOptionalOrg(UserIDVar),
+		Importer: helper.ImportWithIDAndOptionalOrg(
+			UserIDVar,
+			helper.NewImportAttribute(WithSecretVar, helper.ConvertBool, false),
+			helper.NewImportAttribute(clientIDVar, helper.ConvertNonEmpty, true),
+			helper.NewImportAttribute(clientSecretVar, helper.ConvertNonEmpty, true),
+		),
 	}
 }

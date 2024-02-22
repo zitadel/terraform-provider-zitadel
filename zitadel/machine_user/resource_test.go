@@ -2,6 +2,7 @@ package machine_user_test
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -33,6 +34,9 @@ func TestAccMachineUser(t *testing.T) {
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
+			func(state *terraform.State) (string, error) {
+				return strconv.FormatBool(test_utils.AttributeValue(t, machine_user.WithSecretVar, exampleAttributes).True()), nil
+			},
 			test_utils.ImportOrgId(frame),
 		),
 	)

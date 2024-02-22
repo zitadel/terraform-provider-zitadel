@@ -15,7 +15,7 @@ const (
 	nameVar               = "name"
 	DescriptionVar        = "description"
 	accessTokenTypeVar    = "access_token_type"
-	withSecretVar         = "with_secret"
+	WithSecretVar         = "with_secret"
 	clientIDVar           = "client_id"
 	clientSecretVar       = "client_secret"
 )

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -199,6 +200,10 @@ func ConvertNonEmpty(importValue string) (interface{}, error) {
 		return nil, errors.New("value must not be empty")
 	}
 	return importValue, nil
+}
+
+func ConvertBool(importValue string) (interface{}, error) {
+	return strconv.ParseBool(importValue)
 }
 
 // ImportIDValidationError wraps err with a help message about the expected format if it is not nil
