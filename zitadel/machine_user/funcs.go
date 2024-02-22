@@ -59,7 +59,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	d.SetId(respUser.UserId)
 
-	if d.Get(withSecretVar).(bool) {
+	if d.Get(WithSecretVar).(bool) {
 		resp, err := client.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
 			UserId: respUser.UserId,
 		})
@@ -114,8 +114,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(withSecretVar) {
-		if d.Get(withSecretVar).(bool) {
+	if d.HasChange(WithSecretVar) {
+		if d.Get(WithSecretVar).(bool) {
 			resp, err := client.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
 				UserId: d.Id(),
 			})
