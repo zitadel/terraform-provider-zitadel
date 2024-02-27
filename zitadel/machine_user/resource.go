@@ -60,11 +60,34 @@ func GetResource() *schema.Resource {
 				},
 				Default: defaultAccessTokenType,
 			},
+			WithSecretVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "Generate machine secret, only applicable if creation or change from false",
+			},
+			clientIDVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Value of the client ID if withSecret is true",
+				Sensitive:   true,
+			},
+			clientSecretVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Value of the client secret if withSecret is true",
+				Sensitive:   true,
+			},
 		},
 		ReadContext:   read,
 		CreateContext: create,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      helper.ImportWithIDAndOptionalOrg(UserIDVar),
+		Importer: helper.ImportWithIDAndOptionalOrg(
+			UserIDVar,
+			helper.NewImportAttribute(WithSecretVar, helper.ConvertBool, false),
+			helper.NewImportAttribute(clientIDVar, helper.ConvertNonEmpty, true),
+			helper.NewImportAttribute(clientSecretVar, helper.ConvertNonEmpty, true),
+		),
 	}
 }
