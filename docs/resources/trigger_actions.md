@@ -26,8 +26,8 @@ resource "zitadel_trigger_actions" "default" {
 ### Required
 
 - `action_ids` (Set of String) IDs of the triggered actions
-- `flow_type` (String) Type of the flow to which the action triggers belong, supported values: , FLOW_TYPE_EXTERNAL_AUTHENTICATION, FLOW_TYPE_CUSTOMISE_TOKEN
-- `trigger_type` (String) Trigger type on when the actions get triggered, supported values: , TRIGGER_TYPE_POST_AUTHENTICATION, TRIGGER_TYPE_PRE_CREATION, TRIGGER_TYPE_POST_CREATION, TRIGGER_TYPE_PRE_USERINFO_CREATION
+- `flow_type` (String) Type of the flow to which the action triggers belong, supported values: FLOW_TYPE_EXTERNAL_AUTHENTICATION, FLOW_TYPE_CUSTOMISE_TOKEN, FLOW_TYPE_INTERNAL_AUTHENTICATION, FLOW_TYPE_SAML_RESPONSE
+- `trigger_type` (String) Trigger type on when the actions get triggered, supported values: TRIGGER_TYPE_POST_AUTHENTICATION, TRIGGER_TYPE_PRE_CREATION, TRIGGER_TYPE_POST_CREATION, TRIGGER_TYPE_PRE_USERINFO_CREATION, TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION, TRIGGER_TYPE_PRE_SAML_RESPONSE_CREATION
 
 ### Optional
 
