@@ -79,7 +79,7 @@ resource "zitadel_default_label_policy" "default" {
 ## Import
 
 
-```terraform
+```bash
 # The resource can be imported using the ID format `<>`, e.g.
 terraform import default_label_policy.imported ''
 ```

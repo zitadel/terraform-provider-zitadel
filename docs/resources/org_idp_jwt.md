@@ -47,7 +47,7 @@ resource "zitadel_org_idp_jwt" "default" {
 
 ## Import
 
-```terraform
+```bash
 # The resource can be imported using the ID format `<id[:org_id]>`, e.g.
 terraform import org_idp_jwt.imported '123456789012345678:123456789012345678'
 ```
