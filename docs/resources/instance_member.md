@@ -32,7 +32,7 @@ resource "zitadel_instance_member" "default" {
 
 ## Import
 
-```terraform
+```bash
 # The resource can be imported using the ID format `<user_id>`, e.g.
 terraform import instance_member.imported '123456789012345678'
 ```
