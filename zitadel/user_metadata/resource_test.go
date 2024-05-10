@@ -35,7 +35,6 @@ func TestAccUserMetadata(t *testing.T) {
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID, keyProperty), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_metadata.UserIDVar),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_metadata.UserIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_metadata.KeyVar),
 			test_utils.ImportOrgId(frame),
 		),
