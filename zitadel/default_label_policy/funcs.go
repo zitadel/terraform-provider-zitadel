@@ -2,6 +2,7 @@ package default_label_policy
 
 import (
 	"context"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/policy"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -41,6 +42,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		warnColorDarkVar,
 		fontColorDarkVar,
 		disableWatermarkVar,
+		themeModeVar,
 	) {
 		resp, err := client.UpdateLabelPolicy(ctx, &admin.UpdateLabelPolicyRequest{
 			PrimaryColor:        d.Get(PrimaryColorVar).(string),
@@ -53,6 +55,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			WarnColorDark:       d.Get(warnColorDarkVar).(string),
 			FontColorDark:       d.Get(fontColorDarkVar).(string),
 			DisableWatermark:    d.Get(disableWatermarkVar).(bool),
+			ThemeMode:           policy.ThemeMode(policy.ThemeMode_value[d.Get(themeModeVar).(string)]),
 		})
 		if helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to update default label policy: %v", err)
@@ -112,6 +115,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		IconHashVar,
 		IconDarkHashVar,
 		FontHashVar,
+		themeModeVar,
 	) {
 		if d.Get(SetActiveVar).(bool) {
 			if _, err := client.ActivateLabelPolicy(ctx, &admin.ActivateLabelPolicyRequest{}); err != nil {
@@ -161,6 +165,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		logoURLDarkVar:         policy.GetLogoUrlDark(),
 		iconURLDarkVar:         policy.GetIconUrlDark(),
 		fontURLVar:             policy.GetFontUrl(),
+		themeModeVar:           policy.GetThemeMode().String(),
 	}
 
 	for k, v := range set {

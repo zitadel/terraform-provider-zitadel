@@ -1,7 +1,10 @@
 package default_label_policy
 
 import (
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/policy"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )
@@ -139,6 +142,15 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "set the label policy active after creating/updating",
+			},
+			themeModeVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "theme mode" + helper.DescriptionEnumValuesList(policy.ThemeMode_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(themeModeVar, value, policy.ThemeMode_value)
+				},
+				Default: policy.ThemeMode_THEME_MODE_AUTO.String(),
 			},
 		},
 		ReadContext:   read,

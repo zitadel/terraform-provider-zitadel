@@ -2,6 +2,7 @@ package label_policy
 
 import (
 	"context"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/policy"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -56,6 +57,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		warnColorDarkVar,
 		fontColorDarkVar,
 		disableWatermarkVar,
+		themeModeVar,
 	) {
 		resp, err := client.UpdateCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.UpdateCustomLabelPolicyRequest{
 			PrimaryColor:        d.Get(primaryColorVar).(string),
@@ -68,6 +70,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			WarnColorDark:       d.Get(warnColorDarkVar).(string),
 			FontColorDark:       d.Get(fontColorDarkVar).(string),
 			DisableWatermark:    d.Get(disableWatermarkVar).(bool),
+			ThemeMode:           policy.ThemeMode(policy.ThemeMode_value[d.Get(themeModeVar).(string)]),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update label policy: %v", err)
@@ -117,6 +120,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		IconHashVar,
 		IconDarkHashVar,
 		FontHashVar,
+		themeModeVar,
 	) {
 		if d.Get(SetActiveVar).(bool) {
 			if _, err := client.ActivateCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.ActivateCustomLabelPolicyRequest{}); err != nil {
