@@ -2,12 +2,12 @@ package label_policy
 
 import (
 	"context"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/policy"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/policy"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )
