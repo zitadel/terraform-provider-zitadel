@@ -20,4 +20,5 @@ resource "zitadel_default_label_policy" "default" {
   icon_dark_path         = "/path/to/icon_dark.jpg"
   font_hash              = filemd5("/path/to/font.tff")
   font_path              = "/path/to/font.tff"
+  theme_mode             = "THEME_MODE_DARK"
 }

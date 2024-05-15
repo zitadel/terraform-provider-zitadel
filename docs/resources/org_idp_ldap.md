@@ -79,5 +79,5 @@ resource "zitadel_org_idp_ldap" "default" {
 
 ```bash
 # The resource can be imported using the ID format `<id[:org_id][:bind_password]>`, e.g.
-terraform import org_idp_ldap.imported '123456789012345678:123456789012345678:b1nd_p4ssw0rd'
+terraform import zitadel_org_idp_ldap.imported '123456789012345678:123456789012345678:b1nd_p4ssw0rd'
 ```

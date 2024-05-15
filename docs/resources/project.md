@@ -46,5 +46,5 @@ resource "zitadel_project" "default" {
 
 ```bash
 # The resource can be imported using the ID format `<id[:org_id]>`, e.g.
-terraform import project.imported '123456789012345678:123456789012345678'
+terraform import zitadel_project.imported '123456789012345678:123456789012345678'
 ```

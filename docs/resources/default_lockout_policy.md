@@ -33,5 +33,5 @@ resource "zitadel_default_lockout_policy" "default" {
 
 ```bash
 # The resource can be imported using the ID format `<>`, e.g.
-terraform import default_lockout_policy.imported ''
+terraform import zitadel_default_lockout_policy.imported ''
 ```

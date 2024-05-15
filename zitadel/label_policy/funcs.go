@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/policy"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )
@@ -56,6 +57,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		warnColorDarkVar,
 		fontColorDarkVar,
 		disableWatermarkVar,
+		themeModeVar,
 	) {
 		resp, err := client.UpdateCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.UpdateCustomLabelPolicyRequest{
 			PrimaryColor:        d.Get(primaryColorVar).(string),
@@ -68,6 +70,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			WarnColorDark:       d.Get(warnColorDarkVar).(string),
 			FontColorDark:       d.Get(fontColorDarkVar).(string),
 			DisableWatermark:    d.Get(disableWatermarkVar).(bool),
+			ThemeMode:           policy.ThemeMode(policy.ThemeMode_value[d.Get(themeModeVar).(string)]),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update label policy: %v", err)
@@ -117,6 +120,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		IconHashVar,
 		IconDarkHashVar,
 		FontHashVar,
+		themeModeVar,
 	) {
 		if d.Get(SetActiveVar).(bool) {
 			if _, err := client.ActivateCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.ActivateCustomLabelPolicyRequest{}); err != nil {
@@ -152,6 +156,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		WarnColorDark:       d.Get(warnColorDarkVar).(string),
 		FontColorDark:       d.Get(fontColorDarkVar).(string),
 		DisableWatermark:    d.Get(disableWatermarkVar).(bool),
+		ThemeMode:           policy.ThemeMode(policy.ThemeMode_value[d.Get(themeModeVar).(string)]),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create label policy: %v", err)
@@ -237,6 +242,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		logoURLDarkVar:         policy.GetLogoUrlDark(),
 		iconURLDarkVar:         policy.GetIconUrlDark(),
 		fontURLVar:             policy.GetFontUrl(),
+		themeModeVar:           policy.GetThemeMode().String(),
 	}
 
 	for k, v := range set {
