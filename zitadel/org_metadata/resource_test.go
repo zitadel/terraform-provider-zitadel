@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_metadata"
 )
@@ -19,7 +18,7 @@ func TestAccOrgMetadata(t *testing.T) {
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	keyProperty := test_utils.AttributeValue(t, org_metadata.KeyVar, exampleAttributes).AsString()
 	exampleProperty := test_utils.AttributeValue(t, org_metadata.ValueVar, exampleAttributes).AsString()
-	updatedProperty := "YW5vdGhlciB2YWx1ZQ=="
+	updatedProperty := "another_value"
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
@@ -47,7 +46,7 @@ func checkRemoteProperty(frame test_utils.OrgTestFrame) func(string) resource.Te
 			if err != nil {
 				return err
 			}
-			actual := helper.Base64Encode(resp.GetMetadata().GetValue())
+			actual := string(resp.GetMetadata().GetValue())
 			if expect != actual {
 				return fmt.Errorf("expected role %s, but got %s", expect, actual)
 			}

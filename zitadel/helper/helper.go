@@ -2,7 +2,6 @@ package helper
 
 import (
 	"context"
-	"encoding/base64"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -149,12 +148,4 @@ func EnumValueMap(enum map[int32]string) map[string]int32 {
 		values[v] = k
 	}
 	return values
-}
-
-func Base64Decode(encoded string) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(encoded)
-}
-
-func Base64Encode(decoded []byte) string {
-	return base64.StdEncoding.EncodeToString(decoded)
 }

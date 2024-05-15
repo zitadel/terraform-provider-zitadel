@@ -16,7 +16,7 @@ resource "zitadel_user_metadata" "default" {
   org_id  = data.zitadel_org.default.id
   user_id = data.zitadel_human_user.default.id
   key     = "a_key"
-  value   = "YV92YWx1ZQ==" // or base64encode("a_value")
+  value   = "a_value"
 }
 ```
 
@@ -27,7 +27,7 @@ resource "zitadel_user_metadata" "default" {
 
 - `key` (String) The key of a metadata entry
 - `user_id` (String) ID of the user
-- `value` (String) The base64 encoded value of a metadata entry
+- `value` (String) The string representation of a metadata entry value. For binary data, use the base64encode function.
 
 ### Optional
 
@@ -41,5 +41,5 @@ resource "zitadel_user_metadata" "default" {
 
 ```bash
 # The resource can be imported using the ID format `<user_id:key[:org_id]>`, e.g.
-terraform import user_metadata.imported '123456789012345678:a_key:123456789012345678'
+terraform import zitadel_user_metadata.imported '123456789012345678:a_key:123456789012345678'
 ```

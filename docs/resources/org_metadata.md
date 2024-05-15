@@ -15,7 +15,7 @@ Add a custom attribute to the organization like its location or an identifier in
 resource "zitadel_org_metadata" "default" {
   org_id = data.zitadel_org.default.id
   key    = "a_key"
-  value  = "YV92YWx1ZQ==" // or base64encode("a_value")
+  value  = "a_value"
 }
 ```
 
@@ -25,7 +25,7 @@ resource "zitadel_org_metadata" "default" {
 ### Required
 
 - `key` (String) The key of a metadata entry
-- `value` (String) The base64 encoded value of a metadata entry
+- `value` (String) The string representation of a metadata entry value. For binary data, use the base64encode function.
 
 ### Optional
 
@@ -39,5 +39,5 @@ resource "zitadel_org_metadata" "default" {
 
 ```bash
 # The resource can be imported using the ID format `<key[:org_id]>`, e.g.
-terraform import org_metadata.imported 'a_key:123456789012345678'
+terraform import zitadel_org_metadata.imported 'a_key:123456789012345678'
 ```

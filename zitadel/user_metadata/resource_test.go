@@ -21,7 +21,7 @@ func TestAccUserMetadata(t *testing.T) {
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	keyProperty := test_utils.AttributeValue(t, user_metadata.KeyVar, exampleAttributes).AsString()
 	exampleProperty := test_utils.AttributeValue(t, user_metadata.ValueVar, exampleAttributes).AsString()
-	updatedProperty := "YW5vdGhlciB2YWx1ZQ=="
+	updatedProperty := "another_value"
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
@@ -51,7 +51,7 @@ func checkRemoteProperty(frame test_utils.OrgTestFrame, userID, key string) func
 			if err != nil {
 				return err
 			}
-			actual := helper.Base64Encode(resp.GetMetadata().GetValue())
+			actual := string(resp.GetMetadata().GetValue())
 			if expect != actual {
 				return fmt.Errorf("expected role %s, but got %s", expect, actual)
 			}

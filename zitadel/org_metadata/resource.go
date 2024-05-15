@@ -20,7 +20,7 @@ func GetResource() *schema.Resource {
 			ValueVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "The base64 encoded value of a metadata entry",
+				Description: "The string representation of a metadata entry value. For binary data, use the base64encode function.",
 			},
 		},
 		CreateContext: set,

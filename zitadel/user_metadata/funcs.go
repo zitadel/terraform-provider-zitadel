@@ -22,10 +22,7 @@ func set(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 
 	userID := d.Get(UserIDVar).(string)
 	key := d.Get(KeyVar).(string)
-	value, err := helper.Base64Decode(d.Get(ValueVar).(string))
-	if err != nil {
-		return diag.Errorf("failed to decode base64 value: %v", err)
-	}
+	value := []byte(d.Get(ValueVar).(string))
 	_, err = client.SetUserMetadata(helper.CtxWithOrgID(ctx, d), &management.SetUserMetadataRequest{
 		Id:    userID,
 		Key:   key,
@@ -57,11 +54,10 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.Errorf("failed to get metadata object")
 	}
-	value := helper.Base64Encode(resp.GetMetadata().GetValue())
 	set := map[string]interface{}{
 		UserIDVar: userID,
 		KeyVar:    key,
-		ValueVar:  value,
+		ValueVar:  string(resp.GetMetadata().GetValue()),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

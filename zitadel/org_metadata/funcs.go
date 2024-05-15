@@ -21,10 +21,7 @@ func set(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 	}
 
 	key := d.Get(KeyVar).(string)
-	value, err := helper.Base64Decode(d.Get(ValueVar).(string))
-	if err != nil {
-		return diag.Errorf("failed to decode base64 value: %v", err)
-	}
+	value := []byte(d.Get(ValueVar).(string))
 	_, err = client.SetOrgMetadata(helper.CtxWithOrgID(ctx, d), &management.SetOrgMetadataRequest{
 		Key:   key,
 		Value: value,
@@ -54,7 +51,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.Errorf("failed to get metadata object")
 	}
-	value := helper.Base64Encode(resp.GetMetadata().GetValue())
+	value := string(resp.GetMetadata().GetValue())
 	set := map[string]interface{}{
 		KeyVar:   key,
 		ValueVar: value,
