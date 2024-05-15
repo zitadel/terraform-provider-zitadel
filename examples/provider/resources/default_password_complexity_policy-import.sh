@@ -1,2 +1,2 @@
 # The resource can be imported using the ID format `<>`, e.g.
-terraform import default_password_complexity_policy.imported ''
+terraform import zitadel_default_password_complexity_policy.imported ''
