@@ -156,6 +156,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		WarnColorDark:       d.Get(warnColorDarkVar).(string),
 		FontColorDark:       d.Get(fontColorDarkVar).(string),
 		DisableWatermark:    d.Get(disableWatermarkVar).(bool),
+		ThemeMode:           policy.ThemeMode(policy.ThemeMode_value[d.Get(themeModeVar).(string)]),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create label policy: %v", err)
