@@ -27,6 +27,7 @@ const (
 	FontHashVar            = "font_hash"
 	fontURLVar             = "font_url"
 	SetActiveVar           = "set_active"
+	themeModeVar           = "theme_mode"
 )
 
 const (

@@ -34,6 +34,7 @@ resource "zitadel_default_label_policy" "default" {
   icon_dark_path         = "/path/to/icon_dark.jpg"
   font_hash              = filemd5("/path/to/font.tff")
   font_path              = "/path/to/font.tff"
+  theme_mode             = "THEME_MODE_DARK"
 }
 ```
 
@@ -66,6 +67,7 @@ resource "zitadel_default_label_policy" "default" {
 - `logo_hash` (String)
 - `logo_path` (String)
 - `set_active` (Boolean) set the label policy active after creating/updating
+- `theme_mode` (String) theme mode, supported values: THEME_MODE_UNSPECIFIED, THEME_MODE_AUTO, THEME_MODE_DARK, THEME_MODE_LIGHT
 
 ### Read-Only
 
@@ -81,5 +83,5 @@ resource "zitadel_default_label_policy" "default" {
 
 ```bash
 # The resource can be imported using the ID format `<>`, e.g.
-terraform import default_label_policy.imported ''
+terraform import zitadel_default_label_policy.imported ''
 ```
