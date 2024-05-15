@@ -242,6 +242,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		logoURLDarkVar:         policy.GetLogoUrlDark(),
 		iconURLDarkVar:         policy.GetIconUrlDark(),
 		fontURLVar:             policy.GetFontUrl(),
+		themeModeVar:           policy.GetThemeMode().String(),
 	}
 
 	for k, v := range set {
