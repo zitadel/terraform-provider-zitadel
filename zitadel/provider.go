@@ -69,6 +69,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_member"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_metadata"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/password_reset_message_text"
@@ -84,6 +85,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/smtp_config"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/trigger_actions"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/user_grant"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/user_metadata"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_email_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_email_otp_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/verify_phone_message_text"
@@ -328,6 +330,8 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_ldap":                       org_idp_ldap.GetResource(),
 			"zitadel_default_oidc_settings":              default_oidc_settings.GetResource(),
 			"zitadel_idp_saml":                           idp_saml.GetResource(),
+			"zitadel_org_metadata":                       org_metadata.GetResource(),
+			"zitadel_user_metadata":                      user_metadata.GetResource(),
 		},
 		ConfigureContextFunc: ProviderConfigure,
 	}
