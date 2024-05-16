@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_utils"
@@ -16,7 +18,14 @@ func RunInstanceIDPLifecyleTest(t *testing.T, resourceName, secretAttribute stri
 	// Using a unique name makes the test idempotent on failures
 	resourceExample = strings.Replace(resourceExample, nameProperty, frame.UniqueResourcesID, 1)
 	exampleProperty := test_utils.AttributeValue(t, idp_utils.IsCreationAllowedVar, exampleAttributes).True()
-	exampleSecret := test_utils.AttributeValue(t, secretAttribute, exampleAttributes).AsString()
+	exampleSecret := ""
+	importParts := []resource.ImportStateIdFunc{
+		test_utils.ImportResourceId(frame.BaseTestFrame),
+	}
+	if secretAttribute != "" {
+		exampleSecret = test_utils.AttributeValue(t, secretAttribute, exampleAttributes).AsString()
+		importParts = append(importParts, test_utils.ImportStateAttribute(frame.BaseTestFrame, secretAttribute))
+	}
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
@@ -28,9 +37,6 @@ func RunInstanceIDPLifecyleTest(t *testing.T, resourceName, secretAttribute stri
 		CheckCreationAllowed(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		CheckDestroy(*frame),
-		test_utils.ChainImportStateIdFuncs(
-			test_utils.ImportResourceId(frame.BaseTestFrame),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, secretAttribute),
-		),
+		test_utils.ChainImportStateIdFuncs(importParts...),
 	)
 }

@@ -48,6 +48,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_gitlab_self_hosted"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_google"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_ldap"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_saml"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/init_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/instance_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/label_policy"
@@ -238,6 +239,7 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_azure_ad":           org_idp_azure_ad.GetDatasource(),
 			"zitadel_org_idp_ldap":               org_idp_ldap.GetDatasource(),
 			"zitadel_default_oidc_settings":      default_oidc_settings.GetDatasource(),
+			"zitadel_idp_saml":                   idp_saml.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -325,6 +327,7 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_azure_ad":                   org_idp_azure_ad.GetResource(),
 			"zitadel_org_idp_ldap":                       org_idp_ldap.GetResource(),
 			"zitadel_default_oidc_settings":              default_oidc_settings.GetResource(),
+			"zitadel_idp_saml":                           idp_saml.GetResource(),
 		},
 		ConfigureContextFunc: ProviderConfigure,
 	}
