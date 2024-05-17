@@ -48,6 +48,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_gitlab_self_hosted"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_google"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_ldap"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_saml"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/init_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/instance_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/label_policy"
@@ -67,6 +68,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_idp_jwt"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_idp_oidc"
+	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_idp_saml"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_member"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_metadata"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/password_change_message_text"
@@ -240,6 +242,8 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_azure_ad":           org_idp_azure_ad.GetDatasource(),
 			"zitadel_org_idp_ldap":               org_idp_ldap.GetDatasource(),
 			"zitadel_default_oidc_settings":      default_oidc_settings.GetDatasource(),
+			"zitadel_idp_saml":                   idp_saml.GetDatasource(),
+			"zitadel_org_idp_saml":               org_idp_saml.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -327,6 +331,8 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_azure_ad":                   org_idp_azure_ad.GetResource(),
 			"zitadel_org_idp_ldap":                       org_idp_ldap.GetResource(),
 			"zitadel_default_oidc_settings":              default_oidc_settings.GetResource(),
+			"zitadel_idp_saml":                           idp_saml.GetResource(),
+			"zitadel_org_idp_saml":                       org_idp_saml.GetResource(),
 			"zitadel_org_metadata":                       org_metadata.GetResource(),
 			"zitadel_user_metadata":                      user_metadata.GetResource(),
 		},

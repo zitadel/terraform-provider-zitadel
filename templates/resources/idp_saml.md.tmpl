@@ -1,0 +1,28 @@
+---
+page_title: "{{.Name}} {{.Type}} - {{.ProviderName}}"
+subcategory: ""
+description: |-
+{{ .Description | plainmarkdown | trimspace | prefixlines "  " }}
+---
+
+# {{.Name}} ({{.Type}})
+
+{{ .Description | trimspace }}
+
+## Example Usage
+
+{{ tffile "examples/provider/resources/idp_saml.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
+
+## Loading the XML Metadata
+
+If you don't want to pass the XML metadata inline, you have plenty of options. For example:
+- [local_file Data Source](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file)
+- [http Data Source](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http)
+- [terracurl_request Data Source](https://registry.terraform.io/providers/devops-rob/terracurl/latest/docs/data-sources/request)
+- ...
+
+## Import
+
+{{ codefile "bash" "examples/provider/resources/idp_saml-import.sh" }}
