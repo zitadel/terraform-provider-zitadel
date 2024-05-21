@@ -19,7 +19,7 @@ require (
 	github.com/zitadel/zitadel-go/v2 v2.1.8
 	golang.org/x/oauth2 v0.16.0
 	google.golang.org/grpc v1.61.0
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 )
 
 require (
