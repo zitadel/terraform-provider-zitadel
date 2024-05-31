@@ -233,6 +233,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idTokenUserinfoAssertionVar: oidc.GetIdTokenUserinfoAssertion(),
 		clockSkewVar:                clockSkew,
 		additionalOriginsVar:        oidc.GetAdditionalOrigins(),
+		ClientIDVar:                 oidc.GetClientId(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

@@ -137,6 +137,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		helper.OrgIDVar:   app.GetDetails().GetResourceOwner(),
 		NameVar:           app.GetName(),
 		authMethodTypeVar: api.GetAuthMethodType().String(),
+		ClientIDVar:       api.GetClientId(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
