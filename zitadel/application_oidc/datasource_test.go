@@ -22,7 +22,7 @@ func TestAccApplicationOIDCDatasource_ID(t *testing.T) {
 	exampleID := test_utils.AttributeValue(t, application_oidc.AppIDVar, attributes).AsString()
 	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 	appName := "application_oidc_datasource_" + frame.UniqueResourcesID
-	_, appID := application_oidc_test_dep.Create(t, frame, projectID, appName)
+	_, appID, clientID := application_oidc_test_dep.Create(t, frame, projectID, appName)
 	config = strings.Replace(config, exampleID, appID, 1)
 	test_utils.RunDatasourceTest(
 		t,
@@ -35,6 +35,7 @@ func TestAccApplicationOIDCDatasource_ID(t *testing.T) {
 			"project_id": projectID,
 			"app_id":     appID,
 			"name":       appName,
+			"client_id":  clientID,
 		},
 	)
 }
@@ -50,7 +51,7 @@ func TestAccApplicationOIDCsDatasources_ID_Name_Match(t *testing.T) {
 	config = strings.Join(strings.Split(config, "\n")[0:6], "\n")
 	config = strings.Replace(config, exampleName, appName, 1)
 	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
-	_, appID := application_oidc_test_dep.Create(t, frame, projectID, appName)
+	_, appID, _ := application_oidc_test_dep.Create(t, frame, projectID, appName)
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
@@ -75,7 +76,7 @@ func TestAccApplicationOIDCsDatasources_ID_Name_Mismatch(t *testing.T) {
 	config = strings.Join(strings.Split(config, "\n")[0:6], "\n")
 	config = strings.Replace(config, exampleName, "mismatch", 1)
 	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
-	_, appID := application_oidc_test_dep.Create(t, frame, projectID, appName)
+	_, appID, _ := application_oidc_test_dep.Create(t, frame, projectID, appName)
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,

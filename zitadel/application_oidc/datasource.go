@@ -114,6 +114,11 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Additional origins",
 			},
+			ClientIDVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Client ID",
+			},
 		},
 		ReadContext: read,
 	}
