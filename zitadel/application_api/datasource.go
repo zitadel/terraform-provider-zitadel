@@ -34,6 +34,12 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Auth method type",
 			},
+			ClientIDVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "generated ID for this config",
+				Sensitive:   true,
+			},
 		},
 		ReadContext: read,
 	}

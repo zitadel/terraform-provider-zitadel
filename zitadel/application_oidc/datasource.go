@@ -118,6 +118,7 @@ func GetDatasource() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Client ID",
+				Sensitive:   true,
 			},
 		},
 		ReadContext: read,
