@@ -24,7 +24,9 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveSMTPConfig(ctx, &admin.RemoveSMTPConfigRequest{})
+	_, err = client.RemoveSMTPConfig(ctx, &admin.RemoveSMTPConfigRequest{
+		Id: d.Id(),
+	})
 	if err != nil {
 		return diag.Errorf("failed to delete smtp config: %v", err)
 	}
@@ -44,7 +46,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	req := &admin.AddSMTPConfigRequest{
+	resp, err := client.AddSMTPConfig(ctx, &admin.AddSMTPConfigRequest{
 		SenderAddress:  d.Get(SenderAddressVar).(string),
 		SenderName:     d.Get(SenderNameVar).(string),
 		Host:           d.Get(hostVar).(string),
@@ -52,13 +54,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Tls:            d.Get(tlsVar).(bool),
 		Password:       d.Get(PasswordVar).(string),
 		ReplyToAddress: d.Get(replyToAddressVar).(string),
-	}
-
-	resp, err := client.AddSMTPConfig(ctx, req)
+	})
 	if err != nil {
 		return diag.Errorf("failed to create smtp config: %v", err)
 	}
-	d.SetId(resp.Details.ResourceOwner)
+	d.SetId(resp.Id)
 
 	return nil
 }
@@ -78,6 +78,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar, replyToAddressVar) {
 		_, err = client.UpdateSMTPConfig(ctx, &admin.UpdateSMTPConfigRequest{
+			Id:             d.Id(),
 			SenderAddress:  d.Get(SenderAddressVar).(string),
 			SenderName:     d.Get(SenderNameVar).(string),
 			Host:           d.Get(hostVar).(string),
@@ -93,6 +94,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if d.HasChange(PasswordVar) {
 		_, err = client.UpdateSMTPConfigPassword(ctx, &admin.UpdateSMTPConfigPasswordRequest{
 			Password: d.Get(PasswordVar).(string),
+			Id:       d.Id(),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update smtp config password: %v", err)
@@ -115,13 +117,15 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetSMTPConfig(ctx, &admin.GetSMTPConfigRequest{})
+	resp, err := client.GetSMTPConfigById(ctx, &admin.GetSMTPConfigByIdRequest{
+		Id: d.Id(),
+	})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get smtp config")
+		return diag.Errorf("failed to get smtp config: %v", err)
 	}
 
 	set := map[string]interface{}{
@@ -138,6 +142,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			return diag.Errorf("failed to set %s of smtp config: %v", k, err)
 		}
 	}
-	d.SetId(resp.SmtpConfig.Details.ResourceOwner)
+	d.SetId(resp.GetSmtpConfig().GetId())
 	return nil
 }

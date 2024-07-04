@@ -34,5 +34,6 @@ data "zitadel_application_api" "default" {
 ### Read-Only
 
 - `auth_method_type` (String) Auth method type
+- `client_id` (String, Sensitive) generated ID for this config
 - `id` (String) The ID of this resource.
 - `name` (String) Name of the application
