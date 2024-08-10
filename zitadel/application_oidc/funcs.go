@@ -211,7 +211,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	for _, responseType := range oidc.GetResponseTypes() {
 		responseTypes = append(responseTypes, responseType.String())
 	}
-	clockSkew := oidc.GetClockSkew().String()
+	clockSkew := oidc.GetClockSkew().AsDuration().String()
 	if clockSkew == "" {
 		clockSkew = "0s"
 	}
