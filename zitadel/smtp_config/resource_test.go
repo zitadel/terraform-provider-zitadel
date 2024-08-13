@@ -23,9 +23,11 @@ func TestAccSMTPConfig(t *testing.T) {
 	resourceExample = strings.Replace(resourceExample, senderAddressProperty, fmt.Sprintf("zitadel@%s", frame.InstanceDomain), 1)
 	exampleProperty := test_utils.AttributeValue(t, smtp_config.SenderNameVar, exampleAttributes).AsString()
 	exampleSecret := test_utils.AttributeValue(t, smtp_config.PasswordVar, exampleAttributes).AsString()
-	if _, err := frame.RemoveSMTPConfig(frame, &admin.RemoveSMTPConfigRequest{}); err != nil && status.Code(err) != codes.NotFound {
-		t.Fatalf("failed to remove smtp config: %v", err)
+	importParts := []resource.ImportStateIdFunc{
+		test_utils.ImportResourceId(frame.BaseTestFrame),
+		test_utils.ImportStateAttribute(frame.BaseTestFrame, smtp_config.PasswordVar),
 	}
+
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
@@ -36,15 +38,15 @@ func TestAccSMTPConfig(t *testing.T) {
 		false,
 		checkRemoteProperty(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		test_utils.CheckNothing,
-		test_utils.ImportStateAttribute(frame.BaseTestFrame, smtp_config.PasswordVar),
+		CheckDestroy(*frame),
+		test_utils.ChainImportStateIdFuncs(importParts...),
 	)
 }
 
 func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			resp, err := frame.GetSMTPConfig(frame, &admin.GetSMTPConfigRequest{})
+			resp, err := frame.GetSMTPConfigById(frame, &admin.GetSMTPConfigByIdRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return fmt.Errorf("getting smtp config failed: %w", err)
 			}
@@ -54,5 +56,15 @@ func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resour
 			}
 			return nil
 		}
+	}
+}
+
+func CheckDestroy(frame test_utils.InstanceTestFrame) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		err := checkRemoteProperty(frame)("something")(state)
+		if status.Code(err) != codes.NotFound {
+			return fmt.Errorf("expected not found error but got: %w", err)
+		}
+		return nil
 	}
 }
