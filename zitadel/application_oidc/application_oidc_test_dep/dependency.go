@@ -3,7 +3,7 @@ package application_oidc_test_dep
 import (
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/application_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"

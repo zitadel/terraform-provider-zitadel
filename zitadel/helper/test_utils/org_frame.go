@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
-	mgmt "github.com/zitadel/zitadel-go/v2/pkg/client/management"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	mgmt "github.com/zitadel/zitadel-go/v3/pkg/client/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/acceptance"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"

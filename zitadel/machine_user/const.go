@@ -1,7 +1,7 @@
 package machine_user
 
 import (
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/user"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user"
 )
 
 const (

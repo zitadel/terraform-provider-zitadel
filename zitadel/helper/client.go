@@ -8,10 +8,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/pkg/oidc"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/middleware"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

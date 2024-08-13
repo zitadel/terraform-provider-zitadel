@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
 
 	"github.com/zitadel/terraform-provider-zitadel/acceptance"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"

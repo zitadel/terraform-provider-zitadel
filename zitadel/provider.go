@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	zitadel_go "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
+	zitadel_go "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/action"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/application_api"
