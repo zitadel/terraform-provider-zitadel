@@ -56,6 +56,6 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithEmptyID(helper.NewImportAttribute(PasswordVar, helper.ConvertNonEmpty, true)),
+		Importer:      helper.ImportWithIDAndOptionalSecret(IDVar, PasswordVar),
 	}
 }
