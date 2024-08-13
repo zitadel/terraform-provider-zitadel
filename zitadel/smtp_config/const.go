@@ -8,4 +8,5 @@ const (
 	userVar           = "user"
 	PasswordVar       = "password"
 	replyToAddressVar = "reply_to_address"
+	SetActiveVar      = "set_active"
 )

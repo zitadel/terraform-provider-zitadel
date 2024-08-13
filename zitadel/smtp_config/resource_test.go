@@ -23,7 +23,6 @@ func TestAccSMTPConfig(t *testing.T) {
 	resourceExample = strings.Replace(resourceExample, senderAddressProperty, fmt.Sprintf("zitadel@%s", frame.InstanceDomain), 1)
 	exampleProperty := test_utils.AttributeValue(t, smtp_config.SenderNameVar, exampleAttributes).AsString()
 	exampleSecret := test_utils.AttributeValue(t, smtp_config.PasswordVar, exampleAttributes).AsString()
-	// TODO: Does not work yet, because the smtp config is not deleted (API bug?)
 	if _, err := frame.RemoveSMTPConfig(frame, &admin.RemoveSMTPConfigRequest{}); err != nil && status.Code(err) != codes.NotFound {
 		t.Fatalf("failed to remove smtp config: %v", err)
 	}

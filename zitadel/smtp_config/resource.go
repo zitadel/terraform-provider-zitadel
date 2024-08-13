@@ -46,6 +46,11 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Address to reply to.",
 			},
+			SetActiveVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Set the SMTP configuration active after creating/updating",
+			},
 		},
 		CreateContext: create,
 		DeleteContext: delete,
