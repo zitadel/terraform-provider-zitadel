@@ -86,7 +86,7 @@ func (r *defaultPasswordlessRegistrationMessageTextResource) Create(ctx context.
 	}
 	zReq.Language = language
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -112,7 +112,7 @@ func (r *defaultPasswordlessRegistrationMessageTextResource) Read(ctx context.Co
 
 	language := getID(ctx, state)
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -126,7 +126,7 @@ func (r *defaultPasswordlessRegistrationMessageTextResource) Read(ctx context.Co
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, *zResp.CustomText, &state)...)
+	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -170,7 +170,7 @@ func (r *defaultPasswordlessRegistrationMessageTextResource) Update(ctx context.
 	}
 	zReq.Language = language
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -192,7 +192,7 @@ func (r *defaultPasswordlessRegistrationMessageTextResource) Delete(ctx context.
 		return
 	}
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return

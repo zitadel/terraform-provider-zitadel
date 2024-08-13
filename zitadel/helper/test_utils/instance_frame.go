@@ -22,7 +22,7 @@ func NewInstanceTestFrame(t *testing.T, resourceType string) *InstanceTestFrame 
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	adminClient, err := helper.GetAdminClient(baseFrame.ClientInfo)
+	adminClient, err := helper.GetAdminClient(ctx, baseFrame.ClientInfo)
 	if err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}

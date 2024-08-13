@@ -86,7 +86,7 @@ func (r *defaultInitMessageTextResource) Create(ctx context.Context, req resourc
 	}
 	zReq.Language = language
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -112,7 +112,7 @@ func (r *defaultInitMessageTextResource) Read(ctx context.Context, req resource.
 
 	language := getID(ctx, state)
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -126,7 +126,7 @@ func (r *defaultInitMessageTextResource) Read(ctx context.Context, req resource.
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, *zResp.CustomText, &state)...)
+	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -170,7 +170,7 @@ func (r *defaultInitMessageTextResource) Update(ctx context.Context, req resourc
 	}
 	zReq.Language = language
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -192,7 +192,7 @@ func (r *defaultInitMessageTextResource) Delete(ctx context.Context, req resourc
 		return
 	}
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return

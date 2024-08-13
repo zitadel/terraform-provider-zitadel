@@ -85,7 +85,7 @@ func (r *passwordResetMessageTextResource) Create(ctx context.Context, req resou
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo)
+	client, err := helper.GetManagementClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -111,7 +111,7 @@ func (r *passwordResetMessageTextResource) Read(ctx context.Context, req resourc
 
 	orgID, language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo)
+	client, err := helper.GetManagementClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -125,7 +125,7 @@ func (r *passwordResetMessageTextResource) Read(ctx context.Context, req resourc
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, *zResp.CustomText, &state)...)
+	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -169,7 +169,7 @@ func (r *passwordResetMessageTextResource) Update(ctx context.Context, req resou
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo)
+	client, err := helper.GetManagementClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -191,7 +191,7 @@ func (r *passwordResetMessageTextResource) Delete(ctx context.Context, req resou
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo)
+	client, err := helper.GetManagementClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return

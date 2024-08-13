@@ -162,7 +162,7 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	info, err := helper.GetClientInfo(
+	info, err := helper.GetClientInfo(ctx,
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
 		config.Token.ValueString(),
@@ -347,7 +347,7 @@ func Provider() *schema.Provider {
 }
 
 func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	clientinfo, err := helper.GetClientInfo(
+	clientinfo, err := helper.GetClientInfo(ctx,
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
 		d.Get(helper.TokenVar).(string),

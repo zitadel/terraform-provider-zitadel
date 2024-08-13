@@ -23,12 +23,12 @@ type OrgTestFrame struct {
 }
 
 func (o *OrgTestFrame) useOrgContext(orgID string) (err error) {
-	o.Client, err = helper.GetManagementClient(o.BaseTestFrame.ClientInfo)
+	o.Client, err = helper.GetManagementClient(ctx, o.BaseTestFrame.ClientInfo)
 	if err != nil {
 		return err
 	}
 	o.Context = helper.CtxSetOrgID(o.Context, orgID)
-	o.Admin, err = helper.GetAdminClient(o.BaseTestFrame.ClientInfo)
+	o.Admin, err = helper.GetAdminClient(ctx, o.BaseTestFrame.ClientInfo)
 	o.AsOrgDefaultDependency = strings.Replace(o.AsOrgDefaultDependency, o.OrgID, orgID, 1)
 	o.OrgID = orgID
 	return err

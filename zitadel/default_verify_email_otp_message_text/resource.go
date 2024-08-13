@@ -86,7 +86,7 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Create(ctx context.Context, r
 	}
 	zReq.Language = language
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -112,7 +112,7 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Read(ctx context.Context, req
 
 	language := getID(ctx, state)
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -126,7 +126,7 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Read(ctx context.Context, req
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, *zResp.CustomText, &state)...)
+	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -170,7 +170,7 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Update(ctx context.Context, r
 	}
 	zReq.Language = language
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -192,7 +192,7 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Delete(ctx context.Context, r
 		return
 	}
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return

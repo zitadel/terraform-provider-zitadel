@@ -27,7 +27,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -195,7 +195,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
