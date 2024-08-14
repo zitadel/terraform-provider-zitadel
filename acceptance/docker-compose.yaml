@@ -26,7 +26,7 @@ services:
       test: ['CMD', '/app/zitadel', 'ready', "--config", "/zitadel.yaml"]
       interval: '2s'
       timeout: '30s'
-      retries: 5
+      retries: 60
     depends_on:
       db:
         condition: 'service_healthy'
