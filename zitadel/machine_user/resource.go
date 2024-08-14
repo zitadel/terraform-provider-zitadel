@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/user"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )

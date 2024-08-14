@@ -6,10 +6,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/object"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/org"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )
@@ -20,7 +20,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -40,7 +40,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo)
+	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -53,7 +53,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	orgId := resp.GetId()
 	d.SetId(orgId)
 	if val, ok := d.GetOk(IsDefaultVar); ok && val.(bool) {
-		adminClient, err := helper.GetAdminClient(clientinfo)
+		adminClient, err := helper.GetAdminClient(ctx, clientinfo)
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -75,7 +75,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	// If try updating the name to the same value API will return an error.
 	if d.HasChange(NameVar) {
-		client, err := helper.GetManagementClient(clientinfo)
+		client, err := helper.GetManagementClient(ctx, clientinfo)
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -89,7 +89,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	// To unset the default org, we need to set another org as default org.
 	if isDefault, ok := d.GetOk(IsDefaultVar); ok && isDefault.(bool) && d.HasChange(IsDefaultVar) {
-		adminClient, err := helper.GetAdminClient(clientinfo)
+		adminClient, err := helper.GetAdminClient(ctx, clientinfo)
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -109,7 +109,7 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -132,7 +132,7 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 	if err := d.Set(stateVar, state); err != nil {
 		return diag.Errorf("error while setting org state %s: %v", state, err)
 	}
-	adminClient, err := helper.GetAdminClient(clientinfo)
+	adminClient, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -159,7 +159,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}

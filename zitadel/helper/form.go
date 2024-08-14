@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/zitadel/oidc/pkg/client/profile"
 	"github.com/zitadel/oidc/pkg/oidc"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"golang.org/x/oauth2"
 )
 

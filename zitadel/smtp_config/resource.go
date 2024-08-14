@@ -46,11 +46,16 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Address to reply to.",
 			},
+			SetActiveVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Set the SMTP configuration active after creating/updating",
+			},
 		},
 		CreateContext: create,
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithEmptyID(helper.NewImportAttribute(PasswordVar, helper.ConvertNonEmpty, true)),
+		Importer:      helper.ImportWithIDAndOptionalSecret(IDVar, PasswordVar),
 	}
 }

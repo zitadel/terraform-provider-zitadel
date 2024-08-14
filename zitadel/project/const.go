@@ -1,6 +1,6 @@
 package project
 
-import "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/project"
+import "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project"
 
 const (
 	ProjectIDVar              = "project_id"

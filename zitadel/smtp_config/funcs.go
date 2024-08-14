@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
 )
@@ -19,12 +19,14 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveSMTPConfig(ctx, &admin.RemoveSMTPConfigRequest{})
+	_, err = client.RemoveSMTPConfig(ctx, &admin.RemoveSMTPConfigRequest{
+		Id: d.Id(),
+	})
 	if err != nil {
 		return diag.Errorf("failed to delete smtp config: %v", err)
 	}
@@ -39,7 +41,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -58,7 +60,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to create smtp config: %v", err)
 	}
-	d.SetId(resp.Details.ResourceOwner)
+	d.SetId(resp.GetId())
+
+	if d.Get(SetActiveVar).(bool) {
+		if _, err := client.ActivateSMTPConfig(ctx, &admin.ActivateSMTPConfigRequest{Id: d.Id()}); err != nil {
+			return diag.Errorf("failed to activate smtp config: %v", err)
+		}
+	}
 
 	return nil
 }
@@ -71,31 +79,30 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar, replyToAddressVar) {
+	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar, replyToAddressVar, PasswordVar) {
 		_, err = client.UpdateSMTPConfig(ctx, &admin.UpdateSMTPConfigRequest{
+			Id:             d.Id(),
 			SenderAddress:  d.Get(SenderAddressVar).(string),
 			SenderName:     d.Get(SenderNameVar).(string),
 			Host:           d.Get(hostVar).(string),
 			Tls:            d.Get(tlsVar).(bool),
 			User:           d.Get(userVar).(string),
 			ReplyToAddress: d.Get(replyToAddressVar).(string),
+			Password:       d.Get(PasswordVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update smtp config: %v", err)
 		}
 	}
 
-	if d.HasChange(PasswordVar) {
-		_, err = client.UpdateSMTPConfigPassword(ctx, &admin.UpdateSMTPConfigPasswordRequest{
-			Password: d.Get(PasswordVar).(string),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update smtp config password: %v", err)
+	if d.HasChange(SetActiveVar) && d.Get(SetActiveVar).(bool) {
+		if _, err := client.ActivateSMTPConfig(ctx, &admin.ActivateSMTPConfigRequest{Id: d.Id()}); err != nil {
+			return diag.Errorf("failed to activate smtp config: %v", err)
 		}
 	}
 
@@ -110,12 +117,14 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetAdminClient(clientinfo)
+	client, err := helper.GetAdminClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetSMTPConfig(ctx, &admin.GetSMTPConfigRequest{})
+	resp, err := client.GetSMTPConfigById(ctx, &admin.GetSMTPConfigByIdRequest{
+		Id: d.Id(),
+	})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -132,12 +141,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		userVar:           resp.GetSmtpConfig().GetUser(),
 		PasswordVar:       d.Get(PasswordVar).(string),
 		replyToAddressVar: resp.GetSmtpConfig().GetReplyToAddress(),
+		SetActiveVar:      d.Get(SetActiveVar).(bool),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of smtp config: %v", k, err)
 		}
 	}
-	d.SetId(resp.SmtpConfig.Details.ResourceOwner)
+	d.SetId(resp.GetSmtpConfig().GetId())
 	return nil
 }

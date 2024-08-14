@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: 'cockroachdb/cockroach:v23.1.13'
+    image: 'cockroachdb/cockroach:v24.1.0'
     command: 'start-single-node --insecure --http-addr :9090'
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9090/health?ready=1']
@@ -15,7 +15,7 @@ services:
 
   zitadel:
     user: '${ZITADEL_DEV_UID}'
-    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v2.43.4}'
+    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v2.58.3}'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"

@@ -7,9 +7,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/app"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/object"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/app"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
@@ -23,7 +23,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo)
+	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -46,7 +46,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo)
+	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -124,7 +124,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo)
+	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -187,7 +187,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(clientinfo)
+	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -261,7 +261,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(clientinfo)
+	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}

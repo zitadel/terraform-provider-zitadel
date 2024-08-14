@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
-	mgmt "github.com/zitadel/zitadel-go/v2/pkg/client/management"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	mgmt "github.com/zitadel/zitadel-go/v3/pkg/client/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/acceptance"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
@@ -23,12 +23,12 @@ type OrgTestFrame struct {
 }
 
 func (o *OrgTestFrame) useOrgContext(orgID string) (err error) {
-	o.Client, err = helper.GetManagementClient(o.BaseTestFrame.ClientInfo)
+	o.Client, err = helper.GetManagementClient(o.Context, o.BaseTestFrame.ClientInfo)
 	if err != nil {
 		return err
 	}
 	o.Context = helper.CtxSetOrgID(o.Context, orgID)
-	o.Admin, err = helper.GetAdminClient(o.BaseTestFrame.ClientInfo)
+	o.Admin, err = helper.GetAdminClient(o.Context, o.BaseTestFrame.ClientInfo)
 	o.AsOrgDefaultDependency = strings.Replace(o.AsOrgDefaultDependency, o.OrgID, orgID, 1)
 	o.OrgID = orgID
 	return err

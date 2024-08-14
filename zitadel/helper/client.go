@@ -8,10 +8,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/pkg/oidc"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/admin"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/middleware"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -33,17 +33,17 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+func GetClientInfo(ctx context.Context, insecure bool, domain string, token string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
 	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if token != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(token)))
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(ctx, token)))
 		keyPath = token
 	} else if jwtProfileFile != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(jwtProfileFile)))
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(ctx, jwtProfileFile)))
 		keyPath = jwtProfileFile
 	} else if jwtProfileJSON != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData([]byte(jwtProfileJSON))))
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(ctx, []byte(jwtProfileJSON))))
 	} else {
 		return nil, fmt.Errorf("either 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
@@ -84,12 +84,12 @@ func GetClientInfo(insecure bool, domain string, token string, jwtProfileFile st
 var adminClientLock = &sync.Mutex{}
 var adminClient *admin.Client
 
-func GetAdminClient(info *ClientInfo) (*admin.Client, error) {
+func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error) {
 	if adminClient == nil {
 		adminClientLock.Lock()
 		defer adminClientLock.Unlock()
 		if adminClient == nil {
-			client, err := admin.NewClient(
+			client, err := admin.NewClient(ctx,
 				info.Issuer, info.Domain,
 				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 				info.Options...,
@@ -107,12 +107,12 @@ func GetAdminClient(info *ClientInfo) (*admin.Client, error) {
 var mgmtClientLock = &sync.Mutex{}
 var mgmtClient *management.Client
 
-func GetManagementClient(info *ClientInfo) (*management.Client, error) {
+func GetManagementClient(ctx context.Context, info *ClientInfo) (*management.Client, error) {
 	if mgmtClient == nil {
 		mgmtClientLock.Lock()
 		defer mgmtClientLock.Unlock()
 		if mgmtClient == nil {
-			client, err := management.NewClient(
+			client, err := management.NewClient(ctx,
 				info.Issuer, info.Domain,
 				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 				info.Options...,

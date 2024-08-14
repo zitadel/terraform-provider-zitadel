@@ -9,8 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
-	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	textpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/text"
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/zitadel/terraform-provider-zitadel/gen/github.com/zitadel/zitadel/pkg/grpc/text"
@@ -86,7 +86,7 @@ func (r *defaultPasswordChangeMessageTextResource) Create(ctx context.Context, r
 	}
 	zReq.Language = language
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -112,7 +112,7 @@ func (r *defaultPasswordChangeMessageTextResource) Read(ctx context.Context, req
 
 	language := getID(ctx, state)
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -126,7 +126,7 @@ func (r *defaultPasswordChangeMessageTextResource) Read(ctx context.Context, req
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, *zResp.CustomText, &state)...)
+	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -170,7 +170,7 @@ func (r *defaultPasswordChangeMessageTextResource) Update(ctx context.Context, r
 	}
 	zReq.Language = language
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -192,7 +192,7 @@ func (r *defaultPasswordChangeMessageTextResource) Delete(ctx context.Context, r
 		return
 	}
 
-	client, err := helper.GetAdminClient(r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return

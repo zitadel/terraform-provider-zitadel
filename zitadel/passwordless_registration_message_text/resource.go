@@ -10,8 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
-	textpb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/text"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	textpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/text"
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/zitadel/terraform-provider-zitadel/gen/github.com/zitadel/zitadel/pkg/grpc/text"
@@ -85,7 +85,7 @@ func (r *passwordlessRegistrationMessageTextResource) Create(ctx context.Context
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo)
+	client, err := helper.GetManagementClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -111,7 +111,7 @@ func (r *passwordlessRegistrationMessageTextResource) Read(ctx context.Context, 
 
 	orgID, language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(r.clientInfo)
+	client, err := helper.GetManagementClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -125,7 +125,7 @@ func (r *passwordlessRegistrationMessageTextResource) Read(ctx context.Context, 
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, *zResp.CustomText, &state)...)
+	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -169,7 +169,7 @@ func (r *passwordlessRegistrationMessageTextResource) Update(ctx context.Context
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(r.clientInfo)
+	client, err := helper.GetManagementClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
@@ -191,7 +191,7 @@ func (r *passwordlessRegistrationMessageTextResource) Delete(ctx context.Context
 		return
 	}
 
-	client, err := helper.GetManagementClient(r.clientInfo)
+	client, err := helper.GetManagementClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return

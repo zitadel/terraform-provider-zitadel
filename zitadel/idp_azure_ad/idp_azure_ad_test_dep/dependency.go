@@ -3,8 +3,8 @@ package idp_azure_ad_test_dep
 import (
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/admin"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/idp"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/idp"
 
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_utils"
