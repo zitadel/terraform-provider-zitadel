@@ -79,27 +79,27 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(LogoHashVar, LogoPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, logoURL, d.Get(LogoPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, logoURL, d.Get(LogoPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload logo: %v", err)
 		}
 	}
 	if d.HasChanges(LogoDarkHashVar, LogoDarkPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, logoDarkURL, d.Get(LogoDarkPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, logoDarkURL, d.Get(LogoDarkPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload logo dark: %v", err)
 		}
 	}
 	if d.HasChanges(IconHashVar, IconPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, iconURL, d.Get(IconPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, iconURL, d.Get(IconPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload icon: %v", err)
 		}
 	}
 	if d.HasChanges(IconDarkHashVar, IconDarkPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, iconDarkURL, d.Get(IconDarkPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, iconDarkURL, d.Get(IconDarkPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload icon dark: %v", err)
 		}
 	}
 	if d.HasChanges(FontHashVar, FontPathVar) {
-		if err := helper.OrgFormFilePost(clientinfo, fontURL, d.Get(FontPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, fontURL, d.Get(FontPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload font: %v", err)
 		}
 	}
@@ -164,27 +164,27 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	d.SetId(org)
 
 	if d.Get(LogoHashVar) != "" && d.Get(LogoPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, logoURL, d.Get(LogoPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, logoURL, d.Get(LogoPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload logo: %v", err)
 		}
 	}
 	if d.Get(LogoDarkHashVar) != "" && d.Get(LogoDarkPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, logoDarkURL, d.Get(LogoDarkPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, logoDarkURL, d.Get(LogoDarkPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload logo dark: %v", err)
 		}
 	}
 	if d.Get(IconHashVar) != "" && d.Get(IconPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, iconURL, d.Get(IconPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, iconURL, d.Get(IconPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload icon: %v", err)
 		}
 	}
 	if d.Get(IconDarkHashVar) != "" && d.Get(IconDarkPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, iconDarkURL, d.Get(IconDarkPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, iconDarkURL, d.Get(IconDarkPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload icon dark: %v", err)
 		}
 	}
 	if d.Get(FontHashVar) != "" && d.Get(FontPathVar) != "" {
-		if err := helper.OrgFormFilePost(clientinfo, fontURL, d.Get(FontPathVar).(string), org); err != nil {
+		if err := helper.OrgFormFilePost(ctx, clientinfo, fontURL, d.Get(FontPathVar).(string), org); err != nil {
 			return diag.Errorf("failed to upload font: %v", err)
 		}
 	}

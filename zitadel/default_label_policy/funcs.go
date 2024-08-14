@@ -74,27 +74,27 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	d.SetId(id)
 
 	if d.HasChanges(LogoHashVar, LogoPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, logoURL, d.Get(LogoPathVar).(string)); err != nil {
+		if err := helper.InstanceFormFilePost(ctx, clientinfo, logoURL, d.Get(LogoPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload logo: %v", err)
 		}
 	}
 	if d.HasChanges(LogoDarkHashVar, LogoDarkPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, logoDarkURL, d.Get(LogoDarkPathVar).(string)); err != nil {
+		if err := helper.InstanceFormFilePost(ctx, clientinfo, logoDarkURL, d.Get(LogoDarkPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload logo dark: %v", err)
 		}
 	}
 	if d.HasChanges(IconHashVar, IconPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, iconURL, d.Get(IconPathVar).(string)); err != nil {
+		if err := helper.InstanceFormFilePost(ctx, clientinfo, iconURL, d.Get(IconPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload icon: %v", err)
 		}
 	}
 	if d.HasChanges(IconDarkHashVar, IconDarkPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, iconDarkURL, d.Get(IconDarkPathVar).(string)); err != nil {
+		if err := helper.InstanceFormFilePost(ctx, clientinfo, iconDarkURL, d.Get(IconDarkPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload icon dark: %v", err)
 		}
 	}
 	if d.HasChanges(FontHashVar, FontPathVar) {
-		if err := helper.InstanceFormFilePost(clientinfo, fontURL, d.Get(FontPathVar).(string)); err != nil {
+		if err := helper.InstanceFormFilePost(ctx, clientinfo, fontURL, d.Get(FontPathVar).(string)); err != nil {
 			return diag.Errorf("failed to upload font: %v", err)
 		}
 	}

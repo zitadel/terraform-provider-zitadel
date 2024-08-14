@@ -2,6 +2,7 @@ package helper
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -13,8 +14,8 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/zitadel/oidc/pkg/client/profile"
-	"github.com/zitadel/oidc/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/profile"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"golang.org/x/oauth2"
 )
@@ -59,15 +60,15 @@ func createMultipartRequest(issuer, endpoint, path string) (*http.Request, error
 	return r, nil
 }
 
-func InstanceFormFilePost(clientInfo *ClientInfo, endpoint, path string) diag.Diagnostics {
-	return formFilePost(clientInfo, endpoint, path, map[string]string{})
+func InstanceFormFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path string) diag.Diagnostics {
+	return formFilePost(ctx, clientInfo, endpoint, path, map[string]string{})
 }
 
-func OrgFormFilePost(clientInfo *ClientInfo, endpoint, path, orgID string) diag.Diagnostics {
-	return formFilePost(clientInfo, endpoint, path, map[string]string{"x-zitadel-orgid": orgID})
+func OrgFormFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path, orgID string) diag.Diagnostics {
+	return formFilePost(ctx, clientInfo, endpoint, path, map[string]string{"x-zitadel-orgid": orgID})
 }
 
-func formFilePost(clientInfo *ClientInfo, endpoint, path string, additionalHeaders map[string]string) diag.Diagnostics {
+func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path string, additionalHeaders map[string]string) diag.Diagnostics {
 	var client *http.Client
 	r, err := createMultipartRequest(clientInfo.Issuer, endpoint, path)
 	if err != nil {
@@ -78,12 +79,12 @@ func formFilePost(clientInfo *ClientInfo, endpoint, path string, additionalHeade
 	}
 
 	if clientInfo.KeyPath != "" {
-		client, err = NewClientWithInterceptorFromKeyFile(clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
+		client, err = NewClientWithInterceptorFromKeyFile(ctx, clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
 		if err != nil {
 			return diag.Errorf("failed to create client: %v", err)
 		}
 	} else if len(clientInfo.Data) > 0 {
-		client, err = NewClientWithInterceptorFromKeyFileData(clientInfo.Issuer, clientInfo.Data, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
+		client, err = NewClientWithInterceptorFromKeyFileData(ctx, clientInfo.Issuer, clientInfo.Data, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
 		if err != nil {
 			return diag.Errorf("failed to create client: %v", err)
 		}
@@ -103,8 +104,8 @@ type Interceptor struct {
 	core        http.RoundTripper
 }
 
-func NewClientWithInterceptorFromKeyFile(issuer, keyPath string, scopes []string) (*http.Client, error) {
-	ts, err := profile.NewJWTProfileTokenSourceFromKeyFile(issuer, keyPath, scopes)
+func NewClientWithInterceptorFromKeyFile(ctx context.Context, issuer, keyPath string, scopes []string) (*http.Client, error) {
+	ts, err := profile.NewJWTProfileTokenSourceFromKeyFile(ctx, issuer, keyPath, scopes)
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +115,8 @@ func NewClientWithInterceptorFromKeyFile(issuer, keyPath string, scopes []string
 	}, nil
 }
 
-func NewClientWithInterceptorFromKeyFileData(issuer string, data []byte, scopes []string) (*http.Client, error) {
-	ts, err := profile.NewJWTProfileTokenSourceFromKeyFileData(issuer, data, scopes)
+func NewClientWithInterceptorFromKeyFileData(ctx context.Context, issuer string, data []byte, scopes []string) (*http.Client, error) {
+	ts, err := profile.NewJWTProfileTokenSourceFromKeyFileData(ctx, issuer, data, scopes)
 	if err != nil {
 		return nil, err
 	}
