@@ -329,6 +329,7 @@ resource "zitadel_login_texts" "default" {
 - `initialize_done_text` (Attributes) (see [below for nested schema](#nestedatt--initialize_done_text))
 - `initialize_user_text` (Attributes) (see [below for nested schema](#nestedatt--initialize_user_text))
 - `linking_user_done_text` (Attributes) (see [below for nested schema](#nestedatt--linking_user_done_text))
+- `linking_user_prompt_text` (Attributes) (see [below for nested schema](#nestedatt--linking_user_prompt_text))
 - `login_text` (Attributes) (see [below for nested schema](#nestedatt--login_text))
 - `logout_text` (Attributes) (see [below for nested schema](#nestedatt--logout_text))
 - `mfa_providers_text` (Attributes) (see [below for nested schema](#nestedatt--mfa_providers_text))
@@ -424,6 +425,7 @@ Optional:
 
 - `help` (String)
 - `privacy_policy` (String)
+- `support_email` (String)
 - `tos` (String)
 
 
@@ -539,6 +541,17 @@ Optional:
 - `title` (String)
 
 
+<a id="nestedatt--linking_user_prompt_text"></a>
+### Nested Schema for `linking_user_prompt_text`
+
+Optional:
+
+- `description` (String)
+- `link_button_text` (String)
+- `other_button_text` (String)
+- `title` (String)
+
+
 <a id="nestedatt--login_text"></a>
 ### Nested Schema for `login_text`
 
@@ -594,6 +607,7 @@ Optional:
 
 - `cancel_button_text` (String)
 - `description` (String)
+- `expired_description` (String)
 - `new_password_confirm_label` (String)
 - `new_password_label` (String)
 - `next_button_text` (String)
