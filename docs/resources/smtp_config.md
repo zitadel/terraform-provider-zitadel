@@ -9,6 +9,13 @@ description: |-
 
 Resource representing the SMTP configuration of an instance.
 
+---
+**NOTE**
+
+Breaking changes in update to ZITADEL provider v2.0.0, please remove and reimport the SMTP configuration into the Terraform state, as the logic for the ID in this resource changed.
+
+---
+
 ## Example Usage
 
 ```terraform
@@ -36,6 +43,7 @@ resource "zitadel_smtp_config" "default" {
 
 - `password` (String, Sensitive) Password used to communicate with your SMTP server.
 - `reply_to_address` (String) Address to reply to.
+- `set_active` (Boolean) Set the SMTP configuration active after creating/updating
 - `tls` (Boolean) TLS used to communicate with your SMTP server.
 - `user` (String) User used to communicate with your SMTP server.
 
@@ -46,6 +54,6 @@ resource "zitadel_smtp_config" "default" {
 ## Import
 
 ```bash
-# The resource can be imported using the ID format `<[password]>`, e.g.
-terraform import zitadel_smtp_config.imported 'p4ssw0rd'
+# The resource can be imported using the ID format `<id[:password]>`, e.g.
+terraform import zitadel_smtp_config.imported '123456789012345678:p4ssw0rd'
 ```

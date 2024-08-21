@@ -9,6 +9,13 @@ description: |-
 
 {{ .Description | trimspace }}
 
+---
+**NOTE**
+
+Breaking changes in update to ZITADEL provider v2.0.0, please remove and reimport the SMTP configuration into the Terraform state, as the logic for the ID in this resource changed.
+
+---
+
 ## Example Usage
 
 {{ tffile "examples/provider/resources/smtp_config.tf" }}

@@ -38,6 +38,7 @@ data "zitadel_application_oidc" "default" {
 - `additional_origins` (List of String) Additional origins
 - `app_type` (String) App type
 - `auth_method_type` (String) Auth method type
+- `client_id` (String, Sensitive) Client ID
 - `clock_skew` (String) Clockskew
 - `dev_mode` (Boolean) Dev mode
 - `grant_types` (List of String) Grant types
