@@ -37,13 +37,13 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, token stri
 	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if token != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(ctx, token)))
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
 		keyPath = token
 	} else if jwtProfileFile != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(ctx, jwtProfileFile)))
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
 		keyPath = jwtProfileFile
 	} else if jwtProfileJSON != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(ctx, []byte(jwtProfileJSON))))
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
 	} else {
 		return nil, fmt.Errorf("either 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
@@ -91,7 +91,7 @@ func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error
 		if adminClient == nil {
 			client, err := admin.NewClient(ctx,
 				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				[]string{oidc.ScopeOpenID},
 				info.Options...,
 			)
 			if err != nil {
@@ -112,9 +112,9 @@ func GetManagementClient(ctx context.Context, info *ClientInfo) (*management.Cli
 		mgmtClientLock.Lock()
 		defer mgmtClientLock.Unlock()
 		if mgmtClient == nil {
-			client, err := management.NewClient(ctx,
+			client, err := management.NewClient(context.Background(),
 				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				[]string{oidc.ScopeOpenID},
 				info.Options...,
 			)
 			if err != nil {
