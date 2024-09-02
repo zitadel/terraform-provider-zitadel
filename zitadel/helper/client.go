@@ -91,7 +91,7 @@ func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error
 		if adminClient == nil {
 			client, err := admin.NewClient(ctx,
 				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID},
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 				info.Options...,
 			)
 			if err != nil {
@@ -114,7 +114,7 @@ func GetManagementClient(ctx context.Context, info *ClientInfo) (*management.Cli
 		if mgmtClient == nil {
 			client, err := management.NewClient(ctx,
 				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID},
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 				info.Options...,
 			)
 			if err != nil {
