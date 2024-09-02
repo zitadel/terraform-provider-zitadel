@@ -112,7 +112,7 @@ func GetManagementClient(ctx context.Context, info *ClientInfo) (*management.Cli
 		mgmtClientLock.Lock()
 		defer mgmtClientLock.Unlock()
 		if mgmtClient == nil {
-			client, err := management.NewClient(context.Background(),
+			client, err := management.NewClient(ctx,
 				info.Issuer, info.Domain,
 				[]string{oidc.ScopeOpenID},
 				info.Options...,
