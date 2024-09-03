@@ -37,13 +37,13 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, token stri
 	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if token != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(ctx, token)))
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
 		keyPath = token
 	} else if jwtProfileFile != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(ctx, jwtProfileFile)))
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
 		keyPath = jwtProfileFile
 	} else if jwtProfileJSON != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(ctx, []byte(jwtProfileJSON))))
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
 	} else {
 		return nil, fmt.Errorf("either 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
