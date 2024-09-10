@@ -14,8 +14,8 @@ import (
 	textpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/text"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/zitadel/terraform-provider-zitadel/gen/github.com/zitadel/zitadel/pkg/grpc/text"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/gen/github.com/zitadel/zitadel/pkg/grpc/text"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
 const (

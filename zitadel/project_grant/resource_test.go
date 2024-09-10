@@ -8,12 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/org/org_test_dep"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/project/project_test_dep"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/project_grant"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/project_role/project_role_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org/org_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project/project_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_grant"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_role/project_role_test_dep"
 )
 
 func TestAccProjectGrant(t *testing.T) {

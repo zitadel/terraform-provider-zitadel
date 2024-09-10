@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-mux/tf5to6server"
 	"github.com/hashicorp/terraform-plugin-mux/tf6muxserver"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel"
 )
 
 func main() {

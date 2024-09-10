@@ -3,8 +3,8 @@ package idp_gitlab_self_hosted_test
 import (
 	"testing"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_utils/idp_test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils/idp_test_utils"
 )
 
 func TestAccInstanceIdPGitLabSelfHosted(t *testing.T) {

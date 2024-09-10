@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
 
-	"github.com/zitadel/terraform-provider-zitadel/acceptance"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/acceptance"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
 type InstanceTestFrame struct {

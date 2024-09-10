@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
 func Create(t *testing.T, frame *test_utils.OrgTestFrame, projectID, grantedOrgID string) string {
