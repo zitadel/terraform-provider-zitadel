@@ -11,7 +11,7 @@ provider zitadel {
   issuer  = "http://localhost:8080/oauth/v2"
   address = "localhost:8080"
   project = "160549024225689888"
-  token   = "/Users/benz/go/src/github.com/zitadel/terraform-provider-zitadel/v2/local-token"
+  token   = "/Users/benz/go/src/github.com/zitadel/terraform-provider-zitadel/local-token"
 }
 
 
@@ -20,7 +20,7 @@ data zitadelV1Org zitadelV1Org {
   issuer   = "https://issuer.zitadel.dev"
   address  = "api.zitadel.dev:443"
   project  = "70669147545070419"
-  token    = "/Users/benz/go/src/github.com/zitadel/terraform-provider-zitadel/v2/zitadel-dev-token"
+  token    = "/Users/benz/go/src/github.com/zitadel/terraform-provider-zitadel/zitadel-dev-token"
 }
 
 output fetched_org_id {
