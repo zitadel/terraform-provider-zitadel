@@ -1,4 +1,4 @@
-module github.com/zitadel/terraform-provider-zitadel
+module github.com/zitadel/terraform-provider-zitadel/v2
 
 go 1.21
 
