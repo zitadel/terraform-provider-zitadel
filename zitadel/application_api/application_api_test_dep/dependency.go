@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/app"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/application_api"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_api"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
 func Create(t *testing.T, frame *test_utils.OrgTestFrame, projectID, name string) (template, id, clientID string) {

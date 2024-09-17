@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

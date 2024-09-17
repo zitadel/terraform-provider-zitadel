@@ -3,7 +3,7 @@ package org_idp_saml_test
 import (
 	"testing"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_idp_utils/org_idp_test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_utils/org_idp_test_utils"
 )
 
 func TestAccOrgIdPSAML(t *testing.T) {

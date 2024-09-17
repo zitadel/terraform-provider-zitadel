@@ -8,9 +8,9 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/idp"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_saml"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_saml"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
 )
 
 func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

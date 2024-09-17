@@ -10,8 +10,8 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/domain"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
 func TestAccDomain(t *testing.T) {
