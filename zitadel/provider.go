@@ -248,6 +248,8 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_saml":               org_idp_saml.GetDatasource(),
 			"zitadel_org_idp_oauth":              org_idp_oauth.GetDatasource(),
 			"zitadel_default_oidc_settings":      default_oidc_settings.GetDatasource(),
+			"zitadel_user_grant":                 user_grant.GetDatasource(),
+			"zitadel_user_grants":                user_grant.ListDatasources(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
