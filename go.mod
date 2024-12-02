@@ -1,8 +1,8 @@
 module github.com/zitadel/terraform-provider-zitadel
 
-go 1.21
+go 1.22
 
-toolchain go1.22.6
+toolchain go1.23.3
 
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
