@@ -12,8 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
 const (

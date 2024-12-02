@@ -3,7 +3,7 @@ package login_policy
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
 func GetResource() *schema.Resource {

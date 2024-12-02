@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
 func CheckCreationAllowed(frame test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {

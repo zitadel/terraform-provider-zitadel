@@ -10,10 +10,10 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/project/project_test_dep"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/project_role"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project/project_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_role"
 )
 
 func TestAccProjectRole(t *testing.T) {

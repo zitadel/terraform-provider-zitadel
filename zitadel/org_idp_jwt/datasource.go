@@ -3,7 +3,7 @@ package org_idp_jwt
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
 func GetDatasource() *schema.Resource {

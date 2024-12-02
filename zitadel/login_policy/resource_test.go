@@ -8,11 +8,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_azure_ad/idp_azure_ad_test_dep"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_google/idp_google_test_dep"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/login_policy"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_azure_ad/idp_azure_ad_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_google/idp_google_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/login_policy"
 )
 
 func TestAccLoginPolicy(t *testing.T) {

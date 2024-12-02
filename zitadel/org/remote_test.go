@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, id func(state *terraform.State) string) func(string) resource.TestCheckFunc {

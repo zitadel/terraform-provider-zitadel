@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/idp"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
 )
 
 func Create(t *testing.T, frame test_utils.BaseTestFrame, client admin.AdminServiceClient) (string, string) {

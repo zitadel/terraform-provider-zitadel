@@ -3,10 +3,10 @@ package org_idp_oauth
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_oauth"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/idp_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/org_idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_oauth"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_utils"
 )
 
 func GetResource() *schema.Resource {

@@ -9,10 +9,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/application_saml"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/application_saml/application_saml_test_dep"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/project/project_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_saml"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_saml/application_saml_test_dep"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project/project_test_dep"
 )
 
 func TestAccApplicationSAMLDatasource_ID(t *testing.T) {

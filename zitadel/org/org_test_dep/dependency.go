@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/helper/test_utils"
-	"github.com/zitadel/terraform-provider-zitadel/zitadel/org"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org"
 )
 
 func Create(t *testing.T, frame *test_utils.OrgTestFrame, resourceName string) (string, string, *test_utils.OrgTestFrame) {
