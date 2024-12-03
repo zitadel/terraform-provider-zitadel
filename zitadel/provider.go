@@ -49,6 +49,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_google"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_ldap"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_oauth"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_saml"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/init_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_member"
