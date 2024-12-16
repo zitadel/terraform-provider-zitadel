@@ -143,6 +143,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
 		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
 		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
+		idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingString(generalCfg.GetAutoLinking()),
 
 		ServersVar:           specificCfg.GetServers(),
 		StartTLSVar:          specificCfg.GetStartTls(),

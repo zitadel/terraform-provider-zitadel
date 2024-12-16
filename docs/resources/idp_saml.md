@@ -20,6 +20,7 @@ resource "zitadel_idp_saml" "default" {
   is_creation_allowed = true
   is_auto_creation    = false
   is_auto_update      = true
+  auto_linking        = "AUTO_LINKING_OPTION_USERNAME"
   metadata_xml        = <<EOM
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://saml.example.com/entityid" validUntil="2034-05-15T14:21:58.979Z">
@@ -60,6 +61,7 @@ EOM
 
 ### Required
 
+- `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `is_auto_creation` (Boolean) enable if a new account in ZITADEL should be created automatically on login with an external account
 - `is_auto_update` (Boolean) enable if a the ZITADEL account fields should be updated automatically on each login
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
