@@ -145,6 +145,11 @@ func GetResource() *schema.Resource {
 				Description: "generated secret for this config",
 				Sensitive:   true,
 			},
+			skipNativeAppSuccessPageVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Skip the successful login page on native apps and directly redirect the user to the callback.",
+			},
 		},
 		DeleteContext: delete,
 		CreateContext: create,
