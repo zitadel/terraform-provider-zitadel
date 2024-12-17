@@ -22,4 +22,5 @@ const (
 	additionalOriginsVar        = "additional_origins"
 	ClientIDVar                 = "client_id"
 	ClientSecretVar             = "client_secret"
+	skipNativeAppSuccessPageVar = "skip_native_app_success_page"
 )
