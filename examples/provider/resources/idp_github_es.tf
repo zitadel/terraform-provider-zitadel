@@ -10,5 +10,5 @@ resource "zitadel_idp_github_es" "default" {
   is_creation_allowed    = true
   is_auto_creation       = false
   is_auto_update         = true
-  auto_linking        = "AUTO_LINKING_OPTION_USERNAME"
+  auto_linking           = "AUTO_LINKING_OPTION_USERNAME"
 }
