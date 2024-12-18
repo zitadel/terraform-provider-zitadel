@@ -49,4 +49,5 @@ data "zitadel_application_oidc" "default" {
 - `post_logout_redirect_uris` (List of String) Post logout redirect URIs
 - `redirect_uris` (List of String) RedirectURIs
 - `response_types` (List of String) Response type
+- `skip_native_app_success_page` (Boolean) Skip the successful login page on native apps and directly redirect the user to the callback.
 - `version` (String) Version
