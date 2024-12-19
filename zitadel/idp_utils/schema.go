@@ -118,7 +118,6 @@ var (
 	}
 	AutoLinkingResourceField = &schema.Schema{
 		Type:        schema.TypeString,
-		Required:    true,
 		Description: "Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches" + helper.DescriptionEnumValuesList(idp.AutoLinkingOption_name),
 		ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 			return helper.EnumValueValidation(AutoLinkingVar, value, idp.AutoLinkingOption_value)
