@@ -19,6 +19,7 @@ func GetDatasource() *schema.Resource {
 			idp_utils.IsCreationAllowedVar: idp_utils.IsCreationAllowedDataSourceField,
 			idp_utils.IsAutoCreationVar:    idp_utils.IsAutoCreationDataSourceField,
 			idp_utils.IsAutoUpdateVar:      idp_utils.IsAutoUpdateDataSourceField,
+			idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingDataSourceField,
 
 			idp_ldap.ServersVar:           idp_ldap.ServersDataSourceField,
 			idp_ldap.StartTLSVar:          idp_ldap.StartTLSDataSourceField,

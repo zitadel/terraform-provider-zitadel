@@ -22,6 +22,7 @@ func GetDatasource() *schema.Resource {
 			idp_utils.IsCreationAllowedVar:   idp_utils.IsCreationAllowedDataSourceField,
 			idp_utils.IsAutoCreationVar:      idp_utils.IsAutoCreationDataSourceField,
 			idp_utils.IsAutoUpdateVar:        idp_utils.IsAutoUpdateDataSourceField,
+			idp_utils.AutoLinkingVar:         idp_utils.AutoLinkingDataSourceField,
 			idp_gitlab_self_hosted.IssuerVar: idp_gitlab_self_hosted.IssuerDataSourceField,
 		},
 		ReadContext: read,

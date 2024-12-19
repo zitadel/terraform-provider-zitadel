@@ -22,6 +22,7 @@ func GetResource() *schema.Resource {
 			idp_utils.IsCreationAllowedVar: idp_utils.IsCreationAllowedResourceField,
 			idp_utils.IsAutoCreationVar:    idp_utils.IsAutoCreationResourceField,
 			idp_utils.IsAutoUpdateVar:      idp_utils.IsAutoUpdateResourceField,
+			idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingResourceField,
 			idp_azure_ad.TenantTypeVar:     idp_azure_ad.TenantTypeResourceField,
 			idp_azure_ad.TenantIDVar:       idp_azure_ad.TenantIDResourceField,
 			idp_azure_ad.EmailVerifiedVar:  idp_azure_ad.EmailVerifiedResourceField,
