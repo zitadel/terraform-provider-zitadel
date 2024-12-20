@@ -19,6 +19,7 @@ func GetResource() *schema.Resource {
 			idp_utils.IsCreationAllowedVar: idp_utils.IsCreationAllowedResourceField,
 			idp_utils.IsAutoCreationVar:    idp_utils.IsAutoCreationResourceField,
 			idp_utils.IsAutoUpdateVar:      idp_utils.IsAutoUpdateResourceField,
+			idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingResourceField,
 			IssuerVar:                      IssuerResourceField,
 		},
 		ReadContext:   read,

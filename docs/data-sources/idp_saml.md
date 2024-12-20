@@ -26,6 +26,7 @@ data "zitadel_idp_saml" "default" {
 
 ### Read-Only
 
+- `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `binding` (String) The binding
 - `is_auto_creation` (Boolean) enabled if a new account in ZITADEL are created automatically on login with an external account
 - `is_auto_update` (Boolean) enabled if a the ZITADEL account fields are updated automatically on each login

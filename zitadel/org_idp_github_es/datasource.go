@@ -22,6 +22,7 @@ func GetDatasource() *schema.Resource {
 			idp_utils.IsCreationAllowedVar:         idp_utils.IsCreationAllowedDataSourceField,
 			idp_utils.IsAutoCreationVar:            idp_utils.IsAutoCreationDataSourceField,
 			idp_utils.IsAutoUpdateVar:              idp_utils.IsAutoUpdateDataSourceField,
+			idp_utils.AutoLinkingVar:               idp_utils.AutoLinkingDataSourceField,
 			idp_github_es.AuthorizationEndpointVar: idp_github_es.AuthorizationEndpointDataSourceField,
 			idp_github_es.TokenEndpointVar:         idp_github_es.TokenEndpointDataSourceField,
 			idp_github_es.UserEndpointVar:          idp_github_es.UserEndpointDataSourceField,

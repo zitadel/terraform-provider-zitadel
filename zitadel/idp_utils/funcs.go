@@ -39,12 +39,21 @@ func ScopesValue(d *schema.ResourceData) []string {
 	return helper.GetOkSetToStringSlice(d, ScopesVar)
 }
 
+func AutoLinkingValue(d *schema.ResourceData, attributeVar string) idp.AutoLinkingOption {
+	return idp.AutoLinkingOption(idp.AutoLinkingOption_value[StringValue(d, attributeVar)])
+}
+
+func AutoLinkingString(value idp.AutoLinkingOption) string {
+	return idp.AutoLinkingOption_name[int32(value)]
+}
+
 func ProviderOptionsValue(d *schema.ResourceData) *idp.Options {
 	return &idp.Options{
 		IsLinkingAllowed:  BoolValue(d, IsLinkingAllowedVar),
 		IsCreationAllowed: BoolValue(d, IsCreationAllowedVar),
 		IsAutoUpdate:      BoolValue(d, IsAutoUpdateVar),
 		IsAutoCreation:    BoolValue(d, IsAutoCreationVar),
+		AutoLinking:       AutoLinkingValue(d, AutoLinkingVar),
 	}
 }
 

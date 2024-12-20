@@ -6,6 +6,7 @@ resource "zitadel_idp_saml" "default" {
   is_creation_allowed = true
   is_auto_creation    = false
   is_auto_update      = true
+  auto_linking        = "AUTO_LINKING_OPTION_USERNAME"
   metadata_xml        = <<EOM
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://saml.example.com/entityid" validUntil="2034-05-15T14:21:58.979Z">
