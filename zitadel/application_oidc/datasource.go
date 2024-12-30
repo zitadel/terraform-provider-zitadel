@@ -120,6 +120,11 @@ func GetDatasource() *schema.Resource {
 				Description: "Client ID",
 				Sensitive:   true,
 			},
+			skipNativeAppSuccessPageVar: {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "Skip the successful login page on native apps and directly redirect the user to the callback.",
+			},
 		},
 		ReadContext: read,
 	}

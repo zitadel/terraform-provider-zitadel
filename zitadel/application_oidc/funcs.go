@@ -78,6 +78,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		idTokenUserinfoAssertionVar,
 		clockSkewVar,
 		additionalOriginsVar,
+		skipNativeAppSuccessPageVar,
 	) {
 		respTypes := make([]app.OIDCResponseType, 0)
 		for _, respType := range d.Get(responseTypesVar).([]interface{}) {
@@ -108,6 +109,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			IdTokenUserinfoAssertion: d.Get(idTokenUserinfoAssertionVar).(bool),
 			AdditionalOrigins:        interfaceToStringSlice(d.Get(additionalOriginsVar)),
 			ClockSkew:                durationpb.New(dur),
+			SkipNativeAppSuccessPage: d.Get(skipNativeAppSuccessPageVar).(bool),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update applicationOIDC: %v", err)
@@ -160,6 +162,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ClockSkew:                durationpb.New(dur),
 		AdditionalOrigins:        interfaceToStringSlice(d.Get(additionalOriginsVar)),
 		Version:                  app.OIDCVersion(app.OIDCVersion_value[d.Get(versionVar).(string)]),
+		SkipNativeAppSuccessPage: d.Get(skipNativeAppSuccessPageVar).(bool),
 	})
 
 	set := map[string]interface{}{
@@ -234,6 +237,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		clockSkewVar:                clockSkew,
 		additionalOriginsVar:        oidc.GetAdditionalOrigins(),
 		ClientIDVar:                 oidc.GetClientId(),
+		skipNativeAppSuccessPageVar: oidc.GetSkipNativeAppSuccessPage(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

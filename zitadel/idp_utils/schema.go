@@ -1,6 +1,13 @@
 package idp_utils
 
-import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+import (
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/idp"
+
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+)
 
 const (
 	IdpIDVar             = "id"
@@ -12,6 +19,7 @@ const (
 	IsCreationAllowedVar = "is_creation_allowed"
 	IsAutoCreationVar    = "is_auto_creation"
 	IsAutoUpdateVar      = "is_auto_update"
+	AutoLinkingVar       = "auto_linking"
 )
 
 var (
@@ -107,5 +115,19 @@ var (
 		Type:        schema.TypeBool,
 		Computed:    true,
 		Description: "enabled if a the ZITADEL account fields are updated automatically on each login",
+	}
+	AutoLinkingResourceField = &schema.Schema{
+		Type:        schema.TypeString,
+		Optional:    true,
+		Description: "Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches" + helper.DescriptionEnumValuesList(idp.AutoLinkingOption_name),
+		ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+			return helper.EnumValueValidation(AutoLinkingVar, value, idp.AutoLinkingOption_value)
+		},
+		Default: idp.AutoLinkingOption_name[0],
+	}
+	AutoLinkingDataSourceField = &schema.Schema{
+		Type:        schema.TypeString,
+		Computed:    true,
+		Description: "Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches" + helper.DescriptionEnumValuesList(idp.AutoLinkingOption_name),
 	}
 )
