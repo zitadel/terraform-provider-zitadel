@@ -10,4 +10,5 @@ resource "zitadel_org_idp_azure_ad" "default" {
   is_creation_allowed = true
   is_auto_creation    = false
   is_auto_update      = true
+  auto_linking        = "AUTO_LINKING_OPTION_USERNAME"
 }
