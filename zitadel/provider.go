@@ -111,6 +111,7 @@ type providerModel struct {
 	Domain         types.String `tfsdk:"domain"`
 	Port           types.String `tfsdk:"port"`
 	Token          types.String `tfsdk:"token"`
+	JWTFile        types.String `tfsdk:"jwt_file"`
 	JWTProfileFile types.String `tfsdk:"jwt_profile_file"`
 	JWTProfileJSON types.String `tfsdk:"jwt_profile_json"`
 }
@@ -136,15 +137,20 @@ func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnost
 				Optional:    true,
 				Description: "Path to the file containing credentials to connect to ZITADEL",
 			},
+			helper.JWTFile: {
+				Type:        types.StringType,
+				Optional:    true,
+				Description: "Path to the file containing presigned JWT to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required",
+			},
 			helper.JWTProfileFile: {
 				Type:        types.StringType,
 				Optional:    true,
-				Description: "Path to the file containing credentials to connect to ZITADEL. Either 'jwt_profile_file' or 'jwt_profile_json' is required",
+				Description: "Path to the file containing credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required",
 			},
 			helper.JWTProfileJSON: {
 				Type:        types.StringType,
 				Optional:    true,
-				Description: "JSON value of credentials to connect to ZITADEL. Either 'jwt_profile_file' or 'jwt_profile_json' is required",
+				Description: "JSON value of credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required",
 			},
 			helper.PortVar: {
 				Type:        types.StringType,
@@ -167,6 +173,7 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
 		config.Token.ValueString(),
+		config.JWTFile.ValueString(),
 		config.JWTProfileFile.ValueString(),
 		config.JWTProfileJSON.ValueString(),
 		config.Port.ValueString(),
@@ -267,6 +274,11 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: "Path to the file containing credentials to connect to ZITADEL",
 			},
+			helper.JWTFile: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Path to the file containing presigned JWT to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required",
+			},
 			helper.JWTProfileFile: {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -354,6 +366,7 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
 		d.Get(helper.TokenVar).(string),
+		d.Get(helper.JWTFile).(string),
 		d.Get(helper.JWTProfileFile).(string),
 		d.Get(helper.JWTProfileJSON).(string),
 		d.Get(helper.PortVar).(string),
