@@ -56,6 +56,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Type:   authn.KeyType(authn.KeyType_value[keyType]),
 	}
 
+	if publicKey, ok := d.GetOk(PublicKeyVar); ok {
+		req.PublicKey = []byte(publicKey.(string))
+	}
+
 	if expiration, ok := d.GetOk(ExpirationDateVar); ok {
 		t, err := time.Parse(time.RFC3339, expiration.(string))
 		if err != nil {
@@ -69,8 +73,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	d.SetId(resp.GetKeyId())
-	if err := d.Set(KeyDetailsVar, string(resp.GetKeyDetails())); err != nil {
-		return diag.FromErr(err)
+	if keyDetails := resp.GetKeyDetails(); keyDetails != nil {
+		if err := d.Set(KeyDetailsVar, string(keyDetails)); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	return nil
 }

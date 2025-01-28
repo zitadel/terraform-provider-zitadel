@@ -29,6 +29,12 @@ func GetResource() *schema.Resource {
 					return helper.EnumValueValidation(keyTypeVar, value, authn.KeyType_value)
 				},
 			},
+			PublicKeyVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Optionally provide a public key of your own generated RSA private key",
+				ForceNew:    true,
+			},
 			ExpirationDateVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -50,6 +56,7 @@ func GetResource() *schema.Resource {
 			keyIDVar,
 			helper.NewImportAttribute(UserIDVar, helper.ConvertID, false),
 			helper.NewImportAttribute(KeyDetailsVar, helper.ConvertJSON, true),
+			helper.NewImportAttribute(PublicKeyVar, helper.ConvertBase64, true),
 		),
 	}
 }
