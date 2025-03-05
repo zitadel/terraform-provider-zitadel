@@ -9,7 +9,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing an OIDC IDP on the instance.",
+		Description: "Resource representing a generic OIDC IDP on the instance.",
 		Schema: map[string]*schema.Schema{
 			idp_utils.NameVar:              idp_utils.NameResourceField,
 			idp_utils.ClientIDVar:          idp_utils.ClientIDResourceField,
