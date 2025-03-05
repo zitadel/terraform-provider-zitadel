@@ -9,4 +9,5 @@ resource "zitadel_idp_oidc" "default" {
   is_auto_creation    = false
   is_auto_update      = true
   is_id_token_mapping = true
+  auto_linking        = "AUTO_LINKING_OPTION_USERNAME"
 }
