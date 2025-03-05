@@ -39,7 +39,6 @@ resource "zitadel_idp_ldap" "default" {
 
 ### Required
 
-- `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `base_dn` (String) Base DN for LDAP connections
 - `bind_dn` (String) Bind DN for LDAP connections
 - `bind_password` (String, Sensitive) Bind password for LDAP connections
@@ -56,6 +55,7 @@ resource "zitadel_idp_ldap" "default" {
 
 ### Optional
 
+- `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `avatar_url_attribute` (String) User attribute for the avatar url
 - `display_name_attribute` (String) User attribute for the display name
 - `email_attribute` (String) User attribute for the email
