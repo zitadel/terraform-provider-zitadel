@@ -2,12 +2,12 @@
 page_title: "zitadel_idp_oidc Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing a generic OIDC IdP on the instance.
+  Resource representing a generic OIDC IDP on the instance.
 ---
 
-# zitadel_org_idp_oidc (Resource)
+# zitadel_idp_oidc (Resource)
 
-Resource representing a generic OIDC IdP on the organization.
+Resource representing a generic OIDC IDP on the instance.
 
 ## Example Usage
 
@@ -23,6 +23,7 @@ resource "zitadel_idp_oidc" "default" {
   is_auto_creation    = false
   is_auto_update      = true
   is_id_token_mapping = true
+  auto_linking        = "AUTO_LINKING_OPTION_USERNAME"
 }
 ```
 
@@ -42,6 +43,7 @@ resource "zitadel_idp_oidc" "default" {
 
 ### Optional
 
+- `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `name` (String) Name of the IDP
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 
