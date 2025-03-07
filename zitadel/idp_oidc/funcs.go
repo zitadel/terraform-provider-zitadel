@@ -83,7 +83,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	specificCfg := cfg.GetOidc()
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
-		helper.OrgIDVar:                idp.GetDetails().GetResourceOwner(),
 		idp_utils.NameVar:              idp.GetName(),
 		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
 		idp_utils.ClientSecretVar:      idp_utils.StringValue(d, idp_utils.ClientSecretVar),
@@ -92,6 +91,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
 		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
 		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
+		idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingString(generalCfg.GetAutoLinking()),
 		IssuerVar:                      specificCfg.GetIssuer(),
 		IsIdTokenMappingVar:            specificCfg.GetIsIdTokenMapping(),
 	}

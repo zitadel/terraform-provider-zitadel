@@ -11,7 +11,6 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing an OIDC IDP on the instance.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar:                helper.OrgIDResourceField,
 			idp_utils.NameVar:              idp_utils.NameResourceField,
 			idp_utils.ClientIDVar:          idp_utils.ClientIDResourceField,
 			idp_utils.ClientSecretVar:      idp_utils.ClientSecretResourceField,
@@ -20,6 +19,7 @@ func GetResource() *schema.Resource {
 			idp_utils.IsCreationAllowedVar: idp_utils.IsCreationAllowedResourceField,
 			idp_utils.IsAutoCreationVar:    idp_utils.IsAutoCreationResourceField,
 			idp_utils.IsAutoUpdateVar:      idp_utils.IsAutoUpdateResourceField,
+			idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingResourceField,
 			IssuerVar:                      IssuerResourceField,
 			IsIdTokenMappingVar:            IsIdTokenMappingResourceField,
 		},
@@ -27,6 +27,6 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: idp_utils.Delete,
-		Importer:      helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
+		Importer:      helper.ImportWithIDAndOptionalSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
 	}
 }
