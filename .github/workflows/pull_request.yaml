@@ -85,7 +85,7 @@ jobs:
 
     - name: Archive Docker Compose Logs
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: pull-request-tests
         path: |
