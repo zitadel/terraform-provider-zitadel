@@ -89,7 +89,7 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 			return diag.Errorf("failed to create client: %v", err)
 		}
 	} else {
-		return diag.Errorf("either 'jwt_profile_file' or 'jwt_profile_json' is required")
+		return diag.Errorf("either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
 
 	resp, err := client.Do(r)

@@ -3,6 +3,7 @@ package helper
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -21,6 +22,7 @@ const (
 	InsecureVar    = "insecure"
 	TokenVar       = "token"
 	PortVar        = "port"
+	JWTFile        = "jwt_file"
 	JWTProfileFile = "jwt_profile_file"
 	JWTProfileJSON = "jwt_profile_json"
 )
@@ -33,19 +35,25 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(ctx context.Context, insecure bool, domain string, token string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+func GetClientInfo(ctx context.Context, insecure bool, domain string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
 	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if token != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
 		keyPath = token
+	} else if jwtFile != "" {
+		jwt, err := os.ReadFile(jwtFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read JWT file: %v", err)
+		}
+		options = append(options, zitadel.WithJWTDirectTokenSource(string(jwt)))
 	} else if jwtProfileFile != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
 		keyPath = jwtProfileFile
 	} else if jwtProfileJSON != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
 	} else {
-		return nil, fmt.Errorf("either 'jwt_profile_file' or 'jwt_profile_json' is required")
+		return nil, fmt.Errorf("either 'jwt_profile_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
 
 	issuerScheme := "https://"
