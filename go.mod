@@ -5,10 +5,10 @@ go 1.22
 toolchain go1.23.3
 
 require (
-	github.com/envoyproxy/protoc-gen-validate v1.0.4
+	github.com/envoyproxy/protoc-gen-validate v1.1.0
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/gogo/protobuf v1.3.2
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.21.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/hcl/v2 v2.16.2
 	github.com/hashicorp/terraform-plugin-framework v0.15.0
@@ -17,11 +17,11 @@ require (
 	github.com/hashicorp/terraform-plugin-mux v0.7.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
 	github.com/zclconf/go-cty v1.13.1
-	github.com/zitadel/oidc/v3 v3.27.0
-	github.com/zitadel/zitadel-go/v3 v3.0.0
-	golang.org/x/oauth2 v0.22.0
-	google.golang.org/grpc v1.65.0
-	google.golang.org/protobuf v1.34.2
+	github.com/zitadel/oidc/v3 v3.33.1
+	github.com/zitadel/zitadel-go/v3 v3.4.2
+	golang.org/x/oauth2 v0.24.0
+	google.golang.org/grpc v1.67.0
+	google.golang.org/protobuf v1.35.2
 )
 
 require (
@@ -64,11 +64,11 @@ require (
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
 	github.com/vmihailenco/tagparser v0.1.1 // indirect
-	github.com/zitadel/logging v0.6.0 // indirect
+	github.com/zitadel/logging v0.6.1 // indirect
 	github.com/zitadel/schema v1.3.0 // indirect
-	go.opentelemetry.io/otel v1.28.0 // indirect
-	go.opentelemetry.io/otel/metric v1.28.0 // indirect
-	go.opentelemetry.io/otel/trace v1.28.0 // indirect
+	go.opentelemetry.io/otel v1.29.0 // indirect
+	go.opentelemetry.io/otel/metric v1.29.0 // indirect
+	go.opentelemetry.io/otel/trace v1.29.0 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.19.0 // indirect
@@ -76,6 +76,6 @@ require (
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240730163845-b1a4ccb954bf // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240730163845-b1a4ccb954bf // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240814211410-ddb44dafa142 // indirect
 )
