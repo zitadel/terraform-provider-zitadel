@@ -2,6 +2,7 @@ package helper
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/csv"
 	"encoding/json"
 	"errors"
@@ -159,6 +160,9 @@ func importWithAttributes(state importState, attrs ...importAttribute) (err erro
 			state.SetId(val.(string))
 			continue
 		}
+		if val == nil && attr.optional {
+			continue
+		}
 		if err := state.Set(attr.key, val); err != nil {
 			return fmt.Errorf("failed to set %s=%v: %w", attr.key, val, err)
 		}
@@ -178,10 +182,21 @@ func ConvertID(id string) (interface{}, error) {
 var _ ConvertStringFunc = ConvertJSON
 
 func ConvertJSON(importValue string) (interface{}, error) {
+	if len(importValue) == 0 {
+		return nil, nil
+	}
 	if err := json.Unmarshal([]byte(importValue), &struct{}{}); err != nil {
 		return nil, fmt.Errorf("value must be valid JSON: %w", err)
 	}
 	return importValue, nil
+}
+
+func ConvertBase64(importValue string) (interface{}, error) {
+	importValueDecoded, err := base64.StdEncoding.DecodeString(importValue)
+	if err != nil {
+		return nil, fmt.Errorf("value must be valid base64: %w", err)
+	}
+	return string(importValueDecoded), nil
 }
 
 var _ ConvertStringFunc = ConvertEmpty
