@@ -6,4 +6,5 @@ const (
 	keyTypeVar        = "key_type"
 	KeyDetailsVar     = "key_details"
 	ExpirationDateVar = "expiration_date"
+	PublicKeyVar      = "public_key"
 )
