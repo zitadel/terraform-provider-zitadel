@@ -1,19 +1,18 @@
 ---
-page_title: "zitadel_org_idp_oidc Resource - terraform-provider-zitadel"
+page_title: "zitadel_idp_oidc Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing a generic OIDC IdP on the organization.
+  Resource representing a generic OIDC IDP on the instance.
 ---
 
-# zitadel_org_idp_oidc (Resource)
+# zitadel_idp_oidc (Resource)
 
-Resource representing a generic OIDC IdP on the organization.
+Resource representing a generic OIDC IDP on the instance.
 
 ## Example Usage
 
 ```terraform
-resource "zitadel_org_idp_oidc" "default" {
-  org_id              = data.zitadel_org.default.id
+resource "zitadel_idp_oidc" "default" {
   name                = "My Generic OIDC IDP"
   client_id           = "a_client_id"
   client_secret       = "a_client_secret"
@@ -46,7 +45,6 @@ resource "zitadel_org_idp_oidc" "default" {
 
 - `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `name` (String) Name of the IDP
-- `org_id` (String) ID of the organization
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 
 ### Read-Only
@@ -56,6 +54,6 @@ resource "zitadel_org_idp_oidc" "default" {
 ## Import
 
 ```bash
-# The resource can be imported using the ID format `<id[:org_id][:client_secret]>`, e.g.
-terraform import zitadel_org_idp_oidc.imported '123456789012345678:123456789012345678:1234567890abcdef'
+# The resource can be imported using the ID format `<id[:client_secret]>`, e.g.
+terraform import zitadel_idp_oidc.imported '123456789012345678:1234567890abcdef'
 ```
