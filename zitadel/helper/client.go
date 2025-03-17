@@ -18,13 +18,20 @@ import (
 )
 
 const (
-	DomainVar      = "domain"
-	InsecureVar    = "insecure"
-	TokenVar       = "token"
-	PortVar        = "port"
-	JWTFile        = "jwt_file"
-	JWTProfileFile = "jwt_profile_file"
-	JWTProfileJSON = "jwt_profile_json"
+	DomainVar                 = "domain"
+	DomainDescription         = "Domain used to connect to the ZITADEL instance"
+	InsecureVar               = "insecure"
+	InsecureDescription       = "Use insecure connection"
+	TokenVar                  = "token"
+	TokenDescription          = "Path to the file containing credentials to connect to ZITADEL"
+	PortVar                   = "port"
+	PortDescription           = "Used port if not the default ports 80 or 443 are configured"
+	JWTFileVar                = "jwt_file"
+	JWTFileDescription        = "Path to the file containing presigned JWT to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTProfileFileVar         = "jwt_profile_file"
+	JWTProfileFileDescription = "Path to the file containing credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTProfileJSONVar         = "jwt_profile_json"
+	JWTProfileJSONDescription = "JSON value of credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
 )
 
 type ClientInfo struct {
@@ -53,7 +60,7 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, token stri
 	} else if jwtProfileJSON != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
 	} else {
-		return nil, fmt.Errorf("either 'jwt_profile_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
+		return nil, fmt.Errorf("either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
 
 	issuerScheme := "https://"
