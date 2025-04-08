@@ -20,7 +20,9 @@ const (
 	isPhoneVerifiedVar = "is_phone_verified"
 	phoneVar           = "phone"
 
-	InitialPasswordVar = "initial_password"
+	InitialPasswordVar        = "initial_password"
+	initialHashedPasswordVar  = "initial_hashed_password"
+	initialSkipPasswordChange = "initial_skip_password_change"
 
 	defaultGenderString      = "GENDER_UNSPECIFIED"
 	defaultPreferredLanguage = "und"

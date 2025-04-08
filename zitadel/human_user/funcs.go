@@ -49,16 +49,23 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	firstName := d.Get(firstNameVar).(string)
 	lastName := d.Get(lastNameVar).(string)
-	addUser := &management.AddHumanUserRequest{
+	addUser := &management.ImportHumanUserRequest{
 		UserName: d.Get(UserNameVar).(string),
-		Profile: &management.AddHumanUserRequest_Profile{
+		Profile: &management.ImportHumanUserRequest_Profile{
 			FirstName:         firstName,
 			LastName:          lastName,
 			Gender:            user.Gender(user.Gender_value[d.Get(genderVar).(string)]),
 			PreferredLanguage: d.Get(preferredLanguageVar).(string),
 			NickName:          d.Get(nickNameVar).(string),
 		},
-		InitialPassword: d.Get(InitialPasswordVar).(string),
+		Password:               d.Get(InitialPasswordVar).(string),
+		PasswordChangeRequired: d.Get(initialSkipPasswordChange).(bool),
+	}
+
+	if hashedPassword, ok := d.GetOk(initialHashedPasswordVar); ok {
+		addUser.HashedPassword = &management.ImportHumanUserRequest_HashedPassword{
+			Value: hashedPassword.(string),
+		}
 	}
 
 	if displayname, ok := d.GetOk(DisplayNameVar); ok {
@@ -71,7 +78,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	if email, ok := d.GetOk(emailVar); ok {
 		isVerified, isVerifiedOk := d.GetOk(isEmailVerifiedVar)
-		addUser.Email = &management.AddHumanUserRequest_Email{
+		addUser.Email = &management.ImportHumanUserRequest_Email{
 			Email:           email.(string),
 			IsEmailVerified: false,
 		}
@@ -82,7 +89,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	if phone, ok := d.GetOk(phoneVar); ok {
 		isVerified, isVerifiedOk := d.GetOk(isPhoneVerifiedVar)
-		addUser.Phone = &management.AddHumanUserRequest_Phone{
+		addUser.Phone = &management.ImportHumanUserRequest_Phone{
 			Phone:           phone.(string),
 			IsPhoneVerified: false,
 		}
@@ -91,7 +98,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	respUser, err := client.AddHumanUser(helper.CtxWithOrgID(ctx, d), addUser)
+	respUser, err := client.ImportHumanUser(helper.CtxWithOrgID(ctx, d), addUser)
 	if err != nil {
 		return diag.Errorf("failed to create human user: %v", err)
 	}

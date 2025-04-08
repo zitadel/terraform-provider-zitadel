@@ -7,7 +7,7 @@ terraform {
   }
 }
 
-provider zitadel {
+provider "zitadel" {
   issuer  = "http://localhost:8080/oauth/v2"
   address = "localhost:8080"
   project = "160549024225689888"
@@ -15,7 +15,7 @@ provider zitadel {
 }
 
 
-data zitadelV1Org zitadelV1Org {
+data "zitadelV1Org" "zitadelV1Org" {
   provider = zitadel
   issuer   = "https://issuer.zitadel.dev"
   address  = "api.zitadel.dev:443"
@@ -23,26 +23,26 @@ data zitadelV1Org zitadelV1Org {
   token    = "/Users/benz/go/src/github.com/zitadel/terraform-provider-zitadel/zitadel-dev-token"
 }
 
-output fetched_org_id {
+output "fetched_org_id" {
   value = data.zitadelV1Org.zitadelV1Org.org
 }
 
-output fetched_org_name {
+output "fetched_org_name" {
   value = data.zitadelV1Org.zitadelV1Org.name
 }
 
-resource org org {
+resource "org" "org" {
   provider = zitadel
   old_id   = data.zitadelV1Org.zitadelV1Org.org
   name     = data.zitadelV1Org.zitadelV1Org.name
 }
 
-resource user userTest {
+resource "user" "userTest" {
   depends_on = [data.zitadelV1Org.zitadelV1Org, org.org]
   provider   = zitadel
 
   for_each = {
-  for idx, user in data.zitadelV1Org.zitadelV1Org.users : user.user_name => user
+    for idx, user in data.zitadelV1Org.zitadelV1Org.users : user.user_name => user
   }
   old_id               = each.value.id
   resource_owner       = org.org.id
@@ -66,12 +66,12 @@ resource user userTest {
 }
 
 
-resource project projectTest {
+resource "project" "projectTest" {
   depends_on = [data.zitadelV1Org.zitadelV1Org, org.org]
   provider   = zitadel
 
   for_each = {
-  for idx, project in data.zitadelV1Org.zitadelV1Org.projects : project.name => project
+    for idx, project in data.zitadelV1Org.zitadelV1Org.projects : project.name => project
   }
   old_id                   = each.value.id
   name                     = each.value.name
@@ -84,15 +84,15 @@ resource project projectTest {
 }
 
 
-resource domain domainTest {
+resource "domain" "domainTest" {
   depends_on = [data.zitadelV1Org.zitadelV1Org, org.org]
   provider   = zitadel
 
   for_each = {
-  for idx, domain in data.zitadelV1Org.zitadelV1Org.domains : domain.name => domain
+    for idx, domain in data.zitadelV1Org.zitadelV1Org.domains : domain.name => domain
   }
 
-  name                     = each.value.name
-  org_id                    = org.org.id
+  name   = each.value.name
+  org_id = org.org.id
 }
 
