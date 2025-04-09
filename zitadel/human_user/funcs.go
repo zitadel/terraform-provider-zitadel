@@ -199,6 +199,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		UserNameVar:           user.GetUserName(),
 		loginNamesVar:         user.GetLoginNames(),
 		preferredLoginNameVar: user.GetPreferredLoginName(),
+		// This will be ignored using the CustomizeDiff function.
+		// However, we should explicitly set it to true or false so that importing a user doesn't produce an immediate plan diff.
+		initialSkipPasswordChange: false,
 	}
 
 	if human := user.GetHuman(); human != nil {
