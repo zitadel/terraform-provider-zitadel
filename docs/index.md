@@ -54,7 +54,8 @@ provider "zitadel" {
 ### Optional
 
 - `insecure` (Boolean) Use insecure connection
-- `jwt_profile_file` (String) Path to the file containing credentials to connect to ZITADEL. Either 'jwt_profile_file' or 'jwt_profile_json' is required
-- `jwt_profile_json` (String) JSON value of credentials to connect to ZITADEL. Either 'jwt_profile_file' or 'jwt_profile_json' is required
+- `jwt_file` (String) Path to the file containing presigned JWT to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required
+- `jwt_profile_file` (String) Path to the file containing credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required
+- `jwt_profile_json` (String) JSON value of credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required
 - `port` (String) Used port if not the default ports 80 or 443 are configured
 - `token` (String) Path to the file containing credentials to connect to ZITADEL

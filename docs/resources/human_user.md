@@ -15,19 +15,20 @@ Resource representing a human user situated under an organization, which then ca
 
 ```terraform
 resource "zitadel_human_user" "default" {
-  org_id             = data.zitadel_org.default.id
-  user_name          = "humanfull@localhost.com"
-  first_name         = "firstname"
-  last_name          = "lastname"
-  nick_name          = "nickname"
-  display_name       = "displayname"
-  preferred_language = "de"
-  gender             = "GENDER_MALE"
-  phone              = "+41799999999"
-  is_phone_verified  = true
-  email              = "test@zitadel.com"
-  is_email_verified  = true
-  initial_password   = "Password1!"
+  org_id                       = data.zitadel_org.default.id
+  user_name                    = "humanfull@localhost.com"
+  first_name                   = "firstname"
+  last_name                    = "lastname"
+  nick_name                    = "nickname"
+  display_name                 = "displayname"
+  preferred_language           = "de"
+  gender                       = "GENDER_MALE"
+  phone                        = "+41799999999"
+  is_phone_verified            = true
+  email                        = "test@zitadel.com"
+  is_email_verified            = true
+  initial_password             = "Password1!"
+  initial_skip_password_change = true
 }
 ```
 
@@ -45,7 +46,9 @@ resource "zitadel_human_user" "default" {
 
 - `display_name` (String) Display name of the user
 - `gender` (String) Gender of the user, supported values: GENDER_UNSPECIFIED, GENDER_FEMALE, GENDER_MALE, GENDER_DIVERSE
+- `initial_hashed_password` (String, Sensitive) Initial hashed password for the user, not changeable after creation. Being able to pass an initial hashed password is useful in migration scenarios.
 - `initial_password` (String, Sensitive) Initially set password for the user, not changeable after creation
+- `initial_skip_password_change` (Boolean) Whether the user has to change the password on first login.
 - `is_email_verified` (Boolean) Is the email verified of the user, can only be true if password of the user is set
 - `is_phone_verified` (Boolean) Is the phone verified of the user
 - `nick_name` (String) Nick name of the user
