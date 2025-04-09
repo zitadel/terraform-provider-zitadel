@@ -1,27 +1,31 @@
 ExternalDomain: org-level-tests.default.127.0.0.1.sslip.io
 ExternalSecure: false
 
-TLS:
-  Enabled: false
+TLS.Enabled: false
 
 FirstInstance:
   MachineKeyPath: /keys/org-level-admin-sa.json
-  Org:
+  Org.Machine:
     Machine:
-      Machine:
-        Username: zitadel-admin-sa
-        Name: Admin
-      MachineKey:
-        Type: 1
+      Username: zitadel-admin-sa
+      Name: Admin
+    MachineKey.Type: 1
 
 Database:
-  Cockroach:
-    Host: db
+  postgres:
+    Host: 'db'
+    Port: 5432
+    Database: zitadel
+    User:
+      Username: zitadel
+      Password: zitadel
+      SSL.Mode: 'disable'
+    Admin:
+      Username: root
+      Password: postgres
+      SSL.Mode: 'disable'
 
-Logstore:
-  Access:
-    Stdout:
-      Enabled: true
+Logstore.Access.Stdout.Enabled: true
 
 SystemAPIUsers:
   - system-api-sa:
