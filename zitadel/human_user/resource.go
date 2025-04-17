@@ -127,7 +127,7 @@ func GetResource() *schema.Resource {
 				Description:      "Whether the user has to change the password on first login.",
 			},
 		},
-		ReadContext:   read,
+		ReadContext:   readFunc(false),
 		CreateContext: create,
 		DeleteContext: delete,
 		UpdateContext: update,
