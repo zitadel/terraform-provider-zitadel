@@ -49,20 +49,27 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	firstName := d.Get(firstNameVar).(string)
 	lastName := d.Get(lastNameVar).(string)
-	addUser := &management.AddHumanUserRequest{
+	importUser := &management.ImportHumanUserRequest{
 		UserName: d.Get(UserNameVar).(string),
-		Profile: &management.AddHumanUserRequest_Profile{
+		Profile: &management.ImportHumanUserRequest_Profile{
 			FirstName:         firstName,
 			LastName:          lastName,
 			Gender:            user.Gender(user.Gender_value[d.Get(genderVar).(string)]),
 			PreferredLanguage: d.Get(preferredLanguageVar).(string),
 			NickName:          d.Get(nickNameVar).(string),
 		},
-		InitialPassword: d.Get(InitialPasswordVar).(string),
+		Password:               d.Get(InitialPasswordVar).(string),
+		PasswordChangeRequired: !d.Get(initialSkipPasswordChange).(bool),
+	}
+
+	if hashedPassword, ok := d.GetOk(initialHashedPasswordVar); ok {
+		importUser.HashedPassword = &management.ImportHumanUserRequest_HashedPassword{
+			Value: hashedPassword.(string),
+		}
 	}
 
 	if displayname, ok := d.GetOk(DisplayNameVar); ok {
-		addUser.Profile.DisplayName = displayname.(string)
+		importUser.Profile.DisplayName = displayname.(string)
 	} else {
 		if err := d.Set(DisplayNameVar, defaultDisplayName(firstName, lastName)); err != nil {
 			return diag.Errorf("failed to set default display name for human user: %v", err)
@@ -71,34 +78,34 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	if email, ok := d.GetOk(emailVar); ok {
 		isVerified, isVerifiedOk := d.GetOk(isEmailVerifiedVar)
-		addUser.Email = &management.AddHumanUserRequest_Email{
+		importUser.Email = &management.ImportHumanUserRequest_Email{
 			Email:           email.(string),
 			IsEmailVerified: false,
 		}
 		if isVerifiedOk {
-			addUser.Email.IsEmailVerified = isVerified.(bool)
+			importUser.Email.IsEmailVerified = isVerified.(bool)
 		}
 	}
 
 	if phone, ok := d.GetOk(phoneVar); ok {
 		isVerified, isVerifiedOk := d.GetOk(isPhoneVerifiedVar)
-		addUser.Phone = &management.AddHumanUserRequest_Phone{
+		importUser.Phone = &management.ImportHumanUserRequest_Phone{
 			Phone:           phone.(string),
 			IsPhoneVerified: false,
 		}
 		if isVerifiedOk {
-			addUser.Phone.IsPhoneVerified = isVerified.(bool)
+			importUser.Phone.IsPhoneVerified = isVerified.(bool)
 		}
 	}
 
-	respUser, err := client.AddHumanUser(helper.CtxWithOrgID(ctx, d), addUser)
+	respUser, err := client.ImportHumanUser(helper.CtxWithOrgID(ctx, d), importUser)
 	if err != nil {
 		return diag.Errorf("failed to create human user: %v", err)
 	}
 	d.SetId(respUser.UserId)
 	// To avoid diffs for terraform plan -refresh=false right after creation, we query and set the computed values.
 	// The acceptance tests rely on this, too.
-	return read(ctx, d, m)
+	return readFunc(false)(ctx, d, m)
 }
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -163,64 +170,71 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	return nil
 }
 
-func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started read")
+func readFunc(forDatasource bool) func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	return func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+		tflog.Info(ctx, "started read")
 
-	clientinfo, ok := m.(*helper.ClientInfo)
-	if !ok {
-		return diag.Errorf("failed to get client")
-	}
+		clientinfo, ok := m.(*helper.ClientInfo)
+		if !ok {
+			return diag.Errorf("failed to get client")
+		}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
-	if err != nil {
-		return diag.FromErr(err)
-	}
+		client, err := helper.GetManagementClient(ctx, clientinfo)
+		if err != nil {
+			return diag.FromErr(err)
+		}
 
-	respUser, err := client.GetUserByID(helper.CtxWithOrgID(ctx, d), &management.GetUserByIDRequest{Id: helper.GetID(d, UserIDVar)})
-	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
-		d.SetId("")
-		return nil
-	}
-	if err != nil {
-		return diag.Errorf("failed to get user")
-	}
+		respUser, err := client.GetUserByID(helper.CtxWithOrgID(ctx, d), &management.GetUserByIDRequest{Id: helper.GetID(d, UserIDVar)})
+		if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+			d.SetId("")
+			return nil
+		}
+		if err != nil {
+			return diag.Errorf("failed to get user")
+		}
 
-	user := respUser.GetUser()
-	set := map[string]interface{}{
-		helper.OrgIDVar:       user.GetDetails().GetResourceOwner(),
-		userStateVar:          user.GetState().String(),
-		UserNameVar:           user.GetUserName(),
-		loginNamesVar:         user.GetLoginNames(),
-		preferredLoginNameVar: user.GetPreferredLoginName(),
-	}
+		user := respUser.GetUser()
+		set := map[string]interface{}{
+			helper.OrgIDVar:       user.GetDetails().GetResourceOwner(),
+			userStateVar:          user.GetState().String(),
+			UserNameVar:           user.GetUserName(),
+			loginNamesVar:         user.GetLoginNames(),
+			preferredLoginNameVar: user.GetPreferredLoginName(),
+		}
+		if !forDatasource {
+			// This will be ignored using the CustomizeDiff function.
+			// However, we should explicitly set it to true or false so that importing a user doesn't produce an immediate plan diff.
+			set[initialSkipPasswordChange] = false
+		}
 
-	if human := user.GetHuman(); human != nil {
-		if profile := human.GetProfile(); profile != nil {
-			set[firstNameVar] = profile.GetFirstName()
-			set[lastNameVar] = profile.GetLastName()
-			set[DisplayNameVar] = profile.GetDisplayName()
-			set[nickNameVar] = profile.GetNickName()
-			set[preferredLanguageVar] = profile.GetPreferredLanguage()
-			if gender := profile.GetGender().String(); gender != "" {
-				set[genderVar] = gender
+		if human := user.GetHuman(); human != nil {
+			if profile := human.GetProfile(); profile != nil {
+				set[firstNameVar] = profile.GetFirstName()
+				set[lastNameVar] = profile.GetLastName()
+				set[DisplayNameVar] = profile.GetDisplayName()
+				set[nickNameVar] = profile.GetNickName()
+				set[preferredLanguageVar] = profile.GetPreferredLanguage()
+				if gender := profile.GetGender().String(); gender != "" {
+					set[genderVar] = gender
+				}
+			}
+			if email := human.GetEmail(); email != nil {
+				set[emailVar] = email.GetEmail()
+				set[isEmailVerifiedVar] = email.GetIsEmailVerified()
+			}
+			if phone := human.GetPhone(); phone != nil {
+				set[phoneVar] = phone.GetPhone()
+				set[isPhoneVerifiedVar] = phone.GetIsPhoneVerified()
 			}
 		}
-		if email := human.GetEmail(); email != nil {
-			set[emailVar] = email.GetEmail()
-			set[isEmailVerifiedVar] = email.GetIsEmailVerified()
+		for k, v := range set {
+			if err := d.Set(k, v); err != nil {
+				return diag.Errorf("failed to set %s of user: %v", k, err)
+			}
 		}
-		if phone := human.GetPhone(); phone != nil {
-			set[phoneVar] = phone.GetPhone()
-			set[isPhoneVerifiedVar] = phone.GetIsPhoneVerified()
-		}
+		d.SetId(user.GetId())
+		return nil
 	}
-	for k, v := range set {
-		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of user: %v", k, err)
-		}
-	}
-	d.SetId(user.GetId())
-	return nil
 }
 
 func defaultDisplayName(firstName, lastName string) string {
