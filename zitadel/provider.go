@@ -27,6 +27,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_login_texts"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_notification_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_oidc_settings"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_password_age_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_password_reset_message_text"
@@ -74,6 +75,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_saml"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_metadata"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_age_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_complexity_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_reset_message_text"
@@ -317,6 +319,7 @@ func Provider() *schema.Provider {
 			"zitadel_label_policy":                       label_policy.GetResource(),
 			"zitadel_lockout_policy":                     lockout_policy.GetResource(),
 			"zitadel_login_policy":                       login_policy.GetResource(),
+			"zitadel_password_age_policy":                password_age_policy.GetResource(),
 			"zitadel_password_complexity_policy":         password_complexity_policy.GetResource(),
 			"zitadel_privacy_policy":                     privacy_policy.GetResource(),
 			"zitadel_trigger_actions":                    trigger_actions.GetResource(),
@@ -327,6 +330,7 @@ func Provider() *schema.Provider {
 			"zitadel_default_lockout_policy":             default_lockout_policy.GetResource(),
 			"zitadel_default_domain_policy":              default_domain_policy.GetResource(),
 			"zitadel_default_privacy_policy":             default_privacy_policy.GetResource(),
+			"zitadel_default_password_age_policy":        default_password_age_policy.GetResource(),
 			"zitadel_default_password_complexity_policy": default_password_complexity_policy.GetResource(),
 			"zitadel_sms_provider_twilio":                sms_provider_twilio.GetResource(),
 			"zitadel_smtp_config":                        smtp_config.GetResource(),
