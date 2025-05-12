@@ -26,6 +26,6 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithIDAndOptionalSecret(IDVar, DescriptionVar),
+		Importer:      helper.ImportWithID(IDVar),
 	}
 }

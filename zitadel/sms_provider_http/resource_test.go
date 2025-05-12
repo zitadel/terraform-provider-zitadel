@@ -22,7 +22,7 @@ func TestAccSMSHttpProvider(t *testing.T) {
 		frame.BaseTestFrame,
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
-		exampleProperty, "https://new",
+		exampleProperty, "https://relay.example.com/test",
 		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
@@ -42,7 +42,7 @@ func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resour
 			if err != nil {
 				return fmt.Errorf("getting sms provider failed: %w", err)
 			}
-			actual := resp.GetConfig().GetTwilio().GetSenderNumber()
+			actual := resp.GetConfig().GetHttp().GetEndpoint()
 			if actual != expect {
 				return fmt.Errorf("expected %s, but got %s", expect, actual)
 			}
