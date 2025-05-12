@@ -30,7 +30,6 @@ func TestAccSMSHttpProvider(t *testing.T) {
 		test_utils.CheckNothing,
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, sms_provider_http.DescriptionVar),
 		),
 	)
 }
