@@ -49,14 +49,15 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Description: d.Get(DescriptionVar).(string),
 	})
 	if err != nil {
-		return diag.Errorf("failed to create sms provider twilio: %v", err)
+		return diag.Errorf("failed to create sms provider http: %v", err)
 	}
 	d.SetId(resp.Id)
 
-	if _, err := client.ActivateSMSProvider(ctx, &admin.ActivateSMSProviderRequest{Id: d.Id()}); err != nil {
-		return diag.Errorf("failed to activate sms http provider config: %v", err)
+	if d.Get(setActiveVar).(bool) {
+		if _, err := client.ActivateSMSProvider(ctx, &admin.ActivateSMSProviderRequest{Id: d.Id()}); err != nil {
+			return diag.Errorf("failed to activate sms http provider config: %v", err)
+		}
 	}
-
 	return nil
 }
 
@@ -80,10 +81,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			Description: d.Get(DescriptionVar).(string),
 		})
 		if err != nil {
-			return diag.Errorf("failed to update sms provider twilio: %v", err)
+			return diag.Errorf("failed to update sms provider http: %v", err)
 		}
 	}
 
+	if d.HasChange(setActiveVar) && d.Get(setActiveVar).(bool) {
+		if _, err = client.ActivateSMSProvider(ctx, &admin.ActivateSMSProviderRequest{Id: d.Id()}); err != nil {
+			return diag.Errorf("failed to activate sms provider http: %v", err)
+		}
+	}
 	return nil
 }
 
@@ -114,6 +120,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		EndPointVar:    resp.GetConfig().GetHttp().GetEndpoint(),
 		DescriptionVar: resp.GetConfig().GetDescription(),
+		setActiveVar:   d.Get(setActiveVar).(bool),
 	}
 
 	for k, v := range set {

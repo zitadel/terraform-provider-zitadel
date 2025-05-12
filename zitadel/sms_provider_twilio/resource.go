@@ -26,6 +26,11 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "Sender number which is used to send the SMS.",
 			},
+			setActiveVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Set the SMS provider as active after creating/updating.",
+			},
 		},
 		CreateContext: create,
 		DeleteContext: delete,

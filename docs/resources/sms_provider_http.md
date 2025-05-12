@@ -2,20 +2,20 @@
 page_title: "zitadel_sms_provider_http Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing the SMS HTTP provider configuration of an instance.
-  The provider is active by default.
+  Resource representing the HTTP SMS provider configuration of an instance.
 ---
 
 # zitadel_sms_provider_http (Resource)
 
-Resource representing the SMS HTTP provider configuration of an instance.
+Resource representing the HTTP SMS provider configuration of an instance.
 
 ## Example Usage
 
 ```terraform
 resource "zitadel_sms_provider_http" "default" {
-  endpoint           = "https://relay.example.com/provider"
-  description         = "provider description"
+  endpoint    = "https://relay.example.com/provider"
+  description = "provider description"
+  set_active  = true
 }
 ```
 
@@ -24,11 +24,12 @@ resource "zitadel_sms_provider_http" "default" {
 
 ### Required
 
-- `endpoint` (String) URL of the HTTP provider.
+- `endpoint` (String) Http endpoint which is used to send the SMS.
 
 ### Optional
-- `description` (String) Provider description.
 
+- `description` (String) Description of the SMS provider.
+- `set_active` (Boolean) Set the SMS provider as active after creating/updating.
 
 ### Read-Only
 
@@ -37,6 +38,6 @@ resource "zitadel_sms_provider_http" "default" {
 ## Import
 
 ```bash
-# The resource can be imported using the ID format `<id[:token]>`, e.g.
-terraform import zitadel_sms_provider_http.imported '123456789012345678:12345678901234567890123456abcdef'
+# The resource can be imported using the ID format `<id>`, e.g.
+terraform import zitadel_sms_provider_http.imported '123456789012345678'
 ```

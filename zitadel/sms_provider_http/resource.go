@@ -17,9 +17,13 @@ func GetResource() *schema.Resource {
 			},
 			DescriptionVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Description of the SMS provider.",
-				Sensitive:   true,
+			},
+			setActiveVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Set the SMS provider as active after creating/updating.",
 			},
 		},
 		CreateContext: create,

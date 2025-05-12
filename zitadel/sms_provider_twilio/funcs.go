@@ -54,6 +54,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	d.SetId(resp.Id)
 
+	if d.Get(setActiveVar).(bool) {
+		if _, err := client.ActivateSMSProvider(ctx, &admin.ActivateSMSProviderRequest{Id: d.Id()}); err != nil {
+			return diag.Errorf("failed to activate sms twilio provider config: %v", err)
+		}
+	}
+
 	return nil
 }
 
@@ -91,6 +97,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
+	if d.HasChange(setActiveVar) && d.Get(setActiveVar).(bool) {
+		if _, err = client.ActivateSMSProvider(ctx, &admin.ActivateSMSProviderRequest{Id: d.Id()}); err != nil {
+			return diag.Errorf("failed to activate sms provider twilio: %v", err)
+		}
+	}
 	return nil
 }
 
@@ -121,6 +132,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		sidVar:          resp.GetConfig().GetTwilio().GetSid(),
 		SenderNumberVar: resp.GetConfig().GetTwilio().GetSenderNumber(),
+		setActiveVar:    d.Get(setActiveVar).(bool),
 	}
 	if token, ok := d.GetOk(TokenVar); ok {
 		set[TokenVar] = token
