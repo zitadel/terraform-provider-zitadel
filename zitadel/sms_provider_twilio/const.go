@@ -5,4 +5,5 @@ const (
 	sidVar          = "sid"
 	TokenVar        = "token"
 	SenderNumberVar = "sender_number"
+	setActiveVar    = "set_active"
 )

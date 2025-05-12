@@ -16,6 +16,7 @@ resource "zitadel_sms_provider_twilio" "default" {
   sid           = "sid"
   sender_number = "019920892"
   token         = "twilio_token"
+  set_active    = true
 }
 ```
 
@@ -27,6 +28,10 @@ resource "zitadel_sms_provider_twilio" "default" {
 - `sender_number` (String) Sender number which is used to send the SMS.
 - `sid` (String) SID used to communicate with Twilio.
 - `token` (String, Sensitive) Token used to communicate with Twilio.
+
+### Optional
+
+- `set_active` (Boolean) Set the SMS provider as active after creating/updating.
 
 ### Read-Only
 

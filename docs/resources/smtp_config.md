@@ -54,7 +54,7 @@ resource "zitadel_smtp_config" "default" {
 
 - `password` (String, Sensitive) Password used to communicate with your SMTP server.
 - `reply_to_address` (String) Address to reply to.
-- `set_active` (Boolean) Set the SMTP configuration active after creating/updating
+- `set_active` (Boolean) Set the SMTP configuration active after creating/updating.
 - `tls` (Boolean) TLS used to communicate with your SMTP server.
 - `user` (String) User used to communicate with your SMTP server.
 
