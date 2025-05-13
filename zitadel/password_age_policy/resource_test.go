@@ -2,11 +2,11 @@ package password_age_policy_test
 
 import (
 	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/zclconf/go-cty/cty/gocty"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -16,17 +16,21 @@ import (
 func TestPasswordAgePolicy(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_password_age_policy")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
-	exampleProperty, err := strconv.ParseUint(test_utils.AttributeValue(t, "max_age_days", exampleAttributes).AsString(), 10, 64)
-	if err != nil {
-		t.Fatalf("could not parse example property: %v", err)
+	ctyVal := test_utils.AttributeValue(t, "max_age_days", exampleAttributes)
+
+	var maxAgeDays uint64
+
+	if err := gocty.FromCtyValue(ctyVal, &maxAgeDays); err != nil {
+		t.Fatalf("could not parse max_age_days: %s", err)
 	}
+
 	updatedProperty := uint64(15)
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		[]string{frame.AsOrgDefaultDependency},
-		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
-		exampleProperty, updatedProperty,
+		test_utils.ReplaceAll(resourceExample, maxAgeDays, ""),
+		maxAgeDays, updatedProperty,
 		"", "", "",
 		false,
 		checkRemoteProperty(*frame),
