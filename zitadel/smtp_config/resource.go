@@ -49,7 +49,7 @@ func GetResource() *schema.Resource {
 			SetActiveVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Set the SMTP configuration active after creating/updating",
+				Description: "Set the SMTP configuration active after creating/updating.",
 			},
 		},
 		CreateContext: create,

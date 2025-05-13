@@ -85,6 +85,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_grant_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_role"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/sms_provider_http"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/sms_provider_twilio"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/smtp_config"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/trigger_actions"
@@ -329,6 +330,7 @@ func Provider() *schema.Provider {
 			"zitadel_default_privacy_policy":             default_privacy_policy.GetResource(),
 			"zitadel_default_password_complexity_policy": default_password_complexity_policy.GetResource(),
 			"zitadel_sms_provider_twilio":                sms_provider_twilio.GetResource(),
+			"zitadel_sms_provider_http":                  sms_provider_http.GetResource(),
 			"zitadel_smtp_config":                        smtp_config.GetResource(),
 			"zitadel_default_notification_policy":        default_notification_policy.GetResource(),
 			"zitadel_notification_policy":                notification_policy.GetResource(),

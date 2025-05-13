@@ -1,4 +1,4 @@
-package sms_provider_twilio
+package sms_provider_http
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -8,23 +8,17 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing the SMS provider Twilio configuration of an instance.",
+		Description: "Resource representing the HTTP SMS provider configuration of an instance.",
 		Schema: map[string]*schema.Schema{
-			sidVar: {
+			EndPointVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "SID used to communicate with Twilio.",
+				Description: "Http endpoint which is used to send the SMS.",
 			},
-			TokenVar: {
+			DescriptionVar: {
 				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Token used to communicate with Twilio.",
-				Sensitive:   true,
-			},
-			SenderNumberVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Sender number which is used to send the SMS.",
+				Optional:    true,
+				Description: "Description of the SMS provider.",
 			},
 			setActiveVar: {
 				Type:        schema.TypeBool,
@@ -36,6 +30,6 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithIDAndOptionalSecret(providerIDVar, TokenVar),
+		Importer:      helper.ImportWithID(IDVar),
 	}
 }
