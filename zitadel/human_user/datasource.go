@@ -94,6 +94,6 @@ func GetDatasource() *schema.Resource {
 				Description: "Is the phone verified of the user",
 			},
 		},
-		ReadContext: read,
+		ReadContext: readFunc(true),
 	}
 }

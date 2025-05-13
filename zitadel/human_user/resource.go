@@ -108,10 +108,26 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Initially set password for the user, not changeable after creation",
 				Sensitive:   true,
-				ForceNew:    true,
+				// We ignore if the value changes after creation or import
+				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
+			},
+			initialHashedPasswordVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Initial hashed password for the user, not changeable after creation. Being able to pass an initial hashed password is useful in migration scenarios.",
+				// We ignore if the value changes after creation or import
+				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
+				Sensitive:        true,
+			},
+			initialSkipPasswordChange: {
+				Type:     schema.TypeBool,
+				Optional: true,
+				// We ignore if the value changes after creation or import
+				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
+				Description:      "Whether the user has to change the password on first login.",
 			},
 		},
-		ReadContext:   read,
+		ReadContext:   readFunc(false),
 		CreateContext: create,
 		DeleteContext: delete,
 		UpdateContext: update,
