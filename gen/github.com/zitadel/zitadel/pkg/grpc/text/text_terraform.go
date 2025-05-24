@@ -27,11 +27,13 @@ import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/gogo/protobuf/proto"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
-	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
-	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
-	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
-	github_com_hashicorp_terraform_plugin_go_tftypes "github.com/hashicorp/terraform-plugin-go/tftypes"
+	 "github.com/hashicorp/terraform-plugin-framework/attr"
+	 "github.com/hashicorp/terraform-plugin-framework/diag"
+	//github_com_hashicorp_terraform_plugin_framework_provider "github.com/hashicorp/terraform-plugin-framework/provider"
+	 "github.com/hashicorp/terraform-plugin-framework/types"
+	 github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	 //"github.com/hashicorp/terraform-plugin-go/tftypes"
+"github.com/hashicorp/terraform-plugin-framework/provider/schema"	
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -39,12253 +41,2190 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// GenSchemaLoginCustomText returns tfsdk.Schema definition for LoginCustomText
-func GenSchemaLoginCustomText(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-		"email_verification_done_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"cancel_button_text": {
+// GenSchemaLoginCustomText returns schema.Schema definition for LoginCustomText
+func GenSchemaLoginCustomText(ctx context.Context) (schema.Schema, diag.Diagnostics) {
+	return schema.Schema{Attributes: map[string]schema.Attribute{
+		"email_verification_done_text": schema.SingleNestedAttribute{
+			Attributes: map[string]schema.Attribute{
+				"cancel_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"description": {
+				"description": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"login_button_text": {
+				"login_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"next_button_text": {
+				"next_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"title": {
+				"title": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}),
+			},
 			Description: "",
 			Optional:    true,
 		},
-		"email_verification_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"code_label": {
+		"email_verification_text": schema.SingleNestedAttribute{
+			Attributes: map[string]schema.Attribute{
+				"code_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"description": {
+				"description": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"next_button_text": {
+				"next_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"resend_button_text": {
+				"resend_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"title": {
+				"title": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}),
+			},
 			Description: "",
 			Optional:    true,
 		},
-		"external_registration_user_overview_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"back_button_text": {
+		"external_registration_user_overview_text": schema.SingleNestedAttribute{
+			Attributes: map[string]schema.Attribute{
+				"back_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"description": {
+				"description": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"email_label": {
+				"email_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"firstname_label": {
+				"firstname_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"language_label": {
+				"language_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"lastname_label": {
+				"lastname_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"next_button_text": {
+				"next_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"nickname_label": {
+				"nickname_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"phone_label": {
+				"phone_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"privacy_confirm": {
+				"privacy_confirm": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"privacy_link_text": {
+				"privacy_link_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"title": {
+				"title": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"tos_and_privacy_label": {
+				"tos_and_privacy_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"tos_confirm": {
+				"tos_confirm": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"tos_link_text": {
+				"tos_link_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"username_label": {
+				"username_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}),
+			},
 			Description: "",
 			Optional:    true,
 		},
-		"external_user_not_found_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"auto_register_button_text": {
+		"external_user_not_found_text": schema.SingleNestedAttribute{
+			Attributes: map[string]schema.Attribute{
+				"auto_register_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"description": {
+				"description": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"link_button_text": {
+				"link_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"privacy_confirm": {
+				"privacy_confirm": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"privacy_link_text": {
+				"privacy_link_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"title": {
+				"title": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"tos_and_privacy_label": {
+				"tos_and_privacy_label": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"tos_confirm": {
+				"tos_confirm": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"tos_link_text": {
+				"tos_link_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}),
+			},
 			Description: "",
 			Optional:    true,
 		},
-		"footer_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"help": {
+		"footer_text": schema.SingleNestedAttribute{
+			Attributes: map[string]schema.Attribute{
+				"help": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"privacy_policy": {
+				"privacy_policy": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"support_email": {
+				"support_email": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"tos": {
+				"tos": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}),
+			},
 			Description: "",
 			Optional:    true,
 		},
-		"id": {
+		"id": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed: true,
-			Optional: false,
-			Required: false,
-			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"init_mfa_done_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"cancel_button_text": {
+		"init_mfa_done_text": schema.SingleNestedAttribute{
+			Attributes: map[string]schema.Attribute{
+				"cancel_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"description": {
+				"description": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"next_button_text": {
+				"next_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"title": {
+				"title": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}),
+			},
 			Description: "",
 			Optional:    true,
 		},
-		"init_mfa_otp_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"cancel_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"code_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description_otp": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"secret_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"init_mfa_otp_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"cancel_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"code_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description_otp": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"secret_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"init_mfa_prompt_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"otp_option": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"skip_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"u2f_option": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"init_mfa_prompt_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"otp_option": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"skip_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"u2f_option": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"init_mfa_u2f_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"error_retry": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"not_supported": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"register_token_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"token_name_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"init_mfa_u2f_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"error_retry": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"not_supported": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"register_token_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"token_name_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"init_password_done_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"cancel_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"init_password_done_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"cancel_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"init_password_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"code_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"new_password_confirm_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"new_password_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"resend_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"init_password_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"code_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"new_password_confirm_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"new_password_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"resend_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"initialize_done_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"cancel_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"initialize_done_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"cancel_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"initialize_user_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"code_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"new_password_confirm_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"new_password_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"resend_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"initialize_user_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"code_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"new_password_confirm_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"new_password_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"resend_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"language": {
-			Computed: false,
-			Optional: false,
+		"language": schema.StringAttribute{
 			Required: true,
-			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"linking_user_done_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"cancel_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"linking_user_done_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"cancel_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"linking_user_prompt_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"link_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"other_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"linking_user_prompt_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"link_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"other_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"login_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description_linking_process": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"external_user_description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"login_name_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"login_name_placeholder": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"register_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title_linking_process": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"user_must_be_member_of_org": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"user_name_placeholder": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"login_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description_linking_process": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"external_user_description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"login_name_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"login_name_placeholder": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"register_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title_linking_process": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"user_must_be_member_of_org": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"user_name_placeholder": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"logout_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"login_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"logout_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"login_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"mfa_providers_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"choose_other": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"otp": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"u2f": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"mfa_providers_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"choose_other": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"otp": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"u2f": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"org_id": {
-			Computed: false,
-			Optional: false,
+		"org_id": schema.StringAttribute{
 			Required: true,
-			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"password_change_done_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"password_change_done_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"password_change_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"cancel_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"expired_description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"new_password_confirm_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"new_password_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"old_password_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"password_change_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"cancel_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"expired_description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"new_password_confirm_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"new_password_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"old_password_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"password_reset_done_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"password_reset_done_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"password_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"back_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"confirmation": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"has_lowercase": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"has_number": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"has_symbol": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"has_uppercase": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"min_length": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"password_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"reset_link_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"password_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"back_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"confirmation": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"has_lowercase": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"has_number": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"has_symbol": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"has_uppercase": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"min_length": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"password_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"reset_link_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"passwordless_prompt_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description_init": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"passwordless_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"skip_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"passwordless_prompt_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description_init": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"passwordless_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"skip_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"passwordless_registration_done_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"cancel_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description_close": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"passwordless_registration_done_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"cancel_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description_close": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"passwordless_registration_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"error_retry": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"not_supported": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"register_token_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"token_name_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"passwordless_registration_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"error_retry": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"not_supported": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"register_token_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"token_name_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"passwordless_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"error_retry": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"login_with_pw_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"not_supported": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"validate_token_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"passwordless_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"error_retry": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"login_with_pw_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"not_supported": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"validate_token_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"registration_option_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"external_login_description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"login_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"user_name_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"registration_option_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"external_login_description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"login_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"user_name_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"registration_org_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"email_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"firstname_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"lastname_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"orgname_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"password_confirm_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"password_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"privacy_confirm": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"privacy_link_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"save_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_and_privacy_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_confirm": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_link_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"username_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"registration_org_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"email_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"firstname_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"lastname_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"orgname_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"password_confirm_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"password_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"privacy_confirm": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"privacy_link_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"save_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"tos_and_privacy_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"tos_confirm": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"tos_link_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"username_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"registration_user_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"back_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description_org_register": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"email_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"firstname_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"gender_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"language_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"lastname_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"password_confirm_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"password_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"privacy_confirm": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"privacy_link_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_and_privacy_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_confirm": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"tos_link_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"username_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"registration_user_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"back_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description_org_register": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"email_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"firstname_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"gender_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"language_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"lastname_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"password_confirm_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"password_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"privacy_confirm": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"privacy_link_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"tos_and_privacy_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"tos_confirm": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"tos_link_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"username_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"select_account_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description_linking_process": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"other_user": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"session_state_active": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"session_state_inactive": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title_linking_process": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"user_must_be_member_of_org": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"select_account_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description_linking_process": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"other_user": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"session_state_active": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"session_state_inactive": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title_linking_process": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"user_must_be_member_of_org": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"success_login_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"auto_redirect_description": {
+		"success_login_text": schema.SingleNestedAttribute{
+			Description: "",
+			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"auto_redirect_description": schema.StringAttribute{
 					Description: "Text to describe that auto-redirect should happen after successful login",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"next_button_text": {
+				"next_button_text": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"redirected_description": {
+				"redirected_description": schema.StringAttribute{
 					Description: "Text to describe that the window can be closed after redirect",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"title": {
+				"title": schema.StringAttribute{
 					Description: "",
 					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}),
-			Description: "",
-			Optional:    true,
+			},
 		},
-		"username_change_done_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"username_change_done_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"username_change_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"cancel_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"username_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"username_change_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"cancel_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"username_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"verify_mfa_otp_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"code_label": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"next_button_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"verify_mfa_otp_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"code_label": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"next_button_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
-		"verify_mfa_u2f_text": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"description": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"error_retry": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"not_supported": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"title": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-				"validate_token_text": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				},
-			}),
+		"verify_mfa_u2f_text": schema.SingleNestedAttribute{
 			Description: "",
 			Optional:    true,
+			Attributes: map[string]schema.Attribute{
+				"description": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"error_retry": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"not_supported": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"title": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+				"validate_token_text": schema.StringAttribute{
+					Description: "",
+					Optional:    true,
+				},
+			},
 		},
 	}}, nil
 }
 
-// GenSchemaMessageCustomText returns tfsdk.Schema definition for MessageCustomText
-func GenSchemaMessageCustomText(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-		"button_text": {
+// GenSchemaMessageCustomText returns schema.Schema definition for MessageCustomText
+func GenSchemaMessageCustomText(ctx context.Context) (schema.Schema, diag.Diagnostics) {
+	return schema.Schema{Attributes: map[string]schema.Attribute{
+		"button_text": schema.StringAttribute{
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"footer_text": {
+		"footer_text": schema.StringAttribute{
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"greeting": {
+		"greeting": schema.StringAttribute{
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"id": {
+		"id": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed: true,
-			Optional: false,
-			Required: false,
-			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"language": {
-			Computed: false,
-			Optional: false,
+		"language": schema.StringAttribute{
 			Required: true,
-			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"org_id": {
-			Computed: false,
-			Optional: false,
+		"org_id": schema.StringAttribute{
 			Required: true,
-			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"pre_header": {
+		"pre_header": schema.StringAttribute{
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"subject": {
+		"subject": schema.StringAttribute{
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"text": {
+		"text": schema.StringAttribute{
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"title": {
+		"title": schema.StringAttribute{
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 	}}, nil
 }
 
-// CopyLoginCustomTextFromTerraform copies contents of the source Terraform object into a target struct
-func CopyLoginCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *textpb.LoginCustomText) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
-	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
+
+// readStringAttribute is a helper to read a string attribute from a types.Object and assign it to a target string pointer.
+func readStringAttribute(diags diag.Diagnostics, obj types.Object, basePath, attrName string, target *string) diag.Diagnostics {
+	attrs := obj.Attributes()
+	a, ok := attrs[attrName]
+	if !ok {
+		diags.Append(attrReadMissingDiag{Path: fmt.Sprintf("%s.%s", basePath, attrName)})
+		return diags
+	}
+	v, ok := a.(types.String)
+	if !ok {
+		diags.Append(attrReadConversionFailureDiag{
+			Path: fmt.Sprintf("%s.%s", basePath, attrName),
+			Type: "github.com/hashicorp/terraform-plugin-framework/types.String",
+		})
+		return diags
+	}
+	if !v.IsNull() && !v.IsUnknown() {
+		*target = v.ValueString()
+	} else {
+		*target = ""
+	}
+	return diags
+}
+
+// CopyLoginCustomTextFromTerraform copies contents of the source Terraform object into a target struct.
+func CopyLoginCustomTextFromTerraform(_ context.Context, tf types.Object, obj *textpb.LoginCustomText) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Process email_verification_done_text
 	{
-		a, ok := tf.Attrs["email_verification_done_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["email_verification_done_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_done_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_done_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.email_verification_done_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.EmailVerificationDoneText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.EmailVerificationDoneText = &textpb.EmailVerificationDoneScreenText{}
-					obj := obj.EmailVerificationDoneText
-					{
-						a, ok := tf.Attrs["cancel_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_done_text.cancel_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CancelButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_done_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["login_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_done_text.login_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_done_text.login_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LoginButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_done_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_done_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_done_text", "cancel_button_text", &obj.EmailVerificationDoneText.CancelButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_done_text", "description", &obj.EmailVerificationDoneText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_done_text", "login_button_text", &obj.EmailVerificationDoneText.LoginButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_done_text", "next_button_text", &obj.EmailVerificationDoneText.NextButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_done_text", "title", &obj.EmailVerificationDoneText.Title)
 				}
 			}
 		}
 	}
+
+	// Process email_verification_text
 	{
-		a, ok := tf.Attrs["email_verification_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["email_verification_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.email_verification_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.EmailVerificationText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.EmailVerificationText = &textpb.EmailVerificationScreenText{}
-					obj := obj.EmailVerificationText
-					{
-						a, ok := tf.Attrs["code_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_text.code_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CodeLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["resend_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_text.resend_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_text.resend_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ResendButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.email_verification_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.email_verification_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_text", "code_label", &obj.EmailVerificationText.CodeLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_text", "description", &obj.EmailVerificationText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_text", "next_button_text", &obj.EmailVerificationText.NextButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_text", "resend_button_text", &obj.EmailVerificationText.ResendButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.email_verification_text", "title", &obj.EmailVerificationText.Title)
 				}
 			}
 		}
 	}
+
+	// Process external_registration_user_overview_text
 	{
-		a, ok := tf.Attrs["external_registration_user_overview_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["external_registration_user_overview_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.external_registration_user_overview_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.ExternalRegistrationUserOverviewText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.ExternalRegistrationUserOverviewText = &textpb.ExternalRegistrationUserOverviewScreenText{}
-					obj := obj.ExternalRegistrationUserOverviewText
-					{
-						a, ok := tf.Attrs["back_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.back_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.back_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.BackButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["email_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.email_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.email_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.EmailLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["firstname_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.firstname_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.firstname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.FirstnameLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["language_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.language_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.language_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LanguageLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["lastname_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.lastname_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.lastname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LastnameLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["nickname_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.nickname_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.nickname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NicknameLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["phone_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.phone_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.phone_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PhoneLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["privacy_confirm"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.privacy_confirm"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PrivacyConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["privacy_link_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.privacy_link_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.privacy_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PrivacyLinkText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_and_privacy_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.tos_and_privacy_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.tos_and_privacy_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosAndPrivacyLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_confirm"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.tos_confirm"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.tos_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_link_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.tos_link_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.tos_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosLinkText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["username_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_registration_user_overview_text.username_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.username_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.UsernameLabel = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "back_button_text", &obj.ExternalRegistrationUserOverviewText.BackButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "description", &obj.ExternalRegistrationUserOverviewText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "email_label", &obj.ExternalRegistrationUserOverviewText.EmailLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "firstname_label", &obj.ExternalRegistrationUserOverviewText.FirstnameLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "language_label", &obj.ExternalRegistrationUserOverviewText.LanguageLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "lastname_label", &obj.ExternalRegistrationUserOverviewText.LastnameLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "next_button_text", &obj.ExternalRegistrationUserOverviewText.NextButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "nickname_label", &obj.ExternalRegistrationUserOverviewText.NicknameLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "phone_label", &obj.ExternalRegistrationUserOverviewText.PhoneLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "privacy_confirm", &obj.ExternalRegistrationUserOverviewText.PrivacyConfirm)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "privacy_link_text", &obj.ExternalRegistrationUserOverviewText.PrivacyLinkText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "title", &obj.ExternalRegistrationUserOverviewText.Title)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "tos_and_privacy_label", &obj.ExternalRegistrationUserOverviewText.TosAndPrivacyLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "tos_confirm", &obj.ExternalRegistrationUserOverviewText.TosConfirm)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "tos_link_text", &obj.ExternalRegistrationUserOverviewText.TosLinkText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_registration_user_overview_text", "username_label", &obj.ExternalRegistrationUserOverviewText.UsernameLabel)
 				}
 			}
 		}
 	}
+
+	// Process external_user_not_found_text
 	{
-		a, ok := tf.Attrs["external_user_not_found_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["external_user_not_found_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.external_user_not_found_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.ExternalUserNotFoundText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.ExternalUserNotFoundText = &textpb.ExternalUserNotFoundScreenText{}
-					obj := obj.ExternalUserNotFoundText
-					{
-						a, ok := tf.Attrs["auto_register_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.auto_register_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.auto_register_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.AutoRegisterButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["link_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.link_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.link_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LinkButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["privacy_confirm"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.privacy_confirm"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PrivacyConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["privacy_link_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.privacy_link_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.privacy_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PrivacyLinkText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_and_privacy_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.tos_and_privacy_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.tos_and_privacy_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosAndPrivacyLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_confirm"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.tos_confirm"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.tos_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_link_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.external_user_not_found_text.tos_link_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.external_user_not_found_text.tos_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosLinkText = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_user_not_found_text", "auto_register_button_text", &obj.ExternalUserNotFoundText.AutoRegisterButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_user_not_found_text", "description", &obj.ExternalUserNotFoundText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_user_not_found_text", "link_button_text", &obj.ExternalUserNotFoundText.LinkButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_user_not_found_text", "privacy_confirm", &obj.ExternalUserNotFoundText.PrivacyConfirm)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_user_not_found_text", "privacy_link_text", &obj.ExternalUserNotFoundText.PrivacyLinkText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_user_not_found_text", "title", &obj.ExternalUserNotFoundText.Title)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_user_not_found_text", "tos_and_privacy_label", &obj.ExternalUserNotFoundText.TosAndPrivacyLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_user_not_found_text", "tos_confirm", &obj.ExternalUserNotFoundText.TosConfirm)
+					diags = readStringAttribute(diags, v, "LoginCustomText.external_user_not_found_text", "tos_link_text", &obj.ExternalUserNotFoundText.TosLinkText)
 				}
 			}
 		}
 	}
+
+	// Process footer_text
 	{
-		a, ok := tf.Attrs["footer_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["footer_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.footer_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.footer_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.footer_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.FooterText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.FooterText = &textpb.FooterText{}
-					obj := obj.FooterText
-					{
-						a, ok := tf.Attrs["help"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.footer_text.help"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.footer_text.help", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Help = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["privacy_policy"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.footer_text.privacy_policy"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.footer_text.privacy_policy", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PrivacyPolicy = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["support_email"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.footer_text.support_email"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.footer_text.support_email", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.SupportEmail = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.footer_text.tos"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.footer_text.tos", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Tos = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.footer_text", "help", &obj.FooterText.Help)
+					diags = readStringAttribute(diags, v, "LoginCustomText.footer_text", "privacy_policy", &obj.FooterText.PrivacyPolicy)
+					diags = readStringAttribute(diags, v, "LoginCustomText.footer_text", "support_email", &obj.FooterText.SupportEmail)
+					diags = readStringAttribute(diags, v, "LoginCustomText.footer_text", "tos", &obj.FooterText.Tos)
 				}
 			}
 		}
 	}
+
+	// Process init_mfa_done_text
 	{
-		a, ok := tf.Attrs["init_mfa_done_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["init_mfa_done_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_done_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_done_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.init_mfa_done_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.InitMfaDoneText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.InitMfaDoneText = &textpb.InitMFADoneScreenText{}
-					obj := obj.InitMfaDoneText
-					{
-						a, ok := tf.Attrs["cancel_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_done_text.cancel_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CancelButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_done_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_done_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_done_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_done_text", "cancel_button_text", &obj.InitMfaDoneText.CancelButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_done_text", "description", &obj.InitMfaDoneText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_done_text", "next_button_text", &obj.InitMfaDoneText.NextButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_done_text", "title", &obj.InitMfaDoneText.Title)
 				}
 			}
 		}
 	}
+
+	// Process init_mfa_otp_text
 	{
-		a, ok := tf.Attrs["init_mfa_otp_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["init_mfa_otp_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_otp_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_otp_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.init_mfa_otp_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.InitMfaOtpText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.InitMfaOtpText = &textpb.InitMFAOTPScreenText{}
-					obj := obj.InitMfaOtpText
-					{
-						a, ok := tf.Attrs["cancel_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_otp_text.cancel_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CancelButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["code_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_otp_text.code_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CodeLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_otp_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description_otp"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_otp_text.description_otp"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.description_otp", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.DescriptionOtp = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_otp_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["secret_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_otp_text.secret_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.secret_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.SecretLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_otp_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_otp_text", "cancel_button_text", &obj.InitMfaOtpText.CancelButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_otp_text", "code_label", &obj.InitMfaOtpText.CodeLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_otp_text", "description", &obj.InitMfaOtpText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_otp_text", "description_otp", &obj.InitMfaOtpText.DescriptionOtp)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_otp_text", "next_button_text", &obj.InitMfaOtpText.NextButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_otp_text", "secret_label", &obj.InitMfaOtpText.SecretLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_otp_text", "title", &obj.InitMfaOtpText.Title)
 				}
 			}
 		}
 	}
+
+	// Process init_mfa_prompt_text
 	{
-		a, ok := tf.Attrs["init_mfa_prompt_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["init_mfa_prompt_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_prompt_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.init_mfa_prompt_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.InitMfaPromptText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.InitMfaPromptText = &textpb.InitMFAPromptScreenText{}
-					obj := obj.InitMfaPromptText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_prompt_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_prompt_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["otp_option"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_prompt_text.otp_option"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.otp_option", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.OtpOption = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["skip_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_prompt_text.skip_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.skip_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.SkipButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_prompt_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["u2f_option"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_prompt_text.u2f_option"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.u2f_option", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.U2FOption = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_prompt_text", "description", &obj.InitMfaPromptText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_prompt_text", "next_button_text", &obj.InitMfaPromptText.NextButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_prompt_text", "otp_option", &obj.InitMfaPromptText.OtpOption)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_prompt_text", "skip_button_text", &obj.InitMfaPromptText.SkipButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_prompt_text", "title", &obj.InitMfaPromptText.Title)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_prompt_text", "u2f_option", &obj.InitMfaPromptText.U2FOption)
 				}
 			}
 		}
 	}
+
+	// Process init_mfa_u2f_text
 	{
-		a, ok := tf.Attrs["init_mfa_u2f_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["init_mfa_u2f_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_u2f_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.init_mfa_u2f_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.InitMfaU2FText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.InitMfaU2FText = &textpb.InitMFAU2FScreenText{}
-					obj := obj.InitMfaU2FText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_u2f_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["error_retry"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_u2f_text.error_retry"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.error_retry", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ErrorRetry = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["not_supported"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_u2f_text.not_supported"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.not_supported", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NotSupported = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["register_token_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_u2f_text.register_token_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.register_token_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.RegisterTokenButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_u2f_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["token_name_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_mfa_u2f_text.token_name_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.token_name_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TokenNameLabel = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_u2f_text", "description", &obj.InitMfaU2FText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_u2f_text", "error_retry", &obj.InitMfaU2FText.ErrorRetry)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_u2f_text", "not_supported", &obj.InitMfaU2FText.NotSupported)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_u2f_text", "register_token_button_text", &obj.InitMfaU2FText.RegisterTokenButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_u2f_text", "title", &obj.InitMfaU2FText.Title)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_mfa_u2f_text", "token_name_label", &obj.InitMfaU2FText.TokenNameLabel)
 				}
 			}
 		}
 	}
+
+	// Process init_password_done_text
 	{
-		a, ok := tf.Attrs["init_password_done_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["init_password_done_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_done_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_done_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.init_password_done_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.InitPasswordDoneText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.InitPasswordDoneText = &textpb.InitPasswordDoneScreenText{}
-					obj := obj.InitPasswordDoneText
-					{
-						a, ok := tf.Attrs["cancel_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_done_text.cancel_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CancelButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_done_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_done_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_done_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_done_text", "cancel_button_text", &obj.InitPasswordDoneText.CancelButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_done_text", "description", &obj.InitPasswordDoneText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_done_text", "next_button_text", &obj.InitPasswordDoneText.NextButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_done_text", "title", &obj.InitPasswordDoneText.Title)
 				}
 			}
 		}
 	}
+
+	// Process init_password_text
 	{
-		a, ok := tf.Attrs["init_password_text"]
+		attrs := tf.Attributes()
+		a, ok := attrs["init_password_text"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_text"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+				diags.Append(attrReadConversionFailureDiag{
+					Path: "LoginCustomText.init_password_text",
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
 			} else {
 				obj.InitPasswordText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.InitPasswordText = &textpb.InitPasswordScreenText{}
-					obj := obj.InitPasswordText
-					{
-						a, ok := tf.Attrs["code_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_text.code_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CodeLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["new_password_confirm_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_text.new_password_confirm_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_text.new_password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NewPasswordConfirmLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["new_password_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_text.new_password_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_text.new_password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NewPasswordLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["resend_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_text.resend_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_text.resend_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ResendButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.init_password_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.init_password_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_text", "code_label", &obj.InitPasswordText.CodeLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_text", "description", &obj.InitPasswordText.Description)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_text", "new_password_confirm_label", &obj.InitPasswordText.NewPasswordConfirmLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_text", "new_password_label", &obj.InitPasswordText.NewPasswordLabel)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_text", "next_button_text", &obj.InitPasswordText.NextButtonText)
+					diags = readStringAttribute(diags, v, "LoginCustomText.init_password_text", "title", &obj.InitPasswordText.Title)
 				}
 			}
 		}
 	}
+
+	// Process remaining fields (select_account_text, success_login_text, etc.)
 	{
-		a, ok := tf.Attrs["initialize_done_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_done_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+		attrs := tf.Attributes()
+		for _, field := range []string{
+			"select_account_text",
+			"success_login_text",
+			"username_change_done_text",
+			"username_change_text",
+			"verify_mfa_otp_text",
+			"verify_mfa_u2f_text",
+		} {
+			a, ok := attrs[field]
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_done_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.InitializeDoneText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.InitializeDoneText = &textpb.InitializeUserDoneScreenText{}
-					obj := obj.InitializeDoneText
-					{
-						a, ok := tf.Attrs["cancel_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_done_text.cancel_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CancelButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_done_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_done_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_done_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
+				diags.Append(attrReadMissingDiag{fmt.Sprintf("LoginCustomText.%s", field)})
+				continue
 			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["initialize_user_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_user_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			v, ok := a.(types.Object)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_user_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.InitializeUserText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.InitializeUserText = &textpb.InitializeUserScreenText{}
-					obj := obj.InitializeUserText
-					{
-						a, ok := tf.Attrs["code_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_user_text.code_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_user_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CodeLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_user_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_user_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["new_password_confirm_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_user_text.new_password_confirm_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_user_text.new_password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NewPasswordConfirmLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["new_password_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_user_text.new_password_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_user_text.new_password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NewPasswordLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_user_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_user_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["resend_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_user_text.resend_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_user_text.resend_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ResendButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.initialize_user_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.initialize_user_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
+				diags.Append(attrReadConversionFailureDiag{
+					Path: fmt.Sprintf("LoginCustomText.%s", field),
+					Type: "github.com/hashicorp/terraform-plugin-framework/types.Object",
+				})
+				continue
 			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["linking_user_done_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_done_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_done_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.LinkingUserDoneText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.LinkingUserDoneText = &textpb.LinkingUserDoneScreenText{}
-					obj := obj.LinkingUserDoneText
-					{
-						a, ok := tf.Attrs["cancel_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_done_text.cancel_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CancelButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_done_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_done_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_done_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["linking_user_prompt_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_prompt_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_prompt_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.LinkingUserPromptText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.LinkingUserPromptText = &textpb.LinkingUserPromptScreenText{}
-					obj := obj.LinkingUserPromptText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_prompt_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_prompt_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["link_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_prompt_text.link_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_prompt_text.link_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LinkButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["other_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_prompt_text.other_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_prompt_text.other_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.OtherButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.linking_user_prompt_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.linking_user_prompt_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["login_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.login_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.LoginText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.LoginText = &textpb.LoginScreenText{}
-					obj := obj.LoginText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description_linking_process"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.description_linking_process"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.description_linking_process", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.DescriptionLinkingProcess = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["external_user_description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.external_user_description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.external_user_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ExternalUserDescription = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["login_name_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.login_name_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.login_name_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LoginNameLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["login_name_placeholder"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.login_name_placeholder"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.login_name_placeholder", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LoginNamePlaceholder = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["register_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.register_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.register_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.RegisterButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title_linking_process"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.title_linking_process"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.title_linking_process", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TitleLinkingProcess = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["user_must_be_member_of_org"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.user_must_be_member_of_org"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.user_must_be_member_of_org", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.UserMustBeMemberOfOrg = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["user_name_placeholder"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.login_text.user_name_placeholder"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.login_text.user_name_placeholder", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.UserNamePlaceholder = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["logout_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.logout_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.logout_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.LogoutText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.LogoutText = &textpb.LogoutDoneScreenText{}
-					obj := obj.LogoutText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.logout_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.logout_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["login_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.logout_text.login_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.logout_text.login_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LoginButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.logout_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.logout_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["mfa_providers_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.mfa_providers_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.mfa_providers_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.MfaProvidersText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.MfaProvidersText = &textpb.MFAProvidersText{}
-					obj := obj.MfaProvidersText
-					{
-						a, ok := tf.Attrs["choose_other"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.mfa_providers_text.choose_other"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.mfa_providers_text.choose_other", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ChooseOther = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["otp"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.mfa_providers_text.otp"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.mfa_providers_text.otp", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Otp = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["u2f"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.mfa_providers_text.u2f"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.mfa_providers_text.u2f", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.U2F = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["password_change_done_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_done_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_done_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.PasswordChangeDoneText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.PasswordChangeDoneText = &textpb.PasswordChangeDoneScreenText{}
-					obj := obj.PasswordChangeDoneText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_done_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_done_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_done_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["password_change_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.PasswordChangeText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.PasswordChangeText = &textpb.PasswordChangeScreenText{}
-					obj := obj.PasswordChangeText
-					{
-						a, ok := tf.Attrs["cancel_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_text.cancel_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CancelButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["expired_description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_text.expired_description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_text.expired_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ExpiredDescription = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["new_password_confirm_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_text.new_password_confirm_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_text.new_password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NewPasswordConfirmLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["new_password_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_text.new_password_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_text.new_password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NewPasswordLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["old_password_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_text.old_password_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_text.old_password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.OldPasswordLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_change_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_change_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["password_reset_done_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.password_reset_done_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_reset_done_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.PasswordResetDoneText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.PasswordResetDoneText = &textpb.PasswordResetDoneScreenText{}
-					obj := obj.PasswordResetDoneText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_reset_done_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_reset_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_reset_done_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_reset_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_reset_done_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_reset_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["password_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.password_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.PasswordText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.PasswordText = &textpb.PasswordScreenText{}
-					obj := obj.PasswordText
-					{
-						a, ok := tf.Attrs["back_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.back_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.back_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.BackButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["confirmation"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.confirmation"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.confirmation", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Confirmation = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["has_lowercase"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.has_lowercase"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.has_lowercase", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.HasLowercase = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["has_number"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.has_number"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.has_number", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.HasNumber = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["has_symbol"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.has_symbol"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.has_symbol", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.HasSymbol = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["has_uppercase"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.has_uppercase"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.has_uppercase", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.HasUppercase = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["min_length"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.min_length"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.min_length", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.MinLength = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["password_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.password_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PasswordLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["reset_link_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.reset_link_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.reset_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ResetLinkText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.password_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.password_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["passwordless_prompt_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_prompt_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_prompt_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.PasswordlessPromptText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.PasswordlessPromptText = &textpb.PasswordlessPromptScreenText{}
-					obj := obj.PasswordlessPromptText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_prompt_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description_init"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_prompt_text.description_init"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.description_init", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.DescriptionInit = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_prompt_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["passwordless_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_prompt_text.passwordless_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.passwordless_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PasswordlessButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["skip_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_prompt_text.skip_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.skip_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.SkipButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_prompt_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["passwordless_registration_done_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_done_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.PasswordlessRegistrationDoneText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.PasswordlessRegistrationDoneText = &textpb.PasswordlessRegistrationDoneScreenText{}
-					obj := obj.PasswordlessRegistrationDoneText
-					{
-						a, ok := tf.Attrs["cancel_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_done_text.cancel_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CancelButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_done_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description_close"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_done_text.description_close"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.description_close", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.DescriptionClose = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_done_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_done_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["passwordless_registration_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.PasswordlessRegistrationText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.PasswordlessRegistrationText = &textpb.PasswordlessRegistrationScreenText{}
-					obj := obj.PasswordlessRegistrationText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["error_retry"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_text.error_retry"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_text.error_retry", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ErrorRetry = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["not_supported"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_text.not_supported"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_text.not_supported", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NotSupported = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["register_token_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_text.register_token_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_text.register_token_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.RegisterTokenButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["token_name_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_registration_text.token_name_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_registration_text.token_name_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TokenNameLabel = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["passwordless_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.PasswordlessText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.PasswordlessText = &textpb.PasswordlessScreenText{}
-					obj := obj.PasswordlessText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["error_retry"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_text.error_retry"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_text.error_retry", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ErrorRetry = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["login_with_pw_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_text.login_with_pw_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_text.login_with_pw_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LoginWithPwButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["not_supported"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_text.not_supported"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_text.not_supported", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NotSupported = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["validate_token_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.passwordless_text.validate_token_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.passwordless_text.validate_token_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ValidateTokenButtonText = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["registration_option_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.registration_option_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_option_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.RegistrationOptionText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.RegistrationOptionText = &textpb.RegistrationOptionScreenText{}
-					obj := obj.RegistrationOptionText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_option_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_option_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["external_login_description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_option_text.external_login_description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_option_text.external_login_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ExternalLoginDescription = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["login_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_option_text.login_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_option_text.login_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LoginButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_option_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_option_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["user_name_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_option_text.user_name_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_option_text.user_name_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.UserNameButtonText = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["registration_org_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.RegistrationOrgText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.RegistrationOrgText = &textpb.RegistrationOrgScreenText{}
-					obj := obj.RegistrationOrgText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["email_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.email_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.email_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.EmailLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["firstname_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.firstname_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.firstname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.FirstnameLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["lastname_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.lastname_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.lastname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LastnameLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["orgname_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.orgname_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.orgname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.OrgnameLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["password_confirm_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.password_confirm_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PasswordConfirmLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["password_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.password_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PasswordLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["privacy_confirm"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.privacy_confirm"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PrivacyConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["privacy_link_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.privacy_link_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.privacy_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PrivacyLinkText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["save_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.save_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.save_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.SaveButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_and_privacy_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.tos_and_privacy_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.tos_and_privacy_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosAndPrivacyLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_confirm"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.tos_confirm"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.tos_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_link_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.tos_link_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.tos_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosLinkText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["username_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_org_text.username_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_org_text.username_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.UsernameLabel = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["registration_user_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.RegistrationUserText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.RegistrationUserText = &textpb.RegistrationUserScreenText{}
-					obj := obj.RegistrationUserText
-					{
-						a, ok := tf.Attrs["back_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.back_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.back_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.BackButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description_org_register"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.description_org_register"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.description_org_register", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.DescriptionOrgRegister = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["email_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.email_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.email_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.EmailLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["firstname_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.firstname_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.firstname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.FirstnameLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["gender_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.gender_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.gender_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.GenderLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["language_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.language_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.language_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LanguageLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["lastname_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.lastname_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.lastname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.LastnameLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["password_confirm_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.password_confirm_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PasswordConfirmLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["password_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.password_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PasswordLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["privacy_confirm"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.privacy_confirm"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PrivacyConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["privacy_link_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.privacy_link_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.privacy_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.PrivacyLinkText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_and_privacy_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.tos_and_privacy_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.tos_and_privacy_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosAndPrivacyLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_confirm"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.tos_confirm"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.tos_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosConfirm = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["tos_link_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.tos_link_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.tos_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TosLinkText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["username_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.registration_user_text.username_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.registration_user_text.username_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.UsernameLabel = t
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["select_account_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.select_account_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.select_account_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
+			switch field {
+			case "select_account_text":
 				obj.SelectAccountText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.SelectAccountText = &textpb.SelectAccountScreenText{}
-					obj := obj.SelectAccountText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.select_account_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.select_account_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description_linking_process"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.select_account_text.description_linking_process"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.select_account_text.description_linking_process", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.DescriptionLinkingProcess = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["other_user"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.select_account_text.other_user"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.select_account_text.other_user", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.OtherUser = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["session_state_active"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.select_account_text.session_state_active"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.select_account_text.session_state_active", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.SessionStateActive = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["session_state_inactive"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.select_account_text.session_state_inactive"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.select_account_text.session_state_inactive", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.SessionStateInactive = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.select_account_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.select_account_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title_linking_process"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.select_account_text.title_linking_process"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.select_account_text.title_linking_process", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.TitleLinkingProcess = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["user_must_be_member_of_org"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.select_account_text.user_must_be_member_of_org"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.select_account_text.user_must_be_member_of_org", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.UserMustBeMemberOfOrg = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "description", &obj.SelectAccountText.Description)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "description_linking_process", &obj.SelectAccountText.DescriptionLinkingProcess)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "other_user", &obj.SelectAccountText.OtherUser)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "session_state_active", &obj.SelectAccountText.SessionStateActive)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "session_state_inactive", &obj.SelectAccountText.SessionStateInactive)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "title", &obj.SelectAccountText.Title)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "title_linking_process", &obj.SelectAccountText.TitleLinkingProcess)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "user_must_be_member_of_org", &obj.SelectAccountText.UserMustBeMemberOfOrg)
 				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["success_login_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.success_login_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.success_login_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
+			case "success_login_text":
 				obj.SuccessLoginText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.SuccessLoginText = &textpb.SuccessLoginScreenText{}
-					obj := obj.SuccessLoginText
-					{
-						a, ok := tf.Attrs["auto_redirect_description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.success_login_text.auto_redirect_description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.success_login_text.auto_redirect_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.AutoRedirectDescription = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.success_login_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.success_login_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["redirected_description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.success_login_text.redirected_description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.success_login_text.redirected_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.RedirectedDescription = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.success_login_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.success_login_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "auto_redirect_description", &obj.SuccessLoginText.AutoRedirectDescription)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "next_button_text", &obj.SuccessLoginText.NextButtonText)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "redirected_description", &obj.SuccessLoginText.RedirectedDescription)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "title", &obj.SuccessLoginText.Title)
 				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["username_change_done_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_done_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_done_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
+			case "username_change_done_text":
 				obj.UsernameChangeDoneText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.UsernameChangeDoneText = &textpb.UsernameChangeDoneScreenText{}
-					obj := obj.UsernameChangeDoneText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_done_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_done_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_done_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "description", &obj.UsernameChangeDoneText.Description)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "next_button_text", &obj.UsernameChangeDoneText.NextButtonText)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "title", &obj.UsernameChangeDoneText.Title)
 				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["username_change_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
+			case "username_change_text":
 				obj.UsernameChangeText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.UsernameChangeText = &textpb.UsernameChangeScreenText{}
-					obj := obj.UsernameChangeText
-					{
-						a, ok := tf.Attrs["cancel_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_text.cancel_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CancelButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["username_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.username_change_text.username_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.username_change_text.username_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.UsernameLabel = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "cancel_button_text", &obj.UsernameChangeText.CancelButtonText)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "description", &obj.UsernameChangeText.Description)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "next_button_text", &obj.UsernameChangeText.NextButtonText)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "title", &obj.UsernameChangeText.Title)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "username_label", &obj.UsernameChangeText.UsernameLabel)
 				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["verify_mfa_otp_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_otp_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
+			case "verify_mfa_otp_text":
 				obj.VerifyMfaOtpText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.VerifyMfaOtpText = &textpb.VerifyMFAOTPScreenText{}
-					obj := obj.VerifyMfaOtpText
-					{
-						a, ok := tf.Attrs["code_label"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_otp_text.code_label"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.CodeLabel = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_otp_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["next_button_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_otp_text.next_button_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NextButtonText = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_otp_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "code_label", &obj.VerifyMfaOtpText.CodeLabel)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "description", &obj.VerifyMfaOtpText.Description)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "next_button_text", &obj.VerifyMfaOtpText.NextButtonText)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "title", &obj.VerifyMfaOtpText.Title)
 				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["verify_mfa_u2f_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_u2f_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
+			case "verify_mfa_u2f_text":
 				obj.VerifyMfaU2FText = nil
-				if !v.Null && !v.Unknown {
-					tf := v
+				if !v.IsNull() && !v.IsUnknown() {
 					obj.VerifyMfaU2FText = &textpb.VerifyMFAU2FScreenText{}
-					obj := obj.VerifyMfaU2FText
-					{
-						a, ok := tf.Attrs["description"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_u2f_text.description"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Description = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["error_retry"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_u2f_text.error_retry"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.error_retry", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ErrorRetry = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["not_supported"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_u2f_text.not_supported"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.not_supported", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.NotSupported = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["title"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_u2f_text.title"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Title = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["validate_token_text"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"LoginCustomText.verify_mfa_u2f_text.validate_token_text"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.validate_token_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.ValidateTokenText = t
-							}
-						}
-					}
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "description", &obj.VerifyMfaU2FText.Description)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "error_retry", &obj.VerifyMfaU2FText.ErrorRetry)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "not_supported", &obj.VerifyMfaU2FText.NotSupported)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "title", &obj.VerifyMfaU2FText.Title)
+					diags = readStringAttribute(diags, v, fmt.Sprintf("LoginCustomText.%s", field), "validate_token_text", &obj.VerifyMfaU2FText.ValidateTokenText)
 				}
 			}
 		}
 	}
+
 	return diags
 }
 
-// CopyLoginCustomTextToTerraform copies contents of the source Terraform object into a target struct
-func CopyLoginCustomTextToTerraform(ctx context.Context, obj *textpb.LoginCustomText, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
-	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
-	tf.Null = false
-	tf.Unknown = false
-	if tf.Attrs == nil {
-		tf.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
-	}
-	{
-		a, ok := tf.AttrTypes["email_verification_done_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_done_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_done_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["email_verification_done_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+// CopyMessageCustomTextFromTerraform copies contents of the source Terraform object into a target struct.
+func CopyMessageCustomTextFromTerraform(_ context.Context, tf types.Object, obj *textpb.MessageCustomText) diag.Diagnostics {
+	var diags diag.Diagnostics
 
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.EmailVerificationDoneText == nil {
-					v.Null = true
-				} else {
-					obj := obj.EmailVerificationDoneText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["cancel_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_done_text.cancel_button_text"})
-						} else {
-							v, ok := tf.Attrs["cancel_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_done_text.cancel_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CancelButtonText) == ""
-							}
-							v.Value = string(obj.CancelButtonText)
-							v.Unknown = false
-							tf.Attrs["cancel_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_done_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_done_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["login_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_done_text.login_button_text"})
-						} else {
-							v, ok := tf.Attrs["login_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_done_text.login_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_done_text.login_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LoginButtonText) == ""
-							}
-							v.Value = string(obj.LoginButtonText)
-							v.Unknown = false
-							tf.Attrs["login_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_done_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_done_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_done_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_done_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["email_verification_done_text"] = v
+	for _, field := range []string{"button_text", "footer_text", "greeting", "pre_header", "subject", "text", "title"} {
+		diags = readStringAttribute(diags, tf, "MessageCustomText", field, func() *string {
+			switch field {
+			case "button_text":
+				return &obj.ButtonText
+			case "footer_text":
+				return &obj.FooterText
+			case "greeting":
+				return &obj.Greeting
+			case "pre_header":
+				return &obj.PreHeader
+			case "subject":
+				return &obj.Subject
+			case "text":
+				return &obj.Text
+			case "title":
+				return &obj.Title
+			default:
+				return nil
 			}
-		}
+		}())
 	}
-	{
-		a, ok := tf.AttrTypes["email_verification_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["email_verification_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.EmailVerificationText == nil {
-					v.Null = true
-				} else {
-					obj := obj.EmailVerificationText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["code_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_text.code_label"})
-						} else {
-							v, ok := tf.Attrs["code_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_text.code_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CodeLabel) == ""
-							}
-							v.Value = string(obj.CodeLabel)
-							v.Unknown = false
-							tf.Attrs["code_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["resend_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_text.resend_button_text"})
-						} else {
-							v, ok := tf.Attrs["resend_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_text.resend_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_text.resend_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ResendButtonText) == ""
-							}
-							v.Value = string(obj.ResendButtonText)
-							v.Unknown = false
-							tf.Attrs["resend_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.email_verification_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.email_verification_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.email_verification_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["email_verification_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["external_registration_user_overview_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["external_registration_user_overview_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.ExternalRegistrationUserOverviewText == nil {
-					v.Null = true
-				} else {
-					obj := obj.ExternalRegistrationUserOverviewText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["back_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.back_button_text"})
-						} else {
-							v, ok := tf.Attrs["back_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.back_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.back_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.BackButtonText) == ""
-							}
-							v.Value = string(obj.BackButtonText)
-							v.Unknown = false
-							tf.Attrs["back_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["email_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.email_label"})
-						} else {
-							v, ok := tf.Attrs["email_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.email_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.email_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.EmailLabel) == ""
-							}
-							v.Value = string(obj.EmailLabel)
-							v.Unknown = false
-							tf.Attrs["email_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["firstname_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.firstname_label"})
-						} else {
-							v, ok := tf.Attrs["firstname_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.firstname_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.firstname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.FirstnameLabel) == ""
-							}
-							v.Value = string(obj.FirstnameLabel)
-							v.Unknown = false
-							tf.Attrs["firstname_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["language_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.language_label"})
-						} else {
-							v, ok := tf.Attrs["language_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.language_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.language_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LanguageLabel) == ""
-							}
-							v.Value = string(obj.LanguageLabel)
-							v.Unknown = false
-							tf.Attrs["language_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["lastname_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.lastname_label"})
-						} else {
-							v, ok := tf.Attrs["lastname_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.lastname_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.lastname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LastnameLabel) == ""
-							}
-							v.Value = string(obj.LastnameLabel)
-							v.Unknown = false
-							tf.Attrs["lastname_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["nickname_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.nickname_label"})
-						} else {
-							v, ok := tf.Attrs["nickname_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.nickname_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.nickname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NicknameLabel) == ""
-							}
-							v.Value = string(obj.NicknameLabel)
-							v.Unknown = false
-							tf.Attrs["nickname_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["phone_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.phone_label"})
-						} else {
-							v, ok := tf.Attrs["phone_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.phone_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.phone_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PhoneLabel) == ""
-							}
-							v.Value = string(obj.PhoneLabel)
-							v.Unknown = false
-							tf.Attrs["phone_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["privacy_confirm"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.privacy_confirm"})
-						} else {
-							v, ok := tf.Attrs["privacy_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.privacy_confirm", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PrivacyConfirm) == ""
-							}
-							v.Value = string(obj.PrivacyConfirm)
-							v.Unknown = false
-							tf.Attrs["privacy_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["privacy_link_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.privacy_link_text"})
-						} else {
-							v, ok := tf.Attrs["privacy_link_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.privacy_link_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.privacy_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PrivacyLinkText) == ""
-							}
-							v.Value = string(obj.PrivacyLinkText)
-							v.Unknown = false
-							tf.Attrs["privacy_link_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_and_privacy_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.tos_and_privacy_label"})
-						} else {
-							v, ok := tf.Attrs["tos_and_privacy_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.tos_and_privacy_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.tos_and_privacy_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosAndPrivacyLabel) == ""
-							}
-							v.Value = string(obj.TosAndPrivacyLabel)
-							v.Unknown = false
-							tf.Attrs["tos_and_privacy_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_confirm"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.tos_confirm"})
-						} else {
-							v, ok := tf.Attrs["tos_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.tos_confirm", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.tos_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosConfirm) == ""
-							}
-							v.Value = string(obj.TosConfirm)
-							v.Unknown = false
-							tf.Attrs["tos_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_link_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.tos_link_text"})
-						} else {
-							v, ok := tf.Attrs["tos_link_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.tos_link_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.tos_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosLinkText) == ""
-							}
-							v.Value = string(obj.TosLinkText)
-							v.Unknown = false
-							tf.Attrs["tos_link_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["username_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_registration_user_overview_text.username_label"})
-						} else {
-							v, ok := tf.Attrs["username_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_registration_user_overview_text.username_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_registration_user_overview_text.username_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.UsernameLabel) == ""
-							}
-							v.Value = string(obj.UsernameLabel)
-							v.Unknown = false
-							tf.Attrs["username_label"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["external_registration_user_overview_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["external_user_not_found_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["external_user_not_found_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.ExternalUserNotFoundText == nil {
-					v.Null = true
-				} else {
-					obj := obj.ExternalUserNotFoundText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["auto_register_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.auto_register_button_text"})
-						} else {
-							v, ok := tf.Attrs["auto_register_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.auto_register_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.auto_register_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.AutoRegisterButtonText) == ""
-							}
-							v.Value = string(obj.AutoRegisterButtonText)
-							v.Unknown = false
-							tf.Attrs["auto_register_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["link_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.link_button_text"})
-						} else {
-							v, ok := tf.Attrs["link_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.link_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.link_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LinkButtonText) == ""
-							}
-							v.Value = string(obj.LinkButtonText)
-							v.Unknown = false
-							tf.Attrs["link_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["privacy_confirm"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.privacy_confirm"})
-						} else {
-							v, ok := tf.Attrs["privacy_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.privacy_confirm", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PrivacyConfirm) == ""
-							}
-							v.Value = string(obj.PrivacyConfirm)
-							v.Unknown = false
-							tf.Attrs["privacy_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["privacy_link_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.privacy_link_text"})
-						} else {
-							v, ok := tf.Attrs["privacy_link_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.privacy_link_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.privacy_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PrivacyLinkText) == ""
-							}
-							v.Value = string(obj.PrivacyLinkText)
-							v.Unknown = false
-							tf.Attrs["privacy_link_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_and_privacy_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.tos_and_privacy_label"})
-						} else {
-							v, ok := tf.Attrs["tos_and_privacy_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.tos_and_privacy_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.tos_and_privacy_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosAndPrivacyLabel) == ""
-							}
-							v.Value = string(obj.TosAndPrivacyLabel)
-							v.Unknown = false
-							tf.Attrs["tos_and_privacy_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_confirm"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.tos_confirm"})
-						} else {
-							v, ok := tf.Attrs["tos_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.tos_confirm", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.tos_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosConfirm) == ""
-							}
-							v.Value = string(obj.TosConfirm)
-							v.Unknown = false
-							tf.Attrs["tos_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_link_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.external_user_not_found_text.tos_link_text"})
-						} else {
-							v, ok := tf.Attrs["tos_link_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.external_user_not_found_text.tos_link_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.external_user_not_found_text.tos_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosLinkText) == ""
-							}
-							v.Value = string(obj.TosLinkText)
-							v.Unknown = false
-							tf.Attrs["tos_link_text"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["external_user_not_found_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["footer_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.footer_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.footer_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["footer_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.FooterText == nil {
-					v.Null = true
-				} else {
-					obj := obj.FooterText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["help"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.footer_text.help"})
-						} else {
-							v, ok := tf.Attrs["help"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.footer_text.help", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.footer_text.help", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Help) == ""
-							}
-							v.Value = string(obj.Help)
-							v.Unknown = false
-							tf.Attrs["help"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["privacy_policy"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.footer_text.privacy_policy"})
-						} else {
-							v, ok := tf.Attrs["privacy_policy"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.footer_text.privacy_policy", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.footer_text.privacy_policy", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PrivacyPolicy) == ""
-							}
-							v.Value = string(obj.PrivacyPolicy)
-							v.Unknown = false
-							tf.Attrs["privacy_policy"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["support_email"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.footer_text.support_email"})
-						} else {
-							v, ok := tf.Attrs["support_email"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.footer_text.support_email", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.footer_text.support_email", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.SupportEmail) == ""
-							}
-							v.Value = string(obj.SupportEmail)
-							v.Unknown = false
-							tf.Attrs["support_email"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.footer_text.tos"})
-						} else {
-							v, ok := tf.Attrs["tos"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.footer_text.tos", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.footer_text.tos", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Tos) == ""
-							}
-							v.Value = string(obj.Tos)
-							v.Unknown = false
-							tf.Attrs["tos"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["footer_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["init_mfa_done_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_done_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_done_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["init_mfa_done_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.InitMfaDoneText == nil {
-					v.Null = true
-				} else {
-					obj := obj.InitMfaDoneText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["cancel_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_done_text.cancel_button_text"})
-						} else {
-							v, ok := tf.Attrs["cancel_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_done_text.cancel_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CancelButtonText) == ""
-							}
-							v.Value = string(obj.CancelButtonText)
-							v.Unknown = false
-							tf.Attrs["cancel_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_done_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_done_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_done_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_done_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_done_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_done_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["init_mfa_done_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["init_mfa_otp_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_otp_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_otp_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["init_mfa_otp_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.InitMfaOtpText == nil {
-					v.Null = true
-				} else {
-					obj := obj.InitMfaOtpText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["cancel_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_otp_text.cancel_button_text"})
-						} else {
-							v, ok := tf.Attrs["cancel_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_otp_text.cancel_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CancelButtonText) == ""
-							}
-							v.Value = string(obj.CancelButtonText)
-							v.Unknown = false
-							tf.Attrs["cancel_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["code_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_otp_text.code_label"})
-						} else {
-							v, ok := tf.Attrs["code_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_otp_text.code_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CodeLabel) == ""
-							}
-							v.Value = string(obj.CodeLabel)
-							v.Unknown = false
-							tf.Attrs["code_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_otp_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_otp_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description_otp"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_otp_text.description_otp"})
-						} else {
-							v, ok := tf.Attrs["description_otp"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_otp_text.description_otp", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.description_otp", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.DescriptionOtp) == ""
-							}
-							v.Value = string(obj.DescriptionOtp)
-							v.Unknown = false
-							tf.Attrs["description_otp"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_otp_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_otp_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["secret_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_otp_text.secret_label"})
-						} else {
-							v, ok := tf.Attrs["secret_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_otp_text.secret_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.secret_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.SecretLabel) == ""
-							}
-							v.Value = string(obj.SecretLabel)
-							v.Unknown = false
-							tf.Attrs["secret_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_otp_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_otp_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_otp_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["init_mfa_otp_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["init_mfa_prompt_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_prompt_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["init_mfa_prompt_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.InitMfaPromptText == nil {
-					v.Null = true
-				} else {
-					obj := obj.InitMfaPromptText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_prompt_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_prompt_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_prompt_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_prompt_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["otp_option"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_prompt_text.otp_option"})
-						} else {
-							v, ok := tf.Attrs["otp_option"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_prompt_text.otp_option", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.otp_option", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.OtpOption) == ""
-							}
-							v.Value = string(obj.OtpOption)
-							v.Unknown = false
-							tf.Attrs["otp_option"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["skip_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_prompt_text.skip_button_text"})
-						} else {
-							v, ok := tf.Attrs["skip_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_prompt_text.skip_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.skip_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.SkipButtonText) == ""
-							}
-							v.Value = string(obj.SkipButtonText)
-							v.Unknown = false
-							tf.Attrs["skip_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_prompt_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_prompt_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["u2f_option"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_prompt_text.u2f_option"})
-						} else {
-							v, ok := tf.Attrs["u2f_option"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_prompt_text.u2f_option", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_prompt_text.u2f_option", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.U2FOption) == ""
-							}
-							v.Value = string(obj.U2FOption)
-							v.Unknown = false
-							tf.Attrs["u2f_option"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["init_mfa_prompt_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["init_mfa_u2f_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_u2f_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["init_mfa_u2f_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.InitMfaU2FText == nil {
-					v.Null = true
-				} else {
-					obj := obj.InitMfaU2FText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_u2f_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_u2f_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["error_retry"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_u2f_text.error_retry"})
-						} else {
-							v, ok := tf.Attrs["error_retry"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_u2f_text.error_retry", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.error_retry", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ErrorRetry) == ""
-							}
-							v.Value = string(obj.ErrorRetry)
-							v.Unknown = false
-							tf.Attrs["error_retry"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["not_supported"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_u2f_text.not_supported"})
-						} else {
-							v, ok := tf.Attrs["not_supported"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_u2f_text.not_supported", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.not_supported", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NotSupported) == ""
-							}
-							v.Value = string(obj.NotSupported)
-							v.Unknown = false
-							tf.Attrs["not_supported"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["register_token_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_u2f_text.register_token_button_text"})
-						} else {
-							v, ok := tf.Attrs["register_token_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_u2f_text.register_token_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.register_token_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.RegisterTokenButtonText) == ""
-							}
-							v.Value = string(obj.RegisterTokenButtonText)
-							v.Unknown = false
-							tf.Attrs["register_token_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_u2f_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_u2f_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["token_name_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_mfa_u2f_text.token_name_label"})
-						} else {
-							v, ok := tf.Attrs["token_name_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_mfa_u2f_text.token_name_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_mfa_u2f_text.token_name_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TokenNameLabel) == ""
-							}
-							v.Value = string(obj.TokenNameLabel)
-							v.Unknown = false
-							tf.Attrs["token_name_label"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["init_mfa_u2f_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["init_password_done_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_done_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_done_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["init_password_done_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.InitPasswordDoneText == nil {
-					v.Null = true
-				} else {
-					obj := obj.InitPasswordDoneText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["cancel_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_done_text.cancel_button_text"})
-						} else {
-							v, ok := tf.Attrs["cancel_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_done_text.cancel_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CancelButtonText) == ""
-							}
-							v.Value = string(obj.CancelButtonText)
-							v.Unknown = false
-							tf.Attrs["cancel_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_done_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_done_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_done_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_done_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_done_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_done_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["init_password_done_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["init_password_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["init_password_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.InitPasswordText == nil {
-					v.Null = true
-				} else {
-					obj := obj.InitPasswordText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["code_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_text.code_label"})
-						} else {
-							v, ok := tf.Attrs["code_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_text.code_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CodeLabel) == ""
-							}
-							v.Value = string(obj.CodeLabel)
-							v.Unknown = false
-							tf.Attrs["code_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["new_password_confirm_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_text.new_password_confirm_label"})
-						} else {
-							v, ok := tf.Attrs["new_password_confirm_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_text.new_password_confirm_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_text.new_password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NewPasswordConfirmLabel) == ""
-							}
-							v.Value = string(obj.NewPasswordConfirmLabel)
-							v.Unknown = false
-							tf.Attrs["new_password_confirm_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["new_password_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_text.new_password_label"})
-						} else {
-							v, ok := tf.Attrs["new_password_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_text.new_password_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_text.new_password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NewPasswordLabel) == ""
-							}
-							v.Value = string(obj.NewPasswordLabel)
-							v.Unknown = false
-							tf.Attrs["new_password_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["resend_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_text.resend_button_text"})
-						} else {
-							v, ok := tf.Attrs["resend_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_text.resend_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_text.resend_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ResendButtonText) == ""
-							}
-							v.Value = string(obj.ResendButtonText)
-							v.Unknown = false
-							tf.Attrs["resend_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.init_password_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.init_password_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.init_password_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["init_password_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["initialize_done_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_done_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_done_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["initialize_done_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.InitializeDoneText == nil {
-					v.Null = true
-				} else {
-					obj := obj.InitializeDoneText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["cancel_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_done_text.cancel_button_text"})
-						} else {
-							v, ok := tf.Attrs["cancel_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_done_text.cancel_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CancelButtonText) == ""
-							}
-							v.Value = string(obj.CancelButtonText)
-							v.Unknown = false
-							tf.Attrs["cancel_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_done_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_done_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_done_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_done_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_done_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_done_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["initialize_done_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["initialize_user_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_user_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_user_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["initialize_user_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.InitializeUserText == nil {
-					v.Null = true
-				} else {
-					obj := obj.InitializeUserText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["code_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_user_text.code_label"})
-						} else {
-							v, ok := tf.Attrs["code_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_user_text.code_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_user_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CodeLabel) == ""
-							}
-							v.Value = string(obj.CodeLabel)
-							v.Unknown = false
-							tf.Attrs["code_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_user_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_user_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_user_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["new_password_confirm_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_user_text.new_password_confirm_label"})
-						} else {
-							v, ok := tf.Attrs["new_password_confirm_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_user_text.new_password_confirm_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_user_text.new_password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NewPasswordConfirmLabel) == ""
-							}
-							v.Value = string(obj.NewPasswordConfirmLabel)
-							v.Unknown = false
-							tf.Attrs["new_password_confirm_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["new_password_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_user_text.new_password_label"})
-						} else {
-							v, ok := tf.Attrs["new_password_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_user_text.new_password_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_user_text.new_password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NewPasswordLabel) == ""
-							}
-							v.Value = string(obj.NewPasswordLabel)
-							v.Unknown = false
-							tf.Attrs["new_password_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_user_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_user_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_user_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["resend_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_user_text.resend_button_text"})
-						} else {
-							v, ok := tf.Attrs["resend_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_user_text.resend_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_user_text.resend_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ResendButtonText) == ""
-							}
-							v.Value = string(obj.ResendButtonText)
-							v.Unknown = false
-							tf.Attrs["resend_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.initialize_user_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.initialize_user_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.initialize_user_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["initialize_user_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["linking_user_done_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_done_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_done_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["linking_user_done_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.LinkingUserDoneText == nil {
-					v.Null = true
-				} else {
-					obj := obj.LinkingUserDoneText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["cancel_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_done_text.cancel_button_text"})
-						} else {
-							v, ok := tf.Attrs["cancel_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.linking_user_done_text.cancel_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CancelButtonText) == ""
-							}
-							v.Value = string(obj.CancelButtonText)
-							v.Unknown = false
-							tf.Attrs["cancel_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_done_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.linking_user_done_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_done_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.linking_user_done_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_done_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.linking_user_done_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["linking_user_done_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["linking_user_prompt_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_prompt_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_prompt_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["linking_user_prompt_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.LinkingUserPromptText == nil {
-					v.Null = true
-				} else {
-					obj := obj.LinkingUserPromptText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_prompt_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.linking_user_prompt_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_prompt_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["link_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_prompt_text.link_button_text"})
-						} else {
-							v, ok := tf.Attrs["link_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.linking_user_prompt_text.link_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_prompt_text.link_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LinkButtonText) == ""
-							}
-							v.Value = string(obj.LinkButtonText)
-							v.Unknown = false
-							tf.Attrs["link_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["other_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_prompt_text.other_button_text"})
-						} else {
-							v, ok := tf.Attrs["other_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.linking_user_prompt_text.other_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_prompt_text.other_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.OtherButtonText) == ""
-							}
-							v.Value = string(obj.OtherButtonText)
-							v.Unknown = false
-							tf.Attrs["other_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.linking_user_prompt_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.linking_user_prompt_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.linking_user_prompt_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["linking_user_prompt_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["login_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["login_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.LoginText == nil {
-					v.Null = true
-				} else {
-					obj := obj.LoginText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description_linking_process"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.description_linking_process"})
-						} else {
-							v, ok := tf.Attrs["description_linking_process"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.description_linking_process", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.description_linking_process", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.DescriptionLinkingProcess) == ""
-							}
-							v.Value = string(obj.DescriptionLinkingProcess)
-							v.Unknown = false
-							tf.Attrs["description_linking_process"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["external_user_description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.external_user_description"})
-						} else {
-							v, ok := tf.Attrs["external_user_description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.external_user_description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.external_user_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ExternalUserDescription) == ""
-							}
-							v.Value = string(obj.ExternalUserDescription)
-							v.Unknown = false
-							tf.Attrs["external_user_description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["login_name_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.login_name_label"})
-						} else {
-							v, ok := tf.Attrs["login_name_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.login_name_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.login_name_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LoginNameLabel) == ""
-							}
-							v.Value = string(obj.LoginNameLabel)
-							v.Unknown = false
-							tf.Attrs["login_name_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["login_name_placeholder"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.login_name_placeholder"})
-						} else {
-							v, ok := tf.Attrs["login_name_placeholder"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.login_name_placeholder", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.login_name_placeholder", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LoginNamePlaceholder) == ""
-							}
-							v.Value = string(obj.LoginNamePlaceholder)
-							v.Unknown = false
-							tf.Attrs["login_name_placeholder"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["register_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.register_button_text"})
-						} else {
-							v, ok := tf.Attrs["register_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.register_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.register_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.RegisterButtonText) == ""
-							}
-							v.Value = string(obj.RegisterButtonText)
-							v.Unknown = false
-							tf.Attrs["register_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title_linking_process"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.title_linking_process"})
-						} else {
-							v, ok := tf.Attrs["title_linking_process"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.title_linking_process", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.title_linking_process", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TitleLinkingProcess) == ""
-							}
-							v.Value = string(obj.TitleLinkingProcess)
-							v.Unknown = false
-							tf.Attrs["title_linking_process"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["user_must_be_member_of_org"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.user_must_be_member_of_org"})
-						} else {
-							v, ok := tf.Attrs["user_must_be_member_of_org"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.user_must_be_member_of_org", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.user_must_be_member_of_org", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.UserMustBeMemberOfOrg) == ""
-							}
-							v.Value = string(obj.UserMustBeMemberOfOrg)
-							v.Unknown = false
-							tf.Attrs["user_must_be_member_of_org"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["user_name_placeholder"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.login_text.user_name_placeholder"})
-						} else {
-							v, ok := tf.Attrs["user_name_placeholder"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.login_text.user_name_placeholder", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.login_text.user_name_placeholder", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.UserNamePlaceholder) == ""
-							}
-							v.Value = string(obj.UserNamePlaceholder)
-							v.Unknown = false
-							tf.Attrs["user_name_placeholder"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["login_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["logout_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.logout_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.logout_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["logout_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.LogoutText == nil {
-					v.Null = true
-				} else {
-					obj := obj.LogoutText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.logout_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.logout_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.logout_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["login_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.logout_text.login_button_text"})
-						} else {
-							v, ok := tf.Attrs["login_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.logout_text.login_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.logout_text.login_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LoginButtonText) == ""
-							}
-							v.Value = string(obj.LoginButtonText)
-							v.Unknown = false
-							tf.Attrs["login_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.logout_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.logout_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.logout_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["logout_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["mfa_providers_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.mfa_providers_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.mfa_providers_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["mfa_providers_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.MfaProvidersText == nil {
-					v.Null = true
-				} else {
-					obj := obj.MfaProvidersText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["choose_other"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.mfa_providers_text.choose_other"})
-						} else {
-							v, ok := tf.Attrs["choose_other"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.mfa_providers_text.choose_other", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.mfa_providers_text.choose_other", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ChooseOther) == ""
-							}
-							v.Value = string(obj.ChooseOther)
-							v.Unknown = false
-							tf.Attrs["choose_other"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["otp"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.mfa_providers_text.otp"})
-						} else {
-							v, ok := tf.Attrs["otp"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.mfa_providers_text.otp", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.mfa_providers_text.otp", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Otp) == ""
-							}
-							v.Value = string(obj.Otp)
-							v.Unknown = false
-							tf.Attrs["otp"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["u2f"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.mfa_providers_text.u2f"})
-						} else {
-							v, ok := tf.Attrs["u2f"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.mfa_providers_text.u2f", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.mfa_providers_text.u2f", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.U2F) == ""
-							}
-							v.Value = string(obj.U2F)
-							v.Unknown = false
-							tf.Attrs["u2f"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["mfa_providers_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["password_change_done_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_done_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_done_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["password_change_done_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.PasswordChangeDoneText == nil {
-					v.Null = true
-				} else {
-					obj := obj.PasswordChangeDoneText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_done_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_done_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_done_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_done_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_done_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_done_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["password_change_done_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["password_change_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["password_change_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.PasswordChangeText == nil {
-					v.Null = true
-				} else {
-					obj := obj.PasswordChangeText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["cancel_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_text.cancel_button_text"})
-						} else {
-							v, ok := tf.Attrs["cancel_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_text.cancel_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CancelButtonText) == ""
-							}
-							v.Value = string(obj.CancelButtonText)
-							v.Unknown = false
-							tf.Attrs["cancel_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["expired_description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_text.expired_description"})
-						} else {
-							v, ok := tf.Attrs["expired_description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_text.expired_description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_text.expired_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ExpiredDescription) == ""
-							}
-							v.Value = string(obj.ExpiredDescription)
-							v.Unknown = false
-							tf.Attrs["expired_description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["new_password_confirm_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_text.new_password_confirm_label"})
-						} else {
-							v, ok := tf.Attrs["new_password_confirm_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_text.new_password_confirm_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_text.new_password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NewPasswordConfirmLabel) == ""
-							}
-							v.Value = string(obj.NewPasswordConfirmLabel)
-							v.Unknown = false
-							tf.Attrs["new_password_confirm_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["new_password_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_text.new_password_label"})
-						} else {
-							v, ok := tf.Attrs["new_password_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_text.new_password_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_text.new_password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NewPasswordLabel) == ""
-							}
-							v.Value = string(obj.NewPasswordLabel)
-							v.Unknown = false
-							tf.Attrs["new_password_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["old_password_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_text.old_password_label"})
-						} else {
-							v, ok := tf.Attrs["old_password_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_text.old_password_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_text.old_password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.OldPasswordLabel) == ""
-							}
-							v.Value = string(obj.OldPasswordLabel)
-							v.Unknown = false
-							tf.Attrs["old_password_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_change_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_change_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_change_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["password_change_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["password_reset_done_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.password_reset_done_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_reset_done_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["password_reset_done_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.PasswordResetDoneText == nil {
-					v.Null = true
-				} else {
-					obj := obj.PasswordResetDoneText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_reset_done_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_reset_done_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_reset_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_reset_done_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_reset_done_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_reset_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_reset_done_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_reset_done_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_reset_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["password_reset_done_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["password_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["password_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.PasswordText == nil {
-					v.Null = true
-				} else {
-					obj := obj.PasswordText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["back_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.back_button_text"})
-						} else {
-							v, ok := tf.Attrs["back_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.back_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.back_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.BackButtonText) == ""
-							}
-							v.Value = string(obj.BackButtonText)
-							v.Unknown = false
-							tf.Attrs["back_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["confirmation"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.confirmation"})
-						} else {
-							v, ok := tf.Attrs["confirmation"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.confirmation", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.confirmation", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Confirmation) == ""
-							}
-							v.Value = string(obj.Confirmation)
-							v.Unknown = false
-							tf.Attrs["confirmation"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["has_lowercase"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.has_lowercase"})
-						} else {
-							v, ok := tf.Attrs["has_lowercase"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.has_lowercase", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.has_lowercase", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.HasLowercase) == ""
-							}
-							v.Value = string(obj.HasLowercase)
-							v.Unknown = false
-							tf.Attrs["has_lowercase"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["has_number"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.has_number"})
-						} else {
-							v, ok := tf.Attrs["has_number"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.has_number", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.has_number", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.HasNumber) == ""
-							}
-							v.Value = string(obj.HasNumber)
-							v.Unknown = false
-							tf.Attrs["has_number"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["has_symbol"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.has_symbol"})
-						} else {
-							v, ok := tf.Attrs["has_symbol"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.has_symbol", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.has_symbol", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.HasSymbol) == ""
-							}
-							v.Value = string(obj.HasSymbol)
-							v.Unknown = false
-							tf.Attrs["has_symbol"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["has_uppercase"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.has_uppercase"})
-						} else {
-							v, ok := tf.Attrs["has_uppercase"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.has_uppercase", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.has_uppercase", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.HasUppercase) == ""
-							}
-							v.Value = string(obj.HasUppercase)
-							v.Unknown = false
-							tf.Attrs["has_uppercase"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["min_length"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.min_length"})
-						} else {
-							v, ok := tf.Attrs["min_length"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.min_length", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.min_length", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.MinLength) == ""
-							}
-							v.Value = string(obj.MinLength)
-							v.Unknown = false
-							tf.Attrs["min_length"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["password_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.password_label"})
-						} else {
-							v, ok := tf.Attrs["password_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.password_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PasswordLabel) == ""
-							}
-							v.Value = string(obj.PasswordLabel)
-							v.Unknown = false
-							tf.Attrs["password_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["reset_link_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.reset_link_text"})
-						} else {
-							v, ok := tf.Attrs["reset_link_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.reset_link_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.reset_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ResetLinkText) == ""
-							}
-							v.Value = string(obj.ResetLinkText)
-							v.Unknown = false
-							tf.Attrs["reset_link_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.password_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.password_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.password_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["password_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["passwordless_prompt_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_prompt_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_prompt_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["passwordless_prompt_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.PasswordlessPromptText == nil {
-					v.Null = true
-				} else {
-					obj := obj.PasswordlessPromptText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_prompt_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_prompt_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description_init"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_prompt_text.description_init"})
-						} else {
-							v, ok := tf.Attrs["description_init"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_prompt_text.description_init", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.description_init", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.DescriptionInit) == ""
-							}
-							v.Value = string(obj.DescriptionInit)
-							v.Unknown = false
-							tf.Attrs["description_init"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_prompt_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_prompt_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["passwordless_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_prompt_text.passwordless_button_text"})
-						} else {
-							v, ok := tf.Attrs["passwordless_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_prompt_text.passwordless_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.passwordless_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PasswordlessButtonText) == ""
-							}
-							v.Value = string(obj.PasswordlessButtonText)
-							v.Unknown = false
-							tf.Attrs["passwordless_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["skip_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_prompt_text.skip_button_text"})
-						} else {
-							v, ok := tf.Attrs["skip_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_prompt_text.skip_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.skip_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.SkipButtonText) == ""
-							}
-							v.Value = string(obj.SkipButtonText)
-							v.Unknown = false
-							tf.Attrs["skip_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_prompt_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_prompt_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_prompt_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["passwordless_prompt_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["passwordless_registration_done_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_done_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["passwordless_registration_done_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.PasswordlessRegistrationDoneText == nil {
-					v.Null = true
-				} else {
-					obj := obj.PasswordlessRegistrationDoneText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["cancel_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_done_text.cancel_button_text"})
-						} else {
-							v, ok := tf.Attrs["cancel_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_done_text.cancel_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CancelButtonText) == ""
-							}
-							v.Value = string(obj.CancelButtonText)
-							v.Unknown = false
-							tf.Attrs["cancel_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_done_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_done_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description_close"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_done_text.description_close"})
-						} else {
-							v, ok := tf.Attrs["description_close"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_done_text.description_close", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.description_close", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.DescriptionClose) == ""
-							}
-							v.Value = string(obj.DescriptionClose)
-							v.Unknown = false
-							tf.Attrs["description_close"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_done_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_done_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_done_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_done_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["passwordless_registration_done_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["passwordless_registration_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["passwordless_registration_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.PasswordlessRegistrationText == nil {
-					v.Null = true
-				} else {
-					obj := obj.PasswordlessRegistrationText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["error_retry"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_text.error_retry"})
-						} else {
-							v, ok := tf.Attrs["error_retry"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_text.error_retry", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_text.error_retry", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ErrorRetry) == ""
-							}
-							v.Value = string(obj.ErrorRetry)
-							v.Unknown = false
-							tf.Attrs["error_retry"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["not_supported"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_text.not_supported"})
-						} else {
-							v, ok := tf.Attrs["not_supported"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_text.not_supported", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_text.not_supported", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NotSupported) == ""
-							}
-							v.Value = string(obj.NotSupported)
-							v.Unknown = false
-							tf.Attrs["not_supported"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["register_token_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_text.register_token_button_text"})
-						} else {
-							v, ok := tf.Attrs["register_token_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_text.register_token_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_text.register_token_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.RegisterTokenButtonText) == ""
-							}
-							v.Value = string(obj.RegisterTokenButtonText)
-							v.Unknown = false
-							tf.Attrs["register_token_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["token_name_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_registration_text.token_name_label"})
-						} else {
-							v, ok := tf.Attrs["token_name_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_registration_text.token_name_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_registration_text.token_name_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TokenNameLabel) == ""
-							}
-							v.Value = string(obj.TokenNameLabel)
-							v.Unknown = false
-							tf.Attrs["token_name_label"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["passwordless_registration_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["passwordless_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["passwordless_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.PasswordlessText == nil {
-					v.Null = true
-				} else {
-					obj := obj.PasswordlessText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["error_retry"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_text.error_retry"})
-						} else {
-							v, ok := tf.Attrs["error_retry"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_text.error_retry", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_text.error_retry", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ErrorRetry) == ""
-							}
-							v.Value = string(obj.ErrorRetry)
-							v.Unknown = false
-							tf.Attrs["error_retry"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["login_with_pw_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_text.login_with_pw_button_text"})
-						} else {
-							v, ok := tf.Attrs["login_with_pw_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_text.login_with_pw_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_text.login_with_pw_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LoginWithPwButtonText) == ""
-							}
-							v.Value = string(obj.LoginWithPwButtonText)
-							v.Unknown = false
-							tf.Attrs["login_with_pw_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["not_supported"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_text.not_supported"})
-						} else {
-							v, ok := tf.Attrs["not_supported"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_text.not_supported", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_text.not_supported", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NotSupported) == ""
-							}
-							v.Value = string(obj.NotSupported)
-							v.Unknown = false
-							tf.Attrs["not_supported"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["validate_token_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.passwordless_text.validate_token_button_text"})
-						} else {
-							v, ok := tf.Attrs["validate_token_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.passwordless_text.validate_token_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.passwordless_text.validate_token_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ValidateTokenButtonText) == ""
-							}
-							v.Value = string(obj.ValidateTokenButtonText)
-							v.Unknown = false
-							tf.Attrs["validate_token_button_text"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["passwordless_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["registration_option_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_option_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_option_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["registration_option_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.RegistrationOptionText == nil {
-					v.Null = true
-				} else {
-					obj := obj.RegistrationOptionText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_option_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_option_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_option_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["external_login_description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_option_text.external_login_description"})
-						} else {
-							v, ok := tf.Attrs["external_login_description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_option_text.external_login_description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_option_text.external_login_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ExternalLoginDescription) == ""
-							}
-							v.Value = string(obj.ExternalLoginDescription)
-							v.Unknown = false
-							tf.Attrs["external_login_description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["login_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_option_text.login_button_text"})
-						} else {
-							v, ok := tf.Attrs["login_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_option_text.login_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_option_text.login_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LoginButtonText) == ""
-							}
-							v.Value = string(obj.LoginButtonText)
-							v.Unknown = false
-							tf.Attrs["login_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_option_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_option_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_option_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["user_name_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_option_text.user_name_button_text"})
-						} else {
-							v, ok := tf.Attrs["user_name_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_option_text.user_name_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_option_text.user_name_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.UserNameButtonText) == ""
-							}
-							v.Value = string(obj.UserNameButtonText)
-							v.Unknown = false
-							tf.Attrs["user_name_button_text"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["registration_option_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["registration_org_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["registration_org_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.RegistrationOrgText == nil {
-					v.Null = true
-				} else {
-					obj := obj.RegistrationOrgText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["email_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.email_label"})
-						} else {
-							v, ok := tf.Attrs["email_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.email_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.email_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.EmailLabel) == ""
-							}
-							v.Value = string(obj.EmailLabel)
-							v.Unknown = false
-							tf.Attrs["email_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["firstname_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.firstname_label"})
-						} else {
-							v, ok := tf.Attrs["firstname_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.firstname_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.firstname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.FirstnameLabel) == ""
-							}
-							v.Value = string(obj.FirstnameLabel)
-							v.Unknown = false
-							tf.Attrs["firstname_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["lastname_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.lastname_label"})
-						} else {
-							v, ok := tf.Attrs["lastname_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.lastname_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.lastname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LastnameLabel) == ""
-							}
-							v.Value = string(obj.LastnameLabel)
-							v.Unknown = false
-							tf.Attrs["lastname_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["orgname_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.orgname_label"})
-						} else {
-							v, ok := tf.Attrs["orgname_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.orgname_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.orgname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.OrgnameLabel) == ""
-							}
-							v.Value = string(obj.OrgnameLabel)
-							v.Unknown = false
-							tf.Attrs["orgname_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["password_confirm_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.password_confirm_label"})
-						} else {
-							v, ok := tf.Attrs["password_confirm_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.password_confirm_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PasswordConfirmLabel) == ""
-							}
-							v.Value = string(obj.PasswordConfirmLabel)
-							v.Unknown = false
-							tf.Attrs["password_confirm_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["password_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.password_label"})
-						} else {
-							v, ok := tf.Attrs["password_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.password_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PasswordLabel) == ""
-							}
-							v.Value = string(obj.PasswordLabel)
-							v.Unknown = false
-							tf.Attrs["password_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["privacy_confirm"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.privacy_confirm"})
-						} else {
-							v, ok := tf.Attrs["privacy_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.privacy_confirm", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PrivacyConfirm) == ""
-							}
-							v.Value = string(obj.PrivacyConfirm)
-							v.Unknown = false
-							tf.Attrs["privacy_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["privacy_link_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.privacy_link_text"})
-						} else {
-							v, ok := tf.Attrs["privacy_link_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.privacy_link_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.privacy_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PrivacyLinkText) == ""
-							}
-							v.Value = string(obj.PrivacyLinkText)
-							v.Unknown = false
-							tf.Attrs["privacy_link_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["save_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.save_button_text"})
-						} else {
-							v, ok := tf.Attrs["save_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.save_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.save_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.SaveButtonText) == ""
-							}
-							v.Value = string(obj.SaveButtonText)
-							v.Unknown = false
-							tf.Attrs["save_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_and_privacy_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.tos_and_privacy_label"})
-						} else {
-							v, ok := tf.Attrs["tos_and_privacy_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.tos_and_privacy_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.tos_and_privacy_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosAndPrivacyLabel) == ""
-							}
-							v.Value = string(obj.TosAndPrivacyLabel)
-							v.Unknown = false
-							tf.Attrs["tos_and_privacy_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_confirm"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.tos_confirm"})
-						} else {
-							v, ok := tf.Attrs["tos_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.tos_confirm", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.tos_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosConfirm) == ""
-							}
-							v.Value = string(obj.TosConfirm)
-							v.Unknown = false
-							tf.Attrs["tos_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_link_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.tos_link_text"})
-						} else {
-							v, ok := tf.Attrs["tos_link_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.tos_link_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.tos_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosLinkText) == ""
-							}
-							v.Value = string(obj.TosLinkText)
-							v.Unknown = false
-							tf.Attrs["tos_link_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["username_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_org_text.username_label"})
-						} else {
-							v, ok := tf.Attrs["username_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_org_text.username_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_org_text.username_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.UsernameLabel) == ""
-							}
-							v.Value = string(obj.UsernameLabel)
-							v.Unknown = false
-							tf.Attrs["username_label"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["registration_org_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["registration_user_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["registration_user_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.RegistrationUserText == nil {
-					v.Null = true
-				} else {
-					obj := obj.RegistrationUserText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["back_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.back_button_text"})
-						} else {
-							v, ok := tf.Attrs["back_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.back_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.back_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.BackButtonText) == ""
-							}
-							v.Value = string(obj.BackButtonText)
-							v.Unknown = false
-							tf.Attrs["back_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description_org_register"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.description_org_register"})
-						} else {
-							v, ok := tf.Attrs["description_org_register"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.description_org_register", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.description_org_register", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.DescriptionOrgRegister) == ""
-							}
-							v.Value = string(obj.DescriptionOrgRegister)
-							v.Unknown = false
-							tf.Attrs["description_org_register"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["email_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.email_label"})
-						} else {
-							v, ok := tf.Attrs["email_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.email_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.email_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.EmailLabel) == ""
-							}
-							v.Value = string(obj.EmailLabel)
-							v.Unknown = false
-							tf.Attrs["email_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["firstname_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.firstname_label"})
-						} else {
-							v, ok := tf.Attrs["firstname_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.firstname_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.firstname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.FirstnameLabel) == ""
-							}
-							v.Value = string(obj.FirstnameLabel)
-							v.Unknown = false
-							tf.Attrs["firstname_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["gender_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.gender_label"})
-						} else {
-							v, ok := tf.Attrs["gender_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.gender_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.gender_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.GenderLabel) == ""
-							}
-							v.Value = string(obj.GenderLabel)
-							v.Unknown = false
-							tf.Attrs["gender_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["language_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.language_label"})
-						} else {
-							v, ok := tf.Attrs["language_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.language_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.language_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LanguageLabel) == ""
-							}
-							v.Value = string(obj.LanguageLabel)
-							v.Unknown = false
-							tf.Attrs["language_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["lastname_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.lastname_label"})
-						} else {
-							v, ok := tf.Attrs["lastname_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.lastname_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.lastname_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.LastnameLabel) == ""
-							}
-							v.Value = string(obj.LastnameLabel)
-							v.Unknown = false
-							tf.Attrs["lastname_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["password_confirm_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.password_confirm_label"})
-						} else {
-							v, ok := tf.Attrs["password_confirm_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.password_confirm_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.password_confirm_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PasswordConfirmLabel) == ""
-							}
-							v.Value = string(obj.PasswordConfirmLabel)
-							v.Unknown = false
-							tf.Attrs["password_confirm_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["password_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.password_label"})
-						} else {
-							v, ok := tf.Attrs["password_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.password_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.password_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PasswordLabel) == ""
-							}
-							v.Value = string(obj.PasswordLabel)
-							v.Unknown = false
-							tf.Attrs["password_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["privacy_confirm"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.privacy_confirm"})
-						} else {
-							v, ok := tf.Attrs["privacy_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.privacy_confirm", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.privacy_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PrivacyConfirm) == ""
-							}
-							v.Value = string(obj.PrivacyConfirm)
-							v.Unknown = false
-							tf.Attrs["privacy_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["privacy_link_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.privacy_link_text"})
-						} else {
-							v, ok := tf.Attrs["privacy_link_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.privacy_link_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.privacy_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.PrivacyLinkText) == ""
-							}
-							v.Value = string(obj.PrivacyLinkText)
-							v.Unknown = false
-							tf.Attrs["privacy_link_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_and_privacy_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.tos_and_privacy_label"})
-						} else {
-							v, ok := tf.Attrs["tos_and_privacy_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.tos_and_privacy_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.tos_and_privacy_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosAndPrivacyLabel) == ""
-							}
-							v.Value = string(obj.TosAndPrivacyLabel)
-							v.Unknown = false
-							tf.Attrs["tos_and_privacy_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_confirm"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.tos_confirm"})
-						} else {
-							v, ok := tf.Attrs["tos_confirm"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.tos_confirm", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.tos_confirm", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosConfirm) == ""
-							}
-							v.Value = string(obj.TosConfirm)
-							v.Unknown = false
-							tf.Attrs["tos_confirm"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["tos_link_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.tos_link_text"})
-						} else {
-							v, ok := tf.Attrs["tos_link_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.tos_link_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.tos_link_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TosLinkText) == ""
-							}
-							v.Value = string(obj.TosLinkText)
-							v.Unknown = false
-							tf.Attrs["tos_link_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["username_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.registration_user_text.username_label"})
-						} else {
-							v, ok := tf.Attrs["username_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.registration_user_text.username_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.registration_user_text.username_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.UsernameLabel) == ""
-							}
-							v.Value = string(obj.UsernameLabel)
-							v.Unknown = false
-							tf.Attrs["username_label"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["registration_user_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["select_account_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.select_account_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.select_account_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["select_account_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.SelectAccountText == nil {
-					v.Null = true
-				} else {
-					obj := obj.SelectAccountText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.select_account_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.select_account_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.select_account_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description_linking_process"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.select_account_text.description_linking_process"})
-						} else {
-							v, ok := tf.Attrs["description_linking_process"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.select_account_text.description_linking_process", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.select_account_text.description_linking_process", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.DescriptionLinkingProcess) == ""
-							}
-							v.Value = string(obj.DescriptionLinkingProcess)
-							v.Unknown = false
-							tf.Attrs["description_linking_process"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["other_user"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.select_account_text.other_user"})
-						} else {
-							v, ok := tf.Attrs["other_user"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.select_account_text.other_user", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.select_account_text.other_user", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.OtherUser) == ""
-							}
-							v.Value = string(obj.OtherUser)
-							v.Unknown = false
-							tf.Attrs["other_user"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["session_state_active"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.select_account_text.session_state_active"})
-						} else {
-							v, ok := tf.Attrs["session_state_active"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.select_account_text.session_state_active", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.select_account_text.session_state_active", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.SessionStateActive) == ""
-							}
-							v.Value = string(obj.SessionStateActive)
-							v.Unknown = false
-							tf.Attrs["session_state_active"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["session_state_inactive"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.select_account_text.session_state_inactive"})
-						} else {
-							v, ok := tf.Attrs["session_state_inactive"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.select_account_text.session_state_inactive", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.select_account_text.session_state_inactive", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.SessionStateInactive) == ""
-							}
-							v.Value = string(obj.SessionStateInactive)
-							v.Unknown = false
-							tf.Attrs["session_state_inactive"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.select_account_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.select_account_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.select_account_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title_linking_process"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.select_account_text.title_linking_process"})
-						} else {
-							v, ok := tf.Attrs["title_linking_process"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.select_account_text.title_linking_process", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.select_account_text.title_linking_process", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.TitleLinkingProcess) == ""
-							}
-							v.Value = string(obj.TitleLinkingProcess)
-							v.Unknown = false
-							tf.Attrs["title_linking_process"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["user_must_be_member_of_org"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.select_account_text.user_must_be_member_of_org"})
-						} else {
-							v, ok := tf.Attrs["user_must_be_member_of_org"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.select_account_text.user_must_be_member_of_org", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.select_account_text.user_must_be_member_of_org", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.UserMustBeMemberOfOrg) == ""
-							}
-							v.Value = string(obj.UserMustBeMemberOfOrg)
-							v.Unknown = false
-							tf.Attrs["user_must_be_member_of_org"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["select_account_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["success_login_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.success_login_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.success_login_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["success_login_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.SuccessLoginText == nil {
-					v.Null = true
-				} else {
-					obj := obj.SuccessLoginText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["auto_redirect_description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.success_login_text.auto_redirect_description"})
-						} else {
-							v, ok := tf.Attrs["auto_redirect_description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.success_login_text.auto_redirect_description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.success_login_text.auto_redirect_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.AutoRedirectDescription) == ""
-							}
-							v.Value = string(obj.AutoRedirectDescription)
-							v.Unknown = false
-							tf.Attrs["auto_redirect_description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.success_login_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.success_login_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.success_login_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["redirected_description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.success_login_text.redirected_description"})
-						} else {
-							v, ok := tf.Attrs["redirected_description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.success_login_text.redirected_description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.success_login_text.redirected_description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.RedirectedDescription) == ""
-							}
-							v.Value = string(obj.RedirectedDescription)
-							v.Unknown = false
-							tf.Attrs["redirected_description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.success_login_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.success_login_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.success_login_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["success_login_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["username_change_done_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_done_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_done_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["username_change_done_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.UsernameChangeDoneText == nil {
-					v.Null = true
-				} else {
-					obj := obj.UsernameChangeDoneText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_done_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.username_change_done_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_done_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_done_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.username_change_done_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_done_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_done_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.username_change_done_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_done_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["username_change_done_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["username_change_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["username_change_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.UsernameChangeText == nil {
-					v.Null = true
-				} else {
-					obj := obj.UsernameChangeText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["cancel_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_text.cancel_button_text"})
-						} else {
-							v, ok := tf.Attrs["cancel_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.username_change_text.cancel_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_text.cancel_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CancelButtonText) == ""
-							}
-							v.Value = string(obj.CancelButtonText)
-							v.Unknown = false
-							tf.Attrs["cancel_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.username_change_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.username_change_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.username_change_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["username_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.username_change_text.username_label"})
-						} else {
-							v, ok := tf.Attrs["username_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.username_change_text.username_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.username_change_text.username_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.UsernameLabel) == ""
-							}
-							v.Value = string(obj.UsernameLabel)
-							v.Unknown = false
-							tf.Attrs["username_label"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["username_change_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["verify_mfa_otp_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_otp_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["verify_mfa_otp_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.VerifyMfaOtpText == nil {
-					v.Null = true
-				} else {
-					obj := obj.VerifyMfaOtpText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["code_label"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_otp_text.code_label"})
-						} else {
-							v, ok := tf.Attrs["code_label"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.verify_mfa_otp_text.code_label", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text.code_label", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.CodeLabel) == ""
-							}
-							v.Value = string(obj.CodeLabel)
-							v.Unknown = false
-							tf.Attrs["code_label"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_otp_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.verify_mfa_otp_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["next_button_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_otp_text.next_button_text"})
-						} else {
-							v, ok := tf.Attrs["next_button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.verify_mfa_otp_text.next_button_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text.next_button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NextButtonText) == ""
-							}
-							v.Value = string(obj.NextButtonText)
-							v.Unknown = false
-							tf.Attrs["next_button_text"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_otp_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.verify_mfa_otp_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_otp_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["verify_mfa_otp_text"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["verify_mfa_u2f_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_u2f_text"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["verify_mfa_u2f_text"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.VerifyMfaU2FText == nil {
-					v.Null = true
-				} else {
-					obj := obj.VerifyMfaU2FText
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["description"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_u2f_text.description"})
-						} else {
-							v, ok := tf.Attrs["description"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.verify_mfa_u2f_text.description", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.description", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Description) == ""
-							}
-							v.Value = string(obj.Description)
-							v.Unknown = false
-							tf.Attrs["description"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["error_retry"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_u2f_text.error_retry"})
-						} else {
-							v, ok := tf.Attrs["error_retry"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.verify_mfa_u2f_text.error_retry", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.error_retry", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ErrorRetry) == ""
-							}
-							v.Value = string(obj.ErrorRetry)
-							v.Unknown = false
-							tf.Attrs["error_retry"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["not_supported"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_u2f_text.not_supported"})
-						} else {
-							v, ok := tf.Attrs["not_supported"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.verify_mfa_u2f_text.not_supported", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.not_supported", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.NotSupported) == ""
-							}
-							v.Value = string(obj.NotSupported)
-							v.Unknown = false
-							tf.Attrs["not_supported"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["title"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_u2f_text.title"})
-						} else {
-							v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.verify_mfa_u2f_text.title", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Title) == ""
-							}
-							v.Value = string(obj.Title)
-							v.Unknown = false
-							tf.Attrs["title"] = v
-						}
-					}
-					{
-						t, ok := tf.AttrTypes["validate_token_text"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"LoginCustomText.verify_mfa_u2f_text.validate_token_text"})
-						} else {
-							v, ok := tf.Attrs["validate_token_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"LoginCustomText.verify_mfa_u2f_text.validate_token_text", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"LoginCustomText.verify_mfa_u2f_text.validate_token_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.ValidateTokenText) == ""
-							}
-							v.Value = string(obj.ValidateTokenText)
-							v.Unknown = false
-							tf.Attrs["validate_token_text"] = v
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["verify_mfa_u2f_text"] = v
-			}
-		}
-	}
 	return diags
 }
 
-// CopyMessageCustomTextFromTerraform copies contents of the source Terraform object into a target struct
-func CopyMessageCustomTextFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *textpb.MessageCustomText) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
-	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
-	{
-		a, ok := tf.Attrs["button_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"MessageCustomText.button_text"})
+// CopyMessageCustomTextToTerraform copies contents of the source struct into a target Terraform object.
+func CopyMessageCustomTextToTerraform(_ context.Context, obj *textpb.MessageCustomText, tf *types.Object) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Define the attribute types for the object (all fields are strings)
+	attrTypes := map[string]attr.Type{
+		"button_text": types.StringType,
+		"footer_text": types.StringType,
+		"greeting":    types.StringType,
+		"pre_header":  types.StringType,
+		"subject":     types.StringType,
+		"text":        types.StringType,
+		"title":       types.StringType,
+	}
+
+	// Initialize the attributes map
+	attrs := make(map[string]attr.Value)
+
+	// Set each field
+	for _, field := range []string{"button_text", "footer_text", "greeting", "pre_header", "subject", "text", "title"} {
+		var value string
+		switch field {
+		case "button_text":
+			value = obj.ButtonText
+		case "footer_text":
+			value = obj.FooterText
+		case "greeting":
+			value = obj.Greeting
+		case "pre_header":
+			value = obj.PreHeader
+		case "subject":
+			value = obj.Subject
+		case "text":
+			value = obj.Text
+		case "title":
+			value = obj.Title
+		}
+		if value == "" {
+			attrs[field] = types.StringNull()
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"MessageCustomText.button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-			} else {
-				var t string
-				if !v.Null && !v.Unknown {
-					t = string(v.Value)
-				}
-				obj.ButtonText = t
-			}
+			attrs[field] = types.StringValue(value)
 		}
 	}
-	{
-		a, ok := tf.Attrs["footer_text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"MessageCustomText.footer_text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"MessageCustomText.footer_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-			} else {
-				var t string
-				if !v.Null && !v.Unknown {
-					t = string(v.Value)
-				}
-				obj.FooterText = t
-			}
-		}
+
+	// Create the new object
+	newObj, objDiags := types.ObjectValue(attrTypes, attrs)
+	diags.Append(objDiags...)
+	if diags.HasError() {
+		return diags
 	}
-	{
-		a, ok := tf.Attrs["greeting"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"MessageCustomText.greeting"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"MessageCustomText.greeting", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-			} else {
-				var t string
-				if !v.Null && !v.Unknown {
-					t = string(v.Value)
-				}
-				obj.Greeting = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["pre_header"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"MessageCustomText.pre_header"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"MessageCustomText.pre_header", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-			} else {
-				var t string
-				if !v.Null && !v.Unknown {
-					t = string(v.Value)
-				}
-				obj.PreHeader = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["subject"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"MessageCustomText.subject"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"MessageCustomText.subject", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-			} else {
-				var t string
-				if !v.Null && !v.Unknown {
-					t = string(v.Value)
-				}
-				obj.Subject = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["text"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"MessageCustomText.text"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"MessageCustomText.text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-			} else {
-				var t string
-				if !v.Null && !v.Unknown {
-					t = string(v.Value)
-				}
-				obj.Text = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["title"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"MessageCustomText.title"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"MessageCustomText.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-			} else {
-				var t string
-				if !v.Null && !v.Unknown {
-					t = string(v.Value)
-				}
-				obj.Title = t
-			}
-		}
-	}
+
+	// Assign the new object to the pointer
+	*tf = newObj
+
 	return diags
 }
 
-// CopyMessageCustomTextToTerraform copies contents of the source Terraform object into a target struct
-func CopyMessageCustomTextToTerraform(ctx context.Context, obj *textpb.MessageCustomText, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
-	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
-	tf.Null = false
-	tf.Unknown = false
-	if tf.Attrs == nil {
-		tf.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
+// CopyLoginCustomTextToTerraform copies contents of the source struct into a target Terraform object.
+func CopyLoginCustomTextToTerraform(_ context.Context, obj *textpb.LoginCustomText, tf *types.Object) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Define attribute types for the top-level object
+	attrTypes := map[string]attr.Type{
+		"email_verification_done_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"cancel_button_text": types.StringType,
+				"description":        types.StringType,
+				"login_button_text":  types.StringType,
+				"next_button_text":   types.StringType,
+				"title":              types.StringType,
+			},
+		},
+		"email_verification_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"code_label":        types.StringType,
+				"description":       types.StringType,
+				"next_button_text":  types.StringType,
+				"resend_button_text": types.StringType,
+				"title":             types.StringType,
+			},
+		},
+		"external_registration_user_overview_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"back_button_text":      types.StringType,
+				"description":           types.StringType,
+				"email_label":           types.StringType,
+				"firstname_label":       types.StringType,
+				"language_label":        types.StringType,
+				"lastname_label":        types.StringType,
+				"next_button_text":      types.StringType,
+				"nickname_label":        types.StringType,
+				"phone_label":           types.StringType,
+				"privacy_confirm":       types.StringType,
+				"privacy_link_text":     types.StringType,
+				"title":                 types.StringType,
+				"tos_and_privacy_label": types.StringType,
+				"tos_confirm":           types.StringType,
+				"tos_link_text":         types.StringType,
+				"username_label":        types.StringType,
+			},
+		},
+		"external_user_not_found_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"auto_register_button_text": types.StringType,
+				"description":               types.StringType,
+				"link_button_text":          types.StringType,
+				"privacy_confirm":           types.StringType,
+				"privacy_link_text":         types.StringType,
+				"title":                     types.StringType,
+				"tos_and_privacy_label":     types.StringType,
+				"tos_confirm":               types.StringType,
+				"tos_link_text":             types.StringType,
+			},
+		},
+		"footer_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"help":           types.StringType,
+				"privacy_policy": types.StringType,
+				"support_email":  types.StringType,
+				"tos":            types.StringType,
+			},
+		},
+		"init_mfa_done_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"cancel_button_text": types.StringType,
+				"description":        types.StringType,
+				"next_button_text":   types.StringType,
+				"title":              types.StringType,
+			},
+		},
+		"init_mfa_otp_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"cancel_button_text": types.StringType,
+				"code_label":         types.StringType,
+				"description":        types.StringType,
+				"description_otp":    types.StringType,
+				"next_button_text":   types.StringType,
+				"secret_label":       types.StringType,
+				"title":              types.StringType,
+			},
+		},
+		"init_mfa_prompt_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"description":       types.StringType,
+				"next_button_text":  types.StringType,
+				"otp_option":        types.StringType,
+				"skip_button_text":  types.StringType,
+				"title":             types.StringType,
+				"u2f_option":        types.StringType,
+			},
+		},
+		"init_mfa_u2f_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"description":              types.StringType,
+				"error_retry":              types.StringType,
+				"not_supported":            types.StringType,
+				"register_token_button_text": types.StringType,
+				"title":                    types.StringType,
+				"token_name_label":         types.StringType,
+			},
+		},
+		"init_password_done_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"cancel_button_text": types.StringType,
+				"description":        types.StringType,
+				"next_button_text":   types.StringType,
+				"title":              types.StringType,
+			},
+		},
+		"init_password_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"code_label":              types.StringType,
+				"description":             types.StringType,
+				"new_password_confirm_label": types.StringType,
+				"new_password_label":      types.StringType,
+				"next_button_text":        types.StringType,
+				"title":                   types.StringType,
+			},
+		},
+		"select_account_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"description":                types.StringType,
+				"description_linking_process": types.StringType,
+				"other_user":                 types.StringType,
+				"session_state_active":       types.StringType,
+				"session_state_inactive":     types.StringType,
+				"title":                      types.StringType,
+				"title_linking_process":      types.StringType,
+				"user_must_be_member_of_org": types.StringType,
+			},
+		},
+		"success_login_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"auto_redirect_description": types.StringType,
+				"next_button_text":          types.StringType,
+				"redirected_description":    types.StringType,
+				"title":                     types.StringType,
+			},
+		},
+		"username_change_done_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"description":      types.StringType,
+				"next_button_text": types.StringType,
+				"title":            types.StringType,
+			},
+		},
+		"username_change_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"cancel_button_text": types.StringType,
+				"description":        types.StringType,
+				"next_button_text":   types.StringType,
+				"title":              types.StringType,
+				"username_label":     types.StringType,
+			},
+		},
+		"verify_mfa_otp_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"code_label":       types.StringType,
+				"description":      types.StringType,
+				"next_button_text": types.StringType,
+				"title":            types.StringType,
+			},
+		},
+		"verify_mfa_u2f_text": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"description":         types.StringType,
+				"error_retry":         types.StringType,
+				"not_supported":       types.StringType,
+				"title":               types.StringType,
+				"validate_token_text": types.StringType,
+			},
+		},
 	}
-	{
-		t, ok := tf.AttrTypes["button_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"MessageCustomText.button_text"})
-		} else {
-			v, ok := tf.Attrs["button_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"MessageCustomText.button_text", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"MessageCustomText.button_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-				}
-				v.Null = string(obj.ButtonText) == ""
-			}
-			v.Value = string(obj.ButtonText)
-			v.Unknown = false
-			tf.Attrs["button_text"] = v
+
+	// Initialize attributes map
+	attrs := make(map[string]attr.Value)
+
+	// Process email_verification_done_text
+	if obj.EmailVerificationDoneText == nil {
+		attrs["email_verification_done_text"] = types.ObjectNull(attrTypes["email_verification_done_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.EmailVerificationDoneText
+		nestedAttrs := map[string]attr.Value{
+			"cancel_button_text": types.StringValue(o.CancelButtonText),
+			"description":        types.StringValue(o.Description),
+			"login_button_text":  types.StringValue(o.LoginButtonText),
+			"next_button_text":   types.StringValue(o.NextButtonText),
+			"title":              types.StringValue(o.Title),
 		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["email_verification_done_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["email_verification_done_text"] = nestedObj
 	}
-	{
-		t, ok := tf.AttrTypes["footer_text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"MessageCustomText.footer_text"})
-		} else {
-			v, ok := tf.Attrs["footer_text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"MessageCustomText.footer_text", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"MessageCustomText.footer_text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-				}
-				v.Null = string(obj.FooterText) == ""
-			}
-			v.Value = string(obj.FooterText)
-			v.Unknown = false
-			tf.Attrs["footer_text"] = v
+
+	// Process email_verification_text
+	if obj.EmailVerificationText == nil {
+		attrs["email_verification_text"] = types.ObjectNull(attrTypes["email_verification_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.EmailVerificationText
+		nestedAttrs := map[string]attr.Value{
+			"code_label":        types.StringValue(o.CodeLabel),
+			"description":       types.StringValue(o.Description),
+			"next_button_text":  types.StringValue(o.NextButtonText),
+			"resend_button_text": types.StringValue(o.ResendButtonText),
+			"title":             types.StringValue(o.Title),
 		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["email_verification_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["email_verification_text"] = nestedObj
 	}
-	{
-		t, ok := tf.AttrTypes["greeting"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"MessageCustomText.greeting"})
-		} else {
-			v, ok := tf.Attrs["greeting"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"MessageCustomText.greeting", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"MessageCustomText.greeting", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-				}
-				v.Null = string(obj.Greeting) == ""
-			}
-			v.Value = string(obj.Greeting)
-			v.Unknown = false
-			tf.Attrs["greeting"] = v
+
+	// Process external_registration_user_overview_text
+	if obj.ExternalRegistrationUserOverviewText == nil {
+		attrs["external_registration_user_overview_text"] = types.ObjectNull(attrTypes["external_registration_user_overview_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.ExternalRegistrationUserOverviewText
+		nestedAttrs := map[string]attr.Value{
+			"back_button_text":      types.StringValue(o.BackButtonText),
+			"description":           types.StringValue(o.Description),
+			"email_label":           types.StringValue(o.EmailLabel),
+			"firstname_label":       types.StringValue(o.FirstnameLabel),
+			"language_label":        types.StringValue(o.LanguageLabel),
+			"lastname_label":        types.StringValue(o.LastnameLabel),
+			"next_button_text":      types.StringValue(o.NextButtonText),
+			"nickname_label":        types.StringValue(o.NicknameLabel),
+			"phone_label":           types.StringValue(o.PhoneLabel),
+			"privacy_confirm":       types.StringValue(o.PrivacyConfirm),
+			"privacy_link_text":     types.StringValue(o.PrivacyLinkText),
+			"title":                 types.StringValue(o.Title),
+			"tos_and_privacy_label": types.StringValue(o.TosAndPrivacyLabel),
+			"tos_confirm":           types.StringValue(o.TosConfirm),
+			"tos_link_text":         types.StringValue(o.TosLinkText),
+			"username_label":        types.StringValue(o.UsernameLabel),
 		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["external_registration_user_overview_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["external_registration_user_overview_text"] = nestedObj
 	}
-	{
-		t, ok := tf.AttrTypes["pre_header"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"MessageCustomText.pre_header"})
-		} else {
-			v, ok := tf.Attrs["pre_header"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"MessageCustomText.pre_header", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"MessageCustomText.pre_header", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-				}
-				v.Null = string(obj.PreHeader) == ""
-			}
-			v.Value = string(obj.PreHeader)
-			v.Unknown = false
-			tf.Attrs["pre_header"] = v
+
+	// Process external_user_not_found_text
+	if obj.ExternalUserNotFoundText == nil {
+		attrs["external_user_not_found_text"] = types.ObjectNull(attrTypes["external_user_not_found_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.ExternalUserNotFoundText
+		nestedAttrs := map[string]attr.Value{
+			"auto_register_button_text": types.StringValue(o.AutoRegisterButtonText),
+			"description":               types.StringValue(o.Description),
+			"link_button_text":          types.StringValue(o.LinkButtonText),
+			"privacy_confirm":           types.StringValue(o.PrivacyConfirm),
+			"privacy_link_text":         types.StringValue(o.PrivacyLinkText),
+			"title":                     types.StringValue(o.Title),
+			"tos_and_privacy_label":     types.StringValue(o.TosAndPrivacyLabel),
+			"tos_confirm":               types.StringValue(o.TosConfirm),
+			"tos_link_text":             types.StringValue(o.TosLinkText),
 		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["external_user_not_found_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["external_user_not_found_text"] = nestedObj
 	}
-	{
-		t, ok := tf.AttrTypes["subject"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"MessageCustomText.subject"})
-		} else {
-			v, ok := tf.Attrs["subject"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"MessageCustomText.subject", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"MessageCustomText.subject", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-				}
-				v.Null = string(obj.Subject) == ""
-			}
-			v.Value = string(obj.Subject)
-			v.Unknown = false
-			tf.Attrs["subject"] = v
+
+	// Process footer_text
+	if obj.FooterText == nil {
+		attrs["footer_text"] = types.ObjectNull(attrTypes["footer_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.FooterText
+		nestedAttrs := map[string]attr.Value{
+			"help":           types.StringValue(o.Help),
+			"privacy_policy": types.StringValue(o.PrivacyPolicy),
+			"support_email":  types.StringValue(o.SupportEmail),
+			"tos":            types.StringValue(o.Tos),
 		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["footer_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["footer_text"] = nestedObj
 	}
-	{
-		t, ok := tf.AttrTypes["text"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"MessageCustomText.text"})
-		} else {
-			v, ok := tf.Attrs["text"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"MessageCustomText.text", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"MessageCustomText.text", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-				}
-				v.Null = string(obj.Text) == ""
-			}
-			v.Value = string(obj.Text)
-			v.Unknown = false
-			tf.Attrs["text"] = v
+
+	// Process init_mfa_done_text
+	if obj.InitMfaDoneText == nil {
+		attrs["init_mfa_done_text"] = types.ObjectNull(attrTypes["init_mfa_done_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.InitMfaDoneText
+		nestedAttrs := map[string]attr.Value{
+			"cancel_button_text": types.StringValue(o.CancelButtonText),
+			"description":        types.StringValue(o.Description),
+			"next_button_text":   types.StringValue(o.NextButtonText),
+			"title":              types.StringValue(o.Title),
 		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["init_mfa_done_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["init_mfa_done_text"] = nestedObj
 	}
-	{
-		t, ok := tf.AttrTypes["title"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"MessageCustomText.title"})
-		} else {
-			v, ok := tf.Attrs["title"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"MessageCustomText.title", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"MessageCustomText.title", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-				}
-				v.Null = string(obj.Title) == ""
-			}
-			v.Value = string(obj.Title)
-			v.Unknown = false
-			tf.Attrs["title"] = v
+
+	// Process init_mfa_otp_text
+	if obj.InitMfaOtpText == nil {
+		attrs["init_mfa_otp_text"] = types.ObjectNull(attrTypes["init_mfa_otp_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.InitMfaOtpText
+		nestedAttrs := map[string]attr.Value{
+			"cancel_button_text": types.StringValue(o.CancelButtonText),
+			"code_label":         types.StringValue(o.CodeLabel),
+			"description":        types.StringValue(o.Description),
+			"description_otp":    types.StringValue(o.DescriptionOtp),
+			"next_button_text":   types.StringValue(o.NextButtonText),
+			"secret_label":       types.StringValue(o.SecretLabel),
+			"title":              types.StringValue(o.Title),
 		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["init_mfa_otp_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["init_mfa_otp_text"] = nestedObj
 	}
+
+	// Process init_mfa_prompt_text
+	if obj.InitMfaPromptText == nil {
+		attrs["init_mfa_prompt_text"] = types.ObjectNull(attrTypes["init_mfa_prompt_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.InitMfaPromptText
+		nestedAttrs := map[string]attr.Value{
+			"description":       types.StringValue(o.Description),
+			"next_button_text":  types.StringValue(o.NextButtonText),
+			"otp_option":        types.StringValue(o.OtpOption),
+			"skip_button_text":  types.StringValue(o.SkipButtonText),
+			"title":             types.StringValue(o.Title),
+			"u2f_option":        types.StringValue(o.U2FOption),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["init_mfa_prompt_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["init_mfa_prompt_text"] = nestedObj
+	}
+
+	// Process init_mfa_u2f_text
+	if obj.InitMfaU2FText == nil {
+		attrs["init_mfa_u2f_text"] = types.ObjectNull(attrTypes["init_mfa_u2f_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.InitMfaU2FText
+		nestedAttrs := map[string]attr.Value{
+			"description":              types.StringValue(o.Description),
+			"error_retry":              types.StringValue(o.ErrorRetry),
+			"not_supported":            types.StringValue(o.NotSupported),
+			"register_token_button_text": types.StringValue(o.RegisterTokenButtonText),
+			"title":                    types.StringValue(o.Title),
+			"token_name_label":         types.StringValue(o.TokenNameLabel),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["init_mfa_u2f_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["init_mfa_u2f_text"] = nestedObj
+	}
+
+	// Process init_password_done_text
+	if obj.InitPasswordDoneText == nil {
+		attrs["init_password_done_text"] = types.ObjectNull(attrTypes["init_password_done_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.InitPasswordDoneText
+		nestedAttrs := map[string]attr.Value{
+			"cancel_button_text": types.StringValue(o.CancelButtonText),
+			"description":        types.StringValue(o.Description),
+			"next_button_text":   types.StringValue(o.NextButtonText),
+			"title":              types.StringValue(o.Title),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["init_password_done_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["init_password_done_text"] = nestedObj
+	}
+
+	// Process init_password_text
+	if obj.InitPasswordText == nil {
+		attrs["init_password_text"] = types.ObjectNull(attrTypes["init_password_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.InitPasswordText
+		nestedAttrs := map[string]attr.Value{
+			"code_label":              types.StringValue(o.CodeLabel),
+			"description":             types.StringValue(o.Description),
+			"new_password_confirm_label": types.StringValue(o.NewPasswordConfirmLabel),
+			"new_password_label":      types.StringValue(o.NewPasswordLabel),
+			"next_button_text":        types.StringValue(o.NextButtonText),
+			"title":                   types.StringValue(o.Title),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["init_password_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["init_password_text"] = nestedObj
+	}
+
+	// Process select_account_text
+	if obj.SelectAccountText == nil {
+		attrs["select_account_text"] = types.ObjectNull(attrTypes["select_account_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.SelectAccountText
+		nestedAttrs := map[string]attr.Value{
+			"description":                types.StringValue(o.Description),
+			"description_linking_process": types.StringValue(o.DescriptionLinkingProcess),
+			"other_user":                 types.StringValue(o.OtherUser),
+			"session_state_active":       types.StringValue(o.SessionStateActive),
+			"session_state_inactive":     types.StringValue(o.SessionStateInactive),
+			"title":                      types.StringValue(o.Title),
+			"title_linking_process":      types.StringValue(o.TitleLinkingProcess),
+			"user_must_be_member_of_org": types.StringValue(o.UserMustBeMemberOfOrg),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["select_account_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["select_account_text"] = nestedObj
+	}
+
+	// Process success_login_text
+	if obj.SuccessLoginText == nil {
+		attrs["success_login_text"] = types.ObjectNull(attrTypes["success_login_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.SuccessLoginText
+		nestedAttrs := map[string]attr.Value{
+			"auto_redirect_description": types.StringValue(o.AutoRedirectDescription),
+			"next_button_text":          types.StringValue(o.NextButtonText),
+			"redirected_description":    types.StringValue(o.RedirectedDescription),
+			"title":                     types.StringValue(o.Title),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["success_login_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["success_login_text"] = nestedObj
+	}
+
+	// Process username_change_done_text
+	if obj.UsernameChangeDoneText == nil {
+		attrs["username_change_done_text"] = types.ObjectNull(attrTypes["username_change_done_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.UsernameChangeDoneText
+		nestedAttrs := map[string]attr.Value{
+			"description":      types.StringValue(o.Description),
+			"next_button_text": types.StringValue(o.NextButtonText),
+			"title":            types.StringValue(o.Title),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["username_change_done_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["username_change_done_text"] = nestedObj
+	}
+
+	// Process username_change_text
+	if obj.UsernameChangeText == nil {
+		attrs["username_change_text"] = types.ObjectNull(attrTypes["username_change_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.UsernameChangeText
+		nestedAttrs := map[string]attr.Value{
+			"cancel_button_text": types.StringValue(o.CancelButtonText),
+			"description":        types.StringValue(o.Description),
+			"next_button_text":   types.StringValue(o.NextButtonText),
+			"title":              types.StringValue(o.Title),
+			"username_label":     types.StringValue(o.UsernameLabel),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["username_change_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["username_change_text"] = nestedObj
+	}
+
+	// Process verify_mfa_otp_text
+	if obj.VerifyMfaOtpText == nil {
+		attrs["verify_mfa_otp_text"] = types.ObjectNull(attrTypes["verify_mfa_otp_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.VerifyMfaOtpText
+		nestedAttrs := map[string]attr.Value{
+			"code_label":       types.StringValue(o.CodeLabel),
+			"description":      types.StringValue(o.Description),
+			"next_button_text": types.StringValue(o.NextButtonText),
+			"title":            types.StringValue(o.Title),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["verify_mfa_otp_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["verify_mfa_otp_text"] = nestedObj
+	}
+
+	// Process verify_mfa_u2f_text
+	if obj.VerifyMfaU2FText == nil {
+		attrs["verify_mfa_u2f_text"] = types.ObjectNull(attrTypes["verify_mfa_u2f_text"].(types.ObjectType).AttrTypes)
+	} else {
+		o := obj.VerifyMfaU2FText
+		nestedAttrs := map[string]attr.Value{
+			"description":         types.StringValue(o.Description),
+			"error_retry":         types.StringValue(o.ErrorRetry),
+			"not_supported":       types.StringValue(o.NotSupported),
+			"title":               types.StringValue(o.Title),
+			"validate_token_text": types.StringValue(o.ValidateTokenText),
+		}
+		nestedObj, objDiags := types.ObjectValue(attrTypes["verify_mfa_u2f_text"].(types.ObjectType).AttrTypes, nestedAttrs)
+		diags.Append(objDiags...)
+		attrs["verify_mfa_u2f_text"] = nestedObj
+	}
+
+	// Create the new object
+	newObj, objDiags := types.ObjectValue(attrTypes, attrs)
+	diags.Append(objDiags...)
+	if diags.HasError() {
+		return diags
+	}
+
+	// Assign the new object to the pointer
+	*tf = newObj
+
 	return diags
 }
 
@@ -12294,8 +2233,8 @@ type attrReadMissingDiag struct {
 	Path string
 }
 
-func (d attrReadMissingDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
-	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+func (d attrReadMissingDiag) Severity() diag.Severity {
+	return diag.SeverityError
 }
 
 func (d attrReadMissingDiag) Summary() string {
@@ -12303,10 +2242,10 @@ func (d attrReadMissingDiag) Summary() string {
 }
 
 func (d attrReadMissingDiag) Detail() string {
-	return fmt.Sprintf("A value for %v is missing in the source Terraform object Attrs", d.Path)
+	return fmt.Sprintf("A value for %v is missing in the source Terraform object Attributes", d.Path)
 }
 
-func (d attrReadMissingDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+func (d attrReadMissingDiag) Equal(o diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
 
@@ -12316,8 +2255,8 @@ type attrReadConversionFailureDiag struct {
 	Type string
 }
 
-func (d attrReadConversionFailureDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
-	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+func (d attrReadConversionFailureDiag) Severity() diag.Severity {
+	return diag.SeverityError
 }
 
 func (d attrReadConversionFailureDiag) Summary() string {
@@ -12328,7 +2267,7 @@ func (d attrReadConversionFailureDiag) Detail() string {
 	return fmt.Sprintf("A value for %v can not be converted to %v", d.Path, d.Type)
 }
 
-func (d attrReadConversionFailureDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+func (d attrReadConversionFailureDiag) Equal(o diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
 
@@ -12337,8 +2276,8 @@ type attrWriteMissingDiag struct {
 	Path string
 }
 
-func (d attrWriteMissingDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
-	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+func (d attrWriteMissingDiag) Severity() diag.Severity {
+	return diag.SeverityError
 }
 
 func (d attrWriteMissingDiag) Summary() string {
@@ -12349,7 +2288,7 @@ func (d attrWriteMissingDiag) Detail() string {
 	return fmt.Sprintf("A value for %v is missing in the source Terraform object AttrTypes", d.Path)
 }
 
-func (d attrWriteMissingDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+func (d attrWriteMissingDiag) Equal(o diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
 
@@ -12359,8 +2298,8 @@ type attrWriteConversionFailureDiag struct {
 	Type string
 }
 
-func (d attrWriteConversionFailureDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
-	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+func (d attrWriteConversionFailureDiag) Severity() diag.Severity {
+	return diag.SeverityError
 }
 
 func (d attrWriteConversionFailureDiag) Summary() string {
@@ -12371,7 +2310,7 @@ func (d attrWriteConversionFailureDiag) Detail() string {
 	return fmt.Sprintf("A value for %v can not be converted to %v", d.Path, d.Type)
 }
 
-func (d attrWriteConversionFailureDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+func (d attrWriteConversionFailureDiag) Equal(o diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
 
@@ -12381,8 +2320,8 @@ type attrWriteGeneralError struct {
 	Err  error
 }
 
-func (d attrWriteGeneralError) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
-	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+func (d attrWriteGeneralError) Severity() diag.Severity {
+	return diag.SeverityError
 }
 
 func (d attrWriteGeneralError) Summary() string {
@@ -12393,6 +2332,6 @@ func (d attrWriteGeneralError) Detail() string {
 	return fmt.Sprintf("%s: %s", d.Path, d.Err.Error())
 }
 
-func (d attrWriteGeneralError) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+func (d attrWriteGeneralError) Equal(o diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
