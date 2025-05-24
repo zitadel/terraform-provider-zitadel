@@ -4,13 +4,12 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	fdiag "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	sdkschema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	zitadel_go "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action"
@@ -99,16 +98,20 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/verify_sms_otp_message_text"
 )
 
+// Ensure provider satisfies various provider interfaces
 var _ provider.Provider = (*providerPV6)(nil)
 
+// providerPV6 is the provider implementation for the Terraform Plugin Framework v6
 type providerPV6 struct {
 	customOptions []zitadel_go.Option
 }
 
+// NewProviderPV6 creates a new provider instance with optional configuration
 func NewProviderPV6(option ...zitadel_go.Option) provider.Provider {
 	return &providerPV6{customOptions: option}
 }
 
+// providerModel represents the provider's configuration schema
 type providerModel struct {
 	Insecure       types.Bool   `tfsdk:"insecure"`
 	Domain         types.String `tfsdk:"domain"`
@@ -119,51 +122,48 @@ type providerModel struct {
 	JWTProfileJSON types.String `tfsdk:"jwt_profile_json"`
 }
 
+// Metadata returns the provider type name
 func (p *providerPV6) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "zitadel"
 }
-func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnostics) {
-	return tfsdk.Schema{
-		Attributes: map[string]tfsdk.Attribute{
-			helper.DomainVar: {
-				Type:        types.StringType,
+
+// Schema defines the provider-level schema for configuration data
+func (p *providerPV6) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
+	resp.Schema = schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			helper.DomainVar: schema.StringAttribute{
 				Required:    true,
 				Description: helper.DomainDescription,
 			},
-			helper.InsecureVar: {
-				Type:        types.BoolType,
+			helper.InsecureVar: schema.BoolAttribute{
 				Optional:    true,
 				Description: helper.InsecureDescription,
 			},
-			helper.TokenVar: {
-				Type:        types.StringType,
+			helper.TokenVar: schema.StringAttribute{
 				Optional:    true,
 				Description: helper.TokenDescription,
 			},
-			helper.JWTFileVar: {
-				Type:        types.StringType,
+			helper.JWTFileVar: schema.StringAttribute{
 				Optional:    true,
 				Description: helper.JWTFileDescription,
 			},
-			helper.JWTProfileFileVar: {
-				Type:        types.StringType,
+			helper.JWTProfileFileVar: schema.StringAttribute{
 				Optional:    true,
 				Description: helper.JWTProfileFileDescription,
 			},
-			helper.JWTProfileJSONVar: {
-				Type:        types.StringType,
+			helper.JWTProfileJSONVar: schema.StringAttribute{
 				Optional:    true,
 				Description: helper.JWTProfileJSONDescription,
 			},
-			helper.PortVar: {
-				Type:        types.StringType,
+			helper.PortVar: schema.StringAttribute{
 				Optional:    true,
 				Description: helper.PortDescription,
 			},
 		},
-	}, nil
+	}
 }
 
+// Configure prepares the provider for data source and resource CRUD operations
 func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	var config providerModel
 	diags := req.Config.Get(ctx, &config)
@@ -172,6 +172,7 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
+	// Initialize the client with configuration values
 	info, err := helper.GetClientInfo(ctx,
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
@@ -186,14 +187,17 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
+	// Make the client configuration available to resources and data sources
 	resp.DataSourceData = info
 	resp.ResourceData = info
 }
 
+// DataSources defines the data sources implemented in the provider
 func (p *providerPV6) DataSources(_ context.Context) []func() datasource.DataSource {
 	return nil
 }
 
+// Resources defines the resources implemented in the provider
 func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		init_message_text.New,
@@ -219,9 +223,11 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 	}
 }
 
-func Provider() *schema.Provider {
-	return &schema.Provider{
-		DataSourcesMap: map[string]*schema.Resource{
+// Provider returns the SDK v2 provider for backward compatibility
+// This maintains support for existing configurations while transitioning to Framework v6
+func Provider() *sdkschema.Provider {
+	return &sdkschema.Provider{
+		DataSourcesMap: map[string]*sdkschema.Resource{
 			"zitadel_org":                        org.GetDatasource(),
 			"zitadel_orgs":                       org.ListDatasources(),
 			"zitadel_human_user":                 human_user.GetDatasource(),
@@ -261,44 +267,44 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_oauth":              org_idp_oauth.GetDatasource(),
 			"zitadel_default_oidc_settings":      default_oidc_settings.GetDatasource(),
 		},
-		Schema: map[string]*schema.Schema{
+		Schema: map[string]*sdkschema.Schema{
 			helper.DomainVar: {
-				Type:        schema.TypeString,
+				Type:        sdkschema.TypeString,
 				Required:    true,
 				Description: helper.DomainDescription,
 			},
 			helper.InsecureVar: {
-				Type:        schema.TypeBool,
+				Type:        sdkschema.TypeBool,
 				Optional:    true,
 				Description: helper.InsecureDescription,
 			},
 			helper.TokenVar: {
-				Type:        schema.TypeString,
+				Type:        sdkschema.TypeString,
 				Optional:    true,
 				Description: helper.TokenDescription,
 			},
 			helper.JWTFileVar: {
-				Type:        schema.TypeString,
+				Type:        sdkschema.TypeString,
 				Optional:    true,
 				Description: helper.JWTFileDescription,
 			},
 			helper.JWTProfileFileVar: {
-				Type:        schema.TypeString,
+				Type:        sdkschema.TypeString,
 				Optional:    true,
 				Description: helper.JWTProfileFileDescription,
 			},
 			helper.JWTProfileJSONVar: {
-				Type:        schema.TypeString,
+				Type:        sdkschema.TypeString,
 				Optional:    true,
 				Description: helper.JWTProfileJSONDescription,
 			},
 			helper.PortVar: {
-				Type:        schema.TypeString,
+				Type:        sdkschema.TypeString,
 				Optional:    true,
 				Description: helper.PortDescription,
 			},
 		},
-		ResourcesMap: map[string]*schema.Resource{
+		ResourcesMap: map[string]*sdkschema.Resource{
 			"zitadel_org":                                org.GetResource(),
 			"zitadel_human_user":                         human_user.GetResource(),
 			"zitadel_machine_user":                       machine_user.GetResource(),
@@ -367,7 +373,8 @@ func Provider() *schema.Provider {
 	}
 }
 
-func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+// ProviderConfigure configures the SDK v2 provider for backward compatibility
+func ProviderConfigure(ctx context.Context, d *sdkschema.ResourceData) (interface{}, diag.Diagnostics) {
 	clientinfo, err := helper.GetClientInfo(ctx,
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),

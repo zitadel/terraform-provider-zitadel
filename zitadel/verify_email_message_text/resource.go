@@ -2,19 +2,22 @@ package verify_email_message_text
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	providerschema "github.com/hashicorp/terraform-plugin-framework/provider/schema"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	textpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/text"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/zitadel/terraform-provider-zitadel/v2/gen/github.com/zitadel/zitadel/pkg/grpc/text"
+	generatedtext "github.com/zitadel/terraform-provider-zitadel/v2/gen/github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
@@ -35,23 +38,50 @@ type verifyEmailMessageTextResource struct {
 }
 
 func (r *verifyEmailMessageTextResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_verify_email_message_text"
+	resp.TypeName = req.ProviderTypeName + "_default_verify_email_message_text"
 }
 
-func (r *verifyEmailMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaMessageCustomText(ctx)
-}
-
-func (r *verifyEmailMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
-	if req.ProviderData == nil {
+func (r *verifyEmailMessageTextResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	// Get the generated schema - this returns a provider schema, so we need to convert it
+	providerSchema, d := generatedtext.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(d...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	r.clientInfo = req.ProviderData.(*helper.ClientInfo)
+	// Convert provider schema to resource schema
+	resourceAttrs := make(map[string]schema.Attribute)
+	for name, attr := range providerSchema.Attributes {
+		if name != "org_id" { // Skip org_id attribute
+			resourceAttrs[name] = convertProviderAttrToResourceAttr(attr)
+		}
+	}
+
+	resp.Schema = schema.Schema{
+		Attributes:          resourceAttrs,
+		Description:         providerSchema.Description,
+		MarkdownDescription: providerSchema.MarkdownDescription,
+		DeprecationMessage:  providerSchema.DeprecationMessage,
+	}
+}
+
+func (r *verifyEmailMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+	clientInfo, ok := req.ProviderData.(*helper.ClientInfo)
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Configure Provider Data Type",
+			fmt.Sprintf("Expected *helper.ClientInfo, got: %T", req.ProviderData),
+		)
+		return
+	}
+	r.clientInfo = clientInfo
 }
 
 func (r *verifyEmailMessageTextResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	orgID, language := getPlanAttrs(ctx, req.Plan, resp.Diagnostics)
+	language := getPlanAttrs(ctx, req.Plan, resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -63,7 +93,7 @@ func (r *verifyEmailMessageTextResource) Create(ctx context.Context, req resourc
 	}
 
 	obj := textpb.MessageCustomText{}
-	resp.Diagnostics.Append(text.CopyMessageCustomTextFromTerraform(ctx, plan, &obj)...)
+	resp.Diagnostics.Append(generatedtext.CopyMessageCustomTextFromTerraform(ctx, plan, &obj)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -73,31 +103,31 @@ func (r *verifyEmailMessageTextResource) Create(ctx context.Context, req resourc
 			DiscardUnknown: true,
 		},
 	}
-	data, err := jsonpb.Marshal(obj)
+	data, err := jsonpb.Marshal(&obj)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to marshal", err.Error())
+		resp.Diagnostics.AddError("failed to marshal protobuf object", err.Error())
 		return
 	}
-	zReq := &management.SetCustomVerifyEmailMessageTextRequest{}
+	zReq := &admin.SetDefaultVerifyEmailMessageTextRequest{}
 	if err := jsonpb.Unmarshal(data, zReq); err != nil {
-		resp.Diagnostics.AddError("failed to unmarshal", err.Error())
+		resp.Diagnostics.AddError("failed to unmarshal into ZITADEL request", err.Error())
 		return
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(ctx, r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomVerifyEmailMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
+	_, err = client.SetDefaultVerifyEmailMessageText(ctx, zReq)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to create", err.Error())
+		resp.Diagnostics.AddError("failed to create default verify email message text", err.Error())
 		return
 	}
 
-	setID(plan, orgID, language)
+	setID(&plan, language)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
@@ -109,33 +139,39 @@ func (r *verifyEmailMessageTextResource) Read(ctx context.Context, req resource.
 		return
 	}
 
-	orgID, language := getID(ctx, state)
+	language := getID(ctx, state)
 
-	client, err := helper.GetManagementClient(ctx, r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	zResp, err := client.GetCustomVerifyEmailMessageText(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomVerifyEmailMessageTextRequest{Language: language})
+	zResp, err := client.GetCustomVerifyEmailMessageText(ctx, &admin.GetCustomVerifyEmailMessageTextRequest{Language: language})
 	if err != nil {
-		return
-	}
-	if zResp.CustomText.IsDefault {
+		if isResourceNotFoundError(err) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+		resp.Diagnostics.AddError("failed to read default verify email message text", err.Error())
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
+	if zResp.GetCustomText().GetIsDefault() {
+		return
+	}
+
+	resp.Diagnostics.Append(generatedtext.CopyMessageCustomTextToTerraform(ctx, zResp.GetCustomText(), &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	setID(state, orgID, language)
+	setID(&state, language)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
 func (r *verifyEmailMessageTextResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	orgID, language := getPlanAttrs(ctx, req.Plan, resp.Diagnostics)
+	language := getPlanAttrs(ctx, req.Plan, resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -147,7 +183,7 @@ func (r *verifyEmailMessageTextResource) Update(ctx context.Context, req resourc
 	}
 
 	obj := textpb.MessageCustomText{}
-	resp.Diagnostics.Append(text.CopyMessageCustomTextFromTerraform(ctx, plan, &obj)...)
+	resp.Diagnostics.Append(generatedtext.CopyMessageCustomTextFromTerraform(ctx, plan, &obj)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -157,95 +193,187 @@ func (r *verifyEmailMessageTextResource) Update(ctx context.Context, req resourc
 			DiscardUnknown: true,
 		},
 	}
-	data, err := jsonpb.Marshal(obj)
+	data, err := jsonpb.Marshal(&obj)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to marshal", err.Error())
+		resp.Diagnostics.AddError("failed to marshal protobuf object", err.Error())
 		return
 	}
-	zReq := &management.SetCustomVerifyEmailMessageTextRequest{}
+	zReq := &admin.SetDefaultVerifyEmailMessageTextRequest{}
 	if err := jsonpb.Unmarshal(data, zReq); err != nil {
-		resp.Diagnostics.AddError("failed to unmarshal", err.Error())
+		resp.Diagnostics.AddError("failed to unmarshal into ZITADEL request", err.Error())
 		return
 	}
 	zReq.Language = language
 
-	client, err := helper.GetManagementClient(ctx, r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.SetCustomVerifyEmailMessageText(helper.CtxSetOrgID(ctx, orgID), zReq)
+	_, err = client.SetDefaultVerifyEmailMessageText(ctx, zReq)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to update", err.Error())
+		resp.Diagnostics.AddError("failed to update default verify email message text", err.Error())
 		return
 	}
 
-	setID(plan, orgID, language)
+	setID(&plan, language)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
 func (r *verifyEmailMessageTextResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	orgID, language := getStateAttrs(ctx, req.State, resp.Diagnostics)
+	var state types.Object
+	diags := req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	language := getStateAttrsFromObject(ctx, state, resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	client, err := helper.GetManagementClient(ctx, r.clientInfo)
+	client, err := helper.GetAdminClient(ctx, r.clientInfo)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get client", err.Error())
 		return
 	}
 
-	_, err = client.ResetCustomVerifyEmailMessageTextToDefault(helper.CtxSetOrgID(ctx, orgID), &management.ResetCustomVerifyEmailMessageTextToDefaultRequest{Language: language})
+	_, err = client.ResetCustomVerifyEmailMessageTextToDefault(ctx, &admin.ResetCustomVerifyEmailMessageTextToDefaultRequest{Language: language})
 	if err != nil {
-		resp.Diagnostics.AddError("failed to delete", err.Error())
+		if isResourceNotFoundError(err) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+		resp.Diagnostics.AddError("failed to delete default verify email message text", err.Error())
 		return
 	}
 }
 
-func setID(obj types.Object, orgID string, language string) {
+func setID(obj *types.Object, language string) {
+	if obj.IsNull() || obj.IsUnknown() {
+		return
+	}
 	attrs := obj.Attributes()
-	attrs["id"] = types.StringValue(orgID + "_" + language)
-	attrs[helper.OrgIDVar] = types.StringValue(orgID)
+	if attrs == nil {
+		return
+	}
+	attrs["id"] = types.StringValue(language)
 	attrs[LanguageVar] = types.StringValue(language)
 }
 
-func getID(ctx context.Context, obj types.Object) (string, string) {
-	id := helper.GetStringFromAttr(ctx, obj.Attributes(), "id")
-	parts := strings.Split(id, "_")
-	if len(parts) == 2 {
-		return parts[0], parts[1]
+func getID(ctx context.Context, obj types.Object) string {
+	if obj.IsNull() || obj.IsUnknown() {
+		return ""
 	}
-	return helper.GetStringFromAttr(ctx, obj.Attributes(), helper.OrgIDVar), helper.GetStringFromAttr(ctx, obj.Attributes(), LanguageVar)
+	return helper.GetStringFromAttr(ctx, obj.Attributes(), "id")
 }
 
-func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) (string, string) {
-	var orgID string
-	diag.Append(plan.GetAttribute(ctx, path.Root(helper.OrgIDVar), &orgID)...)
-	if diag.HasError() {
-		return "", ""
+func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diags diag.Diagnostics) string {
+	var language types.String
+	diags.Append(plan.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
+	if diags.HasError() || language.IsNull() || language.IsUnknown() {
+		return ""
 	}
-	var language string
-	diag.Append(plan.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
-	if diag.HasError() {
-		return "", ""
-	}
-
-	return orgID, language
+	return language.ValueString()
 }
 
-func getStateAttrs(ctx context.Context, state tfsdk.State, diag diag.Diagnostics) (string, string) {
-	var orgID string
-	diag.Append(state.GetAttribute(ctx, path.Root(helper.OrgIDVar), &orgID)...)
-	if diag.HasError() {
-		return "", ""
-	}
-	var language string
-	diag.Append(state.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
-	if diag.HasError() {
-		return "", ""
+func getStateAttrsFromObject(ctx context.Context, obj types.Object, diags diag.Diagnostics) string {
+	if obj.IsNull() || obj.IsUnknown() {
+		return ""
 	}
 
-	return orgID, language
+	attrs := obj.Attributes()
+	if attrs == nil {
+		return ""
+	}
+
+	if langAttr, exists := attrs[LanguageVar]; exists {
+		if langStr, ok := langAttr.(types.String); ok && !langStr.IsNull() && !langStr.IsUnknown() {
+			return langStr.ValueString()
+		}
+	}
+
+	return ""
+}
+
+func convertProviderAttrToResourceAttr(attr providerschema.Attribute) schema.Attribute {
+	switch v := attr.(type) {
+	case providerschema.StringAttribute:
+		return schema.StringAttribute{
+			Description:         v.Description,
+			MarkdownDescription: v.MarkdownDescription,
+			Required:            v.Required,
+			Optional:            v.Optional,
+			Computed:            false,
+			Sensitive:           v.Sensitive,
+			DeprecationMessage:  v.DeprecationMessage,
+		}
+	case providerschema.BoolAttribute:
+		return schema.BoolAttribute{
+			Description:         v.Description,
+			MarkdownDescription: v.MarkdownDescription,
+			Required:            v.Required,
+			Optional:            v.Optional,
+			Computed:            false,
+			Sensitive:           v.Sensitive,
+			DeprecationMessage:  v.DeprecationMessage,
+		}
+	case providerschema.Int64Attribute:
+		return schema.Int64Attribute{
+			Description:         v.Description,
+			MarkdownDescription: v.MarkdownDescription,
+			Required:            v.Required,
+			Optional:            v.Optional,
+			Computed:            false,
+			Sensitive:           v.Sensitive,
+			DeprecationMessage:  v.DeprecationMessage,
+		}
+	case providerschema.SingleNestedAttribute:
+		nestedAttrs := make(map[string]schema.Attribute)
+		for name, nestedAttr := range v.Attributes {
+			nestedAttrs[name] = convertProviderAttrToResourceAttr(nestedAttr)
+		}
+		return schema.SingleNestedAttribute{
+			Description:         v.Description,
+			MarkdownDescription: v.MarkdownDescription,
+			Required:            v.Required,
+			Optional:            v.Optional,
+			Computed:            false,
+			Sensitive:           v.Sensitive,
+			DeprecationMessage:  v.DeprecationMessage,
+			Attributes:          nestedAttrs,
+		}
+	case providerschema.ListNestedAttribute:
+		nestedAttrs := make(map[string]schema.Attribute)
+		for name, nestedAttr := range v.NestedObject.Attributes {
+			nestedAttrs[name] = convertProviderAttrToResourceAttr(nestedAttr)
+		}
+		return schema.ListNestedAttribute{
+			Description:         v.Description,
+			MarkdownDescription: v.MarkdownDescription,
+			Required:            v.Required,
+			Optional:            v.Optional,
+			Computed:            false,
+			Sensitive:           v.Sensitive,
+			DeprecationMessage:  v.DeprecationMessage,
+			NestedObject: schema.NestedAttributeObject{
+				Attributes: nestedAttrs,
+			},
+		}
+	default:
+		return schema.StringAttribute{
+			Optional: true,
+		}
+	}
+}
+
+func isResourceNotFoundError(err error) bool {
+	if err == nil {
+		return false
+	}
+	errStr := strings.ToLower(err.Error())
+	return strings.Contains(errStr, "not found") ||
+		strings.Contains(errStr, "not_found") ||
+		strings.Contains(errStr, "does not exist")
 }
