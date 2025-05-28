@@ -118,9 +118,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			}},
 		},
 	})
-	if err != nil || resp.Result == nil || len(resp.Result) == 0 {
-		d.SetId("")
-		return nil
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	if len(resp.Result) == 1 {
