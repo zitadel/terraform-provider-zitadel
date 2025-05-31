@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_init_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_invite_user_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_login_policy"
@@ -216,6 +217,7 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 		default_verify_sms_otp_message_text.New,
 		verify_email_otp_message_text.New,
 		verify_sms_otp_message_text.New,
+		default_invite_user_message_text.New,
 	}
 }
 
