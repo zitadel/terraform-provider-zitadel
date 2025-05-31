@@ -8,9 +8,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 )
 
 const (
