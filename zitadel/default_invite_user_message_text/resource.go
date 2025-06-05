@@ -34,7 +34,7 @@ type defaultInviteUserMessageTextResource struct {
 }
 
 func (r *defaultInviteUserMessageTextResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_default_Invite_user_message_text"
+	resp.TypeName = req.ProviderTypeName + "_default_invite_user_message_text"
 }
 
 func (r *defaultInviteUserMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
