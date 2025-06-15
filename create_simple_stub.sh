@@ -1,3 +1,12 @@
+#!/bin/bash
+
+GENFILE="gen/github.com/zitadel/zitadel/pkg/grpc/text/text_terraform.go"
+
+# Create backup
+mv "$GENFILE" "$GENFILE.complex"
+
+# Create simple stub that compiles
+cat > "$GENFILE" << 'GOEOF'
 // Temporary stub for framework upgrade
 package text
 
@@ -59,3 +68,6 @@ func CopyLoginCustomTextFromTerraform(ctx context.Context, data interface{}) (*t
 func CopyLoginCustomTextToTerraform(ctx context.Context, msg *textpb.LoginCustomText) (interface{}, error) {
     return map[string]interface{}{}, nil
 }
+GOEOF
+
+echo "Simple stub created!"
