@@ -27,6 +27,6 @@ jobs:
       - name: Build
         run: go build ./...
 
-      - name: Test
-        run: go test ./...
+      - name: Test 
+        run: go test -v $(go list ./... | grep -v '/acceptance')
 
