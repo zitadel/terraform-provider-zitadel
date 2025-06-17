@@ -1,5 +1,5 @@
 name: 💡 Proposal / Feature request
-description: "Create an issue for an improvemnt you like to see in the terraform provider"
+description: "Create an issue for a feature request/proposal you like to see in the terraform provider"
 labels: ["enhancement"]
 type: enhancement
 body:
