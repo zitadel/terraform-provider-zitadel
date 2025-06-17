@@ -1,4 +1,4 @@
-module github.com/zitadel/terraform-provider-zitadel/v2
+module github.com/dev-torchai/terraform-provider-zitadel
 
 go 1.23.7
 
@@ -14,6 +14,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.35.0
 	github.com/zclconf/go-cty v1.15.0
 	github.com/zitadel/oidc/v3 v3.33.1
+	github.com/zitadel/terraform-provider-zitadel/v2 v2.2.0
 	github.com/zitadel/zitadel-go/v3 v3.4.2
 	golang.org/x/oauth2 v0.26.0
 	google.golang.org/grpc v1.72.1
@@ -30,7 +31,7 @@ require (
 	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-test/deep v1.0.7 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
