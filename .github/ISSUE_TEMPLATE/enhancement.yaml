@@ -1,6 +1,7 @@
-name: 🛠️ Improvement
+name: 💡 Proposal / Feature request
 description: "Create an issue for an improvemnt you like to see in the terraform provider"
-labels: ["improvement"]
+labels: ["enhancement"]
+type: enhancement
 body:
   - type: markdown
     attributes:
