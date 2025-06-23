@@ -48,12 +48,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	// Start with the request struct containing only the mandatory ID
 	req := &action.UpdateTargetRequest{
 		Id: d.Id(),
 	}
 
-	// Conditionally set fields only if they have changed in the configuration
 	if d.HasChange(NameVar) {
 		name := d.Get(NameVar).(string)
 		req.Name = &name
@@ -72,7 +70,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		req.Timeout = durationpb.New(timeout)
 	}
 
-	// The target type and interrupt on error must be checked together
 	if d.HasChange(TargetTypeVar) || d.HasChange(InterruptOnErrorVar) {
 		targetType := d.Get(TargetTypeVar).(string)
 		interruptOnError := d.Get(InterruptOnErrorVar).(bool)
@@ -166,7 +163,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	// Use GetTarget with the correct field name 'Id'
 	resp, err := client.GetTarget(helper.CtxWithOrgID(ctx, d), &action.GetTargetRequest{
 		Id: helper.GetID(d, TargetIDVar),
 	})
@@ -181,8 +177,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	target := resp.GetTarget()
 	if target != nil {
-		// Do not set OrgIDVar, as the v2beta API does not return it in the response body.
-		// The value from the configuration will be preserved in the state.
 		set := map[string]interface{}{
 			NameVar:     target.GetName(),
 			EndpointVar: target.GetEndpoint(),
@@ -197,7 +191,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			set[InterruptOnErrorVar] = target.GetRestCall().GetInterruptOnError()
 		} else if target.GetRestAsync() != nil {
 			set[TargetTypeVar] = "REST_ASYNC"
-			set[InterruptOnErrorVar] = false // Not applicable, so set to default
+			set[InterruptOnErrorVar] = false
 		}
 
 		for k, v := range set {
