@@ -2,6 +2,7 @@ package action_target
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 

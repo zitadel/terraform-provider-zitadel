@@ -1,11 +1,13 @@
 package action_target
 
 import (
+	"strings"
+
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
-	"strings"
 )
 
 func GetResource() *schema.Resource {

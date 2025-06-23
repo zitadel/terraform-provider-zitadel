@@ -15,7 +15,7 @@ Resource representing a target, which can be used in executions.
 resource "zitadel_action_target" "default" {
   org_id               = data.zitadel_org.default.id
   name                 = "webhook_target"
-  endpoint             = "[https://example.com/hooks/my-webhook](https://example.com/hooks/my-webhook)"
+	endpoint = "https://example.com/hooks/my-webhook"
   target_type          = "REST_WEBHOOK"
   timeout              = "10s"
   interrupt_on_error   = true
