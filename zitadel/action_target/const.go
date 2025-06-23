@@ -1,4 +1,4 @@
-package target
+package action_target
 
 const (
 	TargetIDVar         = "target_id"

@@ -1,4 +1,4 @@
-package target
+package action_target
 
 import (
 	"github.com/hashicorp/go-cty/cty"
