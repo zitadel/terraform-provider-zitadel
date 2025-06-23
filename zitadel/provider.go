@@ -4,10 +4,9 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	fdiag "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
+	framework_schema "github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -18,27 +17,16 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_key"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_saml"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_policy"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_init_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_login_policy"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_login_texts"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_notification_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_oidc_settings"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_password_age_policy"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_password_complexity_policy"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_password_reset_message_text"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_passwordless_registration_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_privacy_policy"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_verify_email_message_text"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_verify_email_otp_message_text"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_verify_phone_message_text"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_verify_sms_otp_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/human_user"
@@ -52,12 +40,10 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_oauth"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_saml"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/init_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/login_policy"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/login_texts"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/machine_key"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/machine_user"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/notification_policy"
@@ -76,10 +62,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_metadata"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_age_policy"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_complexity_policy"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_reset_message_text"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/passwordless_registration_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/pat"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/privacy_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project"
@@ -93,10 +76,6 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/trigger_actions"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/user_grant"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/user_metadata"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/verify_email_message_text"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/verify_email_otp_message_text"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/verify_phone_message_text"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/verify_sms_otp_message_text"
 )
 
 var _ provider.Provider = (*providerPV6)(nil)
@@ -122,46 +101,43 @@ type providerModel struct {
 func (p *providerPV6) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "zitadel"
 }
-func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnostics) {
-	return tfsdk.Schema{
-		Attributes: map[string]tfsdk.Attribute{
-			helper.DomainVar: {
-				Type:        types.StringType,
+
+func (p *providerPV6) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
+	resp.Schema = framework_schema.Schema{
+		Description: "The ZITADEL provider is used to configure resources supported by ZITADEL.",
+		Attributes: map[string]framework_schema.Attribute{
+			helper.DomainVar: framework_schema.StringAttribute{
 				Required:    true,
 				Description: helper.DomainDescription,
 			},
-			helper.InsecureVar: {
-				Type:        types.BoolType,
+			helper.InsecureVar: framework_schema.BoolAttribute{
 				Optional:    true,
 				Description: helper.InsecureDescription,
 			},
-			helper.TokenVar: {
-				Type:        types.StringType,
+			helper.TokenVar: framework_schema.StringAttribute{
 				Optional:    true,
+				Sensitive:   true,
 				Description: helper.TokenDescription,
 			},
-			helper.JWTFileVar: {
-				Type:        types.StringType,
+			helper.JWTFileVar: framework_schema.StringAttribute{
 				Optional:    true,
 				Description: helper.JWTFileDescription,
 			},
-			helper.JWTProfileFileVar: {
-				Type:        types.StringType,
+			helper.JWTProfileFileVar: framework_schema.StringAttribute{
 				Optional:    true,
 				Description: helper.JWTProfileFileDescription,
 			},
-			helper.JWTProfileJSONVar: {
-				Type:        types.StringType,
+			helper.JWTProfileJSONVar: framework_schema.StringAttribute{
 				Optional:    true,
+				Sensitive:   true,
 				Description: helper.JWTProfileJSONDescription,
 			},
-			helper.PortVar: {
-				Type:        types.StringType,
+			helper.PortVar: framework_schema.StringAttribute{
 				Optional:    true,
 				Description: helper.PortDescription,
 			},
 		},
-	}, nil
+	}
 }
 
 func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -196,29 +172,12 @@ func (p *providerPV6) DataSources(_ context.Context) []func() datasource.DataSou
 
 func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		init_message_text.New,
-		login_texts.New,
-		password_reset_message_text.New,
-		password_change_message_text.New,
-		verify_email_message_text.New,
-		verify_phone_message_text.New,
-		domain_claimed_message_text.New,
-		passwordless_registration_message_text.New,
-		default_domain_claimed_message_text.New,
-		default_init_message_text.New,
-		default_login_texts.New,
-		default_password_reset_message_text.New,
-		default_password_change_message_text.New,
-		default_passwordless_registration_message_text.New,
-		default_verify_email_message_text.New,
-		default_verify_phone_message_text.New,
-		default_verify_email_otp_message_text.New,
-		default_verify_sms_otp_message_text.New,
-		verify_email_otp_message_text.New,
-		verify_sms_otp_message_text.New,
+		// Framework resources can be added here when available
+		// For now, all resources use SDK v2 through the mux server
 	}
 }
 
+// SDK v2 Provider for backward compatibility (used in mux server)
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
