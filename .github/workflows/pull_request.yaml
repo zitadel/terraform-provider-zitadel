@@ -57,19 +57,11 @@ jobs:
       with:
         go-version-file: 'go.mod'
 
-    - name: Make Machinekey Directory Writable
-      working-directory: acceptance
-      run: "chmod -R 777 keys"
-
-    - name: Setup ZITADEL
-      working-directory: acceptance
-      run: docker compose run setup
-
     - name: Download Go Modules
       run: go mod download
 
     - name: Run Acceptance Tests
-      run: TF_ACC=1 go test -coverprofile=profile.cov ./...
+      run: go run ./mage.go test:cover
 
     - name: Publish Coverage
       uses: codecov/codecov-action@v3.1.4
@@ -77,17 +69,3 @@ jobs:
         file: profile.cov
         name: acceptance-tests
         flags: acceptance-tests
-
-    - name: Save Docker Compose Logs
-      if: always()
-      working-directory: acceptance
-      run: docker compose logs > .docker-compose.log
-
-    - name: Archive Docker Compose Logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: pull-request-tests
-        path: |
-          acceptance/.docker-compose.log
-        retention-days: 30
