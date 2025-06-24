@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
+	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/webkey/v2beta"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -117,6 +118,29 @@ func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error
 		}
 	}
 	return adminClient, nil
+}
+
+var webkeyClientLock = &sync.Mutex{}
+var webkeyClient *webkeys.Client
+
+func GetWebKeyClient(ctx context.Context, info *ClientInfo) (*webkeys.Client, error) {
+	if webkeyClient == nil {
+		webkeyClientLock.Lock()
+		defer webkeyClientLock.Unlock()
+		if webkeyClient == nil {
+			client, err := webkeys.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			webkeyClient = client
+		}
+	}
+	return webkeyClient, nil
 }
 
 var mgmtClientLock = &sync.Mutex{}

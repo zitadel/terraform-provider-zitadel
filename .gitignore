@@ -36,3 +36,10 @@ override.tf.json
 
 # local binary
 terraform-provider-zitadel
+
+.go
+
+# Devbox
+.devbox
+devbox.json
+devbox.lock
