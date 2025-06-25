@@ -1,8 +1,12 @@
 package helper
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"net/url"
 	"os"
 	"sync"
 	"time"
@@ -13,25 +17,33 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
+	"golang.org/x/net/proxy"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 const (
-	DomainVar                 = "domain"
-	DomainDescription         = "Domain used to connect to the ZITADEL instance"
-	InsecureVar               = "insecure"
-	InsecureDescription       = "Use insecure connection"
-	TokenVar                  = "token"
-	TokenDescription          = "Path to the file containing credentials to connect to ZITADEL"
-	PortVar                   = "port"
-	PortDescription           = "Used port if not the default ports 80 or 443 are configured"
-	JWTFileVar                = "jwt_file"
-	JWTFileDescription        = "Path to the file containing presigned JWT to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
-	JWTProfileFileVar         = "jwt_profile_file"
-	JWTProfileFileDescription = "Path to the file containing credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
-	JWTProfileJSONVar         = "jwt_profile_json"
-	JWTProfileJSONDescription = "JSON value of credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	DomainVar                  = "domain"
+	DomainDescription          = "Domain used to connect to the ZITADEL instance"
+	InsecureVar                = "insecure"
+	InsecureDescription        = "Use insecure connection"
+	TokenVar                   = "token"
+	TokenDescription           = "Path to the file containing credentials to connect to ZITADEL"
+	PortVar                    = "port"
+	PortDescription            = "Used port if not the default ports 80 or 443 are configured"
+	JWTFileVar                 = "jwt_file"
+	JWTFileDescription         = "Path to the file containing presigned JWT to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTProfileFileVar          = "jwt_profile_file"
+	JWTProfileFileDescription  = "Path to the file containing credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTProfileJSONVar          = "jwt_profile_json"
+	JWTProfileJSONDescription  = "JSON value of credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	ProxyBlockVar              = "proxy"
+	ProxyBlockDescription      = "Proxy configuration."
+	ProxyURLVar                = "url"
+	ProxyURLDescription        = "URL of the proxy to be used."
+	ProxyAuthHeaderVar         = "auth_header"
+	ProxyAuthHeaderDescription = "Proxy authentication header."
 )
 
 type ClientInfo struct {
@@ -42,7 +54,7 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(ctx context.Context, insecure bool, domain string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+func GetClientInfo(ctx context.Context, insecure bool, domain string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string, proxyURL string, proxyAuth string) (*ClientInfo, error) {
 	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if token != "" {
@@ -61,6 +73,62 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, token stri
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
 	} else {
 		return nil, fmt.Errorf("either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
+	}
+
+	if proxyURL != "" {
+		parsedURL, err := url.Parse(proxyURL)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse proxy url: %w", err)
+		}
+
+		var grpcDialer func(context.Context, string) (net.Conn, error)
+
+		switch parsedURL.Scheme {
+		case "http", "https":
+			// This is the corrected logic for HTTP/HTTPS proxies.
+			grpcDialer = func(ctx context.Context, addr string) (net.Conn, error) {
+				proxyConn, err := net.Dial("tcp", parsedURL.Host)
+				if err != nil {
+					return nil, fmt.Errorf("failed to connect to http proxy: %w", err)
+				}
+				connectReq := &http.Request{
+					Method: "CONNECT",
+					URL:    &url.URL{Opaque: addr},
+					Host:   addr,
+					Header: make(http.Header),
+				}
+				// Use the provided value to set the standard Proxy-Authorization header.
+				if proxyAuth != "" {
+					connectReq.Header.Set("Proxy-Authorization", proxyAuth)
+				}
+				if err := connectReq.Write(proxyConn); err != nil {
+					return nil, err
+				}
+				br := bufio.NewReader(proxyConn)
+				resp, err := http.ReadResponse(br, connectReq)
+				if err != nil {
+					return nil, err
+				}
+				if resp.StatusCode != http.StatusOK {
+					return nil, fmt.Errorf("http proxy connect failed with status %s", resp.Status)
+				}
+				return proxyConn, nil
+			}
+
+		case "socks5":
+			// This logic for SOCKS5 proxies is already correct.
+			dialer, err := proxy.FromURL(parsedURL, proxy.Direct)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create socks5 dialer: %w", err)
+			}
+			grpcDialer = func(ctx context.Context, addr string) (net.Conn, error) {
+				return dialer.Dial("tcp", addr)
+			}
+
+		default:
+			return nil, fmt.Errorf("unsupported proxy scheme: %s. Use 'http', 'https', or 'socks5'", parsedURL.Scheme)
+		}
+		options = append(options, zitadel.WithDialOptions(grpc.WithContextDialer(grpcDialer)))
 	}
 
 	issuerScheme := "https://"

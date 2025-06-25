@@ -14,9 +14,14 @@ services:
       retries: 5
       start_period: 10s
 
+  proxy:
+    image: serjs/go-socks5-proxy:latest
+    ports:
+      - "1080:1080"
+
   zitadel:
     user: '${ZITADEL_DEV_UID}'
-    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v2.71.6}'
+    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v3.3.0}'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"
@@ -31,6 +36,11 @@ services:
     depends_on:
       db:
         condition: 'service_healthy'
+    networks:
+      default:
+        aliases:
+          - org-level-tests.default.127.0.0.1.sslip.io
+          - instance-level-tests.default.127.0.0.1.sslip.io
 
   setup:
     user: '${ZITADEL_DEV_UID}'

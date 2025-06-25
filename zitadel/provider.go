@@ -117,6 +117,12 @@ type providerModel struct {
 	JWTFile        types.String `tfsdk:"jwt_file"`
 	JWTProfileFile types.String `tfsdk:"jwt_profile_file"`
 	JWTProfileJSON types.String `tfsdk:"jwt_profile_json"`
+	Proxy          types.List   `tfsdk:"proxy"`
+}
+
+type proxyModel struct {
+	URL        types.String `tfsdk:"url"`
+	AuthHeader types.String `tfsdk:"auth_header"`
 }
 
 func (p *providerPV6) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -161,6 +167,27 @@ func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnost
 				Description: helper.PortDescription,
 			},
 		},
+		Blocks: map[string]tfsdk.Block{
+			helper.ProxyBlockVar: {
+				Description: helper.ProxyBlockDescription,
+				NestingMode: tfsdk.BlockNestingModeList,
+				MaxItems:    1,
+				MinItems:    0,
+				Attributes: map[string]tfsdk.Attribute{
+					helper.ProxyURLVar: {
+						Type:        types.StringType,
+						Required:    true,
+						Description: helper.ProxyURLDescription,
+					},
+					helper.ProxyAuthHeaderVar: {
+						Type:        types.StringType,
+						Optional:    true,
+						Sensitive:   true,
+						Description: helper.ProxyAuthHeaderDescription,
+					},
+				},
+			},
+		},
 	}, nil
 }
 
@@ -172,6 +199,25 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
+	var proxy *proxyModel
+	if !config.Proxy.IsNull() && !config.Proxy.IsUnknown() {
+		proxies := make([]proxyModel, 0, 1)
+		diags := config.Proxy.ElementsAs(ctx, &proxies, false)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		if len(proxies) > 0 {
+			proxy = &proxies[0]
+		}
+	}
+
+	var proxyURL, proxyAuthHeader string
+	if proxy != nil {
+		proxyURL = proxy.URL.ValueString()
+		proxyAuthHeader = proxy.AuthHeader.ValueString()
+	}
+
 	info, err := helper.GetClientInfo(ctx,
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
@@ -180,6 +226,8 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		config.JWTProfileFile.ValueString(),
 		config.JWTProfileJSON.ValueString(),
 		config.Port.ValueString(),
+		proxyURL,
+		proxyAuthHeader,
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to handle provider config", err.Error())
@@ -297,6 +345,27 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: helper.PortDescription,
 			},
+			helper.ProxyBlockVar: {
+				Type:        schema.TypeList,
+				Optional:    true,
+				MaxItems:    1,
+				Description: helper.ProxyBlockDescription,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						helper.ProxyURLVar: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: helper.ProxyURLDescription,
+						},
+						helper.ProxyAuthHeaderVar: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Sensitive:   true,
+							Description: helper.ProxyAuthHeaderDescription,
+						},
+					},
+				},
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"zitadel_org":                                org.GetResource(),
@@ -368,6 +437,18 @@ func Provider() *schema.Provider {
 }
 
 func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+	var proxyURL, proxyAuthHeader string
+
+	if proxy, ok := d.Get(helper.ProxyBlockVar).([]interface{}); ok && len(proxy) > 0 && proxy[0] != nil {
+		proxyMap := proxy[0].(map[string]interface{})
+		if val, ok := proxyMap[helper.ProxyURLVar].(string); ok {
+			proxyURL = val
+		}
+		if val, ok := proxyMap[helper.ProxyAuthHeaderVar].(string); ok {
+			proxyAuthHeader = val
+		}
+	}
+
 	clientinfo, err := helper.GetClientInfo(ctx,
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
@@ -376,6 +457,8 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		d.Get(helper.JWTProfileFileVar).(string),
 		d.Get(helper.JWTProfileJSONVar).(string),
 		d.Get(helper.PortVar).(string),
+		proxyURL,
+		proxyAuthHeader,
 	)
 	if err != nil {
 		return nil, diag.FromErr(err)
