@@ -36,6 +36,8 @@ services:
     depends_on:
       db:
         condition: 'service_healthy'
+      proxy:
+          condition: 'service_healthy'
     networks:
       default:
         aliases:
