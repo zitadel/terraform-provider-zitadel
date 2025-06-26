@@ -37,7 +37,7 @@ services:
       db:
         condition: 'service_healthy'
       proxy:
-          condition: 'service_healthy'
+        condition: 'service_started'
     networks:
       default:
         aliases:
