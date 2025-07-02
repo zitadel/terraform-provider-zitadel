@@ -14,7 +14,7 @@ echo "2. Fixing generated file..."
 GENFILE="gen/github.com/zitadel/zitadel/pkg/grpc/text/text_terraform.go"
 if [ -f "$GENFILE" ]; then
     cp "$GENFILE" "$GENFILE.backup"
-    sed -i 's|github.com/hashicorp/terraform-plugin-framework/tfsdk|github.com/hashicorp/terraform-plugin-framework/provider/schema|g' "$GENFILE"
+    sed -i 's|github.com/hashicorp/terraform-plugin-framework/provider/schema|github.com/hashicorp/terraform-plugin-framework/provider/schema|g' "$GENFILE"
     sed -i 's/github_com_hashicorp_terraform_plugin_framework_tfsdk/github_com_hashicorp_terraform_plugin_framework_provider_schema/g' "$GENFILE"
     sed -i 's/tfsdk\./schema./g' "$GENFILE"
     echo "Generated file fixed!"

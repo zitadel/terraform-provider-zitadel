@@ -6,7 +6,6 @@ import (
     "github.com/hashicorp/terraform-plugin-framework/provider/schema"
     textpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/text"
 )
-
 // GenSchemaMessageCustomText returns a simple schema
 func GenSchemaMessageCustomText(ctx context.Context) schema.Schema {
     return schema.Schema{

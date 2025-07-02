@@ -7,12 +7,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	textpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/text"
 	"google.golang.org/protobuf/encoding/protojson"
-
+ 	"github.com/hashicorp/terraform-plugin-framework/resource"
+    "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/zitadel/terraform-provider-zitadel/v2/gen/github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -37,10 +38,11 @@ func (r *defaultVerifySMSOTPMessageTextResource) Metadata(_ context.Context, req
 	resp.TypeName = req.ProviderTypeName + "_default_verify_sms_otp_message_text"
 }
 
-func (r *defaultVerifySMSOTPMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *defaultVerifySMSOTPMessageTextResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	s, d := text.GenSchemaMessageCustomText(ctx)
 	delete(s.Attributes, "org_id")
-	return s, d
+	resp.Schema = s
+	resp.Diagnostics.Append(d...)
 }
 
 func (r *defaultVerifySMSOTPMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -215,7 +217,7 @@ func getID(ctx context.Context, obj types.Object) string {
 	return helper.GetStringFromAttr(ctx, obj.Attributes(), "id")
 }
 
-func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) string {
+func getPlanAttrs(ctx context.Context, plan resource.Plam, diag diag.Diagnostics) string {
 	var language string
 	diag.Append(plan.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
 	if diag.HasError() {
@@ -224,7 +226,7 @@ func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) s
 	return language
 }
 
-func getStateAttrs(ctx context.Context, state tfsdk.State, diag diag.Diagnostics) string {
+func getStateAttrs(ctx context.Context, state resource.State, diag diag.Diagnostics) string {
 	var language string
 	diag.Append(state.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
 	if diag.HasError() {

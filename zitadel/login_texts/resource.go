@@ -8,12 +8,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	textpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/text"
 	"google.golang.org/protobuf/encoding/protojson"
-
+ 	"github.com/hashicorp/terraform-plugin-framework/resource"
+    "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/zitadel/terraform-provider-zitadel/v2/gen/github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -38,8 +39,10 @@ func (r *loginTextsResource) Metadata(_ context.Context, req resource.MetadataRe
 	resp.TypeName = req.ProviderTypeName + "_login_texts"
 }
 
-func (r *loginTextsResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaLoginCustomText(ctx)
+func (r *passwordChangeMessageTextResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, d := text.GenSchemaMessageCustomText(ctx)
+	resp.Schema = s
+	resp.Diagnostics.Append(d...)
 }
 
 func (r *loginTextsResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -220,7 +223,7 @@ func getID(ctx context.Context, obj types.Object) (string, string) {
 	return helper.GetStringFromAttr(ctx, obj.Attributes(), helper.OrgIDVar), helper.GetStringFromAttr(ctx, obj.Attributes(), LanguageVar)
 }
 
-func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) (string, string) {
+func getPlanAttrs(ctx context.Context, plan resource.Plam, diag diag.Diagnostics) (string, string) {
 	var orgID string
 	diag.Append(plan.GetAttribute(ctx, path.Root(helper.OrgIDVar), &orgID)...)
 	if diag.HasError() {
@@ -235,7 +238,7 @@ func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) (
 	return orgID, language
 }
 
-func getStateAttrs(ctx context.Context, state tfsdk.State, diag diag.Diagnostics) (string, string) {
+func getStateAttrs(ctx context.Context, state resource.State, diag diag.Diagnostics) (string, string) {
 	var orgID string
 	diag.Append(state.GetAttribute(ctx, path.Root(helper.OrgIDVar), &orgID)...)
 	if diag.HasError() {
