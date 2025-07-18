@@ -17,7 +17,7 @@ require (
 	github.com/zclconf/go-cty v1.13.1
 	github.com/zitadel/oidc/v3 v3.33.1
 	github.com/zitadel/zitadel-go/v3 v3.4.2
-	golang.org/x/oauth2 v0.24.0
+	golang.org/x/oauth2 v0.27.0
 	google.golang.org/grpc v1.67.0
 	google.golang.org/protobuf v1.35.2
 )
