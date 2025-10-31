@@ -14,7 +14,6 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing a target, which can be used in executions.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: helper.OrgIDResourceField,
 			NameVar: {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -55,6 +54,6 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithIDAndOptionalOrg(TargetIDVar),
+		Importer:      helper.ImportWithID(TargetIDVar),
 	}
 }

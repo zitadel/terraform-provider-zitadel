@@ -26,7 +26,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	_, err = client.DeleteTarget(helper.CtxWithOrgID(ctx, d), &action.DeleteTargetRequest{
+	_, err = client.DeleteTarget(ctx, &action.DeleteTargetRequest{
 		Id: d.Id(),
 	})
 	if err != nil {
@@ -92,7 +92,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	_, err = client.UpdateTarget(helper.CtxWithOrgID(ctx, d), req)
+	_, err = client.UpdateTarget(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to update target: %v", err)
 	}
@@ -142,7 +142,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("unknown target type %s", targetType)
 	}
 
-	resp, err := client.CreateTarget(helper.CtxWithOrgID(ctx, d), req)
+	resp, err := client.CreateTarget(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to create target: %v", err)
 	}
@@ -163,7 +163,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetTarget(helper.CtxWithOrgID(ctx, d), &action.GetTargetRequest{
+	resp, err := client.GetTarget(ctx, &action.GetTargetRequest{
 		Id: helper.GetID(d, TargetIDVar),
 	})
 

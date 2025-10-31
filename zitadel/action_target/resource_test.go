@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2beta"
-	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -17,7 +16,7 @@ import (
 )
 
 func TestAccTarget(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_action_target")
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 
 	nameAttribute := test_utils.AttributeValue(t, action_target.NameVar, exampleAttributes).AsString()
@@ -29,7 +28,7 @@ func TestAccTarget(t *testing.T) {
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		[]string{frame.AsOrgDefaultDependency},
+		[]string{},
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty,
 		updatedProperty,
@@ -40,21 +39,19 @@ func TestAccTarget(t *testing.T) {
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
-			test_utils.ImportOrgId(frame),
 		),
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expectedEndpoint string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
 			if err != nil {
 				return fmt.Errorf("failed to get client: %w", err)
 			}
-			ctx := metadata.AppendToOutgoingContext(context.Background(), "x-zitadel-orgid", frame.OrgID)
 			remoteResource, err := client.GetTarget(
-				ctx,
+				context.Background(),
 				&action.GetTargetRequest{Id: frame.State(state).ID},
 			)
 			if err != nil {

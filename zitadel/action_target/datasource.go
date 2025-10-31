@@ -2,8 +2,6 @@ package action_target
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
 func GetDatasource() *schema.Resource {
@@ -15,7 +13,6 @@ func GetDatasource() *schema.Resource {
 				Required:    true,
 				Description: "The ID of this resource.",
 			},
-			helper.OrgIDVar: helper.OrgIDResourceField,
 			NameVar: {
 				Type:        schema.TypeString,
 				Computed:    true,

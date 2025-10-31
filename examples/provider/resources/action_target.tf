@@ -1,5 +1,4 @@
 resource "zitadel_action_target" "default" {
-	org_id             = data.zitadel_org.default.id
 	name               = "test-target-name"
 	endpoint           = "https://example.com/endpoint"
 	target_type        = "REST_WEBHOOK"
