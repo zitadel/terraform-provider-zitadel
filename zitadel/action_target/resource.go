@@ -30,7 +30,7 @@ func GetResource() *schema.Resource {
 				Description: "The type of the target. (REST_WEBHOOK, REST_CALL, REST_ASYNC)",
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					val := value.(string)
-					validValues := []string{"REST_WEBHOOK", "REST_CALL", "REST_ASYNC"}
+					validValues := []string{targetTypeRestWebhook, targetTypeRestCall, targetTypeRestAsync}
 					for _, valid := range validValues {
 						if val == valid {
 							return nil

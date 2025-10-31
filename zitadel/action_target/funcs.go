@@ -75,15 +75,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		interruptOnError := d.Get(InterruptOnErrorVar).(bool)
 
 		switch targetType {
-		case "REST_WEBHOOK":
+		case targetTypeRestWebhook:
 			req.TargetType = &action.UpdateTargetRequest_RestWebhook{
 				RestWebhook: &action.RESTWebhook{InterruptOnError: interruptOnError},
 			}
-		case "REST_CALL":
+		case targetTypeRestCall:
 			req.TargetType = &action.UpdateTargetRequest_RestCall{
 				RestCall: &action.RESTCall{InterruptOnError: interruptOnError},
 			}
-		case "REST_ASYNC":
+		case targetTypeRestAsync:
 			req.TargetType = &action.UpdateTargetRequest_RestAsync{
 				RestAsync: &action.RESTAsync{},
 			}
@@ -126,15 +126,15 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	targetType := d.Get(TargetTypeVar).(string)
 	interruptOnError := d.Get(InterruptOnErrorVar).(bool)
 	switch targetType {
-	case "REST_WEBHOOK":
+	case targetTypeRestWebhook:
 		req.TargetType = &action.CreateTargetRequest_RestWebhook{
 			RestWebhook: &action.RESTWebhook{InterruptOnError: interruptOnError},
 		}
-	case "REST_CALL":
+	case targetTypeRestCall:
 		req.TargetType = &action.CreateTargetRequest_RestCall{
 			RestCall: &action.RESTCall{InterruptOnError: interruptOnError},
 		}
-	case "REST_ASYNC":
+	case targetTypeRestAsync:
 		req.TargetType = &action.CreateTargetRequest_RestAsync{
 			RestAsync: &action.RESTAsync{},
 		}
@@ -189,13 +189,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 
 		if target.GetRestWebhook() != nil {
-			set[TargetTypeVar] = "REST_WEBHOOK"
+			set[TargetTypeVar] = targetTypeRestWebhook
 			set[InterruptOnErrorVar] = target.GetRestWebhook().GetInterruptOnError()
 		} else if target.GetRestCall() != nil {
-			set[TargetTypeVar] = "REST_CALL"
+			set[TargetTypeVar] = targetTypeRestCall
 			set[InterruptOnErrorVar] = target.GetRestCall().GetInterruptOnError()
 		} else if target.GetRestAsync() != nil {
-			set[TargetTypeVar] = "REST_ASYNC"
+			set[TargetTypeVar] = targetTypeRestAsync
 			set[InterruptOnErrorVar] = false
 		}
 
