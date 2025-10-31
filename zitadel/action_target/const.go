@@ -7,4 +7,5 @@ const (
 	TargetTypeVar       = "target_type"
 	TimeoutVar          = "timeout"
 	InterruptOnErrorVar = "interrupt_on_error"
+	SigningKeyVar       = "signing_key"
 )

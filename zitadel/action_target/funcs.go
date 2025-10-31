@@ -147,6 +147,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to create target: %v", err)
 	}
 	d.SetId(resp.GetId())
+
+	if err := d.Set(SigningKeyVar, resp.GetSigningKey()); err != nil {
+		return diag.Errorf("failed to set signing_key: %v", err)
+	}
+
 	return nil
 }
 

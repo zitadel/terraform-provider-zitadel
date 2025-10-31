@@ -40,6 +40,7 @@ func TestAccTarget(t *testing.T) {
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 		),
+		action_target.SigningKeyVar,
 	)
 }
 
