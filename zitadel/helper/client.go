@@ -9,7 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/action/v2beta"
+	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/action/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
@@ -98,14 +98,14 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, token stri
 }
 
 var actionClientLock = &sync.Mutex{}
-var actionClient *v2beta.Client
+var actionClient *actionV2.Client
 
-func GetActionClient(ctx context.Context, info *ClientInfo) (*v2beta.Client, error) {
+func GetActionClient(ctx context.Context, info *ClientInfo) (*actionV2.Client, error) {
 	if actionClient == nil {
 		actionClientLock.Lock()
 		defer actionClientLock.Unlock()
 		if actionClient == nil {
-			client, err := v2beta.NewClient(ctx,
+			client, err := actionV2.NewClient(ctx,
 				info.Issuer, info.Domain,
 				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 				info.Options...,

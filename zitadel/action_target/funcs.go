@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2beta"
+	actionv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -26,7 +26,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	_, err = client.DeleteTarget(ctx, &action.DeleteTargetRequest{
+	_, err = client.DeleteTarget(ctx, &actionv2.DeleteTargetRequest{
 		Id: d.Id(),
 	})
 	if err != nil {
@@ -48,7 +48,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	req := &action.UpdateTargetRequest{
+	req := &actionv2.UpdateTargetRequest{
 		Id: d.Id(),
 	}
 
@@ -76,16 +76,16 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 		switch targetType {
 		case targetTypeRestWebhook:
-			req.TargetType = &action.UpdateTargetRequest_RestWebhook{
-				RestWebhook: &action.RESTWebhook{InterruptOnError: interruptOnError},
+			req.TargetType = &actionv2.UpdateTargetRequest_RestWebhook{
+				RestWebhook: &actionv2.RESTWebhook{InterruptOnError: interruptOnError},
 			}
 		case targetTypeRestCall:
-			req.TargetType = &action.UpdateTargetRequest_RestCall{
-				RestCall: &action.RESTCall{InterruptOnError: interruptOnError},
+			req.TargetType = &actionv2.UpdateTargetRequest_RestCall{
+				RestCall: &actionv2.RESTCall{InterruptOnError: interruptOnError},
 			}
 		case targetTypeRestAsync:
-			req.TargetType = &action.UpdateTargetRequest_RestAsync{
-				RestAsync: &action.RESTAsync{},
+			req.TargetType = &actionv2.UpdateTargetRequest_RestAsync{
+				RestAsync: &actionv2.RESTAsync{},
 			}
 		default:
 			return diag.Errorf("unknown target type %s", targetType)
@@ -117,7 +117,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	req := &action.CreateTargetRequest{
+	req := &actionv2.CreateTargetRequest{
 		Name:     d.Get(NameVar).(string),
 		Endpoint: d.Get(EndpointVar).(string),
 		Timeout:  durationpb.New(timeout),
@@ -127,16 +127,16 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	interruptOnError := d.Get(InterruptOnErrorVar).(bool)
 	switch targetType {
 	case targetTypeRestWebhook:
-		req.TargetType = &action.CreateTargetRequest_RestWebhook{
-			RestWebhook: &action.RESTWebhook{InterruptOnError: interruptOnError},
+		req.TargetType = &actionv2.CreateTargetRequest_RestWebhook{
+			RestWebhook: &actionv2.RESTWebhook{InterruptOnError: interruptOnError},
 		}
 	case targetTypeRestCall:
-		req.TargetType = &action.CreateTargetRequest_RestCall{
-			RestCall: &action.RESTCall{InterruptOnError: interruptOnError},
+		req.TargetType = &actionv2.CreateTargetRequest_RestCall{
+			RestCall: &actionv2.RESTCall{InterruptOnError: interruptOnError},
 		}
 	case targetTypeRestAsync:
-		req.TargetType = &action.CreateTargetRequest_RestAsync{
-			RestAsync: &action.RESTAsync{},
+		req.TargetType = &actionv2.CreateTargetRequest_RestAsync{
+			RestAsync: &actionv2.RESTAsync{},
 		}
 	default:
 		return diag.Errorf("unknown target type %s", targetType)
@@ -168,7 +168,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetTarget(ctx, &action.GetTargetRequest{
+	resp, err := client.GetTarget(ctx, &actionv2.GetTargetRequest{
 		Id: helper.GetID(d, TargetIDVar),
 	})
 
