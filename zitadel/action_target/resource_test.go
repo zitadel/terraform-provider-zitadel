@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2beta"
+	actionv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -53,7 +53,7 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resou
 			}
 			remoteResource, err := client.GetTarget(
 				context.Background(),
-				&action.GetTargetRequest{Id: frame.State(state).ID},
+				&actionv2.GetTargetRequest{Id: frame.State(state).ID},
 			)
 			if err != nil {
 				return err
