@@ -43,3 +43,4 @@ terraform-provider-zitadel
 .devbox
 devbox.json
 devbox.lock
+vendor
