@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/action/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
@@ -96,15 +97,15 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, token stri
 	}, nil
 }
 
-var adminClientLock = &sync.Mutex{}
-var adminClient *admin.Client
+var actionClientLock = &sync.Mutex{}
+var actionClient *actionV2.Client
 
-func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error) {
-	if adminClient == nil {
-		adminClientLock.Lock()
-		defer adminClientLock.Unlock()
-		if adminClient == nil {
-			client, err := admin.NewClient(ctx,
+func GetActionClient(ctx context.Context, info *ClientInfo) (*actionV2.Client, error) {
+	if actionClient == nil {
+		actionClientLock.Lock()
+		defer actionClientLock.Unlock()
+		if actionClient == nil {
+			client, err := actionV2.NewClient(ctx,
 				info.Issuer, info.Domain,
 				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 				info.Options...,
@@ -113,10 +114,10 @@ func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error
 				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
 			}
 			time.Sleep(time.Second * 2)
-			adminClient = client
+			actionClient = client
 		}
 	}
-	return adminClient, nil
+	return actionClient, nil
 }
 
 var mgmtClientLock = &sync.Mutex{}
@@ -140,6 +141,29 @@ func GetManagementClient(ctx context.Context, info *ClientInfo) (*management.Cli
 		}
 	}
 	return mgmtClient, nil
+}
+
+var adminClientLock = &sync.Mutex{}
+var adminClient *admin.Client
+
+func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error) {
+	if adminClient == nil {
+		adminClientLock.Lock()
+		defer adminClientLock.Unlock()
+		if adminClient == nil {
+			client, err := admin.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			adminClient = client
+		}
+	}
+	return adminClient, nil
 }
 
 func CtxWithID(ctx context.Context, d *schema.ResourceData) context.Context {
