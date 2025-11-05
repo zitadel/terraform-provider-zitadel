@@ -26,12 +26,6 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Type of the key.",
 			},
-			PubKeyVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Sensitive:   true,
-				Description: "The public key, PEM encoded.",
-			},
 		},
 		ReadContext: readWebKey,
 	}

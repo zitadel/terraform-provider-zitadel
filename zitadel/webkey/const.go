@@ -10,5 +10,4 @@ const (
 	CurveVar     = "curve"
 	StateVar     = "state"
 	KeyTypeVar   = "key_type"
-	PubKeyVar    = "public_key"
 )

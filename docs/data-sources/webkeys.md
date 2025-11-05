@@ -23,5 +23,4 @@ Datasource representing a web key.
 
 - `id` (String) The ID of this resource.
 - `key_type` (String) Type of the key.
-- `public_key` (String, Sensitive) The public key, PEM encoded.
 - `state` (String) State of the key.

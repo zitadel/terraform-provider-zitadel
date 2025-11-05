@@ -37,7 +37,6 @@ data "zitadel_webkey" "default" {
 					),
 					resource.TestCheckResourceAttr("data.zitadel_webkey.default", webkey.KeyTypeVar, "RSA"),
 					resource.TestCheckResourceAttrSet("data.zitadel_webkey.default", webkey.StateVar),
-					resource.TestCheckResourceAttrSet("data.zitadel_webkey.default", webkey.PubKeyVar),
 				),
 			},
 		},

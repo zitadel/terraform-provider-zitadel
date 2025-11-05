@@ -68,12 +68,6 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "Type of the key.",
 			},
-			PubKeyVar: {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Sensitive:   true,
-				Description: "The public key, PEM encoded.",
-			},
 		},
 		CreateContext: createWebKey,
 		ReadContext:   readWebKey,

@@ -58,12 +58,22 @@ func readWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	webkeyID := helper.GetID(d, WebKeyIDVar)
+
 	resp, err := client.ListWebKeys(helper.CtxWithOrgID(ctx, d), &webkey.ListWebKeysRequest{})
 	if err != nil {
+		if helper.IgnoreIfNotFoundError(err) == nil {
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
+
 	for _, key := range resp.GetWebKeys() {
-		if key.Id == d.Id() {
+		if key.Id == webkeyID {
+			d.SetId(key.Id)
+
 			if err := d.Set(StateVar, key.GetState().String()); err != nil {
 				return diag.Errorf("failed to set state: %v", err)
 			}
@@ -81,6 +91,7 @@ func readWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 			return nil
 		}
 	}
+
 	d.SetId("")
 	return nil
 }
@@ -110,6 +121,9 @@ func deleteWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) di
 	}
 	_, err = client.DeleteWebKey(helper.CtxWithOrgID(ctx, d), &webkey.DeleteWebKeyRequest{Id: d.Id()})
 	if err != nil {
+		if helper.IgnoreIfNotFoundError(err) == nil {
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 	return nil
