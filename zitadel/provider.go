@@ -14,6 +14,7 @@ import (
 	zitadel_go "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_api"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_key"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_oidc"
@@ -233,6 +234,7 @@ func Provider() *schema.Provider {
 			"zitadel_projects":                   project.ListDatasources(),
 			"zitadel_project_role":               project_role.GetDatasource(),
 			"zitadel_action":                     action.GetDatasource(),
+			"zitadel_action_target":              action_target.GetDatasource(),
 			"zitadel_webkey":                     webkey.GetDatasource(),
 			"zitadel_application_oidc":           application_oidc.GetDatasource(),
 			"zitadel_application_oidcs":          application_oidc.ListDatasources(),
@@ -309,6 +311,7 @@ func Provider() *schema.Provider {
 			"zitadel_project_role":                       project_role.GetResource(),
 			"zitadel_domain":                             domain.GetResource(),
 			"zitadel_action":                             action.GetResource(),
+			"zitadel_action_target":                      action_target.GetResource(),
 			"zitadel_webkey":                             webkey.GetResource(),
 			"zitadel_active_webkey":                      active_webkey.GetActiveResource(),
 			"zitadel_application_oidc":                   application_oidc.GetResource(),
