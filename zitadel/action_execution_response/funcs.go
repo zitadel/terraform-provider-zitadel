@@ -3,6 +3,7 @@ package action_execution_response
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -25,8 +26,31 @@ func buildCondition(d *schema.ResourceData) (*action.Condition, error) {
 	return &action.Condition{ConditionType: &action.Condition_Response{Response: resp}}, nil
 }
 
+func IdFromConditionFn(condition *action.Condition) (string, error) {
+	computeID := func(value string) string {
+		if value == "" {
+			return "response"
+		}
+		if strings.HasPrefix(value, "/") {
+			return "response" + value
+		}
+		return "response/" + value
+	}
+
+	if resp := condition.GetResponse(); resp != nil {
+		if method := resp.GetMethod(); method != "" {
+			return computeID(method), nil
+		} else if service := resp.GetService(); service != "" {
+			return computeID(service), nil
+		} else if resp.GetAll() {
+			return computeID(""), nil
+		}
+	}
+	return "", fmt.Errorf("unknown condition type for ID generation: %v", condition.GetConditionType())
+}
+
 func readExecution(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	execution, diags := actionexecutionbase.ReadExecutionBase(ctx, d, m)
+	execution, diags := actionexecutionbase.ReadExecutionBase(ctx, d, m, IdFromConditionFn)
 	if diags != nil || execution == nil {
 		return diags
 	}

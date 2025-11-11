@@ -17,9 +17,7 @@ const (
 	TargetIDsVar = "target_ids"
 )
 
-// ReadExecutionBase is the shared logic for reading an execution.
-// It lists all executions and finds the one matching the resource ID.
-func ReadExecutionBase(ctx context.Context, d *schema.ResourceData, m interface{}) (*action.Execution, diag.Diagnostics) {
+func ReadExecutionBase(ctx context.Context, d *schema.ResourceData, m interface{}, idFromCondition IdFromConditionFunc) (*action.Execution, diag.Diagnostics) {
 	tflog.Info(ctx, "started read")
 
 	clientinfo, ok := m.(*helper.ClientInfo)
@@ -38,7 +36,7 @@ func ReadExecutionBase(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 
 	for _, execution := range resp.GetExecutions() {
-		currentID, err := IdFromCondition(execution.GetCondition())
+		currentID, err := idFromCondition(execution.GetCondition())
 		if err != nil {
 			return nil, diag.FromErr(err)
 		}
@@ -56,54 +54,6 @@ func ReadExecutionBase(ctx context.Context, d *schema.ResourceData, m interface{
 	return nil, nil
 }
 
-// IdFromCondition creates a unique string ID from a condition object.
-// This 1:1 replicates the logic from internal/repository/execution/execution.go
-func IdFromCondition(condition *action.Condition) (string, error) {
-	computeID := func(execType string, value string) string {
-		if value == "" {
-			return execType
-		}
-		if strings.HasPrefix(value, "/") {
-			return execType + value
-		}
-		return execType + "/" + value
-	}
-
-	if req := condition.GetRequest(); req != nil {
-		if method := req.GetMethod(); method != "" {
-			return computeID("request", method), nil
-		} else if service := req.GetService(); service != "" {
-			return computeID("request", service), nil
-		} else if req.GetAll() {
-			return computeID("request", ""), nil
-		}
-	} else if resp := condition.GetResponse(); resp != nil {
-		if method := resp.GetMethod(); method != "" {
-			return computeID("response", method), nil
-		} else if service := resp.GetService(); service != "" {
-			return computeID("response", service), nil
-		} else if resp.GetAll() {
-			return computeID("response", ""), nil
-		}
-	} else if fn := condition.GetFunction(); fn != nil {
-		return computeID("function", fn.GetName()), nil
-	} else if event := condition.GetEvent(); event != nil {
-		if eventName := event.GetEvent(); eventName != "" {
-			return computeID("event", eventName), nil
-		} else if group := event.GetGroup(); group != "" {
-			if !strings.HasSuffix(group, ".*") {
-				group += ".*"
-			}
-			return computeID("event", group), nil
-		} else if event.GetAll() {
-			return computeID("event", ""), nil
-		}
-	}
-	return "", fmt.Errorf("unknown condition type for ID generation: %v", condition.GetConditionType())
-}
-
-// ConditionFromID reconstructs the proto Condition message from its unique
-// string ID.
 func ConditionFromID(id string) (*action.Condition, error) {
 	parts := strings.SplitN(id, "/", 2)
 	if len(parts) == 0 {

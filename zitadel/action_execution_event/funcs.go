@@ -3,6 +3,7 @@ package action_execution_event
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -25,8 +26,34 @@ func buildCondition(d *schema.ResourceData) (*action.Condition, error) {
 	return &action.Condition{ConditionType: &action.Condition_Event{Event: event}}, nil
 }
 
+func IdFromConditionFn(condition *action.Condition) (string, error) {
+	computeID := func(value string) string {
+		if value == "" {
+			return "event"
+		}
+		if strings.HasPrefix(value, "/") {
+			return "event" + value
+		}
+		return "event/" + value
+	}
+
+	if event := condition.GetEvent(); event != nil {
+		if eventName := event.GetEvent(); eventName != "" {
+			return computeID(eventName), nil
+		} else if group := event.GetGroup(); group != "" {
+			if !strings.HasSuffix(group, ".*") {
+				group += ".*"
+			}
+			return computeID(group), nil
+		} else if event.GetAll() {
+			return computeID(""), nil
+		}
+	}
+	return "", fmt.Errorf("unknown condition type for ID generation: %v", condition.GetConditionType())
+}
+
 func readExecution(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	execution, diags := actionexecutionbase.ReadExecutionBase(ctx, d, m)
+	execution, diags := actionexecutionbase.ReadExecutionBase(ctx, d, m, IdFromConditionFn)
 	if diags != nil || execution == nil {
 		return diags
 	}

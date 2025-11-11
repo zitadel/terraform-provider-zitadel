@@ -3,6 +3,7 @@ package action_execution_function
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
@@ -28,19 +29,17 @@ func GetResource() *schema.Resource {
 				Description: "The list of target IDs to call.",
 			},
 		},
-		CreateContext: actionexecutionbase.NewSetExecution(buildCondition),
+		CreateContext: actionexecutionbase.NewSetExecution(buildCondition, IdFromConditionFn),
 		DeleteContext: actionexecutionbase.NewDeleteExecution(buildCondition),
 		ReadContext:   readExecution,
-		UpdateContext: actionexecutionbase.NewSetExecution(buildCondition),
+		UpdateContext: actionexecutionbase.NewSetExecution(buildCondition, IdFromConditionFn),
 		Importer: &schema.ResourceImporter{
-			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-				functionName := d.Id()
-				internalID := fmt.Sprintf("function/%s", functionName)
-				d.SetId(internalID)
-
-				if err := d.Set(NameVar, functionName); err != nil {
-					return nil, err
+			StateContext: func(ctx context.Context, d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
+				m := regexp.MustCompile(`^([^:\s]+)$`).FindStringSubmatch(d.Id())
+				if m == nil {
+					return nil, fmt.Errorf("invalid import ID: %s. Must be a function name like 'Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication'", d.Id())
 				}
+				d.SetId("function/" + m[1])
 				return []*schema.ResourceData{d}, nil
 			},
 		},

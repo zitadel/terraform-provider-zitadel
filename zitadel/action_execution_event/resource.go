@@ -3,7 +3,7 @@ package action_execution_event
 import (
 	"context"
 	"fmt"
-	"strings"
+	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
@@ -53,46 +53,23 @@ func GetResource() *schema.Resource {
 				Description: "The list of target IDs to call.",
 			},
 		},
-		CreateContext: actionexecutionbase.NewSetExecution(buildCondition),
+		CreateContext: actionexecutionbase.NewSetExecution(buildCondition, IdFromConditionFn),
 		DeleteContext: actionexecutionbase.NewDeleteExecution(buildCondition),
 		ReadContext:   readExecution,
-		UpdateContext: actionexecutionbase.NewSetExecution(buildCondition),
+		UpdateContext: actionexecutionbase.NewSetExecution(buildCondition, IdFromConditionFn),
 		Importer: &schema.ResourceImporter{
-			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-				id := d.Id()
-				parts := strings.SplitN(id, ":", 2)
-				if len(parts) != 2 {
-					return nil, fmt.Errorf("invalid import ID: %s. Must be in format 'subtype:value' (e.g., 'event:user.human.added') or 'all'", id)
+			StateContext: func(ctx context.Context, d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
+				m := regexp.MustCompile(`^(?:event:([-\w.]+)|group:([-\w.]+)(?:\.\*)?|all:?)$`).FindStringSubmatch(d.Id())
+				if m == nil {
+					return nil, fmt.Errorf("invalid import ID: %s. Must be 'event:name', 'group:name' (optionally ending with '.*'), or 'all'/'all:'", d.Id())
 				}
-
-				subType := parts[0]
-				value := parts[1]
-				internalID := ""
-
-				switch subType {
-				case "event":
-					internalID = "event/" + value
-					if err := d.Set(EventVar, value); err != nil {
-						return nil, err
-					}
-				case "group":
-					internalID = "event/" + value
-					if !strings.HasSuffix(internalID, ".*") {
-						internalID += ".*"
-					}
-					if err := d.Set(GroupVar, value); err != nil {
-						return nil, err
-					}
-				case "all":
-					internalID = "event"
-					if err := d.Set(AllVar, true); err != nil {
-						return nil, err
-					}
-				default:
-					return nil, fmt.Errorf("invalid import subtype: %s. Must be 'event', 'group', or 'all'", subType)
+				if m[1] != "" {
+					d.SetId("event/" + m[1])
+				} else if m[2] != "" {
+					d.SetId("event/" + m[2] + ".*")
+				} else {
+					d.SetId("event")
 				}
-
-				d.SetId(internalID)
 				return []*schema.ResourceData{d}, nil
 			},
 		},

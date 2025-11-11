@@ -10,12 +10,10 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 )
 
-// BuildConditionFunc defines the function signature for building a condition from schema data.
 type BuildConditionFunc func(d *schema.ResourceData) (*action.Condition, error)
+type IdFromConditionFunc func(condition *action.Condition) (string, error)
 
-// NewSetExecution creates a new schema.ResourceFunc for setting (creating/updating) an execution.
-// It takes a BuildConditionFunc to construct the specific condition for the resource.
-func NewSetExecution(buildCondition BuildConditionFunc) func(context.Context, *schema.ResourceData, interface{}) diag.Diagnostics {
+func NewSetExecution(buildCondition BuildConditionFunc, idFromCondition IdFromConditionFunc) func(context.Context, *schema.ResourceData, interface{}) diag.Diagnostics {
 	return func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 		condition, err := buildCondition(d)
 		if err != nil {
@@ -48,7 +46,7 @@ func NewSetExecution(buildCondition BuildConditionFunc) func(context.Context, *s
 			return diag.Errorf("failed to set execution: %v", err)
 		}
 
-		id, err := IdFromCondition(condition)
+		id, err := idFromCondition(condition)
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -57,8 +55,6 @@ func NewSetExecution(buildCondition BuildConditionFunc) func(context.Context, *s
 	}
 }
 
-// NewDeleteExecution creates a new schema.ResourceFunc for deleting an execution.
-// It takes a BuildConditionFunc to construct the specific condition for the resource.
 func NewDeleteExecution(buildCondition BuildConditionFunc) schema.DeleteContextFunc {
 	return func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 		condition, err := buildCondition(d)

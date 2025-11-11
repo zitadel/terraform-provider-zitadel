@@ -9,7 +9,7 @@ import (
 func GetDatasource() *schema.Resource {
 	return actionexecutionbase.NewActionExecutionDatasource(
 		"Datasource representing an action execution triggered by an event.",
-		"The ID of this resource. Must be set to the condition, e.g. `event:user.human.added`, `group:user.human`, or `all`",
+		"The ID of this resource. Must be set to the condition, e.g. `event:user.human.added`, `group:user.human`, or `all`/`all:`",
 		map[string]*schema.Schema{
 			EventVar: {
 				Type:        schema.TypeString,

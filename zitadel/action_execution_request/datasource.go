@@ -8,7 +8,7 @@ import (
 func GetDatasource() *schema.Resource {
 	return actionexecutionbase.NewActionExecutionDatasource(
 		"Datasource representing an action execution triggered by a request.",
-		"The ID of this resource. Must be set to the condition, e.g. `method:/zitadel.session.v2.SessionService/ListSessions`, `service:zitadel.session.v2.SessionService`, or `all`",
+		"The ID of this resource. Must be set to the condition, e.g. `method:/zitadel.session.v2.SessionService/ListSessions`, `service:zitadel.session.v2.SessionService`, or `all`/`all:`",
 		map[string]*schema.Schema{
 			MethodVar: {
 				Type:        schema.TypeString,
