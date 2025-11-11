@@ -11,6 +11,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_event"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_function"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_request"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_response"
 	zitadel_go "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action"
@@ -233,6 +237,10 @@ func Provider() *schema.Provider {
 			"zitadel_project_role":               project_role.GetDatasource(),
 			"zitadel_action":                     action.GetDatasource(),
 			"zitadel_action_target":              action_target.GetDatasource(),
+			"zitadel_action_execution_request":   action_execution_request.GetDatasource(),
+			"zitadel_action_execution_response":  action_execution_response.GetDatasource(),
+			"zitadel_action_execution_function":  action_execution_function.GetDatasource(),
+			"zitadel_action_execution_event":     action_execution_event.GetDatasource(),
 			"zitadel_application_oidc":           application_oidc.GetDatasource(),
 			"zitadel_application_oidcs":          application_oidc.ListDatasources(),
 			"zitadel_application_api":            application_api.GetDatasource(),
@@ -309,6 +317,10 @@ func Provider() *schema.Provider {
 			"zitadel_domain":                             domain.GetResource(),
 			"zitadel_action":                             action.GetResource(),
 			"zitadel_action_target":                      action_target.GetResource(),
+			"zitadel_action_execution_request":           action_execution_request.GetResource(),
+			"zitadel_action_execution_response":          action_execution_response.GetResource(),
+			"zitadel_action_execution_function":          action_execution_function.GetResource(),
+			"zitadel_action_execution_event":             action_execution_event.GetResource(),
 			"zitadel_application_oidc":                   application_oidc.GetResource(),
 			"zitadel_application_api":                    application_api.GetResource(),
 			"zitadel_application_saml":                   application_saml.GetResource(),
