@@ -11,14 +11,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
-	actionexecutionbase "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
-// TestAccActionExecution_Event asserts the lifecycle of an event
-// execution. It checks creation, update, and import.
 func TestAccActionExecution_Event(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_event")
 	targetFrame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
@@ -83,6 +80,26 @@ func createTargetResource(t *testing.T, frame *test_utils.InstanceTestFrame, res
 	return strings.Replace(targetResource, nameAttribute, frame.UniqueResourcesID, 1)
 }
 
+func deriveEventID(cond *action.Condition) (string, error) {
+	ev := cond.GetEvent()
+	if ev == nil {
+		return "", fmt.Errorf("no event condition")
+	}
+	if e := ev.GetEvent(); e != "" {
+		return "event/" + e, nil
+	}
+	if g := ev.GetGroup(); g != "" {
+		if !strings.HasSuffix(g, ".*") {
+			g += ".*"
+		}
+		return "event/" + g, nil
+	}
+	if ev.GetAll() {
+		return "event", nil
+	}
+	return "", fmt.Errorf("unknown event condition")
+}
+
 func checkRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string) func(string) resource.TestCheckFunc {
 	return func(targetsCount string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
@@ -97,7 +114,7 @@ func checkRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string
 			}
 
 			for _, execution := range resp.GetExecutions() {
-				currentID, err := actionexecutionbase.IdFromCondition(execution.GetCondition())
+				currentID, err := deriveEventID(execution.GetCondition())
 				if err != nil {
 					return err
 				}

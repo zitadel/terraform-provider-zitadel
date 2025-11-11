@@ -6,8 +6,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
+
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
 type BuildConditionFunc func(d *schema.ResourceData) (*action.Condition, error)

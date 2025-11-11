@@ -11,14 +11,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
-	actionexecutionbase "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
-// TestAccActionExecution_Request asserts the lifecycle of a request
-// execution. It checks creation, update, and import.
 func TestAccActionExecution_Request(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_request")
 	targetFrame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
@@ -83,6 +80,23 @@ func createTargetResource(t *testing.T, frame *test_utils.InstanceTestFrame, res
 	return strings.Replace(targetResource, nameAttribute, frame.UniqueResourcesID, 1)
 }
 
+func deriveRequestID(cond *action.Condition) (string, error) {
+	req := cond.GetRequest()
+	if req == nil {
+		return "", fmt.Errorf("no request condition")
+	}
+	if m := req.GetMethod(); m != "" {
+		return "request" + m, nil
+	}
+	if s := req.GetService(); s != "" {
+		return "request/" + s, nil
+	}
+	if req.GetAll() {
+		return "request", nil
+	}
+	return "", fmt.Errorf("unknown request condition")
+}
+
 func checkRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string) func(string) resource.TestCheckFunc {
 	return func(targetsCount string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
@@ -97,7 +111,7 @@ func checkRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string
 			}
 
 			for _, execution := range resp.GetExecutions() {
-				currentID, err := actionexecutionbase.IdFromCondition(execution.GetCondition())
+				currentID, err := deriveRequestID(execution.GetCondition())
 				if err != nil {
 					return err
 				}

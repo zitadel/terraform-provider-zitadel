@@ -11,15 +11,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
-	actionexecutionbase "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
-// TestAccActionExecution_Function asserts the lifecycle of a function
-// execution. It checks creation with one target, update by adding
-// a second target, import, and deletion.
 func TestAccActionExecution_Function(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_function")
 	targetFrame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
@@ -83,6 +79,17 @@ func createTargetResource(t *testing.T, frame *test_utils.InstanceTestFrame, res
 	return strings.Replace(targetResource, nameAttribute, frame.UniqueResourcesID, 1)
 }
 
+func deriveFunctionID(cond *action.Condition) (string, error) {
+	fn := cond.GetFunction()
+	if fn == nil {
+		return "", fmt.Errorf("no function condition")
+	}
+	if n := fn.GetName(); n != "" {
+		return "function/" + n, nil
+	}
+	return "function", nil
+}
+
 func checkRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string) func(string) resource.TestCheckFunc {
 	return func(targetsCount string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
@@ -97,7 +104,7 @@ func checkRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string
 			}
 
 			for _, execution := range resp.GetExecutions() {
-				currentID, err := actionexecutionbase.IdFromCondition(execution.GetCondition())
+				currentID, err := deriveFunctionID(execution.GetCondition())
 				if err != nil {
 					return err
 				}

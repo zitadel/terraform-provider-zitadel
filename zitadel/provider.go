@@ -11,13 +11,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	zitadel_go "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
+
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_event"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_function"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_request"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_response"
-	zitadel_go "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
-
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_api"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_key"
