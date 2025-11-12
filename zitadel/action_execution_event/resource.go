@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	actionexecutionbase "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base"
@@ -22,6 +24,13 @@ func GetResource() *schema.Resource {
 					GroupVar,
 					AllVar,
 				},
+				ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+					v := i.(string)
+					if !regexp.MustCompile(`^[\w.]+$`).MatchString(v) {
+						return diag.Errorf("invalid event name: %s. Must contain only letters, numbers, dots, and underscores", v)
+					}
+					return nil
+				},
 				Description: "The specific event to trigger on, e.g., `user.human.added`",
 			},
 			GroupVar: {
@@ -31,6 +40,13 @@ func GetResource() *schema.Resource {
 				ConflictsWith: []string{
 					EventVar,
 					AllVar,
+				},
+				ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+					v := i.(string)
+					if !regexp.MustCompile(`^[\w.]+$`).MatchString(v) {
+						return diag.Errorf("invalid group name: %s. Must contain only letters, numbers, dots, and underscores", v)
+					}
+					return nil
 				},
 				Description: "The event group to trigger on, e.g., `user.human`",
 			},

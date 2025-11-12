@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	actionexecutionbase "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base"
@@ -22,6 +24,13 @@ func GetResource() *schema.Resource {
 					ServiceVar,
 					AllVar,
 				},
+				ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+					v := i.(string)
+					if !regexp.MustCompile(`^/[\w./]+$`).MatchString(v) {
+						return diag.Errorf("invalid method: %s. Must start with / and contain only letters, numbers, dots, slashes, and underscores", v)
+					}
+					return nil
+				},
 				Description: "The gRPC method to trigger on, e.g., `/zitadel.session.v2.SessionService/ListSessions`",
 			},
 			ServiceVar: {
@@ -31,6 +40,13 @@ func GetResource() *schema.Resource {
 				ConflictsWith: []string{
 					MethodVar,
 					AllVar,
+				},
+				ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+					v := i.(string)
+					if !regexp.MustCompile(`^[\w.]+$`).MatchString(v) {
+						return diag.Errorf("invalid service: %s. Must contain only letters, numbers, dots, and underscores", v)
+					}
+					return nil
 				},
 				Description: "The gRPC service to trigger on, e.g., `zitadel.session.v2.SessionService`",
 			},
