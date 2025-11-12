@@ -1,18 +1,16 @@
 package action_execution_function_test
 
 import (
-	"context"
 	"fmt"
 	"regexp"
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base/test_helpers"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
@@ -24,7 +22,7 @@ func TestAccActionExecution_Function(t *testing.T) {
 	targetResource := createTargetResource(t, targetFrame, "default")
 	targetResource2 := createTargetResource(t, targetFrame2, "default_2")
 
-	functionName := "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"
+	functionName := "preaccesstoken"
 	executionID := "function/" + functionName
 	executionIDRegex := regexp.MustCompile(fmt.Sprintf(`^%s$`, regexp.QuoteMeta(executionID)))
 
@@ -60,9 +58,9 @@ resource "zitadel_action_execution_function" "default" {
 		updatedProperty,
 		"", "", "",
 		true,
-		checkRemoteExecution(frame, executionID),
+		test_helpers.CheckRemoteExecution(frame, executionID, deriveFunctionID),
 		executionIDRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteExecution(frame, executionID), "execution not found"),
+		test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, deriveFunctionID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			func(state *terraform.State) (string, error) {
 				return functionName, nil
@@ -88,32 +86,4 @@ func deriveFunctionID(cond *action.Condition) (string, error) {
 		return "function/" + n, nil
 	}
 	return "function", nil
-}
-
-func checkRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string) func(string) resource.TestCheckFunc {
-	return func(targetsCount string) resource.TestCheckFunc {
-		return func(state *terraform.State) error {
-			client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
-			if err != nil {
-				return fmt.Errorf("failed to get client: %w", err)
-			}
-
-			resp, err := client.ListExecutions(context.Background(), &action.ListExecutionsRequest{})
-			if err != nil {
-				return fmt.Errorf("failed to list executions: %w", err)
-			}
-
-			for _, execution := range resp.GetExecutions() {
-				currentID, err := deriveFunctionID(execution.GetCondition())
-				if err != nil {
-					return err
-				}
-				if currentID == expectedID {
-					return nil
-				}
-			}
-
-			return fmt.Errorf("execution not found")
-		}
-	}
 }

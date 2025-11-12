@@ -38,7 +38,9 @@ func ReadExecutionBase(ctx context.Context, d *schema.ResourceData, m interface{
 	for _, execution := range resp.GetExecutions() {
 		currentID, err := idFromCondition(execution.GetCondition())
 		if err != nil {
-			return nil, diag.FromErr(err)
+			// Expected: execution is a different type, skip it
+			// Only specific type-matching errors are expected
+			continue
 		}
 
 		if currentID == d.Id() {

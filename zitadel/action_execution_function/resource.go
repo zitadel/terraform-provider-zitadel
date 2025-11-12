@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	actionexecutionbase "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base"
@@ -15,10 +17,17 @@ func GetResource() *schema.Resource {
 		Description: "Resource representing an action execution triggered by a function.",
 		Schema: map[string]*schema.Schema{
 			NameVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "The name of the function, e.g. `Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication`",
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+				ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+					v := i.(string)
+					if !regexp.MustCompile(`^(preuserinfo|preaccesstoken|presamlresponse)$`).MatchString(v) {
+						return diag.Errorf("invalid function name: %s. Must be one of: preuserinfo, preaccesstoken, presamlresponse", v)
+					}
+					return nil
+				},
+				Description: "The name of the function. Valid values: `preuserinfo`, `preaccesstoken`, `presamlresponse`",
 			},
 			actionexecutionbase.TargetIDsVar: {
 				Type: schema.TypeList,
@@ -35,9 +44,9 @@ func GetResource() *schema.Resource {
 		UpdateContext: actionexecutionbase.NewSetExecution(buildCondition, IdFromConditionFn),
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
-				m := regexp.MustCompile(`^([^:\s]+)$`).FindStringSubmatch(d.Id())
+				m := regexp.MustCompile(`^(preuserinfo|preaccesstoken|presamlresponse)$`).FindStringSubmatch(d.Id())
 				if m == nil {
-					return nil, fmt.Errorf("invalid import ID: %s. Must be a function name like 'Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication'", d.Id())
+					return nil, fmt.Errorf("invalid function name: %s. Must be one of: preuserinfo, preaccesstoken, presamlresponse", d.Id())
 				}
 				d.SetId("function/" + m[1])
 				return []*schema.ResourceData{d}, nil

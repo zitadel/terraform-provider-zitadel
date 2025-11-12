@@ -1,18 +1,16 @@
 package action_execution_event_test
 
 import (
-	"context"
 	"fmt"
 	"regexp"
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base/test_helpers"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
@@ -61,9 +59,9 @@ resource "zitadel_action_execution_event" "default" {
 		updatedProperty,
 		"", "", "",
 		true,
-		checkRemoteExecution(frame, executionID),
+		test_helpers.CheckRemoteExecution(frame, executionID, deriveEventID),
 		executionIDRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteExecution(frame, executionID), "execution not found"),
+		test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, deriveEventID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			func(state *terraform.State) (string, error) {
 				return importID, nil
@@ -98,32 +96,4 @@ func deriveEventID(cond *action.Condition) (string, error) {
 		return "event", nil
 	}
 	return "", fmt.Errorf("unknown event condition")
-}
-
-func checkRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string) func(string) resource.TestCheckFunc {
-	return func(targetsCount string) resource.TestCheckFunc {
-		return func(state *terraform.State) error {
-			client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
-			if err != nil {
-				return fmt.Errorf("failed to get client: %w", err)
-			}
-
-			resp, err := client.ListExecutions(context.Background(), &action.ListExecutionsRequest{})
-			if err != nil {
-				return fmt.Errorf("failed to list executions: %w", err)
-			}
-
-			for _, execution := range resp.GetExecutions() {
-				currentID, err := deriveEventID(execution.GetCondition())
-				if err != nil {
-					return err
-				}
-				if currentID == expectedID {
-					return nil
-				}
-			}
-
-			return fmt.Errorf("execution not found")
-		}
-	}
 }
