@@ -20,7 +20,8 @@ func GetResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
-				ConflictsWith: []string{
+				ExactlyOneOf: []string{
+					MethodVar,
 					ServiceVar,
 					AllVar,
 				},
@@ -37,8 +38,9 @@ func GetResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
-				ConflictsWith: []string{
+				ExactlyOneOf: []string{
 					MethodVar,
+					ServiceVar,
 					AllVar,
 				},
 				ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
@@ -54,9 +56,10 @@ func GetResource() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
-				ConflictsWith: []string{
+				ExactlyOneOf: []string{
 					MethodVar,
 					ServiceVar,
+					AllVar,
 				},
 				Description: "Trigger on all requests.",
 			},
