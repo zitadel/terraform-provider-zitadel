@@ -15,7 +15,7 @@ import (
 func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing an action execution triggered by an event.",
-		Schema: map[string]*schema.Schema{
+		Schema: actionexecutionbase.WithTargetIDs(map[string]*schema.Schema{
 			EventVar: {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -63,15 +63,7 @@ func GetResource() *schema.Resource {
 				},
 				Description: "Trigger on all events.",
 			},
-			actionexecutionbase.TargetIDsVar: {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Optional:    true,
-				Description: "The list of target IDs to call.",
-			},
-		},
+		}),
 		CreateContext: actionexecutionbase.NewSetExecution(buildCondition, IdFromConditionFn),
 		DeleteContext: actionexecutionbase.NewDeleteExecution(buildCondition),
 		ReadContext:   readExecution,

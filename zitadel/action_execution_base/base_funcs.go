@@ -11,10 +11,6 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
-const (
-	TargetIDsVar = "target_ids"
-)
-
 func ReadExecutionBase(
 	ctx context.Context,
 	d *schema.ResourceData,

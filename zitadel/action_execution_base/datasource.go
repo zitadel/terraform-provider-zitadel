@@ -1,8 +1,6 @@
 package action_execution
 
-import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-)
+import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 func NewActionExecutionDatasource(
 	datasourceDescription string,
@@ -10,30 +8,23 @@ func NewActionExecutionDatasource(
 	specificSchema map[string]*schema.Schema,
 	readFunc schema.ReadContextFunc,
 ) *schema.Resource {
-
-	baseSchema := map[string]*schema.Schema{
-		"id": {
-			Type:        schema.TypeString,
-			Required:    true,
-			Description: idDescription,
-		},
-		TargetIDsVar: {
-			Type: schema.TypeList,
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-			Computed:    true,
-			Description: "The list of target IDs to call.",
-		},
+	specificSchema[IDVar] = &schema.Schema{
+		Type:        schema.TypeString,
+		Required:    true,
+		Description: idDescription,
 	}
-
-	for key, val := range specificSchema {
-		baseSchema[key] = val
+	specificSchema[TargetIDsVar] = &schema.Schema{
+		Type: schema.TypeList,
+		Elem: &schema.Schema{
+			Type: schema.TypeString,
+		},
+		Computed:    true,
+		Description: "The list of target IDs to call.",
 	}
 
 	return &schema.Resource{
 		Description: datasourceDescription,
-		Schema:      baseSchema,
+		Schema:      specificSchema,
 		ReadContext: readFunc,
 	}
 }
