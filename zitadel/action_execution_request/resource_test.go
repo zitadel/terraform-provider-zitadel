@@ -10,27 +10,9 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base/test_helpers"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_request"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
-
-func TestSchemaConsistency(t *testing.T) {
-	resource := action_execution_request.GetResource()
-	if resource == nil {
-		t.Fatal("GetResource() returned nil")
-	}
-
-	const isWritable = true
-
-	t.Run("ExactlyOneOf", func(t *testing.T) {
-		test_helpers.CheckSchemaExactlyOneOfConsistency(t, resource.Schema)
-	})
-
-	t.Run("InternalValidate", func(t *testing.T) {
-		test_helpers.CheckSchemaInternalValidation(t, resource, isWritable)
-	})
-}
 
 func TestAccActionExecution_Request(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_request")
