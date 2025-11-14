@@ -8,13 +8,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
+	actionexecutionbase "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
-type IdFromConditionFunc func(condition *action.Condition) (string, error)
-
-func CheckRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string, idFromCondition IdFromConditionFunc) func(string) resource.TestCheckFunc {
+func CheckRemoteExecution(
+	frame *test_utils.InstanceTestFrame,
+	expectedID string,
+	idFromCondition actionexecutionbase.IdFromConditionFunc,
+) func(string) resource.TestCheckFunc {
 	return func(targetsCount string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
@@ -28,11 +31,11 @@ func CheckRemoteExecution(frame *test_utils.InstanceTestFrame, expectedID string
 			}
 
 			for _, execution := range resp.GetExecutions() {
-				currentID, err := idFromCondition(execution.GetCondition())
+				idPtr, err := idFromCondition(execution.GetCondition())
 				if err != nil {
-					continue // Skip executions of other types
+					return fmt.Errorf("failed to derive execution id: %w", err)
 				}
-				if currentID == expectedID {
+				if idPtr != nil && *idPtr == expectedID {
 					return nil
 				}
 			}

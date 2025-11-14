@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base/test_helpers"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_event"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
@@ -59,9 +59,9 @@ resource "zitadel_action_execution_event" "default" {
 		updatedProperty,
 		"", "", "",
 		true,
-		test_helpers.CheckRemoteExecution(frame, executionID, deriveEventID),
+		test_helpers.CheckRemoteExecution(frame, executionID, action_execution_event.IdFromConditionFn),
 		executionIDRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, deriveEventID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, action_execution_event.IdFromConditionFn), ""),
 		test_utils.ChainImportStateIdFuncs(
 			func(state *terraform.State) (string, error) {
 				return importID, nil
@@ -76,24 +76,4 @@ func createTargetResource(t *testing.T, frame *test_utils.InstanceTestFrame, res
 	targetResource = strings.Replace(targetResource, `"default"`, `"`+resourceName+`"`, 1)
 	nameAttribute := test_utils.AttributeValue(t, action_target.NameVar, targetAttrs).AsString()
 	return strings.Replace(targetResource, nameAttribute, frame.UniqueResourcesID, 1)
-}
-
-func deriveEventID(cond *action.Condition) (string, error) {
-	ev := cond.GetEvent()
-	if ev == nil {
-		return "", fmt.Errorf("no event condition")
-	}
-	if e := ev.GetEvent(); e != "" {
-		return "event/" + e, nil
-	}
-	if g := ev.GetGroup(); g != "" {
-		if !strings.HasSuffix(g, ".*") {
-			g += ".*"
-		}
-		return "event/" + g, nil
-	}
-	if ev.GetAll() {
-		return "event", nil
-	}
-	return "", fmt.Errorf("unknown event condition")
 }

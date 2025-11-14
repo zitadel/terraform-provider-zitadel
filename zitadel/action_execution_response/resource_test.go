@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_base/test_helpers"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_response"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
@@ -59,9 +59,9 @@ resource "zitadel_action_execution_response" "default" {
 		updatedProperty,
 		"", "", "",
 		true,
-		test_helpers.CheckRemoteExecution(frame, executionID, deriveResponseID),
+		test_helpers.CheckRemoteExecution(frame, executionID, action_execution_response.IdFromConditionFn),
 		executionIDRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, deriveResponseID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, action_execution_response.IdFromConditionFn), ""),
 		test_utils.ChainImportStateIdFuncs(
 			func(state *terraform.State) (string, error) {
 				return importID, nil
@@ -76,21 +76,4 @@ func createTargetResource(t *testing.T, frame *test_utils.InstanceTestFrame, res
 	targetResource = strings.Replace(targetResource, `"default"`, `"`+resourceName+`"`, 1)
 	nameAttribute := test_utils.AttributeValue(t, action_target.NameVar, targetAttrs).AsString()
 	return strings.Replace(targetResource, nameAttribute, frame.UniqueResourcesID, 1)
-}
-
-func deriveResponseID(cond *action.Condition) (string, error) {
-	resp := cond.GetResponse()
-	if resp == nil {
-		return "", fmt.Errorf("no response condition")
-	}
-	if m := resp.GetMethod(); m != "" {
-		return "response" + m, nil
-	}
-	if s := resp.GetService(); s != "" {
-		return "response/" + s, nil
-	}
-	if resp.GetAll() {
-		return "response", nil
-	}
-	return "", fmt.Errorf("unknown response condition")
 }
