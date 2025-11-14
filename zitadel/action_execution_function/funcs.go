@@ -2,7 +2,6 @@ package action_execution_function
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -22,14 +21,17 @@ func buildCondition(d *schema.ResourceData) (*action.Condition, error) {
 	return condition, nil
 }
 
-func IdFromConditionFn(condition *action.Condition) (string, error) {
-	if fn := condition.GetFunction(); fn != nil {
-		if name := fn.GetName(); name != "" {
-			return "function/" + name, nil
-		}
-		return "function", nil
+func IdFromConditionFn(condition *action.Condition) (*string, error) {
+	fn := condition.GetFunction()
+	if fn == nil { // not a function execution → skip
+		return nil, nil
+	} else if name := fn.GetName(); name != "" { // named function
+		id := "function/" + name
+		return &id, nil
+	} else { // function with empty name → "all" case
+		id := "function"
+		return &id, nil
 	}
-	return "", fmt.Errorf("unknown condition type for ID generation: %v", condition.GetConditionType())
 }
 
 func readExecution(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

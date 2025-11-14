@@ -26,27 +26,31 @@ func buildCondition(d *schema.ResourceData) (*action.Condition, error) {
 	return &action.Condition{ConditionType: &action.Condition_Response{Response: resp}}, nil
 }
 
-func IdFromConditionFn(condition *action.Condition) (string, error) {
+func IdFromConditionFn(condition *action.Condition) (*string, error) {
 	computeID := func(value string) string {
-		if value == "" {
+		if value == "" { // all responses
 			return "response"
 		}
-		if strings.HasPrefix(value, "/") {
+		if strings.HasPrefix(value, "/") { // method-based condition
 			return "response" + value
 		}
-		return "response/" + value
+		return "response/" + value // service-based condition
 	}
 
-	if resp := condition.GetResponse(); resp != nil {
-		if method := resp.GetMethod(); method != "" {
-			return computeID(method), nil
-		} else if service := resp.GetService(); service != "" {
-			return computeID(service), nil
-		} else if resp.GetAll() {
-			return computeID(""), nil
-		}
+	if resp := condition.GetResponse(); resp == nil { // not a response execution → skip
+		return nil, nil
+	} else if method := resp.GetMethod(); method != "" { // method-based condition
+		id := computeID(method)
+		return &id, nil
+	} else if service := resp.GetService(); service != "" { // service-based condition
+		id := computeID(service)
+		return &id, nil
+	} else if resp.GetAll() { // all responses
+		id := computeID("")
+		return &id, nil
+	} else { // malformed response condition
+		return nil, fmt.Errorf("invalid response condition: %#v", resp)
 	}
-	return "", fmt.Errorf("unknown condition type for ID generation: %v", condition.GetConditionType())
 }
 
 func readExecution(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

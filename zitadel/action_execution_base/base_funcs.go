@@ -15,7 +15,12 @@ const (
 	TargetIDsVar = "target_ids"
 )
 
-func ReadExecutionBase(ctx context.Context, d *schema.ResourceData, m interface{}, idFromCondition IdFromConditionFunc) (*action.Execution, diag.Diagnostics) {
+func ReadExecutionBase(
+	ctx context.Context,
+	d *schema.ResourceData,
+	m interface{},
+	idFromCondition IdFromConditionFunc,
+) (*action.Execution, diag.Diagnostics) {
 	tflog.Info(ctx, "started read")
 
 	clientinfo, ok := m.(*helper.ClientInfo)
@@ -34,14 +39,16 @@ func ReadExecutionBase(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 
 	for _, execution := range resp.GetExecutions() {
-		currentID, err := idFromCondition(execution.GetCondition())
+		idPtr, err := idFromCondition(execution.GetCondition())
 		if err != nil {
-			// Expected: execution is a different type, skip it
-			// Only specific type-matching errors are expected
+			return nil, diag.FromErr(err)
+		}
+		if idPtr == nil {
+			// different execution type → skip
 			continue
 		}
 
-		if currentID == d.Id() {
+		if *idPtr == d.Id() {
 			if len(execution.GetTargets()) == 0 {
 				d.SetId("")
 				return nil, nil

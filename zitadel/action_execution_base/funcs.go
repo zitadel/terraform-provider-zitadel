@@ -12,8 +12,12 @@ import (
 )
 
 type BuildConditionFunc func(d *schema.ResourceData) (*action.Condition, error)
-type IdFromConditionFunc func(condition *action.Condition) (string, error)
+type IdFromConditionFunc func(condition *action.Condition) (*string, error)
 
+// NewSetExecution returns a Terraform handler for create and update that
+// builds an action.Condition from the resource data, calls the Zitadel
+// SetExecution API with the configured targets, and sets the resource ID
+// based on the provided idFromCondition function.
 func NewSetExecution(buildCondition BuildConditionFunc, idFromCondition IdFromConditionFunc) func(context.Context, *schema.ResourceData, interface{}) diag.Diagnostics {
 	return func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 		condition, err := buildCondition(d)
@@ -47,11 +51,15 @@ func NewSetExecution(buildCondition BuildConditionFunc, idFromCondition IdFromCo
 			return diag.Errorf("failed to set execution: %v", err)
 		}
 
-		id, err := idFromCondition(condition)
+		idPtr, err := idFromCondition(condition)
 		if err != nil {
 			return diag.FromErr(err)
 		}
-		d.SetId(id)
+		if idPtr == nil {
+			return diag.Errorf("failed to derive execution ID from condition")
+		}
+
+		d.SetId(*idPtr)
 		return nil
 	}
 }

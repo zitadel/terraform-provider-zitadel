@@ -26,30 +26,35 @@ func buildCondition(d *schema.ResourceData) (*action.Condition, error) {
 	return &action.Condition{ConditionType: &action.Condition_Event{Event: event}}, nil
 }
 
-func IdFromConditionFn(condition *action.Condition) (string, error) {
+func IdFromConditionFn(condition *action.Condition) (*string, error) {
 	computeID := func(value string) string {
-		if value == "" {
+		if value == "" { // all events
 			return "event"
 		}
-		if strings.HasPrefix(value, "/") {
+		if strings.HasPrefix(value, "/") { // method-style value
 			return "event" + value
 		}
-		return "event/" + value
+		return "event/" + value // event/group-style value
 	}
 
-	if event := condition.GetEvent(); event != nil {
-		if eventName := event.GetEvent(); eventName != "" {
-			return computeID(eventName), nil
-		} else if group := event.GetGroup(); group != "" {
-			if !strings.HasSuffix(group, ".*") {
-				group += ".*"
-			}
-			return computeID(group), nil
-		} else if event.GetAll() {
-			return computeID(""), nil
+	if event := condition.GetEvent(); event == nil { // not an event execution → skip
+		return nil, nil
+	} else if eventName := event.GetEvent(); eventName != "" { // specific event
+		id := computeID(eventName)
+		return &id, nil
+	} else if group := event.GetGroup(); group != "" { // event group
+		normalized := group
+		if !strings.HasSuffix(normalized, ".*") { // ensure group has .* suffix
+			normalized += ".*"
 		}
+		id := computeID(normalized)
+		return &id, nil
+	} else if event.GetAll() { // all events
+		id := computeID("")
+		return &id, nil
+	} else { // malformed event condition
+		return nil, fmt.Errorf("invalid event condition: %#v", event)
 	}
-	return "", fmt.Errorf("unknown condition type for ID generation: %v", condition.GetConditionType())
 }
 
 func readExecution(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
