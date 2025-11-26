@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
@@ -15,59 +16,175 @@ import (
 )
 
 func TestAccActionExecution_Function(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_function")
-	targetFrame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
-	targetFrame2 := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_2")
+	t.Run("preaccesstoken", func(t *testing.T) {
+		frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_function")
+		targetFrame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
+		targetFrame2 := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_2")
 
-	targetResource := createTargetResource(t, targetFrame, "default")
-	targetResource2 := createTargetResource(t, targetFrame2, "default_2")
+		targetResource := createTargetResource(t, targetFrame, "default")
+		targetResource2 := createTargetResource(t, targetFrame2, "default_2")
 
-	functionName := "preaccesstoken"
-	executionID := "function/" + functionName
-	executionIDRegex := regexp.MustCompile(fmt.Sprintf(`^%s$`, regexp.QuoteMeta(executionID)))
+		functionName := "preaccesstoken"
+		executionID := "function/" + functionName
+		executionIDRegex := regexp.MustCompile(fmt.Sprintf(`^%s$`, regexp.QuoteMeta(executionID)))
 
-	baseHCL := `
+		baseHCL := `
 resource "zitadel_action_execution_function" "default" {
   name       = "%s"
   target_ids = %s
 }
 `
-	exampleProperty := `[zitadel_action_target.default.id]`
-	updatedProperty := `[zitadel_action_target.default.id, zitadel_action_target.default_2.id]`
+		exampleProperty := `[zitadel_action_target.default.id]`
+		updatedProperty := `[zitadel_action_target.default.id, zitadel_action_target.default_2.id]`
 
-	resourceFunc := func(targetIDsProperty string, secret string) string {
-		if targetIDsProperty == updatedProperty {
-			return fmt.Sprintf(`
+		resourceFunc := func(targetIDsProperty string, secret string) string {
+			if targetIDsProperty == updatedProperty {
+				return fmt.Sprintf(`
 %s
 %s
 %s
 `, targetResource, targetResource2, fmt.Sprintf(baseHCL, functionName, targetIDsProperty))
-		}
-		return fmt.Sprintf(`
+			}
+			return fmt.Sprintf(`
 %s
 %s
 `, targetResource, fmt.Sprintf(baseHCL, functionName, targetIDsProperty))
-	}
+		}
 
-	test_utils.RunLifecyleTest(
-		t,
-		frame.BaseTestFrame,
-		[]string{},
-		resourceFunc,
-		exampleProperty,
-		updatedProperty,
-		"", "", "",
-		true,
-		test_helpers.CheckRemoteExecution(frame, executionID, action_execution_function.IdFromConditionFn),
-		executionIDRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, action_execution_function.IdFromConditionFn), ""),
-		test_utils.ChainImportStateIdFuncs(
-			func(state *terraform.State) (string, error) {
-				return functionName, nil
-			},
-		),
-		"",
-	)
+		test_utils.RunLifecyleTest(
+			t,
+			frame.BaseTestFrame,
+			[]string{},
+			resourceFunc,
+			exampleProperty,
+			updatedProperty,
+			"", "", "",
+			true,
+			test_helpers.CheckRemoteExecution(frame, executionID, action_execution_function.IdFromConditionFn),
+			executionIDRegex,
+			test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, action_execution_function.IdFromConditionFn), ""),
+			test_utils.ChainImportStateIdFuncs(
+				func(state *terraform.State) (string, error) {
+					return functionName, nil
+				},
+			),
+			"",
+		)
+	})
+
+	time.Sleep(2 * time.Second)
+	t.Run("preuserinfo", func(t *testing.T) {
+		frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_function")
+		targetFrame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
+		targetFrame2 := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_2")
+
+		targetResource := createTargetResource(t, targetFrame, "default")
+		targetResource2 := createTargetResource(t, targetFrame2, "default_2")
+
+		functionName := "preuserinfo"
+		executionID := "function/" + functionName
+		executionIDRegex := regexp.MustCompile(fmt.Sprintf(`^%s$`, regexp.QuoteMeta(executionID)))
+
+		baseHCL := `
+resource "zitadel_action_execution_function" "default" {
+  name       = "%s"
+  target_ids = %s
+}
+`
+		exampleProperty := `[zitadel_action_target.default.id]`
+		updatedProperty := `[zitadel_action_target.default.id, zitadel_action_target.default_2.id]`
+
+		resourceFunc := func(targetIDsProperty string, secret string) string {
+			if targetIDsProperty == updatedProperty {
+				return fmt.Sprintf(`
+%s
+%s
+%s
+`, targetResource, targetResource2, fmt.Sprintf(baseHCL, functionName, targetIDsProperty))
+			}
+			return fmt.Sprintf(`
+%s
+%s
+`, targetResource, fmt.Sprintf(baseHCL, functionName, targetIDsProperty))
+		}
+
+		test_utils.RunLifecyleTest(
+			t,
+			frame.BaseTestFrame,
+			[]string{},
+			resourceFunc,
+			exampleProperty,
+			updatedProperty,
+			"", "", "",
+			true,
+			test_helpers.CheckRemoteExecution(frame, executionID, action_execution_function.IdFromConditionFn),
+			executionIDRegex,
+			test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, action_execution_function.IdFromConditionFn), ""),
+			test_utils.ChainImportStateIdFuncs(
+				func(state *terraform.State) (string, error) {
+					return functionName, nil
+				},
+			),
+			"",
+		)
+	})
+
+	time.Sleep(2 * time.Second)
+	t.Run("presamlresponse", func(t *testing.T) {
+		frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_function")
+		targetFrame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
+		targetFrame2 := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_2")
+
+		targetResource := createTargetResource(t, targetFrame, "default")
+		targetResource2 := createTargetResource(t, targetFrame2, "default_2")
+
+		functionName := "presamlresponse"
+		executionID := "function/" + functionName
+		executionIDRegex := regexp.MustCompile(fmt.Sprintf(`^%s$`, regexp.QuoteMeta(executionID)))
+
+		baseHCL := `
+resource "zitadel_action_execution_function" "default" {
+  name       = "%s"
+  target_ids = %s
+}
+`
+		exampleProperty := `[zitadel_action_target.default.id]`
+		updatedProperty := `[zitadel_action_target.default.id, zitadel_action_target.default_2.id]`
+
+		resourceFunc := func(targetIDsProperty string, secret string) string {
+			if targetIDsProperty == updatedProperty {
+				return fmt.Sprintf(`
+%s
+%s
+%s
+`, targetResource, targetResource2, fmt.Sprintf(baseHCL, functionName, targetIDsProperty))
+			}
+			return fmt.Sprintf(`
+%s
+%s
+`, targetResource, fmt.Sprintf(baseHCL, functionName, targetIDsProperty))
+		}
+
+		test_utils.RunLifecyleTest(
+			t,
+			frame.BaseTestFrame,
+			[]string{},
+			resourceFunc,
+			exampleProperty,
+			updatedProperty,
+			"", "", "",
+			true,
+			test_helpers.CheckRemoteExecution(frame, executionID, action_execution_function.IdFromConditionFn),
+			executionIDRegex,
+			test_utils.CheckIsNotFoundFromPropertyCheck(test_helpers.CheckRemoteExecution(frame, executionID, action_execution_function.IdFromConditionFn), ""),
+			test_utils.ChainImportStateIdFuncs(
+				func(state *terraform.State) (string, error) {
+					return functionName, nil
+				},
+			),
+			"",
+		)
+	})
 }
 
 func createTargetResource(t *testing.T, frame *test_utils.InstanceTestFrame, resourceName string) string {
