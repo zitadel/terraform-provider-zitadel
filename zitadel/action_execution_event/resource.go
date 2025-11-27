@@ -70,14 +70,14 @@ func GetResource() *schema.Resource {
 		UpdateContext: actionexecutionbase.NewSetExecution(buildCondition, IdFromConditionFn),
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
-				m := regexp.MustCompile(`^(?:event:([-\w.]+)|group:([-\w.]+)(?:\.\*)?|all:?)$`).FindStringSubmatch(d.Id())
+				m := regexp.MustCompile(`^(?:event:([-\w.]+)|group:([-\w.]+)|all:?)$`).FindStringSubmatch(d.Id())
 				if m == nil {
-					return nil, fmt.Errorf("invalid import ID: %s. Must be 'event:name', 'group:name' (optionally ending with '.*'), or 'all'/'all:'", d.Id())
+					return nil, fmt.Errorf("invalid import ID: %s. Must be 'event:name', 'group:name', or 'all'/'all:'", d.Id())
 				}
 				if m[1] != "" {
 					d.SetId("event/" + m[1])
 				} else if m[2] != "" {
-					d.SetId("event/" + m[2] + ".*")
+					d.SetId("event/" + m[2])
 				} else {
 					d.SetId("event")
 				}
