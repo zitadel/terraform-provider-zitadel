@@ -43,11 +43,7 @@ func IdFromConditionFn(condition *action.Condition) (*string, error) {
 		id := computeID(eventName)
 		return &id, nil
 	} else if group := event.GetGroup(); group != "" { // event group
-		normalized := group
-		if !strings.HasSuffix(normalized, ".*") { // ensure group has .* suffix
-			normalized += ".*"
-		}
-		id := computeID(normalized)
+		id := computeID(group)
 		return &id, nil
 	} else if event.GetAll() { // all events
 		id := computeID("")
