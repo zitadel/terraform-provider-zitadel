@@ -38,3 +38,9 @@ override.tf.json
 terraform-provider-zitadel
 
 .go
+
+# Devbox
+devbox.json
+devbox.lock
+
+vendor
