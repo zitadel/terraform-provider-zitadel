@@ -43,6 +43,14 @@ func NewSetExecution(buildCondition BuildConditionFunc, idFromCondition IdFromCo
 			}
 		}
 
+		// Validate all targets exist
+		for _, targetID := range targetIDs {
+			_, err := client.GetTarget(ctx, &action.GetTargetRequest{Id: targetID})
+			if err != nil {
+				return diag.Errorf("target %s does not exist: %v", targetID, err)
+			}
+		}
+
 		_, err = client.SetExecution(ctx, &action.SetExecutionRequest{
 			Condition: condition,
 			Targets:   targetIDs,
