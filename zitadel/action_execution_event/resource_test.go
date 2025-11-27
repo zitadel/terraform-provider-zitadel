@@ -83,7 +83,7 @@ resource "zitadel_action_execution_event" "default" {
 		targetResource2 := createTargetResource(t, targetFrame2, "default_2")
 
 		groupName := "user.human"
-		executionID := "event/" + groupName + ".*"
+		executionID := "event/" + groupName
 		importID := "group:" + groupName
 		executionIDRegex := regexp.MustCompile(fmt.Sprintf(`^%s$`, regexp.QuoteMeta(executionID)))
 
