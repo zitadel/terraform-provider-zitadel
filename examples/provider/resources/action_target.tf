@@ -1,6 +1,6 @@
 resource "zitadel_action_target" "default" {
 	name               = "test-target-name"
-	endpoint           = "https://example.com/endpoint"
+	endpoint = "https://httpstat.us/200"
 	target_type        = "REST_WEBHOOK"
 	timeout            = "15s"
 	interrupt_on_error = true
