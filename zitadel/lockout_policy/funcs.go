@@ -12,7 +12,7 @@ import (
 )
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started create")
+	tflog.Info(ctx, "started delete")
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
@@ -40,6 +40,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	_, err = client.UpdateCustomLockoutPolicy(helper.CtxWithID(ctx, d), &management.UpdateCustomLockoutPolicyRequest{
 		MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
+		MaxOtpAttempts:      uint32(d.Get(maxOTPAttemptsVar).(int)),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update lockout policy: %v", err)
@@ -60,6 +61,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	_, err = client.AddCustomLockoutPolicy(helper.CtxWithID(ctx, d), &management.AddCustomLockoutPolicyRequest{
 		MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
+		MaxOtpAttempts:      uint32(d.Get(maxOTPAttemptsVar).(int)),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create lockout policy: %v", err)
@@ -87,13 +89,14 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get lockout policy")
 	}
 	policy := resp.Policy
-	if policy.GetIsDefault() == true {
+	if policy.GetIsDefault() {
 		d.SetId("")
 		return nil
 	}
 	set := map[string]interface{}{
 		helper.OrgIDVar:        policy.GetDetails().GetResourceOwner(),
 		maxPasswordAttemptsVar: policy.GetMaxPasswordAttempts(),
+		maxOTPAttemptsVar:      policy.GetMaxOtpAttempts(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
