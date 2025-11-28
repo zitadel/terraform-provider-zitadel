@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
-	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/webkey/v2beta"
+	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/webkey/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

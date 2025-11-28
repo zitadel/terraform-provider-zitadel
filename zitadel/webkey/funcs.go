@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/webkey/v2beta"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/webkey/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -94,10 +94,6 @@ func readWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 
 	d.SetId("")
 	return nil
-}
-
-func updateWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return diag.Errorf("zitadel_webkey resource does not support in-place updates")
 }
 
 func deleteWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
