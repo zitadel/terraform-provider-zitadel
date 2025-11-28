@@ -30,12 +30,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(tosLinkVar, privacyLinkVar, HelpLinkVar, supportEmailVar) {
+	if d.HasChanges(tosLinkVar, privacyLinkVar, HelpLinkVar, supportEmailVar, DocsLinkVar, CustomLinkVar, CustomLinkTextVar) {
 		resp, err := client.UpdatePrivacyPolicy(ctx, &admin.UpdatePrivacyPolicyRequest{
-			TosLink:      d.Get(tosLinkVar).(string),
-			PrivacyLink:  d.Get(privacyLinkVar).(string),
-			HelpLink:     d.Get(HelpLinkVar).(string),
-			SupportEmail: d.Get(supportEmailVar).(string),
+			TosLink:        d.Get(tosLinkVar).(string),
+			PrivacyLink:    d.Get(privacyLinkVar).(string),
+			HelpLink:       d.Get(HelpLinkVar).(string),
+			SupportEmail:   d.Get(supportEmailVar).(string),
+			DocsLink:       d.Get(DocsLinkVar).(string),
+			CustomLink:     d.Get(CustomLinkVar).(string),
+			CustomLinkText: d.Get(CustomLinkTextVar).(string),
 		})
 		if helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to update default privacy policy: %v", err)
@@ -79,10 +82,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	policy := resp.Policy
 	set := map[string]interface{}{
-		tosLinkVar:      policy.GetTosLink(),
-		privacyLinkVar:  policy.GetPrivacyLink(),
-		HelpLinkVar:     policy.GetHelpLink(),
-		supportEmailVar: policy.GetSupportEmail(),
+		tosLinkVar:        policy.GetTosLink(),
+		privacyLinkVar:    policy.GetPrivacyLink(),
+		HelpLinkVar:       policy.GetHelpLink(),
+		supportEmailVar:   policy.GetSupportEmail(),
+		DocsLinkVar:       policy.GetDocsLink(),
+		CustomLinkVar:     policy.GetCustomLink(),
+		CustomLinkTextVar: policy.GetCustomLinkText(),
 	}
 
 	for k, v := range set {
