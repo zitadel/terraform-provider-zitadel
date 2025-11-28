@@ -3,7 +3,6 @@ package action_execution_event
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -30,9 +29,6 @@ func IdFromConditionFn(condition *action.Condition) (*string, error) {
 	computeID := func(value string) string {
 		if value == "" { // all events
 			return "event"
-		}
-		if strings.HasPrefix(value, "/") { // method-style value
-			return "event" + value
 		}
 		return "event/" + value // event/group-style value
 	}
