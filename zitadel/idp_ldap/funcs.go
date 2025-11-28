@@ -40,6 +40,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		UserObjectClasses: helper.GetOkSetToStringSlice(d, UserObjectClassesVar),
 		UserFilters:       helper.GetOkSetToStringSlice(d, UserFiltersVar),
 		Timeout:           durationpb.New(timeout),
+		RootCa:            []byte(idp_utils.StringValue(d, RootCAVar)),
 
 		Attributes: &idp.LDAPAttributes{
 			IdAttribute:                idp_utils.StringValue(d, IdAttributeVar),
@@ -92,6 +93,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		UserObjectClasses: helper.GetOkSetToStringSlice(d, UserObjectClassesVar),
 		UserFilters:       helper.GetOkSetToStringSlice(d, UserFiltersVar),
 		Timeout:           durationpb.New(timeout),
+		RootCa:            []byte(idp_utils.StringValue(d, RootCAVar)),
 
 		Attributes: &idp.LDAPAttributes{
 			IdAttribute:                idp_utils.StringValue(d, IdAttributeVar),
@@ -155,6 +157,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		UserFiltersVar:       specificCfg.GetUserFilters(),
 		TimeoutVar:           specificCfg.GetTimeout().AsDuration().String(),
 		IdAttributeVar:       attributesCfg.GetIdAttribute(),
+		RootCAVar:            string(specificCfg.GetRootCa()),
 
 		FirstNameAttributeVar:         attributesCfg.GetFirstNameAttribute(),
 		LastNameAttributeVar:          attributesCfg.GetLastNameAttribute(),
