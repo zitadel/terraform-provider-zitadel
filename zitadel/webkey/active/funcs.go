@@ -25,6 +25,23 @@ func createActiveWebKey(ctx context.Context, d *schema.ResourceData, m interface
 		return diag.FromErr(err)
 	}
 	keyID := d.Get(KeyIDVar).(string)
+
+	// Validate key exists
+	resp, err := client.ListWebKeys(helper.CtxWithOrgID(ctx, d), &webkey.ListWebKeysRequest{})
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	found := false
+	for _, key := range resp.GetWebKeys() {
+		if key.GetId() == keyID {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return diag.Errorf("webkey %s does not exist", keyID)
+	}
+
 	_, err = client.ActivateWebKey(helper.CtxWithOrgID(ctx, d), &webkey.ActivateWebKeyRequest{Id: keyID})
 	if err != nil {
 		return diag.FromErr(err)
