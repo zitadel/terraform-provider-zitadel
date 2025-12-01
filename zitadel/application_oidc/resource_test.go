@@ -76,6 +76,7 @@ resource "zitadel_application_oidc" "default" {
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientSecretVar),
 		),
+		"compliance_problems",
 	)
 }
 
@@ -117,6 +118,7 @@ resource "zitadel_application_oidc" "default" {
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientSecretVar),
 		),
+		"compliance_problems",
 	)
 }
 
@@ -156,8 +158,10 @@ resource "zitadel_application_oidc" "default" {
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientSecretVar),
 		),
+		"compliance_problems",
 	)
 }
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
@@ -171,44 +175,5 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(
 			}
 			return nil
 		}
-	}
-}
-
-func checkRemoteLoginVersion(frame *test_utils.OrgTestFrame, projectId, expectedVersion, expectedBaseURI string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		for _, rs := range state.RootModule().Resources {
-			if rs.Type != "zitadel_application_oidc" {
-				continue
-			}
-
-			remoteResource, err := frame.GetAppByID(frame, &management.GetAppByIDRequest{AppId: rs.Primary.ID, ProjectId: projectId})
-			if err != nil {
-				return err
-			}
-
-			loginVersion := remoteResource.GetApp().GetOidcConfig().GetLoginVersion()
-			if loginVersion == nil {
-				return fmt.Errorf("login_version is nil")
-			}
-
-			switch expectedVersion {
-			case "v1":
-				if loginVersion.GetLoginV1() == nil {
-					return fmt.Errorf("expected LoginV1, got %T", loginVersion.GetVersion())
-				}
-			case "v2":
-				v2 := loginVersion.GetLoginV2()
-				if v2 == nil {
-					return fmt.Errorf("expected LoginV2, got %T", loginVersion.GetVersion())
-				}
-				actualBaseURI := v2.GetBaseUri()
-				if expectedBaseURI != actualBaseURI {
-					return fmt.Errorf("expected base_uri %q, got %q", expectedBaseURI, actualBaseURI)
-				}
-			default:
-				return fmt.Errorf("unknown version %s", expectedVersion)
-			}
-		}
-		return nil
 	}
 }
