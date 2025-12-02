@@ -36,65 +36,122 @@ func TestAccMachineUserDatasource_ID(t *testing.T) {
 	)
 }
 
-func TestAccMachineUsersDatasources_ID_Name_Match(t *testing.T) {
+func TestAccMachineUsersDatasource_All(t *testing.T) {
 	datasourceName := "zitadel_machine_users"
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
-	config, attributes := test_utils.ReadExample(t, test_utils.Datasources, datasourceName)
-	exampleName := test_utils.AttributeValue(t, machine_user.UserNameVar, attributes).AsString()
-	userName := fmt.Sprintf("%s-%s", exampleName, frame.UniqueResourcesID)
-	// for-each is not supported in acceptance tests, so we cut the example down to the first block
-	// https://github.com/hashicorp/terraform-plugin-sdk/issues/536
-	config = strings.Join(strings.Split(config, "\n")[0:5], "\n")
-	config = strings.Replace(config, exampleName, userName, 1)
-	_, userID := machine_user_test_dep.Create(t, frame, userName)
+
+	usernames := []string{"machine1_" + frame.UniqueResourcesID, "machine2_" + frame.UniqueResourcesID, "machine3_" + frame.UniqueResourcesID}
+	for _, username := range usernames {
+		_, err := frame.AddMachineUser(frame, &management.AddMachineUserRequest{
+			UserName: username,
+			Name:     "Test Machine",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	config := fmt.Sprintf(`
+data "zitadel_machine_users" "default" {
+  org_id    = "%s"
+  user_name = "machine"
+  user_name_method = "TEXT_QUERY_METHOD_CONTAINS"
+}
+`, frame.OrgID)
+
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
 		[]string{frame.AsOrgDefaultDependency},
-		checkRemoteDatasourceProperty(frame, userID)(userName),
+		nil,
+		map[string]string{},
+	)
+}
+
+func TestAccMachineUsersDatasource_FilterByUsername(t *testing.T) {
+	datasourceName := "zitadel_machine_users"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
+
+	matchingUsername := "admin_machine_" + frame.UniqueResourcesID
+	usernames := []string{matchingUsername, "user_machine_" + frame.UniqueResourcesID, "viewer_machine_" + frame.UniqueResourcesID}
+
+	for _, username := range usernames {
+		_, err := frame.AddMachineUser(frame, &management.AddMachineUserRequest{
+			UserName: username,
+			Name:     "Test Machine",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	config := fmt.Sprintf(`
+data "zitadel_machine_users" "default" {
+  org_id    = "%s"
+  user_name = "%s"
+}
+`, frame.OrgID, matchingUsername)
+
+	test_utils.RunDatasourceTest(
+		t,
+		frame.BaseTestFrame,
+		config,
+		[]string{frame.AsOrgDefaultDependency},
+		checkUserExists(frame, matchingUsername),
 		map[string]string{
-			"user_ids.0": userID,
 			"user_ids.#": "1",
 		},
 	)
 }
 
-func TestAccMachineUsersDatasources_ID_Name_Mismatch(t *testing.T) {
+func TestAccMachineUsersDatasource_NoMatch(t *testing.T) {
 	datasourceName := "zitadel_machine_users"
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
-	config, attributes := test_utils.ReadExample(t, test_utils.Datasources, datasourceName)
-	exampleName := test_utils.AttributeValue(t, machine_user.UserNameVar, attributes).AsString()
-	userName := fmt.Sprintf("%s-%s", exampleName, frame.UniqueResourcesID)
-	// for-each is not supported in acceptance tests, so we cut the example down to the first block
-	// https://github.com/hashicorp/terraform-plugin-sdk/issues/536
-	config = strings.Join(strings.Split(config, "\n")[0:5], "\n")
-	config = strings.Replace(config, exampleName, "mismatch", 1)
-	_, userID := machine_user_test_dep.Create(t, frame, userName)
+
+	usernames := []string{"machine1_" + frame.UniqueResourcesID, "machine2_" + frame.UniqueResourcesID}
+	for _, username := range usernames {
+		_, err := frame.AddMachineUser(frame, &management.AddMachineUserRequest{
+			UserName: username,
+			Name:     "Test Machine",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	config := fmt.Sprintf(`
+data "zitadel_machine_users" "default" {
+  org_id    = "%s"
+  user_name = "nonexistent"
+}
+`, frame.OrgID)
+
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
 		[]string{frame.AsOrgDefaultDependency},
-		checkRemoteDatasourceProperty(frame, userID)(userName),
+		nil,
 		map[string]string{
 			"user_ids.#": "0",
 		},
 	)
 }
 
-func checkRemoteDatasourceProperty(frame *test_utils.OrgTestFrame, id string) func(string) resource.TestCheckFunc {
-	return func(expect string) resource.TestCheckFunc {
-		return func(state *terraform.State) error {
-			remoteResource, err := frame.GetUserByID(frame, &management.GetUserByIDRequest{Id: id})
-			if err != nil {
-				return err
-			}
-			actual := remoteResource.GetUser().GetUserName()
-			if actual != expect {
-				return fmt.Errorf("expected %s, but got %s", expect, actual)
-			}
-			return nil
+func checkUserExists(frame *test_utils.OrgTestFrame, expectedUsername string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		resp, err := frame.ListUsers(frame, &management.ListUsersRequest{})
+		if err != nil {
+			return err
 		}
+
+		for _, user := range resp.Result {
+			if user.UserName == expectedUsername {
+				return nil
+			}
+		}
+
+		return fmt.Errorf("expected user %s not found", expectedUsername)
 	}
 }

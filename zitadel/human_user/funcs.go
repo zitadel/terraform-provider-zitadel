@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -235,6 +236,132 @@ func readFunc(forDatasource bool) func(ctx context.Context, d *schema.ResourceDa
 		d.SetId(user.GetId())
 		return nil
 	}
+}
+
+func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started list")
+
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := helper.GetManagementClient(ctx, clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	req := &management.ListUsersRequest{}
+	var queries []*user.SearchQuery
+
+	queries = append(queries, &user.SearchQuery{
+		Query: &user.SearchQuery_TypeQuery{
+			TypeQuery: &user.TypeQuery{
+				Type: user.Type_TYPE_HUMAN,
+			},
+		},
+	})
+
+	if userName, ok := d.GetOk(UserNameVar); ok {
+		userNameMethod := d.Get(userNameMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_UserNameQuery{
+				UserNameQuery: &user.UserNameQuery{
+					UserName: userName.(string),
+					Method:   object.TextQueryMethod(object.TextQueryMethod_value[userNameMethod]),
+				},
+			},
+		})
+	}
+
+	if firstName, ok := d.GetOk(firstNameVar); ok {
+		firstNameMethod := d.Get(firstNameMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_FirstNameQuery{
+				FirstNameQuery: &user.FirstNameQuery{
+					FirstName: firstName.(string),
+					Method:    object.TextQueryMethod(object.TextQueryMethod_value[firstNameMethod]),
+				},
+			},
+		})
+	}
+
+	if lastName, ok := d.GetOk(lastNameVar); ok {
+		lastNameMethod := d.Get(lastNameMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_LastNameQuery{
+				LastNameQuery: &user.LastNameQuery{
+					LastName: lastName.(string),
+					Method:   object.TextQueryMethod(object.TextQueryMethod_value[lastNameMethod]),
+				},
+			},
+		})
+	}
+
+	if nickName, ok := d.GetOk(nickNameVar); ok {
+		nickNameMethod := d.Get(nickNameMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_NickNameQuery{
+				NickNameQuery: &user.NickNameQuery{
+					NickName: nickName.(string),
+					Method:   object.TextQueryMethod(object.TextQueryMethod_value[nickNameMethod]),
+				},
+			},
+		})
+	}
+
+	if displayName, ok := d.GetOk(DisplayNameVar); ok {
+		displayNameMethod := d.Get(displayNameMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_DisplayNameQuery{
+				DisplayNameQuery: &user.DisplayNameQuery{
+					DisplayName: displayName.(string),
+					Method:      object.TextQueryMethod(object.TextQueryMethod_value[displayNameMethod]),
+				},
+			},
+		})
+	}
+
+	if email, ok := d.GetOk(emailVar); ok {
+		emailMethod := d.Get(emailMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_EmailQuery{
+				EmailQuery: &user.EmailQuery{
+					EmailAddress: email.(string),
+					Method:       object.TextQueryMethod(object.TextQueryMethod_value[emailMethod]),
+				},
+			},
+		})
+	}
+
+	if loginName, ok := d.GetOk(loginNameVar); ok {
+		loginNameMethod := d.Get(loginNameMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_LoginNameQuery{
+				LoginNameQuery: &user.LoginNameQuery{
+					LoginName: loginName.(string),
+					Method:    object.TextQueryMethod(object.TextQueryMethod_value[loginNameMethod]),
+				},
+			},
+		})
+	}
+
+	if len(queries) > 0 {
+		req.Queries = queries
+	}
+
+	resp, err := client.ListUsers(helper.CtxWithOrgID(ctx, d), req)
+	if err != nil {
+		return diag.Errorf("error while listing users: %v", err)
+	}
+
+	ids := make([]string, len(resp.Result))
+	for i, res := range resp.Result {
+		ids[i] = res.Id
+	}
+
+	d.SetId("-")
+	return diag.FromErr(d.Set(userIDsVar, ids))
 }
 
 func defaultDisplayName(firstName, lastName string) string {

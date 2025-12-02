@@ -192,37 +192,78 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started list")
-	userName := d.Get(UserNameVar).(string)
-	userNameMethod := d.Get(userNameMethodVar).(string)
+
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
+
 	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	req := &management.ListUsersRequest{}
-	if userName != "" {
-		req.Queries = append(req.Queries,
-			&user.SearchQuery{
-				Query: &user.SearchQuery_UserNameQuery{
-					UserNameQuery: &user.UserNameQuery{
-						UserName: userName,
-						Method:   object.TextQueryMethod(object.TextQueryMethod_value[userNameMethod]),
-					},
+	var queries []*user.SearchQuery
+
+	queries = append(queries, &user.SearchQuery{
+		Query: &user.SearchQuery_TypeQuery{
+			TypeQuery: &user.TypeQuery{
+				Type: user.Type_TYPE_MACHINE,
+			},
+		},
+	})
+
+	if userName, ok := d.GetOk(UserNameVar); ok {
+		userNameMethod := d.Get(userNameMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_UserNameQuery{
+				UserNameQuery: &user.UserNameQuery{
+					UserName: userName.(string),
+					Method:   object.TextQueryMethod(object.TextQueryMethod_value[userNameMethod]),
 				},
-			})
+			},
+		})
 	}
+
+	if email, ok := d.GetOk(emailVar); ok {
+		emailMethod := d.Get(emailMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_EmailQuery{
+				EmailQuery: &user.EmailQuery{
+					EmailAddress: email.(string),
+					Method:       object.TextQueryMethod(object.TextQueryMethod_value[emailMethod]),
+				},
+			},
+		})
+	}
+
+	if loginName, ok := d.GetOk(loginNameVar); ok {
+		loginNameMethod := d.Get(loginNameMethodVar).(string)
+		queries = append(queries, &user.SearchQuery{
+			Query: &user.SearchQuery_LoginNameQuery{
+				LoginNameQuery: &user.LoginNameQuery{
+					LoginName: loginName.(string),
+					Method:    object.TextQueryMethod(object.TextQueryMethod_value[loginNameMethod]),
+				},
+			},
+		})
+	}
+
+	if len(queries) > 0 {
+		req.Queries = queries
+	}
+
 	resp, err := client.ListUsers(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
-		return diag.Errorf("error while getting user by username %s: %v", userName, err)
+		return diag.Errorf("error while listing users: %v", err)
 	}
+
 	ids := make([]string, len(resp.Result))
 	for i, res := range resp.Result {
 		ids[i] = res.Id
 	}
-	// If the ID is blank, the datasource is deleted and not usable.
+
 	d.SetId("-")
 	return diag.FromErr(d.Set(userIDsVar, ids))
 }

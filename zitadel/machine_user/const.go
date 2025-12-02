@@ -11,6 +11,8 @@ const (
 	UserNameVar           = "user_name"
 	userNameMethodVar     = "user_name_method"
 	loginNamesVar         = "login_names"
+	loginNameVar          = "login_name"
+	loginNameMethodVar    = "login_name_method"
 	preferredLoginNameVar = "preferred_login_name"
 	nameVar               = "name"
 	DescriptionVar        = "description"
@@ -18,6 +20,8 @@ const (
 	WithSecretVar         = "with_secret"
 	clientIDVar           = "client_id"
 	clientSecretVar       = "client_secret"
+	emailVar              = "email"
+	emailMethodVar        = "email_method"
 )
 
 var (
