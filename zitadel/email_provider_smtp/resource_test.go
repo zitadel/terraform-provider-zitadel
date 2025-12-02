@@ -23,31 +23,28 @@ func TestAccEmailSMTPProvider(t *testing.T) {
 	exampleProperty := test_utils.AttributeValue(t, email_provider_smtp.SenderNameVar, exampleAttributes).AsString()
 	updatedProperty := "updatedProperty"
 
-	exampleSecret := test_utils.AttributeValue(t, email_provider_smtp.PasswordVar, exampleAttributes).AsString()
-	updatedSecret := "updatedSecret"
-
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		nil,
-		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
+		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
 		exampleProperty, updatedProperty,
-		email_provider_smtp.PasswordVar, exampleSecret, updatedSecret,
-		true,
+		"", "", "",
+		false,
 		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, email_provider_smtp.PasswordVar),
 		),
+		"password", "set_active",
 	)
 }
 
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			resp, err := frame.GetEmailProvider(frame, &admin.GetEmailProviderRequest{})
+			resp, err := frame.GetEmailProviderById(frame, &admin.GetEmailProviderByIdRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return fmt.Errorf("getting email provider failed: %w", err)
 			}

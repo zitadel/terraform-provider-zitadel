@@ -118,13 +118,20 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetEmailProvider(ctx, &admin.GetEmailProviderRequest{})
+	resp, err := client.GetEmailProviderById(ctx, &admin.GetEmailProviderByIdRequest{
+		Id: d.Id(),
+	})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
 	}
 	if err != nil {
 		return diag.Errorf("failed to get email smtp provider")
+	}
+
+	if resp.GetConfig().GetSmtp() == nil {
+		d.SetId("")
+		return nil
 	}
 
 	set := map[string]interface{}{

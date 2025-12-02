@@ -38,7 +38,7 @@ func TestAccEmailHttpProvider(t *testing.T) {
 func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			resp, err := frame.GetEmailProvider(frame, &admin.GetEmailProviderRequest{})
+			resp, err := frame.GetEmailProviderById(frame, &admin.GetEmailProviderByIdRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return fmt.Errorf("getting email provider failed: %w", err)
 			}
