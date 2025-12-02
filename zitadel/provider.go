@@ -114,6 +114,7 @@ type providerModel struct {
 	Insecure       types.Bool   `tfsdk:"insecure"`
 	Domain         types.String `tfsdk:"domain"`
 	Port           types.String `tfsdk:"port"`
+	AccessToken    types.String `tfsdk:"access_token"`
 	Token          types.String `tfsdk:"token"`
 	JWTFile        types.String `tfsdk:"jwt_file"`
 	JWTProfileFile types.String `tfsdk:"jwt_profile_file"`
@@ -135,6 +136,12 @@ func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnost
 				Type:        types.BoolType,
 				Optional:    true,
 				Description: helper.InsecureDescription,
+			},
+			helper.AccessTokenVar: {
+				Type:        types.StringType,
+				Optional:    true,
+				Sensitive:   true,
+				Description: helper.AccessTokenDescription,
 			},
 			helper.TokenVar: {
 				Type:        types.StringType,
@@ -176,6 +183,7 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 	info, err := helper.GetClientInfo(ctx,
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
+		config.AccessToken.ValueString(),
 		config.Token.ValueString(),
 		config.JWTFile.ValueString(),
 		config.JWTProfileFile.ValueString(),
@@ -273,6 +281,12 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: helper.InsecureDescription,
+			},
+			helper.AccessTokenVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
+				Description: helper.AccessTokenDescription,
 			},
 			helper.TokenVar: {
 				Type:        schema.TypeString,
@@ -374,6 +388,7 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	clientinfo, err := helper.GetClientInfo(ctx,
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
+		d.Get(helper.AccessTokenVar).(string),
 		d.Get(helper.TokenVar).(string),
 		d.Get(helper.JWTFileVar).(string),
 		d.Get(helper.JWTProfileFileVar).(string),
