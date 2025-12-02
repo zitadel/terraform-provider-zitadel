@@ -8,8 +8,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
+	objectv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org"
+	orgv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -155,47 +156,61 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	orgDomain := d.Get(DomainVar).(string)
 	orgDomainMethod := d.Get(domainMethodVar).(string)
 	orgState := d.Get(stateVar).(string)
+
+	// Map old v1 state values to v2 for backwards compatibility
+	if orgState != "" {
+		stateMapping := map[string]string{
+			"ORG_STATE_UNSPECIFIED": "ORGANIZATION_STATE_UNSPECIFIED",
+			"ORG_STATE_ACTIVE":      "ORGANIZATION_STATE_ACTIVE",
+			"ORG_STATE_INACTIVE":    "ORGANIZATION_STATE_INACTIVE",
+			"ORG_STATE_REMOVED":     "ORGANIZATION_STATE_REMOVED",
+		}
+		if mappedState, ok := stateMapping[orgState]; ok {
+			orgState = mappedState
+		}
+	}
+
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetAdminClient(ctx, clientinfo)
+	client, err := helper.GetOrgClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	req := &admin.ListOrgsRequest{}
+	req := &orgv2.ListOrganizationsRequest{}
 	if orgName != "" {
-		req.Queries = append(req.Queries, &org.OrgQuery{
-			Query: &org.OrgQuery_NameQuery{
-				NameQuery: &org.OrgNameQuery{
+		req.Queries = append(req.Queries, &orgv2.SearchQuery{
+			Query: &orgv2.SearchQuery_NameQuery{
+				NameQuery: &orgv2.OrganizationNameQuery{
 					Name:   orgName,
-					Method: object.TextQueryMethod(object.TextQueryMethod_value[orgNameMethod]),
+					Method: objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[orgNameMethod]),
 				},
 			},
 		})
 	}
 	if orgState != "" {
-		req.Queries = append(req.Queries, &org.OrgQuery{
-			Query: &org.OrgQuery_StateQuery{
-				StateQuery: &org.OrgStateQuery{
-					State: org.OrgState(org.OrgState_value[orgState]),
+		req.Queries = append(req.Queries, &orgv2.SearchQuery{
+			Query: &orgv2.SearchQuery_StateQuery{
+				StateQuery: &orgv2.OrganizationStateQuery{
+					State: orgv2.OrganizationState(orgv2.OrganizationState_value[orgState]),
 				},
 			},
 		})
 	}
 	if orgDomain != "" {
-		req.Queries = append(req.Queries, &org.OrgQuery{
-			Query: &org.OrgQuery_DomainQuery{
-				DomainQuery: &org.OrgDomainQuery{
+		req.Queries = append(req.Queries, &orgv2.SearchQuery{
+			Query: &orgv2.SearchQuery_DomainQuery{
+				DomainQuery: &orgv2.OrganizationDomainQuery{
 					Domain: orgDomain,
-					Method: object.TextQueryMethod(object.TextQueryMethod_value[orgDomainMethod]),
+					Method: objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[orgDomainMethod]),
 				},
 			},
 		})
 	}
-	resp, err := client.ListOrgs(ctx, req)
+	resp, err := client.ListOrganizations(ctx, req)
 	if err != nil {
-		return diag.Errorf("error while getting org by id %s: %v", orgName, err)
+		return diag.Errorf("error while listing orgs with name %s: %v", orgName, err)
 	}
 	orgIDs := make([]string, len(resp.Result))
 	for i, org := range resp.Result {
