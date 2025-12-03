@@ -54,7 +54,12 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_saml"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/init_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_custom_domain"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_custom_domains"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_member"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_trusted_domain"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_trusted_domains"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/login_policy"
@@ -262,6 +267,9 @@ func Provider() *schema.Provider {
 			"zitadel_org_idp_saml":               org_idp_saml.GetDatasource(),
 			"zitadel_org_idp_oauth":              org_idp_oauth.GetDatasource(),
 			"zitadel_default_oidc_settings":      default_oidc_settings.GetDatasource(),
+			"zitadel_instance":                   instance.GetDatasource(),
+			"zitadel_instance_custom_domains":    instance_custom_domains.GetDatasource(),
+			"zitadel_instance_trusted_domains":   instance_trusted_domains.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -365,6 +373,8 @@ func Provider() *schema.Provider {
 			"zitadel_default_oidc_settings":              default_oidc_settings.GetResource(),
 			"zitadel_org_metadata":                       org_metadata.GetResource(),
 			"zitadel_user_metadata":                      user_metadata.GetResource(),
+			"zitadel_instance_custom_domain":             instance_custom_domain.GetResource(),
+			"zitadel_instance_trusted_domain":            instance_trusted_domain.GetResource(),
 		},
 		ConfigureContextFunc: ProviderConfigure,
 	}

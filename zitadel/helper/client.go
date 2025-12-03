@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/action/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/instance/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
@@ -164,6 +165,29 @@ func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error
 		}
 	}
 	return adminClient, nil
+}
+
+var instanceClientLock = &sync.Mutex{}
+var instanceClient *instanceV2.Client
+
+func GetInstanceClient(ctx context.Context, info *ClientInfo) (*instanceV2.Client, error) {
+	if instanceClient == nil {
+		instanceClientLock.Lock()
+		defer instanceClientLock.Unlock()
+		if instanceClient == nil {
+			client, err := instanceV2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			instanceClient = client
+		}
+	}
+	return instanceClient, nil
 }
 
 func CtxWithID(ctx context.Context, d *schema.ResourceData) context.Context {
