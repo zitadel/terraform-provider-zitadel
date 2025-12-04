@@ -7,9 +7,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org"
+	orgv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -20,12 +20,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetAdminClient(ctx, clientinfo)
+	client, err := helper.GetOrgV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.RemoveOrg(ctx, &admin.RemoveOrgRequest{
-		OrgId: d.Id(),
+	_, err = client.DeleteOrganization(ctx, &orgv2.DeleteOrganizationRequest{
+		OrganizationId: d.Id(),
 	})
 	if err != nil {
 		return diag.FromErr(err)
@@ -40,18 +40,29 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+
+	client, err := helper.GetOrgV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.AddOrg(ctx, &management.AddOrgRequest{
+
+	req := &orgv2.AddOrganizationRequest{
 		Name: d.Get(NameVar).(string),
-	})
+	}
+
+	if orgID, ok := d.GetOk(OrgIDInputVar); ok {
+		orgIDStr := orgID.(string)
+		req.OrganizationId = &orgIDStr
+	}
+
+	resp, err := client.AddOrganization(ctx, req)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	orgId := resp.GetId()
+
+	orgId := resp.GetOrganizationId()
 	d.SetId(orgId)
+
 	if val, ok := d.GetOk(IsDefaultVar); ok && val.(bool) {
 		adminClient, err := helper.GetAdminClient(ctx, clientinfo)
 		if err != nil {
@@ -73,21 +84,22 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	// If try updating the name to the same value API will return an error.
+
 	if d.HasChange(NameVar) {
-		client, err := helper.GetManagementClient(ctx, clientinfo)
+		client, err := helper.GetOrgV2Client(ctx, clientinfo)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 
-		_, err = client.UpdateOrg(helper.CtxSetOrgID(ctx, d.Id()), &management.UpdateOrgRequest{
-			Name: d.Get(NameVar).(string),
+		_, err = client.UpdateOrganization(ctx, &orgv2.UpdateOrganizationRequest{
+			OrganizationId: d.Id(),
+			Name:           d.Get(NameVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update org: %v", err)
 		}
 	}
-	// To unset the default org, we need to set another org as default org.
+
 	if isDefault, ok := d.GetOk(IsDefaultVar); ok && isDefault.(bool) && d.HasChange(IsDefaultVar) {
 		adminClient, err := helper.GetAdminClient(ctx, clientinfo)
 		if err != nil {
@@ -201,7 +213,6 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	for i, org := range resp.Result {
 		orgIDs[i] = org.Id
 	}
-	// If the ID is blank, the datasource is deleted and not usable.
 	d.SetId("-")
 	return diag.FromErr(d.Set(orgIDsVar, orgIDs))
 }

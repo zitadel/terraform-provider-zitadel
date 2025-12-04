@@ -13,6 +13,8 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
+	orgv2 "github.com/zitadel/zitadel-go/v3/pkg/client/org/v2"
+	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/user/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -141,6 +143,52 @@ func GetManagementClient(ctx context.Context, info *ClientInfo) (*management.Cli
 		}
 	}
 	return mgmtClient, nil
+}
+
+var orgV2ClientLock = &sync.Mutex{}
+var orgV2Client *orgv2.Client
+
+func GetOrgV2Client(ctx context.Context, info *ClientInfo) (*orgv2.Client, error) {
+	if orgV2Client == nil {
+		orgV2ClientLock.Lock()
+		defer orgV2ClientLock.Unlock()
+		if orgV2Client == nil {
+			client, err := orgv2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel org v2 client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			orgV2Client = client
+		}
+	}
+	return orgV2Client, nil
+}
+
+var userV2ClientLock = &sync.Mutex{}
+var userV2Client *userv2.Client
+
+func GetUserV2Client(ctx context.Context, info *ClientInfo) (*userv2.Client, error) {
+	if userV2Client == nil {
+		userV2ClientLock.Lock()
+		defer userV2ClientLock.Unlock()
+		if userV2Client == nil {
+			client, err := userv2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel user v2 client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			userV2Client = client
+		}
+	}
+	return userV2Client, nil
 }
 
 var adminClientLock = &sync.Mutex{}

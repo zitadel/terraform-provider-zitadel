@@ -36,6 +36,12 @@ func GetResource() *schema.Resource {
 				Computed:    true,
 				Description: "State of the org",
 			},
+			OrgIDInputVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Description: "Optionally set a custom unique ID for the organization. If omitted, ZITADEL will generate one.",
+			},
 		},
 		CreateContext: create,
 		DeleteContext: delete,

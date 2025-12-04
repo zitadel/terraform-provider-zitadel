@@ -9,25 +9,26 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user"
+	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started read")
+	tflog.Info(ctx, "started delete")
 
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetUserV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveUser(helper.CtxWithOrgID(ctx, d), &management.RemoveUserRequest{
-		Id: d.Id(),
+	_, err = client.DeleteUser(helper.CtxWithOrgID(ctx, d), &userv2.DeleteUserRequest{
+		UserId: d.Id(),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete user: %v", err)
@@ -43,40 +44,44 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetUserV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	respUser, err := client.AddMachineUser(helper.CtxWithOrgID(ctx, d), &management.AddMachineUserRequest{
-		UserName:        d.Get(UserNameVar).(string),
-		Name:            d.Get(nameVar).(string),
-		Description:     d.Get(DescriptionVar).(string),
-		AccessTokenType: user.AccessTokenType(user.AccessTokenType_value[(d.Get(accessTokenTypeVar).(string))]),
-	})
+	name := d.Get(nameVar).(string)
+	username := d.Get(UserNameVar).(string)
+	orgID := d.Get(helper.OrgIDVar).(string)
+
+	machineUser := &userv2.CreateUserRequest_Machine{
+		Name: name,
+	}
+
+	if description, ok := d.GetOk(DescriptionVar); ok && description.(string) != "" {
+		desc := description.(string)
+		machineUser.Description = &desc
+	}
+
+	req := &userv2.CreateUserRequest{
+		OrganizationId: orgID,
+		Username:       &username,
+		UserType: &userv2.CreateUserRequest_Machine_{
+			Machine: machineUser,
+		},
+	}
+
+	if userID, ok := d.GetOk(UserIDVar); ok {
+		uid := userID.(string)
+		req.UserId = &uid
+	}
+
+	respUser, err := client.CreateUser(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
 		return diag.Errorf("failed to create machine user: %v", err)
 	}
-	d.SetId(respUser.UserId)
+	d.SetId(respUser.Id)
 
-	if d.Get(WithSecretVar).(bool) {
-		resp, err := client.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
-			UserId: respUser.UserId,
-		})
-		if err != nil {
-			return diag.Errorf("failed to generate machine user secret: %v", err)
-		}
-		if err := d.Set(clientIDVar, resp.GetClientId()); err != nil {
-			return diag.Errorf("failed to set %s of user: %v", clientIDVar, err)
-		}
-		if err := d.Set(clientSecretVar, resp.GetClientSecret()); err != nil {
-			return diag.Errorf("failed to set %s of user: %v", clientSecretVar, err)
-		}
-	}
-
-	// To avoid diffs for terraform plan -refresh=false right after creation, we query and set the computed values.
-	// The acceptance tests rely on this, too.
-	return read(ctx, d, m)
+	return nil
 }
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -87,36 +92,52 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetUserV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
+	req := &userv2.UpdateUserRequest{
+		UserId: d.Id(),
+	}
+
 	if d.HasChange(UserNameVar) {
-		_, err = client.UpdateUserName(helper.CtxWithOrgID(ctx, d), &management.UpdateUserNameRequest{
-			UserId:   d.Id(),
-			UserName: d.Get(UserNameVar).(string),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update username: %v", err)
+		username := d.Get(UserNameVar).(string)
+		req.Username = &username
+	}
+
+	if d.HasChanges(nameVar, DescriptionVar) {
+		machineUpdate := &userv2.UpdateUserRequest_Machine{}
+
+		if d.HasChange(nameVar) {
+			name := d.Get(nameVar).(string)
+			machineUpdate.Name = &name
+		}
+		if d.HasChange(DescriptionVar) {
+			desc := d.Get(DescriptionVar).(string)
+			machineUpdate.Description = &desc
+		}
+
+		req.UserType = &userv2.UpdateUserRequest_Machine_{
+			Machine: machineUpdate,
 		}
 	}
 
-	if d.HasChanges(nameVar, DescriptionVar, accessTokenTypeVar) {
-		_, err := client.UpdateMachine(helper.CtxWithOrgID(ctx, d), &management.UpdateMachineRequest{
-			UserId:          d.Id(),
-			Name:            d.Get(nameVar).(string),
-			Description:     d.Get(DescriptionVar).(string),
-			AccessTokenType: user.AccessTokenType(user.AccessTokenType_value[(d.Get(accessTokenTypeVar).(string))]),
-		})
+	if req.Username != nil || req.UserType != nil {
+		_, err = client.UpdateUser(helper.CtxWithOrgID(ctx, d), req)
 		if err != nil {
 			return diag.Errorf("failed to update machine user: %v", err)
 		}
 	}
 
 	if d.HasChange(WithSecretVar) {
+		managementClient, err := helper.GetManagementClient(ctx, clientinfo)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
 		if d.Get(WithSecretVar).(bool) {
-			resp, err := client.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
+			resp, err := managementClient.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
 				UserId: d.Id(),
 			})
 			if err != nil {
@@ -129,7 +150,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 				return diag.Errorf("failed to set %s of user: %v", clientSecretVar, err)
 			}
 		} else {
-			_, err := client.RemoveMachineSecret(helper.CtxWithOrgID(ctx, d), &management.RemoveMachineSecretRequest{
+			_, err := managementClient.RemoveMachineSecret(helper.CtxWithOrgID(ctx, d), &management.RemoveMachineSecretRequest{
 				UserId: d.Id(),
 			})
 			if err != nil {
@@ -154,25 +175,27 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetUserV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	respUser, err := client.GetUserByID(helper.CtxWithOrgID(ctx, d), &management.GetUserByIDRequest{Id: helper.GetID(d, UserIDVar)})
+	respUser, err := client.GetUserByID(helper.CtxWithOrgID(ctx, d), &userv2.GetUserByIDRequest{
+		UserId: helper.GetID(d, UserIDVar),
+	})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get user")
+		return diag.Errorf("failed to get user: %v", err)
 	}
 
 	user := respUser.GetUser()
 	set := map[string]interface{}{
 		helper.OrgIDVar:       user.GetDetails().GetResourceOwner(),
 		userStateVar:          user.GetState().String(),
-		UserNameVar:           user.GetUserName(),
+		UserNameVar:           user.GetUsername(),
 		loginNamesVar:         user.GetLoginNames(),
 		preferredLoginNameVar: user.GetPreferredLoginName(),
 	}
@@ -186,7 +209,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			return diag.Errorf("failed to set %s of user: %v", k, err)
 		}
 	}
-	d.SetId(user.GetId())
+	d.SetId(user.GetUserId())
 	return nil
 }
 
@@ -222,7 +245,6 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	for i, res := range resp.Result {
 		ids[i] = res.Id
 	}
-	// If the ID is blank, the datasource is deleted and not usable.
 	d.SetId("-")
 	return diag.FromErr(d.Set(userIDsVar, ids))
 }
