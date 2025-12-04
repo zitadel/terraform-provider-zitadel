@@ -223,6 +223,7 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
+			"zitadel":                            GetSessionTokenDatasource(),
 			"zitadel_org":                        org.GetDatasource(),
 			"zitadel_orgs":                       org.ListDatasources(),
 			"zitadel_human_user":                 human_user.GetDatasource(),
