@@ -11,4 +11,5 @@ const (
 	domainMethodVar  = "domain_method"
 	stateVar         = "state"
 	primaryDomainVar = "primary_domain"
+	adminsVar        = "admins"
 )

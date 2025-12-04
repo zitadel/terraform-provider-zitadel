@@ -55,6 +55,29 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		req.OrganizationId = &orgIDStr
 	}
 
+	if admins, ok := d.GetOk(adminsVar); ok {
+		adminSet := admins.(*schema.Set)
+		for _, admin := range adminSet.List() {
+			adminMap := admin.(map[string]interface{})
+			userId := adminMap["user_id"].(string)
+
+			adminReq := &orgv2.AddOrganizationRequest_Admin{
+				UserType: &orgv2.AddOrganizationRequest_Admin_UserId{
+					UserId: userId,
+				},
+			}
+
+			if roles, ok := adminMap["roles"]; ok && roles != nil {
+				rolesList := roles.([]interface{})
+				for _, role := range rolesList {
+					adminReq.Roles = append(adminReq.Roles, role.(string))
+				}
+			}
+
+			req.Admins = append(req.Admins, adminReq)
+		}
+	}
+
 	resp, err := client.AddOrganization(ctx, req)
 	if err != nil {
 		return diag.FromErr(err)

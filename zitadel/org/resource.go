@@ -42,6 +42,27 @@ func GetResource() *schema.Resource {
 				ForceNew:    true,
 				Description: "Optionally set a custom unique ID for the organization. If omitted, ZITADEL will generate one.",
 			},
+			adminsVar: {
+				Type:     schema.TypeSet,
+				Optional: true,
+				ForceNew: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"user_id": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "ID of existing user to grant admin access",
+						},
+						"roles": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Description: "Roles to assign (defaults to ORG_OWNER if empty)",
+						},
+					},
+				},
+				Description: "Admin users for the organization",
+			},
 		},
 		CreateContext: create,
 		DeleteContext: delete,
