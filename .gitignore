@@ -43,3 +43,11 @@ devbox.lock
 
 # local binary
 terraform-provider-zitadel
+
+.go
+
+# Devbox
+devbox.json
+devbox.lock
+
+vendor
