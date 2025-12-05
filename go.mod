@@ -17,7 +17,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/zclconf/go-cty v1.13.1
 	github.com/zitadel/oidc/v3 v3.44.0
-	github.com/zitadel/zitadel-go/v3 v3.14.2
+	github.com/zitadel/zitadel-go/v3 v3.19.0
 	golang.org/x/oauth2 v0.30.0
 	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.7
