@@ -44,3 +44,4 @@ devbox.json
 devbox.lock
 
 vendor
+dist
