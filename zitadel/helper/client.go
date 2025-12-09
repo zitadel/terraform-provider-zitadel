@@ -2,8 +2,11 @@ package helper
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -14,7 +17,9 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 )
 
@@ -23,6 +28,8 @@ const (
 	DomainDescription         = "Domain used to connect to the ZITADEL instance"
 	InsecureVar               = "insecure"
 	InsecureDescription       = "Use insecure connection"
+	SkipTLSVerifyVar          = "skip_tls_verify"
+	SkipTLSVerifyDescription  = "Skip TLS certificate verification"
 	TokenVar                  = "token"
 	TokenDescription          = "Path to the file containing credentials to connect to ZITADEL"
 	PortVar                   = "port"
@@ -43,7 +50,7 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(ctx context.Context, insecure bool, domain string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+func GetClientInfo(ctx context.Context, insecure bool, skipTLSVerify bool, domain string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
 	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if token != "" {
@@ -68,6 +75,24 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, token stri
 	if insecure {
 		options = append(options, zitadel.WithInsecure())
 		issuerScheme = "http://"
+	}
+
+	if skipTLSVerify && !insecure {
+		ca, err := x509.SystemCertPool()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get system cert pool: %v", err)
+		}
+		if ca == nil {
+			ca = x509.NewCertPool()
+		}
+		servernameWithoutPort := strings.Split(domain, ":")[0]
+		tlsConfig := &tls.Config{
+			RootCAs:            ca,
+			ServerName:         servernameWithoutPort,
+			InsecureSkipVerify: true,
+		}
+		creds := credentials.NewTLS(tlsConfig)
+		options = append(options, zitadel.WithDialOptions(grpc.WithTransportCredentials(creds)))
 	}
 
 	issuerPort := port
