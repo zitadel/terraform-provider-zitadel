@@ -39,6 +39,7 @@ terraform {
 provider "zitadel" {
   domain           = "localhost"
   insecure         = "true"
+  skip_tls_verify  = false
   port             = "8080"
   jwt_profile_file = "local-token"
 }
@@ -58,4 +59,5 @@ provider "zitadel" {
 - `jwt_profile_file` (String) Path to the file containing credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required
 - `jwt_profile_json` (String) JSON value of credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required
 - `port` (String) Used port if not the default ports 80 or 443 are configured
+- `skip_tls_verify` (Boolean) Skip TLS certificate verification
 - `token` (String) Path to the file containing credentials to connect to ZITADEL

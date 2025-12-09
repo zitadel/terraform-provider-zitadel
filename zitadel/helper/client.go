@@ -23,6 +23,8 @@ const (
 	DomainDescription         = "Domain used to connect to the ZITADEL instance"
 	InsecureVar               = "insecure"
 	InsecureDescription       = "Use insecure connection"
+	SkipTLSVerifyVar          = "skip_tls_verify"
+	SkipTLSVerifyDescription  = "Skip TLS certificate verification"
 	TokenVar                  = "token"
 	TokenDescription          = "Path to the file containing credentials to connect to ZITADEL"
 	PortVar                   = "port"
@@ -43,7 +45,7 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(ctx context.Context, insecure bool, domain string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+func GetClientInfo(ctx context.Context, insecure bool, skipTLSVerify bool, domain string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
 	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if token != "" {
@@ -68,6 +70,8 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, token stri
 	if insecure {
 		options = append(options, zitadel.WithInsecure())
 		issuerScheme = "http://"
+	} else if skipTLSVerify {
+		options = append(options, zitadel.WithInsecureSkipVerifyTLS())
 	}
 
 	issuerPort := port
