@@ -41,6 +41,12 @@ provider "zitadel" {
   insecure         = "true"
   port             = "8080"
   jwt_profile_file = "local-token"
+
+  # (Optional) Example of how to configure the new proxy block.
+  proxy {
+    url         = "socks5://my-proxy-server.com:1080"
+    auth_header = "Basic dXNlcjpwYXNzd29yZA=="
+  }
 }
 ```
 
