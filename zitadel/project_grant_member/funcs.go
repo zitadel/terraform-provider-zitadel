@@ -123,7 +123,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to list projectgrantmembers")
+		return diag.Errorf("failed to list projectgrantmembers: %v", err)
 	}
 
 	if len(resp.Result) == 1 {
