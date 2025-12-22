@@ -64,26 +64,54 @@ func GetDatasource() *schema.Resource {
 
 func ListDatasources() *schema.Resource {
 	return &schema.Resource{
-		Description: "Datasource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
+		Description: "Datasource representing machine users situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDDatasourceField,
 			userIDsVar: {
 				Type:        schema.TypeList,
 				Computed:    true,
-				Description: "A set of all IDs.",
+				Description: "A list of all user IDs",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			UserNameVar: {
 				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Username",
+				Optional:    true,
+				Description: "Username to filter by",
 			},
 			userNameMethodVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Method for querying machine users by username" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				Description: "Method for querying users by username" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(userNameMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+			emailVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Email to filter by",
+			},
+			emailMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying users by email" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(emailMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+			loginNameVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Login name to filter by",
+			},
+			loginNameMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying users by login name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(loginNameMethodVar, value, object.TextQueryMethod_value)
 				},
 				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
 			},

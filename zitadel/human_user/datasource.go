@@ -1,7 +1,10 @@
 package human_user
 
 import (
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -95,5 +98,119 @@ func GetDatasource() *schema.Resource {
 			},
 		},
 		ReadContext: readFunc(true),
+	}
+}
+
+func ListDatasources() *schema.Resource {
+	return &schema.Resource{
+		Description: "Datasource representing human users situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
+		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
+			userIDsVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "A list of all user IDs",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
+			UserNameVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Username to filter by",
+			},
+			userNameMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying users by username" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(userNameMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+			firstNameVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "First name to filter by",
+			},
+			firstNameMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying users by first name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(firstNameMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+			lastNameVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Last name to filter by",
+			},
+			lastNameMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying users by last name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(lastNameMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+			nickNameVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Nick name to filter by",
+			},
+			nickNameMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying users by nick name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(nickNameMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+			DisplayNameVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Display name to filter by",
+			},
+			displayNameMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying users by display name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(displayNameMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+			emailVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Email to filter by",
+			},
+			emailMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying users by email" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(emailMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+			loginNameVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Login name to filter by",
+			},
+			loginNameMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying users by login name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(loginNameMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+		},
+		ReadContext: list,
 	}
 }
