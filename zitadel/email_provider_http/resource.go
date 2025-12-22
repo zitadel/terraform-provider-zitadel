@@ -13,7 +13,7 @@ func GetResource() *schema.Resource {
 			EndpointVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Http endpoint which is used to send the email.",
+				Description: "HTTP endpoint which is used to send the email.",
 			},
 			DescriptionVar: {
 				Type:        schema.TypeString,
