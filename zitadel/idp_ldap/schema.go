@@ -153,12 +153,12 @@ var (
 	RootCAResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Optional:    true,
-		Description: "Root CA for self signing certificates for TLS connections to LDAP servers. It is intended to be filled with the contents of a .pem file.",
+		Description: "Root CA for self-signed certificates for TLS connections to LDAP servers. It is intended to be filled with the contents of a .pem file.",
 	}
 	RootCADataSourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Computed:    true,
-		Description: "Root CA for self signing certificates for TLS connections to LDAP servers. It is intended to be filled with the contents of a .pem file.",
+		Description: "Root CA for self-signed certificates for TLS connections to LDAP servers. It is intended to be filled with the contents of a .pem file.",
 	}
 
 	FirstNameAttributeResourceField = &schema.Schema{
