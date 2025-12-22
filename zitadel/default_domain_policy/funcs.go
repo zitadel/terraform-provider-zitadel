@@ -73,7 +73,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get default domain policy")
+		return diag.Errorf("failed to get default domain policy: %v", err)
 	}
 	policy := resp.Policy
 	set := map[string]interface{}{
