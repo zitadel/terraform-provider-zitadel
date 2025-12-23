@@ -64,7 +64,8 @@ resource "zitadel_login_policy" "default" {
 - `disable_login_with_phone` (Boolean) defines if user can additionally (to the loginname) be identified by their verified phone number
 - `idps` (Set of String) allowed idps to login or register
 - `multi_factors` (Set of String) allowed multi factors
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
+  is used.
 - `second_factors` (Set of String) allowed second factors
 
 ### Read-Only
