@@ -1,6 +1,10 @@
 package idp_ldap
 
-import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+)
 
 const (
 	ServersVar           = "servers"
@@ -130,9 +134,10 @@ var (
 		Description: "User filters for LDAP connections",
 	}
 	TimeoutResourceField = &schema.Schema{
-		Type:        schema.TypeString,
-		Required:    true,
-		Description: "Timeout for LDAP connections",
+		Type:             schema.TypeString,
+		Required:         true,
+		Description:      "Timeout for LDAP connections",
+		DiffSuppressFunc: helper.DurationDiffSuppress,
 	}
 	TimeoutDataSourceField = &schema.Schema{
 		Type:        schema.TypeString,
