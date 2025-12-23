@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -47,6 +48,8 @@ type ClientInfo struct {
 }
 
 func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+	domain = strings.TrimPrefix(domain, "http://")
+	domain = strings.TrimPrefix(domain, "https://")
 	options := make([]zitadel.Option, 0)
 	keyPath := ""
 	if accessToken != "" {
@@ -56,6 +59,9 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		})
 		options = append(options, zitadel.WithTokenSource(tokenSource))
 	} else if token != "" {
+		if _, err := os.Stat(token); err != nil {
+			return nil, fmt.Errorf("failed to read token file: %v", err)
+		}
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
 		keyPath = token
 	} else if jwtFile != "" {
@@ -65,6 +71,9 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		}
 		options = append(options, zitadel.WithJWTDirectTokenSource(string(jwt)))
 	} else if jwtProfileFile != "" {
+		if _, err := os.Stat(jwtProfileFile); err != nil {
+			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
+		}
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
 		keyPath = jwtProfileFile
 	} else if jwtProfileJSON != "" {
