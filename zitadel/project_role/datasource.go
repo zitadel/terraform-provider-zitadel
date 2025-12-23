@@ -47,7 +47,11 @@ func ListDatasources() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing all project roles in a project, which can be given as authorizations to users. Note: Group-based filtering is not supported by the ZITADEL API.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: helper.OrgIDResourceField,
+			helper.OrgIDVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "ID of the organization",
+			},
 			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
