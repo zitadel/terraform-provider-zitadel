@@ -10,7 +10,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the default security settings.",
 		Schema: map[string]*schema.Schema{
-			EnableImpersonationVar: {
+			enableImpersonationVar: {
 				Type:        schema.TypeBool,
 				Required:    true,
 				Description: "Enable impersonation for the instance",

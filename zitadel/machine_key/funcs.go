@@ -104,7 +104,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get machine key")
+		return diag.Errorf("failed to get machine key: %v", err)
 	}
 
 	d.SetId(resp.GetKey().GetId())

@@ -33,7 +33,8 @@ output "trigger_actions" {
 
 ### Optional
 
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
+  is used.
 
 ### Read-Only
 

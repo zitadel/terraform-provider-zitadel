@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	zitadel_go "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
+	zitadelgo "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
@@ -42,6 +42,8 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain_policy"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/email_provider_http"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/email_provider_smtp"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/human_user"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_azure_ad"
@@ -104,10 +106,10 @@ import (
 var _ provider.Provider = (*providerPV6)(nil)
 
 type providerPV6 struct {
-	customOptions []zitadel_go.Option
+	customOptions []zitadelgo.Option
 }
 
-func NewProviderPV6(option ...zitadel_go.Option) provider.Provider {
+func NewProviderPV6(option ...zitadelgo.Option) provider.Provider {
 	return &providerPV6{customOptions: option}
 }
 
@@ -115,6 +117,7 @@ type providerModel struct {
 	Insecure       types.Bool   `tfsdk:"insecure"`
 	Domain         types.String `tfsdk:"domain"`
 	Port           types.String `tfsdk:"port"`
+	AccessToken    types.String `tfsdk:"access_token"`
 	Token          types.String `tfsdk:"token"`
 	JWTFile        types.String `tfsdk:"jwt_file"`
 	JWTProfileFile types.String `tfsdk:"jwt_profile_file"`
@@ -124,6 +127,7 @@ type providerModel struct {
 func (p *providerPV6) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "zitadel"
 }
+
 func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnostics) {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
@@ -136,6 +140,12 @@ func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnost
 				Type:        types.BoolType,
 				Optional:    true,
 				Description: helper.InsecureDescription,
+			},
+			helper.AccessTokenVar: {
+				Type:        types.StringType,
+				Optional:    true,
+				Sensitive:   true,
+				Description: helper.AccessTokenDescription,
 			},
 			helper.TokenVar: {
 				Type:        types.StringType,
@@ -177,6 +187,7 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 	info, err := helper.GetClientInfo(ctx,
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
+		config.AccessToken.ValueString(),
 		config.Token.ValueString(),
 		config.JWTFile.ValueString(),
 		config.JWTProfileFile.ValueString(),
@@ -275,25 +286,61 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: helper.InsecureDescription,
 			},
+			helper.AccessTokenVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
+				Description: helper.AccessTokenDescription,
+				ConflictsWith: []string{
+					helper.TokenVar,
+					helper.JWTFileVar,
+					helper.JWTProfileFileVar,
+					helper.JWTProfileJSONVar,
+				},
+			},
 			helper.TokenVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: helper.TokenDescription,
+				ConflictsWith: []string{
+					helper.AccessTokenVar,
+					helper.JWTFileVar,
+					helper.JWTProfileFileVar,
+					helper.JWTProfileJSONVar,
+				},
 			},
 			helper.JWTFileVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: helper.JWTFileDescription,
+				ConflictsWith: []string{
+					helper.AccessTokenVar,
+					helper.TokenVar,
+					helper.JWTProfileFileVar,
+					helper.JWTProfileJSONVar,
+				},
 			},
 			helper.JWTProfileFileVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: helper.JWTProfileFileDescription,
+				ConflictsWith: []string{
+					helper.AccessTokenVar,
+					helper.TokenVar,
+					helper.JWTFileVar,
+					helper.JWTProfileJSONVar,
+				},
 			},
 			helper.JWTProfileJSONVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: helper.JWTProfileJSONDescription,
+				ConflictsWith: []string{
+					helper.AccessTokenVar,
+					helper.TokenVar,
+					helper.JWTFileVar,
+					helper.JWTProfileFileVar,
+				},
 			},
 			helper.PortVar: {
 				Type:        schema.TypeString,
@@ -366,6 +413,8 @@ func Provider() *schema.Provider {
 			"zitadel_default_oidc_settings":              default_oidc_settings.GetResource(),
 			"zitadel_org_metadata":                       org_metadata.GetResource(),
 			"zitadel_user_metadata":                      user_metadata.GetResource(),
+			"zitadel_email_provider_smtp":                email_provider_smtp.GetResource(),
+			"zitadel_email_provider_http":                email_provider_http.GetResource(),
 			"zitadel_default_security_settings":          default_security_settings.GetResource(),
 		},
 		ConfigureContextFunc: ProviderConfigure,
@@ -373,9 +422,31 @@ func Provider() *schema.Provider {
 }
 
 func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+	credentials := 0
+	for _, k := range []string{
+		helper.AccessTokenVar,
+		helper.TokenVar,
+		helper.JWTFileVar,
+		helper.JWTProfileFileVar,
+		helper.JWTProfileJSONVar,
+	} {
+		if v, ok := d.GetOk(k); ok {
+			if s, ok := v.(string); ok && s != "" {
+				credentials++
+			}
+		}
+	}
+	if credentials == 0 {
+		return nil, diag.Errorf("one authentication method must be configured")
+	}
+	if credentials > 1 {
+		return nil, diag.Errorf("only one authentication method may be configured")
+	}
+
 	clientinfo, err := helper.GetClientInfo(ctx,
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
+		d.Get(helper.AccessTokenVar).(string),
 		d.Get(helper.TokenVar).(string),
 		d.Get(helper.JWTFileVar).(string),
 		d.Get(helper.JWTProfileFileVar).(string),

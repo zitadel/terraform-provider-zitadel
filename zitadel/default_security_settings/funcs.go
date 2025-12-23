@@ -29,9 +29,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(EnableImpersonationVar, embeddedIframeEnabledVar, embeddedIframeAllowedOriginsVar) {
+	if d.HasChanges(enableImpersonationVar, embeddedIframeEnabledVar, embeddedIframeAllowedOriginsVar) {
 		req := &settingsv2.SetSecuritySettingsRequest{
-			EnableImpersonation: d.Get(EnableImpersonationVar).(bool),
+			EnableImpersonation: d.Get(enableImpersonationVar).(bool),
 		}
 
 		if d.Get(embeddedIframeEnabledVar) != nil || d.Get(embeddedIframeAllowedOriginsVar) != nil {
@@ -75,7 +75,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	settings := resp.Settings
 	set := map[string]interface{}{
-		EnableImpersonationVar: settings.GetEnableImpersonation(),
+		enableImpersonationVar: settings.GetEnableImpersonation(),
 	}
 
 	if settings.GetEmbeddedIframe() != nil {
