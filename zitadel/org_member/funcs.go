@@ -2,6 +2,7 @@ package org_member
 
 import (
 	"context"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -47,9 +48,16 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	roles := helper.GetOkSetToStringSlice(d, RolesVar)
+	for _, role := range roles {
+		if !strings.HasPrefix(role, "ORG_") {
+			return diag.Errorf("invalid role '%s': organization member roles must start with 'ORG_' (e.g., ORG_OWNER, ORG_USER_MANAGER)", role)
+		}
+	}
+
 	_, err = client.UpdateOrgMember(helper.CtxWithOrgID(ctx, d), &management.UpdateOrgMemberRequest{
 		UserId: d.Get(UserIDVar).(string),
-		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
+		Roles:  roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to update orgmember: %v", err)
@@ -72,9 +80,16 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	userID := d.Get(UserIDVar).(string)
+	roles := helper.GetOkSetToStringSlice(d, RolesVar)
+	for _, role := range roles {
+		if !strings.HasPrefix(role, "ORG_") {
+			return diag.Errorf("invalid role '%s': organization member roles must start with 'ORG_' (e.g., ORG_OWNER, ORG_USER_MANAGER)", role)
+		}
+	}
+
 	_, err = client.AddOrgMember(helper.CtxWithOrgID(ctx, d), &management.AddOrgMemberRequest{
 		UserId: userID,
-		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
+		Roles:  roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to create orgmember: %v", err)
