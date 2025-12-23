@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
-func GetSessionTokenDatasource() *schema.Resource {
+func GetZitadelDatasource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing the session token of the provider's configuration.",
 		Schema: map[string]*schema.Schema{
@@ -40,7 +40,7 @@ func GetSessionTokenDatasource() *schema.Resource {
 			} else if len(clientInfo.Data) > 0 {
 				tokenSource, err = profile.NewJWTProfileTokenSourceFromKeyFileData(ctx, clientInfo.Issuer, clientInfo.Data, scopes)
 			} else {
-				return diag.Errorf("Session token generation is only supported when using 'jwt_profile_file', 'jwt_profile_json' or 'token' (service account key) in the provider configuration.")
+				return diag.Errorf("Session token generation is only supported when using 'jwt_profile_file', 'jwt_profile_json' or 'token' (service account key file path) in the provider configuration.")
 			}
 
 			if err != nil {
