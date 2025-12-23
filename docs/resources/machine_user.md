@@ -33,7 +33,8 @@ resource "zitadel_machine_user" "default" {
 
 - `access_token_type` (String) Access token type, supported values: ACCESS_TOKEN_TYPE_BEARER, ACCESS_TOKEN_TYPE_JWT
 - `description` (String) Description of the user
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
+  is used.
 - `with_secret` (Boolean) Generate machine secret, only applicable if creation or change from false
 
 ### Read-Only

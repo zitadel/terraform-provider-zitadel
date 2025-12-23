@@ -32,7 +32,8 @@ resource "zitadel_project" "default" {
 ### Optional
 
 - `has_project_check` (Boolean) ZITADEL checks if the org of the user has permission to this project
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
+  is used.
 - `private_labeling_setting` (String) Defines from where the private labeling should be triggered, supported values: PRIVATE_LABELING_SETTING_UNSPECIFIED, PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY, PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY
 - `project_role_assertion` (Boolean) describes if roles of user should be added in token
 - `project_role_check` (Boolean) ZITADEL checks if the user has at least one on this project
