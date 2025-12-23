@@ -41,6 +41,8 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain_policy"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/email_provider_http"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/email_provider_smtp"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/human_user"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_azure_ad"
@@ -366,6 +368,8 @@ func Provider() *schema.Provider {
 			"zitadel_default_oidc_settings":              default_oidc_settings.GetResource(),
 			"zitadel_org_metadata":                       org_metadata.GetResource(),
 			"zitadel_user_metadata":                      user_metadata.GetResource(),
+			"zitadel_email_provider_smtp":                email_provider_smtp.GetResource(),
+			"zitadel_email_provider_http":                email_provider_http.GetResource(),
 		},
 		ConfigureContextFunc: ProviderConfigure,
 	}
