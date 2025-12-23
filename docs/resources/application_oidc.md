@@ -57,7 +57,8 @@ resource "zitadel_application_oidc" "default" {
 - `dev_mode` (Boolean) Dev mode
 - `id_token_role_assertion` (Boolean) ID token role assertion
 - `id_token_userinfo_assertion` (Boolean) Token userinfo assertion
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
+  is used.
 - `post_logout_redirect_uris` (List of String) Post logout redirect URIs
 - `skip_native_app_success_page` (Boolean) Skip the successful login page on native apps and directly redirect the user to the callback.
 - `version` (String) Version, supported values: OIDC_VERSION_1_0
