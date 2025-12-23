@@ -23,7 +23,7 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Required:    true,
-				Description: "List of roles granted",
+				Description: "List of roles granted. Organization member roles must start with 'ORG_' (e.g., ORG_OWNER, ORG_USER_MANAGER). See https://zitadel.com/docs/guides/manage/console/managers for available roles.",
 			},
 		},
 		DeleteContext: delete,
