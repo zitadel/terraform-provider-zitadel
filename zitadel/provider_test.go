@@ -37,7 +37,17 @@ func TestClientInfo_Schemes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dummyJSON := `{"type":"service_account"}`
-			info, err := helper.GetClientInfo(context.Background(), tt.insecure, tt.domain, "", "", "", dummyJSON, "")
+			info, err := helper.GetClientInfo(
+				context.Background(),
+				tt.insecure,
+				tt.domain,
+				"",        // accessToken
+				"",        // token
+				"",        // jwtFile
+				"",        // jwtProfileFile
+				dummyJSON, // jwtProfileJSON
+				"",        // port
+			)
 			if err != nil {
 				t.Fatalf("GetClientInfo() error = %v", err)
 			}
@@ -79,7 +89,17 @@ func TestClientInfo_Files(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := helper.GetClientInfo(context.Background(), false, "example.com", tt.token, tt.jwtFile, tt.jwtProfile, "", "")
+			_, err := helper.GetClientInfo(
+				context.Background(),
+				false,
+				"example.com",
+				"",            // accessToken
+				tt.token,      // token
+				tt.jwtFile,    // jwtFile
+				tt.jwtProfile, // jwtProfileFile
+				"",            // jwtProfileJSON
+				"",            // port
+			)
 			if (err != nil) != tt.wantError {
 				t.Errorf("GetClientInfo() error = %v, wantError %v", err, tt.wantError)
 			}
