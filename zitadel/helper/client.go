@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 	orgv2 "github.com/zitadel/zitadel-go/v3/pkg/client/org/v2"
 	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/user/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
+	"golang.org/x/oauth2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -25,16 +27,18 @@ const (
 	DomainDescription         = "Domain used to connect to the ZITADEL instance"
 	InsecureVar               = "insecure"
 	InsecureDescription       = "Use insecure connection"
+	AccessTokenVar            = "access_token"
+	AccessTokenDescription    = "Personal Access Token to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
 	TokenVar                  = "token"
 	TokenDescription          = "Path to the file containing credentials to connect to ZITADEL"
 	PortVar                   = "port"
 	PortDescription           = "Used port if not the default ports 80 or 443 are configured"
 	JWTFileVar                = "jwt_file"
-	JWTFileDescription        = "Path to the file containing presigned JWT to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTFileDescription        = "Path to the file containing presigned JWT to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
 	JWTProfileFileVar         = "jwt_profile_file"
-	JWTProfileFileDescription = "Path to the file containing credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTProfileFileDescription = "Path to the file containing credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
 	JWTProfileJSONVar         = "jwt_profile_json"
-	JWTProfileJSONDescription = "JSON value of credentials to connect to ZITADEL. Either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTProfileJSONDescription = "JSON value of credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
 )
 
 type ClientInfo struct {
@@ -45,10 +49,21 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(ctx context.Context, insecure bool, domain string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+	domain = strings.TrimPrefix(domain, "http://")
+	domain = strings.TrimPrefix(domain, "https://")
 	options := make([]zitadel.Option, 0)
 	keyPath := ""
-	if token != "" {
+	if accessToken != "" {
+		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{
+			AccessToken: accessToken,
+			TokenType:   "Bearer",
+		})
+		options = append(options, zitadel.WithTokenSource(tokenSource))
+	} else if token != "" {
+		if _, err := os.Stat(token); err != nil {
+			return nil, fmt.Errorf("failed to read token file: %v", err)
+		}
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
 		keyPath = token
 	} else if jwtFile != "" {
@@ -58,12 +73,15 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, token stri
 		}
 		options = append(options, zitadel.WithJWTDirectTokenSource(string(jwt)))
 	} else if jwtProfileFile != "" {
+		if _, err := os.Stat(jwtProfileFile); err != nil {
+			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
+		}
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
 		keyPath = jwtProfileFile
 	} else if jwtProfileJSON != "" {
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
 	} else {
-		return nil, fmt.Errorf("either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
+		return nil, fmt.Errorf("either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
 
 	issuerScheme := "https://"

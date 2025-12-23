@@ -103,7 +103,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get user grant")
+		return diag.Errorf("failed to get user grant: %v", err)
 	}
 	grant := resp.GetUserGrant()
 	set := map[string]interface{}{
