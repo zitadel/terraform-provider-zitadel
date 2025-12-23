@@ -137,7 +137,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to list domains")
+		return diag.Errorf("failed to list domains: %v", err)
 	}
 
 	if len(resp.Result) == 1 {
