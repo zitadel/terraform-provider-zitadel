@@ -10,13 +10,13 @@ import (
 
 func TestAccSessionTokenDatasource(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel")
-	config := `data "zitadel" "token" {}`
+	config := `data "zitadel_zitadel" "token" {}`
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
 		nil,
-		resource.TestCheckResourceAttrSet("data.zitadel.token", "token"),
+		resource.TestCheckResourceAttrSet("data.zitadel_zitadel.token", "token"),
 		nil,
 	)
 }
