@@ -29,7 +29,7 @@ type BaseTestFrame struct {
 	ResourceType                       string
 	InstanceDomain                     string
 	TerraformName                      string
-	v6ProviderFactories                map[string]func() (tfprotov6.ProviderServer, error)
+	V6ProviderFactories                map[string]func() (tfprotov6.ProviderServer, error)
 }
 
 func NewBaseTestFrame(ctx context.Context, resourceType, domain string, jwtProfileJson []byte) (*BaseTestFrame, error) {
@@ -47,7 +47,7 @@ func NewBaseTestFrame(ctx context.Context, resourceType, domain string, jwtProfi
 provider "zitadel" {
   domain   			= "%s"
   insecure 			= "%t"
-  port     			= "%s" 
+  port     			= "%s"
   jwt_profile_json  = <<KEY
 %s
 KEY
@@ -65,7 +65,7 @@ KEY
 		ResourceType:      resourceType,
 		InstanceDomain:    domain,
 	}
-	frame.v6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
+	frame.V6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
 		"zitadel": func() (tfprotov6.ProviderServer, error) {
 			muxServer, err := tf6muxserver.NewMuxServer(frame,
 				providerserver.NewProtocol6(zitadel.NewProviderPV6()),

@@ -80,6 +80,6 @@ func RunLifecyleTest[P comparable](
 			}
 			return err
 		},
-		ProtoV6ProviderFactories: frame.v6ProviderFactories,
+		ProtoV6ProviderFactories: frame.V6ProviderFactories,
 	})
 }

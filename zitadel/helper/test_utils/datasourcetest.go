@@ -28,6 +28,6 @@ func RunDatasourceTest(
 			Config: fmt.Sprintf("%s\n%s\n%s", frame.ProviderSnippet, strings.Join(dependencies, "\n"), config),
 			Check:  resource.ComposeAggregateTestCheckFunc(checks...),
 		}},
-		ProtoV6ProviderFactories: frame.v6ProviderFactories,
+		ProtoV6ProviderFactories: frame.V6ProviderFactories,
 	})
 }

@@ -100,6 +100,8 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/verify_email_otp_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/verify_phone_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/verify_sms_otp_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/webkey"
+	active_webkey "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/webkey/active"
 )
 
 var _ provider.Provider = (*providerPV6)(nil)
@@ -245,6 +247,7 @@ func Provider() *schema.Provider {
 			"zitadel_project_role":               project_role.GetDatasource(),
 			"zitadel_action":                     action.GetDatasource(),
 			"zitadel_action_target":              action_target.GetDatasource(),
+			"zitadel_webkey":                     webkey.GetDatasource(),
 			"zitadel_application_oidc":           application_oidc.GetDatasource(),
 			"zitadel_application_oidcs":          application_oidc.ListDatasources(),
 			"zitadel_application_api":            application_api.GetDatasource(),
@@ -357,6 +360,8 @@ func Provider() *schema.Provider {
 			"zitadel_domain":                             domain.GetResource(),
 			"zitadel_action":                             action.GetResource(),
 			"zitadel_action_target":                      action_target.GetResource(),
+			"zitadel_webkey":                             webkey.GetResource(),
+			"zitadel_active_webkey":                      active_webkey.GetActiveResource(),
 			"zitadel_application_oidc":                   application_oidc.GetResource(),
 			"zitadel_application_api":                    application_api.GetResource(),
 			"zitadel_application_saml":                   application_saml.GetResource(),
