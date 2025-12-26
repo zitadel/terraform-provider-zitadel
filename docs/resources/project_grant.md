@@ -30,8 +30,7 @@ resource "zitadel_project_grant" "default" {
 
 ### Optional
 
-- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
-  is used.
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `role_keys` (Set of String) List of roles granted
 
 ### Read-Only
