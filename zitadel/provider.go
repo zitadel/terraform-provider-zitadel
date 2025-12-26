@@ -235,6 +235,7 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
+			"zitadel_zitadel":                    GetZitadelDatasource(),
 			"zitadel_org":                        org.GetDatasource(),
 			"zitadel_orgs":                       org.ListDatasources(),
 			"zitadel_human_user":                 human_user.GetDatasource(),
@@ -243,6 +244,7 @@ func Provider() *schema.Provider {
 			"zitadel_project":                    project.GetDatasource(),
 			"zitadel_projects":                   project.ListDatasources(),
 			"zitadel_project_role":               project_role.GetDatasource(),
+			"zitadel_project_roles":              project_role.ListDatasources(),
 			"zitadel_action":                     action.GetDatasource(),
 			"zitadel_action_target":              action_target.GetDatasource(),
 			"zitadel_application_oidc":           application_oidc.GetDatasource(),
