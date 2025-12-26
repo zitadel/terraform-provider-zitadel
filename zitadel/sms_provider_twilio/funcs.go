@@ -126,7 +126,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get sms provider twilio")
+		return diag.Errorf("failed to get sms provider twilio: %v", err)
 	}
 
 	set := map[string]interface{}{

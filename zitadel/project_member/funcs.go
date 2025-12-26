@@ -2,6 +2,7 @@ package project_member
 
 import (
 	"context"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -48,9 +49,16 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	roles := helper.GetOkSetToStringSlice(d, rolesVar)
+	for _, role := range roles {
+		if !strings.HasPrefix(role, "PROJECT_") {
+			return diag.Errorf("invalid role '%s': project member roles must start with 'PROJECT_' (e.g., PROJECT_OWNER, PROJECT_OWNER_VIEWER)", role)
+		}
+	}
+
 	_, err = client.UpdateProjectMember(helper.CtxWithOrgID(ctx, d), &management.UpdateProjectMemberRequest{
 		UserId:    d.Get(UserIDVar).(string),
-		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
+		Roles:     roles,
 		ProjectId: d.Get(ProjectIDVar).(string),
 	})
 	if err != nil {
@@ -75,10 +83,17 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	userID := d.Get(UserIDVar).(string)
 	projectID := d.Get(ProjectIDVar).(string)
+	roles := helper.GetOkSetToStringSlice(d, rolesVar)
+	for _, role := range roles {
+		if !strings.HasPrefix(role, "PROJECT_") {
+			return diag.Errorf("invalid role '%s': project member roles must start with 'PROJECT_' (e.g., PROJECT_OWNER, PROJECT_OWNER_VIEWER)", role)
+		}
+	}
+
 	_, err = client.AddProjectMember(helper.CtxWithOrgID(ctx, d), &management.AddProjectMemberRequest{
 		UserId:    userID,
 		ProjectId: projectID,
-		Roles:     helper.GetOkSetToStringSlice(d, rolesVar),
+		Roles:     roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to create projectmember: %v", err)
@@ -117,7 +132,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to list projectmembers")
+		return diag.Errorf("failed to list projectmembers: %v", err)
 	}
 
 	if len(resp.Result) == 1 {
