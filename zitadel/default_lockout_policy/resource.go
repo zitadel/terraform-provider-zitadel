@@ -15,6 +15,12 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset.",
 			},
+			MaxOTPAttemptsVar: {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Maximum OTP check attempts before the account gets locked. Attempts are reset as soon as the OTP is entered correctly.",
+			},
 		},
 		DeleteContext: delete,
 		CreateContext: update,
