@@ -31,6 +31,7 @@ func GetDatasource() *schema.Resource {
 			idp_ldap.UserFiltersVar:       idp_ldap.UserFiltersDataSourceField,
 			idp_ldap.TimeoutVar:           idp_ldap.TimeoutDataSourceField,
 			idp_ldap.IdAttributeVar:       idp_ldap.IdAttributeDataSourceField,
+			idp_ldap.RootCAVar:            idp_ldap.RootCADataSourceField,
 
 			idp_ldap.FirstNameAttributeVar:         idp_ldap.FirstNameAttributeDataSourceField,
 			idp_ldap.LastNameAttributeVar:          idp_ldap.LastNameAttributeDataSourceField,

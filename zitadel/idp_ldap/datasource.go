@@ -28,6 +28,7 @@ func GetDatasource() *schema.Resource {
 			UserFiltersVar:       UserFiltersDataSourceField,
 			TimeoutVar:           TimeoutDataSourceField,
 			IdAttributeVar:       IdAttributeDataSourceField,
+			RootCAVar:            RootCADataSourceField,
 
 			FirstNameAttributeVar:         FirstNameAttributeDataSourceField,
 			LastNameAttributeVar:          LastNameAttributeDataSourceField,
