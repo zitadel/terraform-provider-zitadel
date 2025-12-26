@@ -28,6 +28,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ProviderOptions:  idp_utils.ProviderOptionsValue(d),
 		Issuer:           idp_utils.StringValue(d, IssuerVar),
 		IsIdTokenMapping: idp_utils.BoolValue(d, IsIdTokenMappingVar),
+		UsePkce:          idp_utils.BoolValue(d, UsePKCEVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
@@ -54,6 +55,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Scopes:           idp_utils.ScopesValue(d),
 		ProviderOptions:  idp_utils.ProviderOptionsValue(d),
 		IsIdTokenMapping: idp_utils.BoolValue(d, IsIdTokenMappingVar),
+		UsePkce:          idp_utils.BoolValue(d, UsePKCEVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update idp: %v", err)
@@ -94,6 +96,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingString(generalCfg.GetAutoLinking()),
 		IssuerVar:                      specificCfg.GetIssuer(),
 		IsIdTokenMappingVar:            specificCfg.GetIsIdTokenMapping(),
+		UsePKCEVar:                     specificCfg.GetUsePkce(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

@@ -22,6 +22,7 @@ func GetResource() *schema.Resource {
 			idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingResourceField,
 			IssuerVar:                      IssuerResourceField,
 			IsIdTokenMappingVar:            IsIdTokenMappingResourceField,
+			UsePKCEVar:                     UsePKCEResourceField,
 		},
 		ReadContext:   read,
 		UpdateContext: update,
