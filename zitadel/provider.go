@@ -243,6 +243,7 @@ func Provider() *schema.Provider {
 			"zitadel_project":                    project.GetDatasource(),
 			"zitadel_projects":                   project.ListDatasources(),
 			"zitadel_project_role":               project_role.GetDatasource(),
+			"zitadel_project_roles":              project_role.ListDatasources(),
 			"zitadel_action":                     action.GetDatasource(),
 			"zitadel_action_target":              action_target.GetDatasource(),
 			"zitadel_application_oidc":           application_oidc.GetDatasource(),

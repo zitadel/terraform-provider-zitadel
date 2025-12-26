@@ -26,14 +26,12 @@ resource "zitadel_project_member" "default" {
 ### Required
 
 - `project_id` (String) ID of the project
-- `roles` (Set of String) List of roles granted. Project member roles must start with 'PROJECT_' (e.g., PROJECT_OWNER,
-  PROJECT_OWNER_VIEWER). See https://zitadel.com/docs/guides/manage/console/managers for available roles.
+- `roles` (Set of String) List of roles granted. Project member roles must start with 'PROJECT_' (e.g., PROJECT_OWNER, PROJECT_OWNER_VIEWER). See https://zitadel.com/docs/guides/manage/console/managers for available roles.
 - `user_id` (String) ID of the user
 
 ### Optional
 
-- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
-  is used.
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 
 ### Read-Only
 

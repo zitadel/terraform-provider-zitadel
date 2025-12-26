@@ -23,8 +23,7 @@ resource "zitadel_instance_member" "default" {
 
 ### Required
 
-- `roles` (Set of String) List of roles granted. Instance member roles must start with 'IAM_' (e.g., IAM_OWNER,
-  IAM_OWNER_VIEWER). See https://zitadel.com/docs/guides/manage/console/managers for available roles.
+- `roles` (Set of String) List of roles granted. Instance member roles must start with 'IAM_' (e.g., IAM_OWNER, IAM_OWNER_VIEWER). See https://zitadel.com/docs/guides/manage/console/managers for available roles.
 - `user_id` (String) ID of the user
 
 ### Read-Only
