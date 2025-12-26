@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
+//goland:noinspection GoUnusedParameter
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "default lockout policy cannot be deleted")
 	return nil
@@ -30,9 +31,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(MaxPasswordAttemptsVar) {
+	// Check if either property has changes to avoid unnecessary API calls
+	if d.HasChanges(MaxPasswordAttemptsVar, MaxOTPAttemptsVar) {
 		resp, err := client.UpdateLockoutPolicy(ctx, &admin.UpdateLockoutPolicyRequest{
 			MaxPasswordAttempts: uint32(d.Get(MaxPasswordAttemptsVar).(int)),
+			MaxOtpAttempts:      uint32(d.Get(MaxOTPAttemptsVar).(int)),
 		})
 		if helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to update default lockout policy: %v", err)
@@ -77,6 +80,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	policy := resp.Policy
 	set := map[string]interface{}{
 		MaxPasswordAttemptsVar: policy.GetMaxPasswordAttempts(),
+		MaxOTPAttemptsVar:      policy.GetMaxOtpAttempts(),
 	}
 
 	for k, v := range set {
