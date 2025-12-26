@@ -17,6 +17,7 @@ const (
 	UserFiltersVar       = "user_filters"
 	TimeoutVar           = "timeout"
 	IdAttributeVar       = "id_attribute"
+	RootCAVar            = "root_ca"
 
 	FirstNameAttributeVar         = "first_name_attribute"
 	LastNameAttributeVar          = "last_name_attribute"
@@ -153,6 +154,17 @@ var (
 		Type:        schema.TypeString,
 		Computed:    true,
 		Description: "User attribute for the id",
+	}
+	RootCAResourceField = &schema.Schema{
+		Type:        schema.TypeString,
+		Optional:    true,
+		Computed:    true,
+		Description: "Root CA for self-signed certificates for TLS connections to LDAP servers. It is intended to be filled with the contents of a .pem file.",
+	}
+	RootCADataSourceField = &schema.Schema{
+		Type:        schema.TypeString,
+		Computed:    true,
+		Description: "Root CA for self-signed certificates for TLS connections to LDAP servers. It is intended to be filled with the contents of a .pem file.",
 	}
 
 	FirstNameAttributeResourceField = &schema.Schema{

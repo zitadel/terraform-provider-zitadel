@@ -31,6 +31,7 @@ func GetResource() *schema.Resource {
 			idp_ldap.UserFiltersVar:       idp_ldap.UserFiltersResourceField,
 			idp_ldap.TimeoutVar:           idp_ldap.TimeoutResourceField,
 			idp_ldap.IdAttributeVar:       idp_ldap.IdAttributeResourceField,
+			idp_ldap.RootCAVar:            idp_ldap.RootCAResourceField,
 
 			idp_ldap.FirstNameAttributeVar:         idp_ldap.FirstNameAttributeResourceField,
 			idp_ldap.LastNameAttributeVar:          idp_ldap.LastNameAttributeResourceField,
