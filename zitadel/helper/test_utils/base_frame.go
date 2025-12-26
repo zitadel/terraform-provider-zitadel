@@ -47,7 +47,7 @@ func NewBaseTestFrame(ctx context.Context, resourceType, domain string, jwtProfi
 provider "zitadel" {
   domain   			= "%s"
   insecure 			= "%t"
-  port     			= "%s" 
+  port     			= "%s"
   jwt_profile_json  = <<KEY
 %s
 KEY
@@ -99,4 +99,8 @@ func (b *BaseTestFrame) State(state *terraform.State) *terraform.InstanceState {
 		return resource.Primary
 	}
 	return &terraform.InstanceState{}
+}
+
+func (b *BaseTestFrame) V6ProviderFactories() map[string]func() (tfprotov6.ProviderServer, error) {
+	return b.v6ProviderFactories
 }
