@@ -17,8 +17,7 @@ Resource representing a target, which can be used in executions.
 ### Required
 
 - `endpoint` (String) The endpoint of the target.
-- `interrupt_on_error` (Boolean) Define if any error stops the whole execution. Note: this is not used for REST_ASYNC
-  target type.
+- `interrupt_on_error` (Boolean) Define if any error stops the whole execution. Note: this is not used for REST_ASYNC target type.
 - `name` (String) The name of the target.
 - `target_type` (String) The type of the target. (REST_WEBHOOK, REST_CALL, REST_ASYNC)
 - `timeout` (String) Timeout defines the duration until ZITADEL cancels the execution.

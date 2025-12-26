@@ -40,9 +40,10 @@ func GetResource() *schema.Resource {
 				},
 			},
 			TimeoutVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Timeout defines the duration until ZITADEL cancels the execution.",
+				Type:             schema.TypeString,
+				Required:         true,
+				Description:      "Timeout defines the duration until ZITADEL cancels the execution.",
+				DiffSuppressFunc: helper.DurationDiffSuppress,
 			},
 			InterruptOnErrorVar: {
 				Type:        schema.TypeBool,

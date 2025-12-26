@@ -73,8 +73,7 @@ EOM
 - `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `binding` (String) The binding, supported values: SAML_BINDING_UNSPECIFIED, SAML_BINDING_POST, SAML_BINDING_REDIRECT, SAML_BINDING_ARTIFACT
 - `name` (String) Name of the IDP
-- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
-  is used.
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `with_signed_request` (Boolean) Whether the SAML IDP requires signed requests
 
 ### Read-Only
