@@ -146,6 +146,68 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	return nil
 }
 
+func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started list")
+
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := helper.GetManagementClient(ctx, clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	projectID := d.Get(ProjectIDVar).(string)
+	req := &management.ListProjectRolesRequest{
+		ProjectId: projectID,
+	}
+
+	var queries []*project2.RoleQuery
+
+	if key, ok := d.GetOk(KeyVar); ok {
+		keyMethod := d.Get(keyMethodVar).(string)
+		queries = append(queries, &project2.RoleQuery{
+			Query: &project2.RoleQuery_KeyQuery{
+				KeyQuery: &project2.RoleKeyQuery{
+					Key:    key.(string),
+					Method: object.TextQueryMethod(object.TextQueryMethod_value[keyMethod]),
+				},
+			},
+		})
+	}
+
+	if displayName, ok := d.GetOk(displayNameVar); ok {
+		displayNameMethodVal := d.Get(displayNameMethod).(string)
+		queries = append(queries, &project2.RoleQuery{
+			Query: &project2.RoleQuery_DisplayNameQuery{
+				DisplayNameQuery: &project2.RoleDisplayNameQuery{
+					DisplayName: displayName.(string),
+					Method:      object.TextQueryMethod(object.TextQueryMethod_value[displayNameMethodVal]),
+				},
+			},
+		})
+	}
+
+	if len(queries) > 0 {
+		req.Queries = queries
+	}
+
+	resp, err := client.ListProjectRoles(helper.CtxWithOrgID(ctx, d), req)
+	if err != nil {
+		return diag.Errorf("error while listing project roles: %v", err)
+	}
+
+	keys := make([]string, len(resp.Result))
+	for i, role := range resp.Result {
+		keys[i] = role.Key
+	}
+
+	d.SetId("-")
+	return diag.FromErr(d.Set(roleKeysVar, keys))
+}
+
 func getProjectRoleID(orgID string, projectID string, roleKey string) string {
 	return orgID + "_" + projectID + "_" + roleKey
 }

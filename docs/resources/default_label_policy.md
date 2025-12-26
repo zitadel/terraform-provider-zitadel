@@ -48,9 +48,7 @@ resource "zitadel_default_label_policy" "default" {
 - `disable_watermark` (Boolean) disable watermark
 - `font_color` (String) hex value for font color
 - `font_color_dark` (String) hex value for font color dark theme
-- `hide_login_name_suffix` (Boolean) hides the org suffix on the login form if the scope "urn:zitadel:iam:org:domain:
-  primary:{domainname}" is set. Details about this scope
-  in https://zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes
+- `hide_login_name_suffix` (Boolean) hides the org suffix on the login form if the scope "urn:zitadel:iam:org:domain:primary:{domainname}" is set. Details about this scope in https://zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes
 - `primary_color` (String) hex value for primary color
 - `primary_color_dark` (String) hex value for primary color dark theme
 - `warn_color` (String) hex value for warn color

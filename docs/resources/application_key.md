@@ -33,8 +33,7 @@ resource "zitadel_application_key" "default" {
 
 ### Optional
 
-- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
-  is used.
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 
 ### Read-Only
 

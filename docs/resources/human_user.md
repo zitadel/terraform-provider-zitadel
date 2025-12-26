@@ -52,8 +52,7 @@ resource "zitadel_human_user" "default" {
 - `is_email_verified` (Boolean) Is the email verified of the user, can only be true if password of the user is set
 - `is_phone_verified` (Boolean) Is the phone verified of the user
 - `nick_name` (String) Nick name of the user
-- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account
-  is used.
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `phone` (String) Phone of the user
 - `preferred_language` (String) Preferred language of the user
 

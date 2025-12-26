@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
 )
 
@@ -26,8 +27,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ClientSecret:     idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		Scopes:           idp_utils.ScopesValue(d),
 		ProviderOptions:  idp_utils.ProviderOptionsValue(d),
-		Issuer:           idp_utils.StringValue(d, IssuerVar),
-		IsIdTokenMapping: idp_utils.BoolValue(d, IsIdTokenMappingVar),
+		Issuer:           idp_utils.StringValue(d, idp_oidc.IssuerVar),
+		IsIdTokenMapping: idp_utils.BoolValue(d, idp_oidc.IsIdTokenMappingVar),
+		UsePkce:          idp_utils.BoolValue(d, idp_oidc.UsePKCEVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create oidc idp: %v", err)
@@ -48,12 +50,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	_, err = client.UpdateGenericOIDCProvider(helper.CtxWithOrgID(ctx, d), &management.UpdateGenericOIDCProviderRequest{
 		Id:               d.Id(),
 		Name:             idp_utils.StringValue(d, idp_utils.NameVar),
-		Issuer:           idp_utils.StringValue(d, IssuerVar),
+		Issuer:           idp_utils.StringValue(d, idp_oidc.IssuerVar),
 		ClientId:         idp_utils.StringValue(d, idp_utils.ClientIDVar),
 		ClientSecret:     idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		Scopes:           idp_utils.ScopesValue(d),
 		ProviderOptions:  idp_utils.ProviderOptionsValue(d),
-		IsIdTokenMapping: idp_utils.BoolValue(d, IsIdTokenMappingVar),
+		IsIdTokenMapping: idp_utils.BoolValue(d, idp_oidc.IsIdTokenMappingVar),
+		UsePkce:          idp_utils.BoolValue(d, idp_oidc.UsePKCEVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update idp: %v", err)
@@ -93,8 +96,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
 		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
 		idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingString(generalCfg.GetAutoLinking()),
-		IssuerVar:                      specificCfg.GetIssuer(),
-		IsIdTokenMappingVar:            specificCfg.GetIsIdTokenMapping(),
+		idp_oidc.IssuerVar:             specificCfg.GetIssuer(),
+		idp_oidc.IsIdTokenMappingVar:   specificCfg.GetIsIdTokenMapping(),
+		idp_oidc.UsePKCEVar:            specificCfg.GetUsePkce(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
