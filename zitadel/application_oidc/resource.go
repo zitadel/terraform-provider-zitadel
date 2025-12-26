@@ -112,10 +112,11 @@ func GetResource() *schema.Resource {
 				Description: "Token userinfo assertion",
 			},
 			clockSkewVar: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Clockskew",
-				Default:     "0s",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Clockskew",
+				Default:          "0s",
+				DiffSuppressFunc: helper.DurationDiffSuppress,
 			},
 			additionalOriginsVar: {
 				Type: schema.TypeList,

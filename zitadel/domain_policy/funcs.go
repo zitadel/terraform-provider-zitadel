@@ -107,7 +107,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get domain policy")
+		return diag.Errorf("failed to get domain policy: %v", err)
 	}
 
 	policy := resp.Policy

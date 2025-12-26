@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -114,12 +115,20 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 		return diag.FromErr(err)
 	}
 	orgID := helper.GetID(d, OrgIDVar)
+	tflog.Info(ctx, fmt.Sprintf("Reading org ID: %s", orgID))
 	resp, err := client.GetOrgByID(ctx, &admin.GetOrgByIDRequest{
 		Id: orgID,
 	})
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+		tflog.Info(ctx, "Org not found, clearing from state")
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
+		tflog.Error(ctx, fmt.Sprintf("Error getting org: %v", err))
 		return diag.Errorf("error while getting org by id %s: %v", orgID, err)
 	}
+	tflog.Info(ctx, "Org found, updating state")
 	remoteOrg := resp.GetOrg()
 	d.SetId(remoteOrg.Id)
 	if err := d.Set(NameVar, remoteOrg.Name); err != nil {
