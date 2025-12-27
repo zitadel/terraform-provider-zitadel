@@ -66,7 +66,7 @@ resource "zitadel_org_idp_ldap" "default" {
 - `last_name_attribute` (String) User attribute for the last name
 - `name` (String) Name of the IDP
 - `nick_name_attribute` (String) User attribute for the nick name
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `phone_attribute` (String) User attribute for the phone
 - `phone_verified_attribute` (String) User attribute for the phone verified state
 - `preferred_language_attribute` (String) User attribute for the preferred language

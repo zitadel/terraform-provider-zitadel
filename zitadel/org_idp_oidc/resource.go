@@ -4,6 +4,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_utils"
 )
@@ -22,8 +23,9 @@ func GetResource() *schema.Resource {
 			idp_utils.IsAutoCreationVar:    idp_utils.IsAutoCreationResourceField,
 			idp_utils.IsAutoUpdateVar:      idp_utils.IsAutoUpdateResourceField,
 			idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingResourceField,
-			IssuerVar:                      IssuerResourceField,
-			IsIdTokenMappingVar:            IsIdTokenMappingResourceField,
+			idp_oidc.IssuerVar:             idp_oidc.IssuerResourceField,
+			idp_oidc.IsIdTokenMappingVar:   idp_oidc.IsIdTokenMappingResourceField,
+			idp_oidc.UsePKCEVar:            idp_oidc.UsePKCEResourceField,
 		},
 		ReadContext:   read,
 		UpdateContext: update,

@@ -86,7 +86,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get idp")
+		return diag.Errorf("failed to get idp: %v", err)
 	}
 	respIdp := resp.GetIdp()
 	cfg := respIdp.GetConfig()

@@ -41,6 +41,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		UserObjectClasses: helper.GetOkSetToStringSlice(d, idp_ldap.UserObjectClassesVar),
 		UserFilters:       helper.GetOkSetToStringSlice(d, idp_ldap.UserFiltersVar),
 		Timeout:           durationpb.New(timeout),
+		RootCa:            []byte(idp_utils.StringValue(d, idp_ldap.RootCAVar)),
 
 		Attributes: &idp.LDAPAttributes{
 			IdAttribute:                idp_utils.StringValue(d, idp_ldap.IdAttributeVar),
@@ -92,6 +93,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		UserObjectClasses: helper.GetOkSetToStringSlice(d, idp_ldap.UserObjectClassesVar),
 		UserFilters:       helper.GetOkSetToStringSlice(d, idp_ldap.UserFiltersVar),
 		Timeout:           durationpb.New(timeout),
+		RootCa:            []byte(idp_utils.StringValue(d, idp_ldap.RootCAVar)),
 
 		Attributes: &idp.LDAPAttributes{
 			IdAttribute:                idp_utils.StringValue(d, idp_ldap.IdAttributeVar),
@@ -130,7 +132,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get idp")
+		return diag.Errorf("failed to get idp: %v", err)
 	}
 	idp := resp.GetIdp()
 	cfg := idp.GetConfig()
@@ -156,6 +158,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_ldap.UserFiltersVar:       specificCfg.GetUserFilters(),
 		idp_ldap.TimeoutVar:           specificCfg.GetTimeout().AsDuration().String(),
 		idp_ldap.IdAttributeVar:       attributesCfg.GetIdAttribute(),
+		idp_ldap.RootCAVar:            string(specificCfg.GetRootCa()),
 
 		idp_ldap.FirstNameAttributeVar:         attributesCfg.GetFirstNameAttribute(),
 		idp_ldap.LastNameAttributeVar:          attributesCfg.GetLastNameAttribute(),
