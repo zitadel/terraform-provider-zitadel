@@ -23,4 +23,13 @@ const (
 	ClientIDVar                 = "client_id"
 	ClientSecretVar             = "client_secret"
 	skipNativeAppSuccessPageVar = "skip_native_app_success_page"
+	NoneCompliantVar            = "none_compliant"
+	ComplianceProblemsVar       = "compliance_problems"
+	ComplianceProblemKeyVar     = "key"
+	ComplianceProblemMessageVar = "message"
+	BackChannelLogoutURIVar     = "back_channel_logout_uri"
+	LoginVersionVar             = "login_version"
+	LoginV1Var                  = "login_v1"
+	LoginV2Var                  = "login_v2"
+	BaseURIVar                  = "base_uri"
 )
