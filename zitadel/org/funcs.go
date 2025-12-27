@@ -219,7 +219,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	resp, err := client.ListOrganizations(ctx, req)
 	if err != nil {
-		return diag.Errorf("error while listing orgs with name %s: %v", orgName, err)
+		return diag.Errorf("error while listing orgs (name=%q, domain=%q, state=%q): %v", orgName, orgDomain, orgState, err)
 	}
 	orgIDs := make([]string, len(resp.Result))
 	for i, org := range resp.Result {
