@@ -21,7 +21,7 @@ func GetDatasource() *schema.Resource {
 			PrimaryDomainVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Primary domain of the instance. This is the first custom domain if any exist, otherwise the generated domain.",
+				Description: "Primary domain of the instance. This is the first custom domain if any exist.",
 			},
 			GeneratedDomainVar: {
 				Type:        schema.TypeString,
