@@ -45,10 +45,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.UpdateCustomPrivacyPolicy(helper.CtxWithID(ctx, d), &management.UpdateCustomPrivacyPolicyRequest{
-		TosLink:      d.Get(tosLinkVar).(string),
-		PrivacyLink:  d.Get(privacyLinkVar).(string),
-		HelpLink:     d.Get(HelpLinkVar).(string),
-		SupportEmail: d.Get(supportEmailVar).(string),
+		TosLink:        d.Get(tosLinkVar).(string),
+		PrivacyLink:    d.Get(privacyLinkVar).(string),
+		HelpLink:       d.Get(HelpLinkVar).(string),
+		SupportEmail:   d.Get(supportEmailVar).(string),
+		DocsLink:       d.Get(DocsLinkVar).(string),
+		CustomLink:     d.Get(CustomLinkVar).(string),
+		CustomLinkText: d.Get(CustomLinkTextVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update privacy policy: %v", err)
@@ -71,10 +74,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	_, err = client.AddCustomPrivacyPolicy(helper.CtxWithID(ctx, d), &management.AddCustomPrivacyPolicyRequest{
-		TosLink:      d.Get(tosLinkVar).(string),
-		PrivacyLink:  d.Get(privacyLinkVar).(string),
-		HelpLink:     d.Get(HelpLinkVar).(string),
-		SupportEmail: d.Get(supportEmailVar).(string),
+		TosLink:        d.Get(tosLinkVar).(string),
+		PrivacyLink:    d.Get(privacyLinkVar).(string),
+		HelpLink:       d.Get(HelpLinkVar).(string),
+		SupportEmail:   d.Get(supportEmailVar).(string),
+		DocsLink:       d.Get(DocsLinkVar).(string),
+		CustomLink:     d.Get(CustomLinkVar).(string),
+		CustomLinkText: d.Get(CustomLinkTextVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create privacy policy: %v", err)
@@ -106,16 +112,19 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	policy := resp.Policy
-	if policy.GetIsDefault() == true {
+	if policy.GetIsDefault() {
 		d.SetId("")
 		return nil
 	}
 	set := map[string]interface{}{
-		helper.OrgIDVar: policy.GetDetails().GetResourceOwner(),
-		tosLinkVar:      policy.GetTosLink(),
-		privacyLinkVar:  policy.GetPrivacyLink(),
-		HelpLinkVar:     policy.GetHelpLink(),
-		supportEmailVar: policy.GetSupportEmail(),
+		helper.OrgIDVar:   policy.GetDetails().GetResourceOwner(),
+		tosLinkVar:        policy.GetTosLink(),
+		privacyLinkVar:    policy.GetPrivacyLink(),
+		HelpLinkVar:       policy.GetHelpLink(),
+		supportEmailVar:   policy.GetSupportEmail(),
+		DocsLinkVar:       policy.GetDocsLink(),
+		CustomLinkVar:     policy.GetCustomLink(),
+		CustomLinkTextVar: policy.GetCustomLinkText(),
 	}
 
 	for k, v := range set {

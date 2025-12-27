@@ -32,13 +32,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if d.HasChanges(enableImpersonationVar, embeddedIframeEnabledVar, embeddedIframeAllowedOriginsVar) {
 		req := &settingsv2.SetSecuritySettingsRequest{
 			EnableImpersonation: d.Get(enableImpersonationVar).(bool),
-		}
-
-		if d.Get(embeddedIframeEnabledVar) != nil || d.Get(embeddedIframeAllowedOriginsVar) != nil {
-			req.EmbeddedIframe = &settingsv2.EmbeddedIframeSettings{
+			EmbeddedIframe: &settingsv2.EmbeddedIframeSettings{
 				Enabled:        d.Get(embeddedIframeEnabledVar).(bool),
 				AllowedOrigins: helper.GetOkSetToStringSlice(d, embeddedIframeAllowedOriginsVar),
-			}
+			},
 		}
 
 		_, err := client.SetSecuritySettings(ctx, req)
