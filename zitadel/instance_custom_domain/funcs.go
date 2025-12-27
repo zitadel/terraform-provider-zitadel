@@ -73,8 +73,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	// Find the domain in the list
 	found := false
-	for _, d := range resp.GetDomains() {
-		if d.GetDomain() == domain {
+	for _, domainEntry := range resp.GetDomains() {
+		if domainEntry.GetDomain() == domain {
 			found = true
 			break
 		}
