@@ -36,13 +36,13 @@ output "user_names" {
 
 ### Optional
 
-- `email` (String) Email to filter by
-- `email_method` (String) Method for querying users by email, supported values: TEXT_QUERY_METHOD_EQUALS,
+- `login_name` (String) Login name to filter by
+- `login_name_method` (String) Method for querying users by login name, supported values: TEXT_QUERY_METHOD_EQUALS,
   TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE,
   TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH,
   TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
-- `login_name` (String) Login name to filter by
-- `login_name_method` (String) Method for querying users by login name, supported values: TEXT_QUERY_METHOD_EQUALS,
+- `name` (String) Name to filter by
+- `name_method` (String) Method for querying users by name, supported values: TEXT_QUERY_METHOD_EQUALS,
   TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE,
   TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH,
   TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE

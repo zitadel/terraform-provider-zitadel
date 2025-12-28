@@ -15,7 +15,7 @@ Resource representing the HTTP SMS provider configuration of an instance.
 resource "zitadel_sms_provider_http" "default" {
   endpoint    = "https://relay.example.com/provider"
   description = "provider description"
-	set_active = false
+  set_active  = false
 }
 ```
 

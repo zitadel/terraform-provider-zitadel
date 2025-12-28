@@ -226,13 +226,13 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		})
 	}
 
-	if email, ok := d.GetOk(emailVar); ok {
-		emailMethod := d.Get(emailMethodVar).(string)
+	if name, ok := d.GetOk(nameVar); ok {
+		nameMethod := d.Get(nameMethodVar).(string)
 		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_EmailQuery{
-				EmailQuery: &user.EmailQuery{
-					EmailAddress: email.(string),
-					Method:       object.TextQueryMethod(object.TextQueryMethod_value[emailMethod]),
+			Query: &user.SearchQuery_DisplayNameQuery{
+				DisplayNameQuery: &user.DisplayNameQuery{
+					DisplayName: name.(string),
+					Method:      object.TextQueryMethod(object.TextQueryMethod_value[nameMethod]),
 				},
 			},
 		})

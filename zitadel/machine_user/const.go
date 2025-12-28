@@ -15,13 +15,12 @@ const (
 	loginNameMethodVar    = "login_name_method"
 	preferredLoginNameVar = "preferred_login_name"
 	nameVar               = "name"
+	nameMethodVar         = "name_method"
 	DescriptionVar        = "description"
 	accessTokenTypeVar    = "access_token_type"
 	WithSecretVar         = "with_secret"
 	clientIDVar           = "client_id"
 	clientSecretVar       = "client_secret"
-	emailVar              = "email"
-	emailMethodVar        = "email_method"
 )
 
 var (

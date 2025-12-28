@@ -87,17 +87,17 @@ func ListDatasources() *schema.Resource {
 				},
 				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
 			},
-			emailVar: {
+			nameVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Email to filter by",
+				Description: "Name to filter by",
 			},
-			emailMethodVar: {
+			nameMethodVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Method for querying users by email" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				Description: "Method for querying users by name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(emailMethodVar, value, object.TextQueryMethod_value)
+					return helper.EnumValueValidation(nameMethodVar, value, object.TextQueryMethod_value)
 				},
 				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
 			},
