@@ -24,6 +24,11 @@ resource "zitadel_default_lockout_policy" "default" {
 
 - `max_password_attempts` (Number) Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset.
 
+### Optional
+
+- `max_otp_attempts` (Number) Maximum OTP check attempts before the account gets locked. Attempts are reset as soon as
+  the OTP is entered correctly.
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.

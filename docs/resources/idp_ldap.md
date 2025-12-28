@@ -70,6 +70,8 @@ resource "zitadel_idp_ldap" "default" {
 - `preferred_language_attribute` (String) User attribute for the preferred language
 - `preferred_username_attribute` (String) User attribute for the preferred username
 - `profile_attribute` (String) User attribute for the profile
+- `root_ca` (String) Root CA for self-signed certificates for TLS connections to LDAP servers. It is intended to be
+  filled with the contents of a .pem file.
 
 ### Read-Only
 

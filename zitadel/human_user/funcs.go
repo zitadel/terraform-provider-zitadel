@@ -191,7 +191,7 @@ func readFunc(forDatasource bool) func(ctx context.Context, d *schema.ResourceDa
 			return nil
 		}
 		if err != nil {
-			return diag.Errorf("failed to get user")
+			return diag.Errorf("failed to get user: %v", err)
 		}
 
 		user := respUser.GetUser()
