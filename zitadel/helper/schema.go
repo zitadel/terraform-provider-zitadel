@@ -22,7 +22,7 @@ var (
 	OrgIDResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Optional:    true,
-		Description: "ID of the organization",
+		Description: "ID of the organization. If not provided, the organization of the authenticated user/service account is used.",
 		ForceNew:    true,
 		ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
 			_, err := ConvertID(i.(string))

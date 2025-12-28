@@ -27,13 +27,13 @@ resource "zitadel_project_role" "default" {
 ### Required
 
 - `display_name` (String) Name used for project role
+- `org_id` (String) ID of the organization
 - `project_id` (String) ID of the project
 - `role_key` (String) Key used for project role
 
 ### Optional
 
 - `group` (String) Group used for project role
-- `org_id` (String) ID of the organization
 
 ### Read-Only
 

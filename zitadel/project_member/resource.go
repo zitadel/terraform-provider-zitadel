@@ -29,7 +29,7 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Required:    true,
-				Description: "List of roles granted",
+				Description: "List of roles granted. Project member roles must start with 'PROJECT_' (e.g., PROJECT_OWNER, PROJECT_OWNER_VIEWER). See https://zitadel.com/docs/guides/manage/console/managers for available roles.",
 			},
 		},
 		DeleteContext: delete,
