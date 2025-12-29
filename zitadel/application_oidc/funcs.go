@@ -185,7 +185,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	d.SetId(resp.GetAppId())
-	return nil
+	return read(ctx, d, m)
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -242,12 +242,14 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			})
 		case *app.LoginVersion_LoginV2:
 			v2 := oidc.GetLoginVersion().GetLoginV2()
+			v2Map := map[string]interface{}{}
+
+			if baseUri := v2.GetBaseUri(); baseUri != "" {
+				v2Map[BaseURIVar] = baseUri
+			}
+
 			loginVersion = append(loginVersion, map[string]interface{}{
-				LoginV2Var: []interface{}{
-					map[string]interface{}{
-						BaseURIVar: v2.GetBaseUri(),
-					},
-				},
+				LoginV2Var: []interface{}{v2Map},
 			})
 		}
 	}
@@ -274,8 +276,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		NoneCompliantVar:            oidc.GetNoneCompliant(),
 		ComplianceProblemsVar:       complianceProblems,
 		BackChannelLogoutURIVar:     oidc.GetBackChannelLogoutUri(),
-		LoginVersionVar:             loginVersion,
 	}
+
+	// Only set login_version if it has content
+	if len(loginVersion) > 0 {
+		set[LoginVersionVar] = loginVersion
+	}
+
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of applicationOIDC: %v", k, err)
@@ -305,6 +312,10 @@ func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
 		return nil
 	}
 
+	if list[0] == nil {
+		return nil
+	}
+
 	item := list[0].(map[string]interface{})
 
 	if loginV1, ok := item[LoginV1Var]; ok && loginV1.(bool) {
@@ -315,9 +326,13 @@ func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
 		}
 	}
 
-	if v2, ok := item[LoginV2Var]; ok {
+	if v2, ok := item[LoginV2Var]; ok && v2 != nil {
 		v2List := v2.([]interface{})
 		if len(v2List) > 0 {
+			// Add nil check HERE before type assertion
+			if v2List[0] == nil {
+				return nil
+			}
 			v2Item := v2List[0].(map[string]interface{})
 			var uri *string
 			if baseURI, ok := v2Item[BaseURIVar]; ok && baseURI.(string) != "" {

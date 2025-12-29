@@ -44,11 +44,16 @@ func TestAccAppOIDC_LoginV1(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_oidc")
 	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 
-	resourceConfig := fmt.Sprintf(`
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency, projectDep},
+		func(property, secret string) string {
+			return fmt.Sprintf(`
 resource "zitadel_application_oidc" "default" {
   org_id           = data.zitadel_org.default.id
   project_id       = %q
-  name             = "app_login_v1_%s"
+  name             = %q
   redirect_uris    = ["https://localhost.com/callback"]
   response_types   = ["OIDC_RESPONSE_TYPE_CODE"]
   grant_types      = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
@@ -56,14 +61,10 @@ resource "zitadel_application_oidc" "default" {
   login_version {
     login_v1 = true
   }
-}`, projectID, frame.UniqueResourcesID)
-
-	test_utils.RunLifecyleTest(
-		t,
-		frame.BaseTestFrame,
-		[]string{frame.AsOrgDefaultDependency, projectDep},
-		func(property, secret string) string { return resourceConfig },
-		"app_login_v1_"+frame.UniqueResourcesID, "app_login_v1_updated_"+frame.UniqueResourcesID,
+}`, projectID, property)
+		},
+		"app_login_v1_"+frame.UniqueResourcesID,
+		"app_login_v1_updated_"+frame.UniqueResourcesID,
 		"", "", "",
 		false,
 		checkRemoteProperty(frame, projectID),
@@ -84,11 +85,16 @@ func TestAccAppOIDC_LoginV2_WithBaseURI(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_oidc")
 	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 
-	resourceConfig := fmt.Sprintf(`
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency, projectDep},
+		func(property, secret string) string {
+			return fmt.Sprintf(`
 resource "zitadel_application_oidc" "default" {
   org_id           = data.zitadel_org.default.id
   project_id       = %q
-  name             = "app_login_v2_%s"
+  name             = %q
   redirect_uris    = ["https://localhost.com/callback"]
   response_types   = ["OIDC_RESPONSE_TYPE_CODE"]
   grant_types      = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
@@ -98,14 +104,10 @@ resource "zitadel_application_oidc" "default" {
       base_uri = "https://custom-login.example.com"
     }
   }
-}`, projectID, frame.UniqueResourcesID)
-
-	test_utils.RunLifecyleTest(
-		t,
-		frame.BaseTestFrame,
-		[]string{frame.AsOrgDefaultDependency, projectDep},
-		func(property, secret string) string { return resourceConfig },
-		"app_login_v2_"+frame.UniqueResourcesID, "app_login_v2_updated_"+frame.UniqueResourcesID,
+}`, projectID, property)
+		},
+		"app_login_v2_"+frame.UniqueResourcesID,
+		"app_login_v2_updated_"+frame.UniqueResourcesID,
 		"", "", "",
 		false,
 		checkRemoteProperty(frame, projectID),
@@ -126,11 +128,16 @@ func TestAccAppOIDC_LoginV2_WithoutBaseURI(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_oidc")
 	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
 
-	resourceConfig := fmt.Sprintf(`
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency, projectDep},
+		func(property, secret string) string {
+			return fmt.Sprintf(`
 resource "zitadel_application_oidc" "default" {
   org_id           = data.zitadel_org.default.id
   project_id       = %q
-  name             = "app_login_v2_default_%s"
+  name             = %q
   redirect_uris    = ["https://localhost.com/callback"]
   response_types   = ["OIDC_RESPONSE_TYPE_CODE"]
   grant_types      = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
@@ -138,14 +145,10 @@ resource "zitadel_application_oidc" "default" {
   login_version {
     login_v2 {}
   }
-}`, projectID, frame.UniqueResourcesID)
-
-	test_utils.RunLifecyleTest(
-		t,
-		frame.BaseTestFrame,
-		[]string{frame.AsOrgDefaultDependency, projectDep},
-		func(property, secret string) string { return resourceConfig },
-		"app_login_v2_default_"+frame.UniqueResourcesID, "app_login_v2_default_updated_"+frame.UniqueResourcesID,
+}`, projectID, property)
+		},
+		"app_login_v2_default_"+frame.UniqueResourcesID,
+		"app_login_v2_default_updated_"+frame.UniqueResourcesID,
 		"", "", "",
 		false,
 		checkRemoteProperty(frame, projectID),
