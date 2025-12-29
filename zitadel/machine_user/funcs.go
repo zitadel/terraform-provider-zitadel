@@ -238,9 +238,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		})
 	}
 
-	if len(queries) > 0 {
-		req.Queries = queries
-	}
+	req.Queries = queries
 
 	resp, err := client.ListUsers(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
