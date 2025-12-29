@@ -25,10 +25,13 @@ resource "zitadel_default_privacy_policy" "default" {
 
 ### Optional
 
-- `help_link` (String)
-- `privacy_link` (String)
-- `support_email` (String)
-- `tos_link` (String)
+- `custom_link` (String) Link to an external resource that will be available to users in the console.
+- `custom_link_text` (String) The button text that would be shown in console pointing to custom link.
+- `docs_link` (String) Link to documentation to be shown in the console.
+- `help_link` (String) Link to the Help/Manual page.
+- `privacy_link` (String) Link to the Privacy Policy.
+- `support_email` (String) Help / support email address.
+- `tos_link` (String) Link to the Terms of Service.
 
 ### Read-Only
 
