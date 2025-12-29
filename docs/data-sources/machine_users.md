@@ -7,8 +7,7 @@ description: |-
 
 # zitadel_machine_users (Data Source)
 
-Datasource representing machine users situated under an organization, which then can be authorized through memberships
-or direct grants on other resources.
+Datasource representing machine users situated under an organization, which then can be authorized through memberships or direct grants on other resources.
 
 ## Example Usage
 
@@ -37,21 +36,10 @@ output "user_names" {
 ### Optional
 
 - `login_name` (String) Login name to filter by
-- `login_name_method` (String) Method for querying users by login name, supported values: TEXT_QUERY_METHOD_EQUALS,
-  TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE,
-  TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH,
-  TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
-- `name` (String) Name to filter by
-- `name_method` (String) Method for querying users by name, supported values: TEXT_QUERY_METHOD_EQUALS,
-  TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE,
-  TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH,
-  TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
+- `login_name_method` (String) Method for querying users by login name, supported values: TEXT_QUERY_METHOD_EQUALS, TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE, TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH, TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
 - `org_id` (String) ID of the organization
 - `user_name` (String) Username to filter by
-- `user_name_method` (String) Method for querying users by username, supported values: TEXT_QUERY_METHOD_EQUALS,
-  TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE,
-  TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH,
-  TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
+- `user_name_method` (String) Method for querying users by username, supported values: TEXT_QUERY_METHOD_EQUALS, TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE, TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH, TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
 
 ### Read-Only
 

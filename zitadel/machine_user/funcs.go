@@ -226,18 +226,6 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		})
 	}
 
-	if name, ok := d.GetOk(nameVar); ok {
-		nameMethod := d.Get(nameMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_DisplayNameQuery{
-				DisplayNameQuery: &user.DisplayNameQuery{
-					DisplayName: name.(string),
-					Method:      object.TextQueryMethod(object.TextQueryMethod_value[nameMethod]),
-				},
-			},
-		})
-	}
-
 	if loginName, ok := d.GetOk(loginNameVar); ok {
 		loginNameMethod := d.Get(loginNameMethodVar).(string)
 		queries = append(queries, &user.SearchQuery{

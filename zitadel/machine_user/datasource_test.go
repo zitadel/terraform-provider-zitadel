@@ -105,49 +105,6 @@ data "zitadel_machine_users" "default" {
 	)
 }
 
-func TestAccMachineUsersDatasource_FilterByName(t *testing.T) {
-	datasourceName := "zitadel_machine_users"
-	frame := test_utils.NewOrgTestFrame(t, datasourceName)
-
-	username := "nametest_" + frame.UniqueResourcesID
-	displayName := "UniqueDisplayName_" + frame.UniqueResourcesID
-
-	_, err := frame.AddMachineUser(frame, &management.AddMachineUserRequest{
-		UserName: username,
-		Name:     displayName,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Create another user with different name to ensure filtering works
-	_, err = frame.AddMachineUser(frame, &management.AddMachineUserRequest{
-		UserName: "other_" + frame.UniqueResourcesID,
-		Name:     "OtherName",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	config := fmt.Sprintf(`
-data "zitadel_machine_users" "default" {
-  org_id = "%s"
-  name   = "%s"
-}
-`, frame.OrgID, displayName)
-
-	test_utils.RunDatasourceTest(
-		t,
-		frame.BaseTestFrame,
-		config,
-		[]string{frame.AsOrgDefaultDependency},
-		nil,
-		map[string]string{
-			"user_ids.#": "1",
-		},
-	)
-}
-
 func TestAccMachineUsersDatasource_NoMatch(t *testing.T) {
 	datasourceName := "zitadel_machine_users"
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)

@@ -87,20 +87,6 @@ func ListDatasources() *schema.Resource {
 				},
 				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
 			},
-			nameVar: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Name to filter by",
-			},
-			nameMethodVar: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Method for querying users by name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
-				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(nameMethodVar, value, object.TextQueryMethod_value)
-				},
-				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
-			},
 			loginNameVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
