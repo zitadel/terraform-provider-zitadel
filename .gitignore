@@ -44,3 +44,6 @@ devbox.json
 devbox.lock
 
 vendor
+
+# Claude
+.claude

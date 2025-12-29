@@ -47,6 +47,7 @@ terraform fmt -recursive
 
 1. Manually maintain files in /templates and /examples
 2. Generate the docs
+
 ```bash
 go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.14.1 generate
  ```

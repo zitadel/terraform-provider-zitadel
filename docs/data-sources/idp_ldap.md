@@ -48,6 +48,8 @@ data "zitadel_idp_ldap" "default" {
 - `preferred_language_attribute` (String) User attribute for the preferred language
 - `preferred_username_attribute` (String) User attribute for the preferred username
 - `profile_attribute` (String) User attribute for the profile
+- `root_ca` (String) Root CA for self-signed certificates for TLS connections to LDAP servers. It is intended to be
+  filled with the contents of a .pem file.
 - `servers` (List of String) Servers to try in order for establishing LDAP connections
 - `start_tls` (Boolean) Wether to use StartTLS for LDAP connections
 - `timeout` (String) Timeout for LDAP connections
