@@ -34,6 +34,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_password_reset_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_passwordless_registration_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_privacy_policy"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_security_settings"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_verify_email_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_verify_email_otp_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_verify_phone_message_text"
@@ -238,6 +239,7 @@ func Provider() *schema.Provider {
 			"zitadel_org":                        org.GetDatasource(),
 			"zitadel_orgs":                       org.ListDatasources(),
 			"zitadel_human_user":                 human_user.GetDatasource(),
+			"zitadel_human_users":                human_user.ListDatasources(),
 			"zitadel_machine_user":               machine_user.GetDatasource(),
 			"zitadel_machine_users":              machine_user.ListDatasources(),
 			"zitadel_project":                    project.GetDatasource(),
@@ -416,6 +418,7 @@ func Provider() *schema.Provider {
 			"zitadel_user_metadata":                      user_metadata.GetResource(),
 			"zitadel_email_provider_smtp":                email_provider_smtp.GetResource(),
 			"zitadel_email_provider_http":                email_provider_http.GetResource(),
+			"zitadel_default_security_settings":          default_security_settings.GetResource(),
 		},
 		ConfigureContextFunc: ProviderConfigure,
 	}
