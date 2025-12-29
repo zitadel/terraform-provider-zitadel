@@ -41,6 +41,6 @@ func GetDatasource() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
-		ReadContext: list,
+		ReadContext: read,
 	}
 }

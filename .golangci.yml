@@ -8,6 +8,6 @@ linters:
 linters-settings:
   gci:
     sections:
-    - standard
-    - default
-    - prefix(github.com/zitadel/terraform-provider-zitadel/v2)
+      - standard
+      - default
+      - prefix(github.com/zitadel/terraform-provider-zitadel/v2)
