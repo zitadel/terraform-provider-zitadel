@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
-func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started read")
+func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started list")
 
 	clientInfo, ok := m.(*helper.ClientInfo)
 	if !ok {
@@ -26,24 +26,18 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	instanceID := d.Get(InstanceIDVar).(string)
 
-	req := &instance.GetInstanceRequest{}
+	instanceReq := &instance.GetInstanceRequest{}
 	if instanceID != "" {
-		req.InstanceId = instanceID
+		instanceReq.InstanceId = instanceID
 	}
 
-	inst, err := client.GetInstance(ctx, req)
+	inst, err := client.GetInstance(ctx, instanceReq)
 	if err != nil {
 		return diag.Errorf("failed to get instance: %v", err)
 	}
 
-	customDomainsReq := &instance.ListCustomDomainsRequest{}
-	if instanceID != "" {
-		customDomainsReq.InstanceId = instanceID
-	}
-
-	customDomainsResp, err := client.ListCustomDomains(ctx, customDomainsReq)
-	if err != nil {
-		return diag.Errorf("failed to list custom domains: %v", err)
+	if inst == nil || inst.Instance == nil {
+		return diag.Errorf("instance not found")
 	}
 
 	trustedDomainsReq := &instance.ListTrustedDomainsRequest{}
@@ -56,38 +50,36 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to list trusted domains: %v", err)
 	}
 
-	customDomains := make([]string, len(customDomainsResp.Domains))
-	for i, domain := range customDomainsResp.Domains {
-		customDomains[i] = domain.Domain
-	}
-
-	trustedDomains := make([]string, len(trustedDomainsResp.TrustedDomain))
-	for i, domain := range trustedDomainsResp.TrustedDomain {
-		trustedDomains[i] = domain.Domain
-	}
-
-	var generatedDomain string
-	var primaryDomain string
-
-	for _, domain := range customDomainsResp.Domains {
-		if domain.Generated {
-			generatedDomain = domain.Domain
-		}
-		if domain.Primary {
-			primaryDomain = domain.Domain
+	customDomains := make([]map[string]interface{}, 0)
+	if inst.Instance.CustomDomains != nil {
+		customDomains = make([]map[string]interface{}, len(inst.Instance.CustomDomains))
+		for i, domain := range inst.Instance.CustomDomains {
+			if domain != nil {
+				customDomains[i] = map[string]interface{}{
+					"domain":    domain.Domain,
+					"primary":   domain.Primary,
+					"generated": domain.Generated,
+				}
+			}
 		}
 	}
 
-	if primaryDomain == "" && len(customDomains) > 0 {
-		primaryDomain = customDomains[0]
+	trustedDomains := make([]string, 0)
+	if trustedDomainsResp != nil && trustedDomainsResp.TrustedDomain != nil {
+		trustedDomains = make([]string, len(trustedDomainsResp.TrustedDomain))
+		for i, domain := range trustedDomainsResp.TrustedDomain {
+			if domain != nil {
+				trustedDomains[i] = domain.Domain
+			}
+		}
 	}
 
 	set := map[string]interface{}{
-		NameVar:            inst.Instance.Name,
-		PrimaryDomainVar:   primaryDomain,
-		GeneratedDomainVar: generatedDomain,
-		CustomDomainsVar:   customDomains,
-		TrustedDomainsVar:  trustedDomains,
+		NameVar:           inst.Instance.Name,
+		VersionVar:        inst.Instance.Version,
+		StateVar:          inst.Instance.State.String(),
+		CustomDomainsVar:  customDomains,
+		TrustedDomainsVar: trustedDomains,
 	}
 
 	for k, v := range set {

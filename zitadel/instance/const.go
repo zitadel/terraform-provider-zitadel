@@ -1,10 +1,10 @@
 package instance
 
 const (
-	InstanceIDVar      = "instance_id"
-	NameVar            = "name"
-	PrimaryDomainVar   = "primary_domain"
-	GeneratedDomainVar = "generated_domain"
-	CustomDomainsVar   = "custom_domains"
-	TrustedDomainsVar  = "trusted_domains"
+	InstanceIDVar     = "instance_id"
+	NameVar           = "name"
+	VersionVar        = "version"
+	StateVar          = "state"
+	CustomDomainsVar  = "custom_domains"
+	TrustedDomainsVar = "trusted_domains"
 )

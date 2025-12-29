@@ -28,6 +28,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		ReadContext:   read,
 		DeleteContext: delete,
-		Importer:      helper.ImportWithIDAndOptionalOrg(InstanceIDVar),
+		Importer:      helper.ImportWithID(InstanceIDVar),
 	}
 }

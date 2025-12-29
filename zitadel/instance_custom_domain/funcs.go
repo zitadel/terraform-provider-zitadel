@@ -37,7 +37,6 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to add custom domain: %v", err)
 	}
 
-	// Set ID as composite: instance_id/domain
 	d.SetId(fmt.Sprintf("%s/%s", instanceID, domain))
 	return read(ctx, d, m)
 }
@@ -55,7 +54,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	// Parse composite ID
 	parts := strings.Split(d.Id(), "/")
 	if len(parts) != 2 {
 		return diag.Errorf("invalid ID format, expected instance_id/domain")
@@ -63,7 +61,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	instanceID := parts[0]
 	domain := parts[1]
 
-	// List all custom domains and find ours
 	resp, err := client.ListCustomDomains(ctx, &instance.ListCustomDomainsRequest{
 		InstanceId: instanceID,
 	})
@@ -71,7 +68,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to list custom domains: %v", err)
 	}
 
-	// Find the domain in the list
 	found := false
 	for _, domainEntry := range resp.GetDomains() {
 		if domainEntry.GetDomain() == domain {
@@ -81,7 +77,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	if !found {
-		// Domain was deleted outside of Terraform
 		d.SetId("")
 		return nil
 	}

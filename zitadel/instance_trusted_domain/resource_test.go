@@ -1,6 +1,7 @@
 package instance_trusted_domain_test
 
 import (
+	"fmt"
 	"regexp"
 	"testing"
 
@@ -13,11 +14,14 @@ func TestAccInstanceTrustedDomain(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_instance_trusted_domain")
 
 	resourceConfig := func(domain string, _ string) string {
-		return `
+		return fmt.Sprintf(`
 resource "zitadel_instance_trusted_domain" "default" {
-	domain = "` + domain + `"
+    instance_id = data.zitadel_instance.current.id
+    domain      = "%s"
 }
-		`
+
+data "zitadel_instance" "current" {}
+`, domain)
 	}
 
 	test_utils.RunLifecyleTest(

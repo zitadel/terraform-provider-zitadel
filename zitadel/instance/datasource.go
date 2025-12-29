@@ -6,7 +6,7 @@ import (
 
 func GetDatasource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Datasource representing the ZITADEL instance with its domains.",
+		Description: "Datasource representing the ZITADEL instance.",
 		Schema: map[string]*schema.Schema{
 			InstanceIDVar: {
 				Type:        schema.TypeString,
@@ -18,29 +18,47 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Name of the instance.",
 			},
-			PrimaryDomainVar: {
+			VersionVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Primary domain of the instance. This is the first custom domain if any exist.",
+				Description: "Version of the ZITADEL system the instance is running on.",
 			},
-			GeneratedDomainVar: {
+			StateVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The generated domain for this instance (e.g., instance1.zitadel.cloud).",
+				Description: "Current state of the instance.",
 			},
 			CustomDomainsVar: {
 				Type:        schema.TypeList,
 				Computed:    true,
-				Description: "List of custom domains configured for this instance.",
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Custom domains configured for this instance.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"domain": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The domain name.",
+						},
+						"primary": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "Whether this is the primary domain.",
+						},
+						"generated": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "Whether this domain was auto-generated.",
+						},
+					},
+				},
 			},
 			TrustedDomainsVar: {
 				Type:        schema.TypeList,
 				Computed:    true,
-				Description: "List of trusted domains configured for this instance.",
+				Description: "Trusted domains configured for this instance.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
-		ReadContext: read,
+		ReadContext: list,
 	}
 }

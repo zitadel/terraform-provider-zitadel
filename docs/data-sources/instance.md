@@ -3,12 +3,12 @@
 page_title: "zitadel_instance Data Source - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Datasource representing the ZITADEL instance with its domains.
+  Datasource representing the ZITADEL instance.
 ---
 
 # zitadel_instance (Data Source)
 
-Datasource representing the ZITADEL instance with its domains.
+Datasource representing the ZITADEL instance.
 
 
 
@@ -21,11 +21,20 @@ Datasource representing the ZITADEL instance with its domains.
 
 ### Read-Only
 
-- `custom_domains` (List of String) List of custom domains configured for this instance.
-- `generated_domain` (String) The generated domain for this instance (e.g., instance1.zitadel.cloud).
+- `custom_domains` (List of Object) Custom domains configured for this instance. (see [below for nested schema](#nestedatt--custom_domains))
 - `id` (String) The ID of this resource.
 - `name` (String) Name of the instance.
-- `primary_domain` (String) Primary domain of the instance. This is the first custom domain if any exist.
-- `trusted_domains` (List of String) List of trusted domains configured for this instance.
+- `state` (String) Current state of the instance.
+- `trusted_domains` (List of String) Trusted domains configured for this instance.
+- `version` (String) Version of the ZITADEL system the instance is running on.
+
+<a id="nestedatt--custom_domains"></a>
+### Nested Schema for `custom_domains`
+
+Read-Only:
+
+- `domain` (String)
+- `generated` (Boolean)
+- `primary` (Boolean)
 
 

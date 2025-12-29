@@ -15,7 +15,7 @@ func GetResource() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			InstanceIDVar: {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
 				Description: "The ID of the instance. If not provided, the instance from the current context will be used.",
 				ForceNew:    true,
 			},
@@ -29,6 +29,6 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		ReadContext:   read,
 		DeleteContext: delete,
-		Importer:      helper.ImportWithIDAndOptionalOrg(InstanceIDVar),
+		Importer:      helper.ImportWithID(InstanceIDVar),
 	}
 }

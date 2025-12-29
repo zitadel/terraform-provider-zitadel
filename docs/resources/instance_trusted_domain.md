@@ -18,9 +18,6 @@ Resource representing a trusted domain on a ZITADEL instance. Trusted domains ca
 ### Required
 
 - `domain` (String) Trusted domain to add to the instance (max 253 characters)
-
-### Optional
-
 - `instance_id` (String) The ID of the instance. If not provided, the instance from the current context will be used.
 
 ### Read-Only

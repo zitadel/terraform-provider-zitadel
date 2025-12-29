@@ -1,6 +1,7 @@
 package instance_custom_domain_test
 
 import (
+	"fmt"
 	"regexp"
 	"testing"
 
@@ -14,12 +15,14 @@ func TestAccInstanceCustomDomain(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_instance_custom_domain")
 
 	resourceConfig := func(domain string, _ string) string {
-		return `
+		return fmt.Sprintf(`
 resource "zitadel_instance_custom_domain" "default" {
-	instance_id = "269374853454389250"
-	domain      = "` + domain + `"
+    instance_id = data.zitadel_instance.current.id
+    domain      = "%s"
 }
-		`
+
+data "zitadel_instance" "current" {}
+`, domain)
 	}
 
 	test_utils.RunLifecyleTest(

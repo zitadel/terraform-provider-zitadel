@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	instance "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/instance/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/instance/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -37,13 +37,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to add trusted domain: %v", err)
 	}
 
-	// Set ID as composite: instance_id/domain (or just domain if instance_id is empty)
-	if instanceID != "" {
-		d.SetId(fmt.Sprintf("%s/%s", instanceID, domain))
-	} else {
-		d.SetId(domain)
-	}
-
+	d.SetId(fmt.Sprintf("%s/%s", instanceID, domain))
 	return read(ctx, d, m)
 }
 
@@ -60,21 +54,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	// Parse composite ID
-	var instanceID, domain string
 	parts := strings.Split(d.Id(), "/")
-	if len(parts) == 2 {
-		instanceID = parts[0]
-		domain = parts[1]
-	} else if len(parts) == 1 {
-		// Instance context, just domain
-		domain = parts[0]
-		instanceID = d.Get(InstanceIDVar).(string)
-	} else {
-		return diag.Errorf("invalid ID format, expected instance_id/domain or domain")
+	if len(parts) != 2 {
+		return diag.Errorf("invalid ID format, expected instance_id/domain")
 	}
+	instanceID := parts[0]
+	domain := parts[1]
 
-	// List all trusted domains and find ours
 	resp, err := client.ListTrustedDomains(ctx, &instance.ListTrustedDomainsRequest{
 		InstanceId: instanceID,
 	})
@@ -82,7 +68,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to list trusted domains: %v", err)
 	}
 
-	// Find the domain in the list
 	found := false
 	for _, domainEntry := range resp.GetTrustedDomain() {
 		if domainEntry.GetDomain() == domain {
@@ -92,16 +77,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	if !found {
-		// Domain was deleted outside of Terraform
 		d.SetId("")
 		return nil
 	}
 
 	set := map[string]interface{}{
-		DomainVar: domain,
-	}
-	if instanceID != "" {
-		set[InstanceIDVar] = instanceID
+		InstanceIDVar: instanceID,
+		DomainVar:     domain,
 	}
 
 	for k, v := range set {
