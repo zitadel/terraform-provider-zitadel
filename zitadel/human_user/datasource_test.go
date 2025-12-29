@@ -217,6 +217,44 @@ data "zitadel_human_users" "default" {
 	)
 }
 
+func TestAccHumanUsersDatasource_AllNoFilter(t *testing.T) {
+	datasourceName := "zitadel_human_users"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
+
+	usernames := []string{"user1_" + frame.UniqueResourcesID, "user2_" + frame.UniqueResourcesID, "user3_" + frame.UniqueResourcesID}
+	for _, username := range usernames {
+		_, err := frame.ImportHumanUser(frame, &management.ImportHumanUserRequest{
+			UserName: username,
+			Profile: &management.ImportHumanUserRequest_Profile{
+				FirstName: "Test",
+				LastName:  "User",
+			},
+			Email: &management.ImportHumanUserRequest_Email{
+				Email:           username + "@example.com",
+				IsEmailVerified: true,
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	config := fmt.Sprintf(`
+data "zitadel_human_users" "default" {
+  org_id = "%s"
+}
+`, frame.OrgID)
+
+	test_utils.RunDatasourceTest(
+		t,
+		frame.BaseTestFrame,
+		config,
+		[]string{frame.AsOrgDefaultDependency},
+		nil,
+		map[string]string{},
+	)
+}
+
 func checkUserExists(frame *test_utils.OrgTestFrame, expectedUsername string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		resp, err := frame.ListUsers(frame, &management.ListUsersRequest{})

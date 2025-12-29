@@ -139,6 +139,37 @@ data "zitadel_machine_users" "default" {
 	)
 }
 
+func TestAccMachineUsersDatasource_AllNoFilter(t *testing.T) {
+	datasourceName := "zitadel_machine_users"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
+
+	usernames := []string{"machine1_" + frame.UniqueResourcesID, "machine2_" + frame.UniqueResourcesID, "machine3_" + frame.UniqueResourcesID}
+	for _, username := range usernames {
+		_, err := frame.AddMachineUser(frame, &management.AddMachineUserRequest{
+			UserName: username,
+			Name:     "Test Machine",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	config := fmt.Sprintf(`
+data "zitadel_machine_users" "default" {
+  org_id = "%s"
+}
+`, frame.OrgID)
+
+	test_utils.RunDatasourceTest(
+		t,
+		frame.BaseTestFrame,
+		config,
+		[]string{frame.AsOrgDefaultDependency},
+		nil,
+		map[string]string{},
+	)
+}
+
 func checkUserExists(frame *test_utils.OrgTestFrame, expectedUsername string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		resp, err := frame.ListUsers(frame, &management.ListUsersRequest{})
