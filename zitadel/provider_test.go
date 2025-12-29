@@ -2,7 +2,12 @@ package zitadel
 
 import (
 	"context"
+	"os/exec"
+	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -105,4 +110,79 @@ func TestClientInfo_Files(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestDocumentation verifies that the generated documentation in the docs/
+// directory is up-to-date with the current provider schema.
+//
+// This test runs tfplugindocs to regenerate documentation and then checks
+// each resource and datasource individually. If any documentation file has
+// changed or is missing, that specific subtest fails.
+//
+// To fix failing tests, run:
+//
+//	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.14.1 generate
+//
+// Then commit the updated documentation files.
+func TestDocumentation(t *testing.T) {
+	generate := exec.Command("go", "run",
+		"github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.14.1",
+		"generate")
+	generate.Dir = ".."
+	if output, err := generate.CombinedOutput(); err != nil {
+		t.Fatalf("tfplugindocs generate failed: %v\n%s", err, output)
+	}
+
+	status := exec.Command("git", "status", "--porcelain", "docs/")
+	status.Dir = ".."
+	output, err := status.Output()
+	if err != nil {
+		t.Fatalf("git status failed: %v", err)
+	}
+
+	changedFiles := make(map[string]bool)
+	for _, line := range strings.Split(string(output), "\n") {
+		if len(line) > 3 {
+			changedFiles[strings.TrimSpace(line[2:])] = true
+		}
+	}
+
+	sdkProvider := Provider()
+	frameworkProvider := NewProviderPV6()
+
+	t.Run("resources", func(t *testing.T) {
+		for name := range sdkProvider.ResourcesMap {
+			name := strings.TrimPrefix(name, "zitadel_")
+			t.Run(name, func(t *testing.T) {
+				docPath := filepath.Join("docs", "resources", name+".md")
+				if changedFiles[docPath] {
+					t.Errorf("documentation is out of date")
+				}
+			})
+		}
+		for _, factory := range frameworkProvider.Resources(context.Background()) {
+			res := factory()
+			var resp resource.MetadataResponse
+			res.Metadata(context.Background(), resource.MetadataRequest{ProviderTypeName: "zitadel"}, &resp)
+			name := strings.TrimPrefix(resp.TypeName, "zitadel_")
+			t.Run(name, func(t *testing.T) {
+				docPath := filepath.Join("docs", "resources", name+".md")
+				if changedFiles[docPath] {
+					t.Errorf("documentation is out of date")
+				}
+			})
+		}
+	})
+
+	t.Run("data_sources", func(t *testing.T) {
+		for name := range sdkProvider.DataSourcesMap {
+			name := strings.TrimPrefix(name, "zitadel_")
+			t.Run(name, func(t *testing.T) {
+				docPath := filepath.Join("docs", "data-sources", name+".md")
+				if changedFiles[docPath] {
+					t.Errorf("documentation is out of date")
+				}
+			})
+		}
+	})
 }
