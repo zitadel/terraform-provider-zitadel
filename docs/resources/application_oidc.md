@@ -53,10 +53,12 @@ resource "zitadel_application_oidc" "default" {
 - `additional_origins` (List of String) Additional origins
 - `app_type` (String) App type, supported values: OIDC_APP_TYPE_WEB, OIDC_APP_TYPE_USER_AGENT, OIDC_APP_TYPE_NATIVE
 - `auth_method_type` (String) Auth method type, supported values: OIDC_AUTH_METHOD_TYPE_BASIC, OIDC_AUTH_METHOD_TYPE_POST, OIDC_AUTH_METHOD_TYPE_NONE, OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT
+- `back_channel_logout_uri` (String) ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout
 - `clock_skew` (String) Clockskew
 - `dev_mode` (Boolean) Dev mode
 - `id_token_role_assertion` (Boolean) ID token role assertion
 - `id_token_userinfo_assertion` (Boolean) Token userinfo assertion
+- `login_version` (Block List, Max: 1) Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default. (see [below for nested schema](#nestedblock--login_version))
 - `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `post_logout_redirect_uris` (List of String) Post logout redirect URIs
 - `skip_native_app_success_page` (Boolean) Skip the successful login page on native apps and directly redirect the user to the callback.
@@ -66,7 +68,34 @@ resource "zitadel_application_oidc" "default" {
 
 - `client_id` (String, Sensitive) generated ID for this config
 - `client_secret` (String, Sensitive) generated secret for this config
+- `compliance_problems` (List of Object) lists the problems for non-compliancy (see [below for nested schema](#nestedatt--compliance_problems))
 - `id` (String) The ID of this resource.
+- `none_compliant` (Boolean) specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant
+
+<a id="nestedblock--login_version"></a>
+### Nested Schema for `login_version`
+
+Optional:
+
+- `login_v1` (Boolean) Login V1
+- `login_v2` (Block List, Max: 1) Login V2 (see [below for nested schema](#nestedblock--login_version--login_v2))
+
+<a id="nestedblock--login_version--login_v2"></a>
+### Nested Schema for `login_version.login_v2`
+
+Optional:
+
+- `base_uri` (String) Optionally specify a base uri of the login UI. If unspecified the default URI will be used.
+
+
+
+<a id="nestedatt--compliance_problems"></a>
+### Nested Schema for `compliance_problems`
+
+Read-Only:
+
+- `key` (String)
+- `message` (String)
 
 ## Import
 
