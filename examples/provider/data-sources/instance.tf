@@ -1,11 +1,7 @@
 data "zitadel_instance" "default" {
-	# instance_id is optional - uses current context if not provided
+  instance_id = "123456789012345678"
 }
 
 output "instance" {
-	value = data.zitadel_instance.default
-}
-
-output "primary_domain" {
-	value = data.zitadel_instance.default.primary_domain
+  value = data.zitadel_instance.default
 }

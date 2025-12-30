@@ -10,8 +10,8 @@ func GetDatasource() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			InstanceIDVar: {
 				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "ID of the instance. If not provided, uses the instance from the authentication context.",
+				Required:    true,
+				Description: "ID of the instance.",
 			},
 			NameVar: {
 				Type:        schema.TypeString,

@@ -1,6 +1,7 @@
 package instance_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
@@ -11,9 +12,11 @@ func TestAccInstanceDatasource(t *testing.T) {
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
-		`
-		data "zitadel_instance" "default" {}
-		`,
+		fmt.Sprintf(`
+		data "zitadel_instance" "default" {
+			instance_id = "%s"
+		}
+		`, frame.InstanceID),
 		nil,
 		nil,
 		map[string]string{

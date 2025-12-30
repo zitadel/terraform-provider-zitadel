@@ -26,12 +26,9 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	instanceID := d.Get(InstanceIDVar).(string)
 
-	instanceReq := &instance.GetInstanceRequest{}
-	if instanceID != "" {
-		instanceReq.InstanceId = instanceID
-	}
-
-	inst, err := client.GetInstance(ctx, instanceReq)
+	inst, err := client.GetInstance(ctx, &instance.GetInstanceRequest{
+		InstanceId: instanceID,
+	})
 	if err != nil {
 		return diag.Errorf("failed to get instance: %v", err)
 	}
@@ -40,12 +37,9 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("instance not found")
 	}
 
-	trustedDomainsReq := &instance.ListTrustedDomainsRequest{}
-	if instanceID != "" {
-		trustedDomainsReq.InstanceId = instanceID
-	}
-
-	trustedDomainsResp, err := client.ListTrustedDomains(ctx, trustedDomainsReq)
+	trustedDomainsResp, err := client.ListTrustedDomains(ctx, &instance.ListTrustedDomainsRequest{
+		InstanceId: instanceID,
+	})
 	if err != nil {
 		return diag.Errorf("failed to list trusted domains: %v", err)
 	}
@@ -88,11 +82,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 	}
 
-	if instanceID != "" {
-		d.SetId(instanceID)
-	} else {
-		d.SetId(inst.Instance.Id)
-	}
+	d.SetId(instanceID)
 
 	return nil
 }

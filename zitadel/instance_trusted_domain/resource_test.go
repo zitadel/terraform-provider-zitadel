@@ -16,12 +16,10 @@ func TestAccInstanceTrustedDomain(t *testing.T) {
 	resourceConfig := func(domain string, _ string) string {
 		return fmt.Sprintf(`
 resource "zitadel_instance_trusted_domain" "default" {
-    instance_id = data.zitadel_instance.current.id
+    instance_id = "%s"
     domain      = "%s"
 }
-
-data "zitadel_instance" "current" {}
-`, domain)
+`, frame.InstanceID, domain)
 	}
 
 	test_utils.RunLifecyleTest(
@@ -40,6 +38,8 @@ data "zitadel_instance" "current" {}
 		},
 		regexp.MustCompile(`^.+$`),
 		test_utils.CheckNothing,
-		nil,
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+		),
 	)
 }

@@ -41,6 +41,8 @@ data "zitadel_instance" "current" {}
 		},
 		regexp.MustCompile(`^.+$`),
 		test_utils.CheckNothing,
-		nil,
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+		),
 	)
 }

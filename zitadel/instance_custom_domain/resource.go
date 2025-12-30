@@ -1,9 +1,9 @@
 package instance_custom_domain
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"context"
 
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func GetResource() *schema.Resource {
@@ -28,6 +28,10 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		ReadContext:   read,
 		DeleteContext: delete,
-		Importer:      helper.ImportWithID(InstanceIDVar),
+		Importer: &schema.ResourceImporter{
+			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+				return []*schema.ResourceData{d}, nil
+			},
+		},
 	}
 }
