@@ -102,6 +102,7 @@ func GetResource() *schema.Resource {
 			isPhoneVerifiedVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Is the phone verified of the user",
 			},
 			InitialPasswordVar: {

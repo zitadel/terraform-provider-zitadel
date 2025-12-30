@@ -37,7 +37,7 @@ TF_ACC=1 go test ./...
 
 ```bash
 # Format go code
-go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3 run --fix
+go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2 run --fix
 
 # Format Terraform example files
 terraform fmt -recursive
