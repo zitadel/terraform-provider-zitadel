@@ -91,6 +91,7 @@ func GetResource() *schema.Resource {
 			isEmailVerifiedVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Is the email verified of the user, can only be true if password of the user is set",
 			},
 			phoneVar: {
@@ -101,6 +102,7 @@ func GetResource() *schema.Resource {
 			isPhoneVerifiedVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Is the phone verified of the user",
 			},
 			InitialPasswordVar: {

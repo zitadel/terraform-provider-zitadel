@@ -161,7 +161,7 @@ resource "zitadel_application_oidc" "default" {
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientSecretVar),
 		),
-		"compliance_problems",
+		"compliance_problems", "login_version",
 	)
 }
 

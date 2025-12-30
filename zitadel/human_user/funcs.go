@@ -148,26 +148,41 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(emailVar, isEmailVerifiedVar) {
-		_, err = client.UpdateHumanEmail(helper.CtxWithOrgID(ctx, d), &management.UpdateHumanEmailRequest{
-			UserId:          d.Id(),
-			Email:           d.Get(emailVar).(string),
-			IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update human email: %v", err)
+		oldEmail, newEmail := d.GetChange(emailVar)
+		_, isVerifiedInConfig := d.GetOk(isEmailVerifiedVar)
+
+		if oldEmail == newEmail && !isVerifiedInConfig {
+			// Skip update - is_email_verified removed from config but email unchanged
+		} else {
+			_, err = client.UpdateHumanEmail(helper.CtxWithOrgID(ctx, d), &management.UpdateHumanEmailRequest{
+				UserId:          d.Id(),
+				Email:           d.Get(emailVar).(string),
+				IsEmailVerified: d.Get(isEmailVerifiedVar).(bool),
+			})
+			if err != nil {
+				return diag.Errorf("failed to update human email: %v", err)
+			}
 		}
 	}
 
 	if d.HasChanges(phoneVar, isPhoneVerifiedVar) {
-		_, err = client.UpdateHumanPhone(helper.CtxWithOrgID(ctx, d), &management.UpdateHumanPhoneRequest{
-			UserId:          d.Id(),
-			Phone:           d.Get(phoneVar).(string),
-			IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update human phone: %v", err)
+		oldPhone, newPhone := d.GetChange(phoneVar)
+		_, isVerifiedInConfig := d.GetOk(isPhoneVerifiedVar)
+
+		if oldPhone == newPhone && !isVerifiedInConfig {
+			// Skip update - is_phone_verified removed from config but phone unchanged
+		} else {
+			_, err = client.UpdateHumanPhone(helper.CtxWithOrgID(ctx, d), &management.UpdateHumanPhoneRequest{
+				UserId:          d.Id(),
+				Phone:           d.Get(phoneVar).(string),
+				IsPhoneVerified: d.Get(isPhoneVerifiedVar).(bool),
+			})
+			if err != nil {
+				return diag.Errorf("failed to update human phone: %v", err)
+			}
 		}
 	}
+
 	return nil
 }
 
