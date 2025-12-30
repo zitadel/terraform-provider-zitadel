@@ -12,8 +12,10 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/action/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/instance/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
+	settingsv2 "github.com/zitadel/zitadel-go/v3/pkg/client/settings/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc/codes"
@@ -115,6 +117,29 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 	}, nil
 }
 
+var securitySettingsClientLock = &sync.Mutex{}
+var securitySettingsClient *settingsv2.Client
+
+func GetSecuritySettingsClient(ctx context.Context, info *ClientInfo) (*settingsv2.Client, error) {
+	if securitySettingsClient == nil {
+		securitySettingsClientLock.Lock()
+		defer securitySettingsClientLock.Unlock()
+		if securitySettingsClient == nil {
+			client, err := settingsv2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			securitySettingsClient = client
+		}
+	}
+	return securitySettingsClient, nil
+}
+
 var actionClientLock = &sync.Mutex{}
 var actionClient *actionV2.Client
 
@@ -182,6 +207,29 @@ func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error
 		}
 	}
 	return adminClient, nil
+}
+
+var instanceClientLock = &sync.Mutex{}
+var instanceClient *instanceV2.Client
+
+func GetInstanceClient(ctx context.Context, info *ClientInfo) (*instanceV2.Client, error) {
+	if instanceClient == nil {
+		instanceClientLock.Lock()
+		defer instanceClientLock.Unlock()
+		if instanceClient == nil {
+			client, err := instanceV2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			instanceClient = client
+		}
+	}
+	return instanceClient, nil
 }
 
 func CtxWithID(ctx context.Context, d *schema.ResourceData) context.Context {

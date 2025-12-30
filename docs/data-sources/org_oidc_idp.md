@@ -43,6 +43,7 @@ output "org_oidc_idp" {
 - `is_creation_allowed` (Boolean) enabled if users are able to create a new account in ZITADEL when using an external account
 - `is_id_token_mapping` (Boolean) if true, provider information get mapped from the id token, not from the userinfo endpoint.
 - `is_linking_allowed` (Boolean) enabled if users are able to link an existing ZITADEL user with an external account
-- `issuer` (String) the issuer of the idp
+- `issuer` (String) the OIDC issuer of the identity provider
 - `name` (String) Name of the IDP
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
+- `use_pkce` (Boolean) Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.
