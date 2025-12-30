@@ -29,7 +29,7 @@ resource "zitadel_personal_access_token" "default" {
 ### Optional
 
 - `expiration_date` (String) Expiration date of the token in the RFC3339 format
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 
 ### Read-Only
 

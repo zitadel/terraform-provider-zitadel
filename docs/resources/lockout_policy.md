@@ -27,7 +27,8 @@ resource "zitadel_lockout_policy" "default" {
 
 ### Optional
 
-- `org_id` (String) ID of the organization
+- `max_otp_attempts` (Number) Maximum OTP check attempts before the account gets locked. Attempts are reset as soon as the OTP is entered correct.
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 
 ### Read-Only
 

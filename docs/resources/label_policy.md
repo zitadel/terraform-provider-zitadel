@@ -67,7 +67,7 @@ resource "zitadel_label_policy" "default" {
 - `logo_dark_path` (String)
 - `logo_hash` (String)
 - `logo_path` (String)
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `set_active` (Boolean) set the label policy active after creating/updating
 - `theme_mode` (String) theme mode, supported values: THEME_MODE_UNSPECIFIED, THEME_MODE_AUTO, THEME_MODE_DARK, THEME_MODE_LIGHT
 

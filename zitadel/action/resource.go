@@ -31,9 +31,10 @@ func GetResource() *schema.Resource {
 				Description: "",
 			},
 			timeoutVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "after which time the action will be terminated if not finished",
+				Type:             schema.TypeString,
+				Required:         true,
+				Description:      "after which time the action will be terminated if not finished",
+				DiffSuppressFunc: helper.DurationDiffSuppress,
 			},
 			allowedToFailVar: {
 				Type:        schema.TypeBool,

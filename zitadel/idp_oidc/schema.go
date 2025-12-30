@@ -5,6 +5,7 @@ import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 const (
 	IsIdTokenMappingVar = "is_id_token_mapping"
 	IssuerVar           = "issuer"
+	UsePKCEVar          = "use_pkce"
 )
 
 var (
@@ -21,11 +22,22 @@ var (
 	IssuerResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Required:    true,
-		Description: "the issuer of the idp",
+		Description: "the OIDC issuer of the identity provider",
 	}
 	IssuerDatasourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Computed:    true,
-		Description: "the issuer of the idp",
+		Description: "the OIDC issuer of the identity provider",
+	}
+	UsePKCEResourceField = &schema.Schema{
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Computed:    true,
+		Description: "Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.",
+	}
+	UsePKCEDatasourceField = &schema.Schema{
+		Type:        schema.TypeBool,
+		Computed:    true,
+		Description: "Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.",
 	}
 )
