@@ -27,6 +27,6 @@ func GetDatasource() *schema.Resource {
 				Description: "Type of the key.",
 			},
 		},
-		ReadContext: readWebKey,
+		ReadContext: read,
 	}
 }

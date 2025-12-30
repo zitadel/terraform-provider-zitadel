@@ -125,6 +125,63 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Skip the successful login page on native apps and directly redirect the user to the callback.",
 			},
+			NoneCompliantVar: {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant",
+			},
+			ComplianceProblemsVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "lists the problems for non-compliancy",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						ComplianceProblemKeyVar: {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Machine-readable identifier for the compliance problem",
+						},
+						ComplianceProblemMessageVar: {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Human-readable localized message",
+						},
+					},
+				},
+			},
+			BackChannelLogoutURIVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout",
+			},
+			LoginVersionVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						LoginV1Var: {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "Login V1",
+						},
+						LoginV2Var: {
+							Type:        schema.TypeList,
+							Computed:    true,
+							Description: "Login V2",
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									BaseURIVar: {
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "Optionally specify a base uri of the login UI. If unspecified the default URI will be used.",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		ReadContext: read,
 	}

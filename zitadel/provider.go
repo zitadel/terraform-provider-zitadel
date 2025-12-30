@@ -372,7 +372,7 @@ func Provider() *schema.Provider {
 			"zitadel_action":                             action.GetResource(),
 			"zitadel_action_target":                      action_target.GetResource(),
 			"zitadel_webkey":                             webkey.GetResource(),
-			"zitadel_active_webkey":                      active_webkey.GetActiveResource(),
+			"zitadel_active_webkey":                      active_webkey.GetResource(),
 			"zitadel_application_oidc":                   application_oidc.GetResource(),
 			"zitadel_application_api":                    application_api.GetResource(),
 			"zitadel_application_saml":                   application_saml.GetResource(),

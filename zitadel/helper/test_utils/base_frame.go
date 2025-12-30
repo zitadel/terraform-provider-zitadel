@@ -29,7 +29,7 @@ type BaseTestFrame struct {
 	ResourceType                       string
 	InstanceDomain                     string
 	TerraformName                      string
-	V6ProviderFactories                map[string]func() (tfprotov6.ProviderServer, error)
+	v6ProviderFactories                map[string]func() (tfprotov6.ProviderServer, error)
 }
 
 func NewBaseTestFrame(ctx context.Context, resourceType, domain string, jwtProfileJson []byte) (*BaseTestFrame, error) {
@@ -65,7 +65,7 @@ KEY
 		ResourceType:      resourceType,
 		InstanceDomain:    domain,
 	}
-	frame.V6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
+	frame.v6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
 		"zitadel": func() (tfprotov6.ProviderServer, error) {
 			muxServer, err := tf6muxserver.NewMuxServer(frame,
 				providerserver.NewProtocol6(zitadel.NewProviderPV6()),
@@ -99,4 +99,8 @@ func (b *BaseTestFrame) State(state *terraform.State) *terraform.InstanceState {
 		return resource.Primary
 	}
 	return &terraform.InstanceState{}
+}
+
+func (b *BaseTestFrame) V6ProviderFactories() map[string]func() (tfprotov6.ProviderServer, error) {
+	return b.v6ProviderFactories
 }

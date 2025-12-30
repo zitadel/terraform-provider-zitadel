@@ -1,5 +1,5 @@
 resource "zitadel_email_provider_http" "default" {
-	endpoint    = "https://relay.example.com/provider"
-	description = "provider description"
-	set_active  = false
+  endpoint    = "https://relay.example.com/provider"
+  description = "provider description"
+  set_active  = false
 }

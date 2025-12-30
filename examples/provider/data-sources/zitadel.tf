@@ -1,8 +1,8 @@
 data "zitadel" "default" {
-	//
+  //
 }
 
 output "token" {
-	value     = data.zitadel.default.token
-	sensitive = true
+  value     = data.zitadel.default.token
+  sensitive = true
 }

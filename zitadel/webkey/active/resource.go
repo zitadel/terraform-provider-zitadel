@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
-func GetActiveResource() *schema.Resource {
+func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the active web key.",
 		Schema: map[string]*schema.Schema{
@@ -21,10 +21,10 @@ func GetActiveResource() *schema.Resource {
 				Description: "The ID of the webkey to be active.",
 			},
 		},
-		CreateContext: createActiveWebKey,
-		ReadContext:   readActiveWebKey,
-		UpdateContext: updateActiveWebKey,
-		DeleteContext: deleteActiveWebKey,
+		CreateContext: create,
+		ReadContext:   read,
+		UpdateContext: update,
+		DeleteContext: delete,
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
 				parts := strings.Split(d.Id(), ":")
@@ -32,6 +32,9 @@ func GetActiveResource() *schema.Resource {
 					return nil, fmt.Errorf("invalid import id %q, format must be <org_id>:<key_id>", d.Id())
 				}
 				if err := d.Set(helper.OrgIDVar, parts[0]); err != nil {
+					return nil, err
+				}
+				if err := d.Set(KeyIDVar, parts[1]); err != nil {
 					return nil, err
 				}
 				d.SetId(d.Id())

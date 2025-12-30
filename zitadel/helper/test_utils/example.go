@@ -22,9 +22,6 @@ const (
 func ReadExample(t *testing.T, folder examplesFolder, exampleType string) (string, hcl.Attributes) {
 	fileName := strings.Replace(exampleType, "zitadel_", "", 1) + ".tf"
 	filePath := path.Join("..", "..", "examples", "provider", string(folder), fileName)
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		filePath = path.Join("..", "..", "..", "examples", "provider", string(folder), fileName)
-	}
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		t.Fatalf("error reading example file: %v", err)

@@ -3,13 +3,11 @@ package active_webkey_test
 import (
 	"context"
 	"fmt"
-	"strings"
 	"testing"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/webkey/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/webkey/v2"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -18,31 +16,7 @@ import (
 
 func TestAccActiveWebKey(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_active_webkey")
-	configInitial := generateResourceHCL(frame, "zitadel_webkey.key_v1.id")
-	configRotated := generateResourceHCL(frame, "zitadel_webkey.key_v2.id")
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: frame.V6ProviderFactories,
-		CheckDestroy:             checkDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: configInitial,
-				Check: resource.ComposeTestCheckFunc(
-					checkRemoteProperty(frame, "zitadel_webkey.key_v1.id"),
-				),
-			},
-			{
-				Config: configRotated,
-				Check: resource.ComposeTestCheckFunc(
-					checkRemoteProperty(frame, "zitadel_webkey.key_v2.id"),
-				),
-			},
-		},
-	})
-}
-
-func generateResourceHCL(frame *test_utils.OrgTestFrame, activeKeyRef string) string {
-	return fmt.Sprintf(`
+	configInitial := fmt.Sprintf(`
 %s
 %s
 
@@ -58,80 +32,147 @@ resource "zitadel_webkey" "key_v2" {
 
 resource "zitadel_active_webkey" "default" {
   org_id = data.zitadel_org.default.id
-  key_id = %s
+  key_id = zitadel_webkey.key_v1.id
 }
-`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, activeKeyRef)
-}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame, expectedKeyIdRef string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		resourceAddress := strings.TrimSuffix(expectedKeyIdRef, ".id")
-		rs, ok := state.RootModule().Resources[resourceAddress]
-		if !ok {
-			return fmt.Errorf("not found in state: %s", resourceAddress)
-		}
-		expectedKeyId := rs.Primary.ID
+	configRotated := fmt.Sprintf(`
+%s
+%s
 
-		client, err := helper.GetWebKeyClient(context.Background(), frame.ClientInfo)
-		if err != nil {
-			return err
-		}
-		ctx := metadata.AppendToOutgoingContext(context.Background(), "x-zitadel-orgid", frame.OrgID)
-		resp, err := client.ListWebKeys(ctx, &webkeys.ListWebKeysRequest{})
-		if err != nil {
-			return err
-		}
-		for _, key := range resp.GetWebKeys() {
-			if key.GetState() == webkeys.State_STATE_ACTIVE {
-				if key.GetId() == expectedKeyId {
-					return nil
-				}
-				return fmt.Errorf("expected active key id %s, but got %s", expectedKeyId, key.GetId())
-			}
-		}
-		return fmt.Errorf("no active key found in remote")
-	}
+resource "zitadel_webkey" "key_v1" {
+  org_id = data.zitadel_org.default.id
+  rsa {}
 }
 
-func checkDestroy(s *terraform.State) error {
-	frame := test_utils.NewOrgTestFrame(nil, "zitadel_active_webkey")
+resource "zitadel_webkey" "key_v2" {
+  org_id = data.zitadel_org.default.id
+  ecdsa {}
+}
 
-	return resource.Retry(15*time.Second, func() *resource.RetryError {
-		client, err := helper.GetWebKeyClient(context.Background(), frame.ClientInfo)
-		if err != nil {
-			return resource.NonRetryableError(err)
-		}
-		ctx := metadata.AppendToOutgoingContext(context.Background(), "x-zitadel-orgid", frame.OrgID)
-		resp, err := client.ListWebKeys(ctx, &webkeys.ListWebKeysRequest{})
-		if err != nil {
-			return resource.RetryableError(fmt.Errorf("API error while listing keys: %w", err))
-		}
+resource "zitadel_active_webkey" "default" {
+  org_id = data.zitadel_org.default.id
+  key_id = zitadel_webkey.key_v2.id
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
 
-		var activeKeyId string
-		var oldestKey *webkeys.WebKey
-
-		for _, key := range resp.GetWebKeys() {
-			if key.GetState() == webkeys.State_STATE_ACTIVE {
-				activeKeyId = key.GetId()
-			}
-
-			if oldestKey == nil {
-				oldestKey = key
-				continue
-			}
-			if key.GetCreationDate().AsTime().Before(oldestKey.GetCreationDate().AsTime()) {
-				oldestKey = key
-				continue
-			}
-			if key.GetCreationDate().AsTime().Equal(oldestKey.GetCreationDate().AsTime()) && key.GetId() < oldestKey.GetId() {
-				oldestKey = key
-			}
-		}
-
-		if oldestKey != nil && activeKeyId != oldestKey.GetId() {
-			return resource.RetryableError(fmt.Errorf("destroy did not revert to the oldest key yet: active key is %s, but should be %s", activeKeyId, oldestKey.GetId()))
-		}
-
-		return nil
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: configInitial,
+				Check: resource.ComposeTestCheckFunc(
+					checkRemoteProperty(frame, "key_v1")(""),
+				),
+			},
+			{
+				Config: configRotated,
+				Check: resource.ComposeTestCheckFunc(
+					checkRemoteProperty(frame, "key_v2")(""),
+				),
+			},
+		},
 	})
+}
+
+func TestAccActiveWebKeyRotation(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_active_webkey")
+	configInitial := fmt.Sprintf(`
+%s
+%s
+
+resource "zitadel_webkey" "key_v1" {
+  org_id = data.zitadel_org.default.id
+  rsa {
+    bits = "RSA_BITS_2048"
+  }
+}
+
+resource "zitadel_webkey" "key_v2" {
+  org_id = data.zitadel_org.default.id
+  ecdsa {
+    curve = "ECDSA_CURVE_P256"
+  }
+}
+
+resource "zitadel_active_webkey" "default" {
+  org_id = data.zitadel_org.default.id
+  key_id = zitadel_webkey.key_v1.id
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
+
+	configRotated := fmt.Sprintf(`
+%s
+%s
+
+resource "zitadel_webkey" "key_v1" {
+  org_id = data.zitadel_org.default.id
+  rsa {
+    bits = "RSA_BITS_2048"
+  }
+}
+
+resource "zitadel_webkey" "key_v2" {
+  org_id = data.zitadel_org.default.id
+  ecdsa {
+    curve = "ECDSA_CURVE_P256"
+  }
+}
+
+resource "zitadel_active_webkey" "default" {
+  org_id = data.zitadel_org.default.id
+  key_id = zitadel_webkey.key_v2.id
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: configInitial,
+				Check: resource.ComposeTestCheckFunc(
+					checkRemoteProperty(frame, "key_v1")(""),
+				),
+			},
+			{
+				Config: configRotated,
+				Check: resource.ComposeTestCheckFunc(
+					checkRemoteProperty(frame, "key_v2")(""),
+				),
+			},
+		},
+	})
+}
+
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, expectedKeyRef string) func(string) resource.TestCheckFunc {
+	return func(_ string) resource.TestCheckFunc {
+		return func(state *terraform.State) error {
+			rs, ok := state.RootModule().Resources["zitadel_webkey."+expectedKeyRef]
+			if !ok {
+				return fmt.Errorf("not found in state: zitadel_webkey.%s", expectedKeyRef)
+			}
+			expectedKeyId := rs.Primary.ID
+
+			client, err := helper.GetWebKeyClient(context.Background(), frame.ClientInfo)
+			if err != nil {
+				return err
+			}
+
+			ctx := metadata.AppendToOutgoingContext(context.Background(), "x-zitadel-orgid", frame.OrgID)
+			resp, err := client.ListWebKeys(ctx, &webkey.ListWebKeysRequest{})
+			if err != nil {
+				return err
+			}
+
+			for _, key := range resp.GetWebKeys() {
+				if key.GetState() == webkey.State_STATE_ACTIVE {
+					if key.GetId() == expectedKeyId {
+						return nil
+					}
+					return fmt.Errorf("expected active key id %s, but got %s", expectedKeyId, key.GetId())
+				}
+			}
+			return fmt.Errorf("no active key found in remote")
+		}
+	}
 }

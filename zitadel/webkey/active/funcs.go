@@ -14,52 +14,43 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
-func createActiveWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started create active_webkey")
+func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started create")
+
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
+
 	client, err := helper.GetWebKeyClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	keyID := d.Get(KeyIDVar).(string)
 
-	// Validate key exists
-	resp, err := client.ListWebKeys(helper.CtxWithOrgID(ctx, d), &webkey.ListWebKeysRequest{})
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	found := false
-	for _, key := range resp.GetWebKeys() {
-		if key.GetId() == keyID {
-			found = true
-			break
-		}
-	}
-	if !found {
-		return diag.Errorf("webkey %s does not exist", keyID)
-	}
+	keyID := d.Get(KeyIDVar).(string)
 
 	_, err = client.ActivateWebKey(helper.CtxWithOrgID(ctx, d), &webkey.ActivateWebKeyRequest{Id: keyID})
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	d.SetId(fmt.Sprintf("%s:%s", d.Get(helper.OrgIDVar).(string), keyID))
 	return nil
 }
 
-func readActiveWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started read active_webkey")
+func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started read")
+
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
+
 	client, err := helper.GetWebKeyClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	resp, err := client.ListWebKeys(helper.CtxWithOrgID(ctx, d), &webkey.ListWebKeysRequest{})
 	if err != nil {
 		st, ok := status.FromError(err)
@@ -69,6 +60,7 @@ func readActiveWebKey(ctx context.Context, d *schema.ResourceData, m interface{}
 		}
 		return diag.FromErr(err)
 	}
+
 	for _, key := range resp.GetWebKeys() {
 		if key.State == webkey.State_STATE_ACTIVE {
 			if err := d.Set(KeyIDVar, key.Id); err != nil {
@@ -78,58 +70,49 @@ func readActiveWebKey(ctx context.Context, d *schema.ResourceData, m interface{}
 			return nil
 		}
 	}
+
 	d.SetId("")
 	return nil
 }
 
-func updateActiveWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started update active_webkey")
-	return createActiveWebKey(ctx, d, m)
+func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started update")
+	return create(ctx, d, m)
 }
 
-func deleteActiveWebKey(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started delete active_webkey: reverting to default key")
+func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started delete: reverting to initial key")
+
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
+
 	client, err := helper.GetWebKeyClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	resp, err := client.ListWebKeys(helper.CtxWithOrgID(ctx, d), &webkey.ListWebKeysRequest{})
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	var oldestKey *webkey.WebKey
 	for _, key := range resp.GetWebKeys() {
-		if oldestKey == nil {
-			oldestKey = key
-			continue
-		}
-		if key.GetCreationDate().AsTime().Before(oldestKey.GetCreationDate().AsTime()) {
-			oldestKey = key
-			continue
-		}
-		if key.GetCreationDate().AsTime().Equal(oldestKey.GetCreationDate().AsTime()) && key.GetId() < oldestKey.GetId() {
-			oldestKey = key
-		}
-	}
-
-	if oldestKey == nil {
-		tflog.Info(ctx, "no keys found, nothing to revert to")
-		return nil
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("re-activating default key with id %s", oldestKey.GetId()))
-	_, err = client.ActivateWebKey(helper.CtxWithOrgID(ctx, d), &webkey.ActivateWebKeyRequest{Id: oldestKey.GetId()})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if ok && st.Code() == codes.FailedPrecondition {
+		if key.GetState() == webkey.State_STATE_INITIAL {
+			tflog.Info(ctx, fmt.Sprintf("activating initial key with id %s", key.GetId()))
+			_, err = client.ActivateWebKey(helper.CtxWithOrgID(ctx, d), &webkey.ActivateWebKeyRequest{Id: key.GetId()})
+			if err != nil {
+				st, ok := status.FromError(err)
+				if ok && st.Code() == codes.FailedPrecondition {
+					return nil
+				}
+				return diag.FromErr(err)
+			}
 			return nil
 		}
-		return diag.FromErr(err)
 	}
+
+	tflog.Info(ctx, "no initial key found, leaving current active key unchanged")
 	return nil
 }
