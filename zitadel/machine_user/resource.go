@@ -14,6 +14,13 @@ func GetResource() *schema.Resource {
 		Description: "Resource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
+			UserIDVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "The ID of this resource. Optionally set a custom unique ID. If omitted, ZITADEL will generate one.",
+			},
 			userStateVar: {
 				Type:        schema.TypeString,
 				Computed:    true,

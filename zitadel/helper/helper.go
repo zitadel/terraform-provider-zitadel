@@ -149,3 +149,12 @@ func EnumValueMap(enum map[int32]string) map[string]int32 {
 	}
 	return values
 }
+
+// StringPtr returns a pointer to the provided string.
+// Returns nil if the string is empty.
+func StringPtr(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
+}
