@@ -6,7 +6,7 @@ data "zitadel_projects" "default" {
 
 data "zitadel_project" "default" {
   for_each = toset(data.zitadel_projects.default.project_ids)
-  id       = each.value
+  id = each.value
 }
 
 output "project_names" {
