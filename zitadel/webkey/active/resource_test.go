@@ -58,75 +58,7 @@ resource "zitadel_active_webkey" "default" {
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
-		Steps: []resource.TestStep{
-			{
-				Config: configInitial,
-				Check: resource.ComposeTestCheckFunc(
-					checkRemoteProperty(frame, "key_v1")(""),
-				),
-			},
-			{
-				Config: configRotated,
-				Check: resource.ComposeTestCheckFunc(
-					checkRemoteProperty(frame, "key_v2")(""),
-				),
-			},
-		},
-	})
-}
-
-func TestAccActiveWebKeyRotation(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_active_webkey")
-	configInitial := fmt.Sprintf(`
-%s
-%s
-
-resource "zitadel_webkey" "key_v1" {
-  org_id = data.zitadel_org.default.id
-  rsa {
-    bits = "RSA_BITS_2048"
-  }
-}
-
-resource "zitadel_webkey" "key_v2" {
-  org_id = data.zitadel_org.default.id
-  ecdsa {
-    curve = "ECDSA_CURVE_P256"
-  }
-}
-
-resource "zitadel_active_webkey" "default" {
-  org_id = data.zitadel_org.default.id
-  key_id = zitadel_webkey.key_v1.id
-}
-`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
-
-	configRotated := fmt.Sprintf(`
-%s
-%s
-
-resource "zitadel_webkey" "key_v1" {
-  org_id = data.zitadel_org.default.id
-  rsa {
-    bits = "RSA_BITS_2048"
-  }
-}
-
-resource "zitadel_webkey" "key_v2" {
-  org_id = data.zitadel_org.default.id
-  ecdsa {
-    curve = "ECDSA_CURVE_P256"
-  }
-}
-
-resource "zitadel_active_webkey" "default" {
-  org_id = data.zitadel_org.default.id
-  key_id = zitadel_webkey.key_v2.id
-}
-`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		CheckDestroy:             nil,
 		Steps: []resource.TestStep{
 			{
 				Config: configInitial,

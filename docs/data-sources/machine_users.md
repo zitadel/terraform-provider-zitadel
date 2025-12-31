@@ -20,7 +20,7 @@ data "zitadel_machine_users" "default" {
 
 data "zitadel_machine_user" "default" {
   for_each = toset(data.zitadel_machine_users.default.user_ids)
-  id       = each.value
+  id = each.value
 }
 
 output "user_names" {

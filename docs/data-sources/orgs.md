@@ -22,7 +22,7 @@ data "zitadel_orgs" "default" {
 
 data "zitadel_org" "default" {
   for_each = toset(data.zitadel_orgs.default.ids)
-  id       = each.value
+  id = each.value
 }
 
 output "org_names" {
