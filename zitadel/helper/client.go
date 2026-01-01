@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
 	settingsv2 "github.com/zitadel/zitadel-go/v3/pkg/client/settings/v2"
+	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/webkey/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc/codes"
@@ -161,6 +162,29 @@ func GetActionClient(ctx context.Context, info *ClientInfo) (*actionV2.Client, e
 		}
 	}
 	return actionClient, nil
+}
+
+var webkeyClientLock = &sync.Mutex{}
+var webkeyClient *webkeys.Client
+
+func GetWebKeyClient(ctx context.Context, info *ClientInfo) (*webkeys.Client, error) {
+	if webkeyClient == nil {
+		webkeyClientLock.Lock()
+		defer webkeyClientLock.Unlock()
+		if webkeyClient == nil {
+			client, err := webkeys.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			webkeyClient = client
+		}
+	}
+	return webkeyClient, nil
 }
 
 var mgmtClientLock = &sync.Mutex{}
