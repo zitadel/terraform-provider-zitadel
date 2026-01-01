@@ -40,10 +40,6 @@ func GetResource() *schema.Resource {
 				},
 				Required:    true,
 				Description: "Response type" + helper.DescriptionEnumValuesList(app.OIDCResponseType_name),
-				/* Not yet supported
-				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return enumValuesValidation(applicationAuthMethodTypeVar, value, app.OIDCResponseType_value)
-				},*/
 			},
 			grantTypesVar: {
 				Type: schema.TypeList,
@@ -52,10 +48,6 @@ func GetResource() *schema.Resource {
 				},
 				Required:    true,
 				Description: "Grant types" + helper.DescriptionEnumValuesList(app.OIDCGrantType_name),
-				/* Not yet supported
-				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return enumValuesValidation(applicationGrantTypesVar, value, app.OIDCGrantType_value)
-				},*/
 			},
 			appTypeVar: {
 				Type:        schema.TypeString,
@@ -120,10 +112,11 @@ func GetResource() *schema.Resource {
 				Description: "Token userinfo assertion",
 			},
 			clockSkewVar: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Clockskew",
-				Default:     "0s",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Clockskew",
+				Default:          "0s",
+				DiffSuppressFunc: helper.DurationDiffSuppress,
 			},
 			additionalOriginsVar: {
 				Type: schema.TypeList,
@@ -149,6 +142,69 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Skip the successful login page on native apps and directly redirect the user to the callback.",
+			},
+			NoneCompliantVar: {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant",
+			},
+			ComplianceProblemsVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "lists the problems for non-compliancy",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						ComplianceProblemKeyVar: {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Machine-readable identifier for the compliance problem",
+						},
+						ComplianceProblemMessageVar: {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Human-readable localized message",
+						},
+					},
+				},
+			},
+			BackChannelLogoutURIVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout",
+			},
+			LoginVersionVar: {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				MaxItems:    1,
+				Description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						LoginV1Var: {
+							Type:          schema.TypeBool,
+							Optional:      true,
+							Description:   "Login V1",
+							ConflictsWith: []string{LoginVersionVar + ".0." + LoginV2Var},
+						},
+						LoginV2Var: {
+							Type:          schema.TypeList,
+							Optional:      true,
+							MaxItems:      1,
+							Description:   "Login V2",
+							ConflictsWith: []string{LoginVersionVar + ".0." + LoginV1Var},
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									BaseURIVar: {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "Optionally specify a base uri of the login UI. If unspecified the default URI will be used.",
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 		DeleteContext: delete,

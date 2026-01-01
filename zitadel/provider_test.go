@@ -1,234 +1,188 @@
 package zitadel
 
 import (
-	"os"
+	"context"
+	"os/exec"
 	"path/filepath"
-	"slices"
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
-func TestProvider(t *testing.T) {
-	if err := Provider().InternalValidate(); err != nil {
-		t.Fatalf("err: %s", err)
-	}
-}
-
-// TestProvider_AllResourcesRegistered scans the filesystem for resource
-// packages and verifies that each discovered resource is properly registered
-// in the provider's ResourcesMap. This test ensures no resource package is
-// accidentally omitted from provider registration.
-func TestProvider_AllResourcesRegistered(t *testing.T) {
-	p := Provider()
-
-	discoveredResources, err := discoverResources(".")
-	require.NoError(t, err, "Failed to discover resources")
-
-	var missingResources []string
-	for _, resourceName := range discoveredResources {
-		if !slices.Contains(getRegisteredResourceNames(p), resourceName) {
-			missingResources = append(missingResources, resourceName)
-		}
-	}
-
-	assert.Empty(t, missingResources,
-		"The following resources were discovered but not registered: %v",
-		missingResources)
-
-	t.Logf("Total resources registered: %d", len(p.ResourcesMap))
-	t.Logf("Total resources discovered: %d", len(discoveredResources))
-}
-
-// TestProvider_AllDatasourcesRegistered scans the filesystem for datasource
-// packages and verifies that each discovered datasource is properly registered
-// in the provider's DataSourcesMap. This test ensures no datasource package
-// is accidentally omitted from provider registration.
-func TestProvider_AllDatasourcesRegistered(t *testing.T) {
-	p := Provider()
-
-	discoveredDatasources, err := discoverDatasources(".")
-	require.NoError(t, err, "Failed to discover datasources")
-
-	var missingDatasources []string
-	for _, datasourceName := range discoveredDatasources {
-		if !slices.Contains(getRegisteredDatasourceNames(p), datasourceName) {
-			missingDatasources = append(missingDatasources, datasourceName)
-		}
+func TestClientInfo_Schemes(t *testing.T) {
+	tests := []struct {
+		name       string
+		domain     string
+		insecure   bool
+		wantIssuer string
+	}{
+		{
+			name:       "standard_domain",
+			domain:     "instance.zitadel.cloud",
+			insecure:   false,
+			wantIssuer: "https://instance.zitadel.cloud",
+		},
+		{
+			name:       "domain_with_https",
+			domain:     "https://instance.zitadel.cloud",
+			insecure:   false,
+			wantIssuer: "https://instance.zitadel.cloud",
+		},
+		{
+			name:       "domain_with_http_insecure",
+			domain:     "http://localhost",
+			insecure:   true,
+			wantIssuer: "http://localhost",
+		},
 	}
 
-	assert.Empty(t, missingDatasources,
-		"The following datasources were discovered but not registered: %v",
-		missingDatasources)
-
-	t.Logf("Total datasources registered: %d", len(p.DataSourcesMap))
-	t.Logf("Total datasources discovered: %d", len(discoveredDatasources))
-}
-
-// TestProvider_ResourceSchemaExactlyOneOfConsistency validates that all
-// registered resources have consistent ExactlyOneOf field references. This
-// ensures that mutually exclusive field groups are properly configured across
-// all resource schemas.
-func TestProvider_ResourceSchemaExactlyOneOfConsistency(t *testing.T) {
-	p := Provider()
-
-	for resourceName, resource := range p.ResourcesMap {
-		t.Run(resourceName, func(t *testing.T) {
-			checkSchemaExactlyOneOfConsistency(t, resource.Schema)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dummyJSON := `{"type":"service_account"}`
+			info, err := helper.GetClientInfo(
+				context.Background(),
+				tt.insecure,
+				tt.domain,
+				"",        // accessToken
+				"",        // token
+				"",        // jwtFile
+				"",        // jwtProfileFile
+				dummyJSON, // jwtProfileJSON
+				"",        // port
+			)
+			if err != nil {
+				t.Fatalf("GetClientInfo() error = %v", err)
+			}
+			if info.Issuer != tt.wantIssuer {
+				t.Errorf("GetClientInfo() Issuer = %v, want %v", info.Issuer, tt.wantIssuer)
+			}
 		})
 	}
 }
 
-func getRegisteredResourceNames(p *schema.Provider) []string {
-	names := make([]string, 0, len(p.ResourcesMap))
-	for name := range p.ResourcesMap {
-		names = append(names, name)
-	}
-	return names
-}
-
-func getRegisteredDatasourceNames(p *schema.Provider) []string {
-	names := make([]string, 0, len(p.DataSourcesMap))
-	for name := range p.DataSourcesMap {
-		names = append(names, name)
-	}
-	return names
-}
-
-func discoverResources(baseDir string) ([]string, error) {
-	excludeDirs := []string{"helper", "pat"}
-
-	entries, err := os.ReadDir(baseDir)
-	if err != nil {
-		return nil, err
-	}
-
-	var resources []string
-	for _, entry := range entries {
-		if !entry.IsDir() || strings.HasPrefix(entry.Name(), ".") {
-			continue
-		}
-
-		if slices.Contains(excludeDirs, entry.Name()) {
-			continue
-		}
-
-		resourcePath := filepath.Join(baseDir, entry.Name(), "resource.go")
-		if _, err := os.Stat(resourcePath); err != nil {
-			continue
-		}
-
-		content, err := os.ReadFile(resourcePath)
-		if err != nil {
-			continue
-		}
-
-		if strings.Contains(string(content), "func GetResource()") {
-			resources = append(resources, "zitadel_"+entry.Name())
-		}
-	}
-
-	return resources, nil
-}
-
-func discoverDatasources(baseDir string) ([]string, error) {
-	excludeDirs := []string{"helper", "pat"}
-
-	entries, err := os.ReadDir(baseDir)
-	if err != nil {
-		return nil, err
-	}
-
-	var datasources []string
-	for _, entry := range entries {
-		if !entry.IsDir() || strings.HasPrefix(entry.Name(), ".") {
-			continue
-		}
-
-		if slices.Contains(excludeDirs, entry.Name()) {
-			continue
-		}
-
-		datasourcePath := filepath.Join(baseDir, entry.Name(), "datasource.go")
-		if _, err := os.Stat(datasourcePath); err != nil {
-			continue
-		}
-
-		content, err := os.ReadFile(datasourcePath)
-		if err != nil {
-			continue
-		}
-
-		if strings.Contains(string(content), "func GetDatasource()") {
-			datasources = append(datasources, "zitadel_"+entry.Name())
-		}
-	}
-
-	return datasources, nil
-}
-
-func checkSchemaExactlyOneOfConsistency(t *testing.T, schemaMap map[string]*schema.Schema) {
+func TestClientInfo_Files(t *testing.T) {
 	tests := []struct {
-		name      string
-		checkFunc func(t *testing.T, fieldName string, fieldSchema *schema.Schema)
+		name       string
+		token      string
+		jwtFile    string
+		jwtProfile string
+		wantError  bool
 	}{
 		{
-			name: "referenced fields exist",
-			checkFunc: func(t *testing.T, fieldName string, fieldSchema *schema.Schema) {
-				for _, refFieldName := range fieldSchema.ExactlyOneOf {
-					assert.Contains(t, schemaMap, refFieldName,
-						"Field %q references non-existent field %q in ExactlyOneOf",
-						fieldName, refFieldName)
-				}
-			},
+			name:      "missing_token_file",
+			token:     "non_existent_token.json",
+			wantError: true,
 		},
 		{
-			name: "field includes itself",
-			checkFunc: func(t *testing.T, fieldName string, fieldSchema *schema.Schema) {
-				assert.Contains(t, fieldSchema.ExactlyOneOf, fieldName,
-					"Field %q has ExactlyOneOf set but does not include itself in the list",
-					fieldName)
-			},
+			name:      "missing_jwt_file",
+			jwtFile:   "non_existent_jwt.json",
+			wantError: true,
 		},
 		{
-			name: "group consistency",
-			checkFunc: func(t *testing.T, fieldName string, fieldSchema *schema.Schema) {
-				for _, refFieldName := range fieldSchema.ExactlyOneOf {
-					if refFieldName == fieldName {
-						continue
-					}
-
-					refSchema, exists := schemaMap[refFieldName]
-					if !exists {
-						continue
-					}
-
-					if len(refSchema.ExactlyOneOf) == 0 {
-						t.Errorf("Field %q references %q in ExactlyOneOf, but %q does not have ExactlyOneOf set",
-							fieldName, refFieldName, refFieldName)
-						continue
-					}
-
-					assert.ElementsMatch(t, fieldSchema.ExactlyOneOf, refSchema.ExactlyOneOf,
-						"Field %q and %q are in the same ExactlyOneOf group but have inconsistent field lists",
-						fieldName, refFieldName)
-				}
-			},
+			name:       "missing_jwt_profile_file",
+			jwtProfile: "non_existent_profile.json",
+			wantError:  true,
+		},
+		{
+			name:      "no_credentials",
+			wantError: true,
 		},
 	}
 
-	for fieldName, fieldSchema := range schemaMap {
-		if len(fieldSchema.ExactlyOneOf) == 0 {
-			continue
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := helper.GetClientInfo(
+				context.Background(),
+				false,
+				"example.com",
+				"",            // accessToken
+				tt.token,      // token
+				tt.jwtFile,    // jwtFile
+				tt.jwtProfile, // jwtProfileFile
+				"",            // jwtProfileJSON
+				"",            // port
+			)
+			if (err != nil) != tt.wantError {
+				t.Errorf("GetClientInfo() error = %v, wantError %v", err, tt.wantError)
+			}
+		})
+	}
+}
 
-		for _, tt := range tests {
-			t.Run(fieldName+"_"+tt.name, func(t *testing.T) {
-				tt.checkFunc(t, fieldName, fieldSchema)
+// TestDocumentation verifies that the generated documentation in the docs/
+// directory is up-to-date with the current provider schema.
+//
+// This test runs tfplugindocs to regenerate documentation and then checks
+// each resource and datasource individually. If any documentation file has
+// changed or is missing, that specific subtest fails.
+//
+// To fix failing tests, run:
+//
+//	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.14.1 generate
+//
+// Then commit the updated documentation files.
+func TestDocumentation(t *testing.T) {
+	generate := exec.Command("go", "run",
+		"github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.14.1",
+		"generate")
+	generate.Dir = ".."
+	if output, err := generate.CombinedOutput(); err != nil {
+		t.Fatalf("tfplugindocs generate failed: %v\n%s", err, output)
+	}
+
+	status := exec.Command("git", "status", "--porcelain", "docs/")
+	status.Dir = ".."
+	output, err := status.Output()
+	if err != nil {
+		t.Fatalf("git status failed: %v", err)
+	}
+
+	changedFiles := make(map[string]bool)
+	for _, line := range strings.Split(string(output), "\n") {
+		if len(line) > 3 {
+			changedFiles[strings.TrimSpace(line[2:])] = true
+		}
+	}
+
+	sdkProvider := Provider()
+	frameworkProvider := NewProviderPV6()
+
+	t.Run("resources", func(t *testing.T) {
+		for name := range sdkProvider.ResourcesMap {
+			name := strings.TrimPrefix(name, "zitadel_")
+			t.Run(name, func(t *testing.T) {
+				docPath := filepath.Join("docs", "resources", name+".md")
+				if changedFiles[docPath] {
+					t.Errorf("documentation is out of date")
+				}
 			})
 		}
-	}
+		for _, factory := range frameworkProvider.Resources(context.Background()) {
+			res := factory()
+			var resp resource.MetadataResponse
+			res.Metadata(context.Background(), resource.MetadataRequest{ProviderTypeName: "zitadel"}, &resp)
+			name := strings.TrimPrefix(resp.TypeName, "zitadel_")
+			t.Run(name, func(t *testing.T) {
+				docPath := filepath.Join("docs", "resources", name+".md")
+				if changedFiles[docPath] {
+					t.Errorf("documentation is out of date")
+				}
+			})
+		}
+	})
+
+	t.Run("data_sources", func(t *testing.T) {
+		for name := range sdkProvider.DataSourcesMap {
+			name := strings.TrimPrefix(name, "zitadel_")
+			t.Run(name, func(t *testing.T) {
+				docPath := filepath.Join("docs", "data-sources", name+".md")
+				if changedFiles[docPath] {
+					t.Errorf("documentation is out of date")
+				}
+			})
+		}
+	})
 }

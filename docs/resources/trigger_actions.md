@@ -16,7 +16,7 @@ resource "zitadel_trigger_actions" "default" {
   org_id       = data.zitadel_org.default.id
   flow_type    = "FLOW_TYPE_CUSTOMISE_TOKEN"
   trigger_type = "TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION"
-  action_ids   = [data.zitadel_action.default.id]
+  action_ids = [data.zitadel_action.default.id]
 }
 ```
 
@@ -31,7 +31,7 @@ resource "zitadel_trigger_actions" "default" {
 
 ### Optional
 
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 
 ### Read-Only
 

@@ -22,7 +22,7 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Required:    true,
-				Description: "List of roles granted, full list available here: https://zitadel.com/docs/guides/manage/console/managers#roles",
+				Description: "List of roles granted. Instance member roles must start with 'IAM_' (e.g., IAM_OWNER, IAM_OWNER_VIEWER). See https://zitadel.com/docs/guides/manage/console/managers for available roles.",
 			},
 		},
 		DeleteContext: delete,

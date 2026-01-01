@@ -17,7 +17,7 @@ resource "zitadel_org_idp_github" "default" {
   name                = "GitHub"
   client_id           = "86a165..."
   client_secret       = "*****afdbac18"
-  scopes              = ["openid", "profile", "email"]
+  scopes = ["openid", "profile", "email"]
   is_linking_allowed  = false
   is_creation_allowed = true
   is_auto_creation    = false
@@ -42,7 +42,7 @@ resource "zitadel_org_idp_github" "default" {
 
 - `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `name` (String) Name of the IDP
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 
 ### Read-Only

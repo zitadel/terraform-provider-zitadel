@@ -40,6 +40,131 @@ func TestAccAppOIDC(t *testing.T) {
 	)
 }
 
+func TestAccAppOIDC_LoginV1(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_oidc")
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
+
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency, projectDep},
+		func(property, secret string) string {
+			return fmt.Sprintf(`
+resource "zitadel_application_oidc" "default" {
+  org_id           = data.zitadel_org.default.id
+  project_id       = %q
+  name             = %q
+  redirect_uris    = ["https://localhost.com/callback"]
+  response_types   = ["OIDC_RESPONSE_TYPE_CODE"]
+  grant_types      = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
+
+  login_version {
+    login_v1 = true
+  }
+}`, projectID, property)
+		},
+		"app_login_v1_"+frame.UniqueResourcesID,
+		"app_login_v1_updated_"+frame.UniqueResourcesID,
+		"", "", "",
+		false,
+		checkRemoteProperty(frame, projectID),
+		helper.ZitadelGeneratedIdOnlyRegex,
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID), ""),
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ProjectIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientSecretVar),
+		),
+		"compliance_problems",
+	)
+}
+
+func TestAccAppOIDC_LoginV2_WithBaseURI(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_oidc")
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
+
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency, projectDep},
+		func(property, secret string) string {
+			return fmt.Sprintf(`
+resource "zitadel_application_oidc" "default" {
+  org_id           = data.zitadel_org.default.id
+  project_id       = %q
+  name             = %q
+  redirect_uris    = ["https://localhost.com/callback"]
+  response_types   = ["OIDC_RESPONSE_TYPE_CODE"]
+  grant_types      = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
+
+  login_version {
+    login_v2 {
+      base_uri = "https://custom-login.example.com"
+    }
+  }
+}`, projectID, property)
+		},
+		"app_login_v2_"+frame.UniqueResourcesID,
+		"app_login_v2_updated_"+frame.UniqueResourcesID,
+		"", "", "",
+		false,
+		checkRemoteProperty(frame, projectID),
+		helper.ZitadelGeneratedIdOnlyRegex,
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID), ""),
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ProjectIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientSecretVar),
+		),
+		"compliance_problems",
+	)
+}
+
+func TestAccAppOIDC_LoginV2_WithoutBaseURI(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_oidc")
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
+
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency, projectDep},
+		func(property, secret string) string {
+			return fmt.Sprintf(`
+resource "zitadel_application_oidc" "default" {
+  org_id           = data.zitadel_org.default.id
+  project_id       = %q
+  name             = %q
+  redirect_uris    = ["https://localhost.com/callback"]
+  response_types   = ["OIDC_RESPONSE_TYPE_CODE"]
+  grant_types      = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
+
+  login_version {
+    login_v2 {}
+  }
+}`, projectID, property)
+		},
+		"app_login_v2_default_"+frame.UniqueResourcesID,
+		"app_login_v2_default_updated_"+frame.UniqueResourcesID,
+		"", "", "",
+		false,
+		checkRemoteProperty(frame, projectID),
+		helper.ZitadelGeneratedIdOnlyRegex,
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID), ""),
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ProjectIDVar),
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientIDVar),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_oidc.ClientSecretVar),
+		),
+		"compliance_problems", "login_version",
+	)
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

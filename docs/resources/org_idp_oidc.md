@@ -17,7 +17,7 @@ resource "zitadel_org_idp_oidc" "default" {
   name                = "My Generic OIDC IDP"
   client_id           = "a_client_id"
   client_secret       = "a_client_secret"
-  scopes              = ["openid", "profile", "email"]
+  scopes = ["openid", "profile", "email"]
   issuer              = "https://example.com"
   is_linking_allowed  = false
   is_creation_allowed = true
@@ -40,14 +40,15 @@ resource "zitadel_org_idp_oidc" "default" {
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
 - `is_id_token_mapping` (Boolean) if true, provider information get mapped from the id token, not from the userinfo endpoint
 - `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
-- `issuer` (String) the issuer of the idp
+- `issuer` (String) the OIDC issuer of the identity provider
 
 ### Optional
 
 - `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `name` (String) Name of the IDP
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
+- `use_pkce` (Boolean) Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.
 
 ### Read-Only
 

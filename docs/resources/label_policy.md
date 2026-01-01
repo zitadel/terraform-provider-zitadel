@@ -25,15 +25,15 @@ resource "zitadel_label_policy" "default" {
   font_color_dark        = "#ffffff"
   disable_watermark      = false
   set_active             = true
-  logo_hash              = filemd5("/path/to/logo.jpg")
+  logo_hash = filemd5("/path/to/logo.jpg")
   logo_path              = "/path/to/logo.jpg"
-  logo_dark_hash         = filemd5("/path/to/logo_dark.jpg")
+  logo_dark_hash = filemd5("/path/to/logo_dark.jpg")
   logo_dark_path         = "/path/to/logo_dark.jpg"
-  icon_hash              = filemd5("/path/to/icon.jpg")
+  icon_hash = filemd5("/path/to/icon.jpg")
   icon_path              = "/path/to/icon.jpg"
-  icon_dark_hash         = filemd5("/path/to/icon_dark.jpg")
+  icon_dark_hash = filemd5("/path/to/icon_dark.jpg")
   icon_dark_path         = "/path/to/icon_dark.jpg"
-  font_hash              = filemd5("/path/to/font.tff")
+  font_hash = filemd5("/path/to/font.tff")
   font_path              = "/path/to/font.tff"
   theme_mode             = "THEME_MODE_DARK"
 }
@@ -67,7 +67,7 @@ resource "zitadel_label_policy" "default" {
 - `logo_dark_path` (String)
 - `logo_hash` (String)
 - `logo_path` (String)
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `set_active` (Boolean) set the label policy active after creating/updating
 - `theme_mode` (String) theme mode, supported values: THEME_MODE_UNSPECIFIED, THEME_MODE_AUTO, THEME_MODE_DARK, THEME_MODE_LIGHT
 
