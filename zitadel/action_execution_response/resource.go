@@ -27,7 +27,7 @@ func GetResource() *schema.Resource {
 				},
 				ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
 					v := i.(string)
-					if !regexp.MustCompile(`^/[\w./]+$`).MatchString(v) {
+					if !regexp.MustCompile(`^/[\w.]+/[\w]+$`).MatchString(v) {
 						return diag.Errorf("invalid method: %s. Must start with / and contain only letters, numbers, dots, slashes, and underscores", v)
 					}
 					return nil

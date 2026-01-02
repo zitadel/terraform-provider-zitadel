@@ -25,7 +25,7 @@ func TestAccEmailHttpProvider(t *testing.T) {
 		exampleProperty, "https://relay.example.com/test",
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		test_utils.ChainImportStateIdFuncs(
@@ -35,7 +35,7 @@ func TestAccEmailHttpProvider(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetEmailProviderById(frame, &admin.GetEmailProviderByIdRequest{Id: frame.State(state).ID})
