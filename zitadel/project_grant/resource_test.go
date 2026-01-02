@@ -32,9 +32,9 @@ func TestAccProjectGrant(t *testing.T) {
 		exampleProperty, updatedProperty,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame, projectID),
+		checkRemoteProperty(frame, projectID),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant.ProjectIDVar),
@@ -43,7 +43,7 @@ func TestAccProjectGrant(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, projectID string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetProjectGrantByID(frame, &management.GetProjectGrantByIDRequest{

@@ -30,9 +30,9 @@ func TestAccUserMetadata(t *testing.T) {
 		exampleProperty, updatedProperty,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame, userID, keyProperty),
+		checkRemoteProperty(frame, userID, keyProperty),
 		regexp.MustCompile(fmt.Sprintf(`^%s_%s$`, helper.ZitadelGeneratedIdPattern, keyProperty)),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID, keyProperty), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, userID, keyProperty), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_metadata.UserIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_metadata.KeyVar),
@@ -41,7 +41,7 @@ func TestAccUserMetadata(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, userID, key string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, userID, key string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetUserMetadata(frame, &management.GetUserMetadataRequest{

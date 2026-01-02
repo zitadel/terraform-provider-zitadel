@@ -39,14 +39,14 @@ resource "zitadel_default_security_settings" "default" {
 		true, false,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		regexp.MustCompile(`^default_security_settings$`),
 		test_utils.CheckNothing,
 		test_utils.ImportNothing,
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {
 	return func(expect bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			client, err := helper.GetSecuritySettingsClient(context.Background(), frame.ClientInfo)

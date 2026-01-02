@@ -38,7 +38,7 @@ func TestAccDefaultLabelPolicy(t *testing.T) {
 		exampleProperty, "#5469d3",
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		test_utils.ImportNothing,
@@ -56,7 +56,7 @@ func TestAccDefaultLabelPolicy(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetLabelPolicy(frame, &admin.GetLabelPolicyRequest{})
