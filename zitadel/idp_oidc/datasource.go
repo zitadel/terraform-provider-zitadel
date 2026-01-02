@@ -22,6 +22,7 @@ func GetDatasource() *schema.Resource {
 			idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingDataSourceField,
 			IssuerVar:                      IssuerDatasourceField,
 			IsIdTokenMappingVar:            IsIdTokenMappingDatasourceField,
+			UsePKCEVar:                     UsePKCEDatasourceField,
 		},
 		ReadContext: read,
 	}

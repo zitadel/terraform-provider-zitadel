@@ -26,14 +26,14 @@ func TestAccNotificationPolicy(t *testing.T) {
 		initialProperty, updatedProperty,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		checkRemoteProperty(*frame)(true),
+		checkRemoteProperty(frame)(true),
 		test_utils.ImportOrgId(frame),
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame) func(bool) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(bool) resource.TestCheckFunc {
 	return func(expect bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetNotificationPolicy(frame, &management.GetNotificationPolicyRequest{})

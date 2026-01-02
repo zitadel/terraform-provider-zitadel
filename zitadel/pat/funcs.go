@@ -95,7 +95,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get pat")
+		return diag.Errorf("failed to get pat: %v", err)
 	}
 
 	set := map[string]interface{}{

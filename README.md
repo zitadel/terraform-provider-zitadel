@@ -15,12 +15,15 @@ Importing existing resources to the Terraform state is supported.
 ## Usage
 
 [Follow the Guide in our Docs](https://zitadel.com/docs/guides/manage/terraform/basics).
-Note that you need to create an authorized service user to access the ZITADEL APIs through the provider, as noted in the prerequisites.
+Note that you need to create an authorized service user to access the ZITADEL APIs through the provider, as noted in the
+prerequisites.
 
 ## Contributing
 
-If you find a bug or want to request a new feature, please open an [issue](https://github.com/zitadel/terraform-provider-zitadel/issues).
-Contributions to the provider are very welcome, please follow the general guidance in the [Contribution Guide](https://github.com/zitadel/terraform-provider-zitadel/blob/main/CONTRIBUTING.md).
+If you find a bug or want to request a new feature, please open
+an [issue](https://github.com/zitadel/terraform-provider-zitadel/issues).
+Contributions to the provider are very welcome, please follow the general guidance in
+the [Contribution Guide](https://github.com/zitadel/terraform-provider-zitadel/blob/main/CONTRIBUTING.md).
 
 ## Contributors
 

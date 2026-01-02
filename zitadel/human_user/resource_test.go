@@ -40,6 +40,102 @@ func TestAccHumanUser(t *testing.T) {
 	)
 }
 
+func TestAccHumanUserEmailVerifiedDrift(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_human_user")
+
+	configWithVerified := fmt.Sprintf(`%s
+resource "%s" "default" {
+	org_id            = "%s"
+	user_name         = "%s"
+	first_name        = "Test"
+	last_name         = "User"
+	email             = "test@example.com"
+	is_email_verified = true
+	initial_password  = "Password1!"
+}
+`, frame.ProviderSnippet, frame.ResourceType, frame.OrgID, frame.UniqueResourcesID)
+
+	configWithoutVerified := fmt.Sprintf(`%s
+resource "%s" "default" {
+	org_id           = "%s"
+	user_name        = "%s"
+	first_name       = "Test"
+	last_name        = "User"
+	email            = "test@example.com"
+	initial_password = "Password1!"
+}
+`, frame.ProviderSnippet, frame.ResourceType, frame.OrgID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: configWithVerified,
+			},
+			{
+				Config: configWithoutVerified,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "is_email_verified", "true"),
+				),
+			},
+			{
+				Config:             configWithoutVerified,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: false,
+			},
+		},
+	})
+}
+
+func TestAccHumanUserPhoneVerifiedDrift(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_human_user")
+
+	configWithVerified := fmt.Sprintf(`%s
+resource "%s" "default" {
+	org_id            = "%s"
+	user_name         = "%s"
+	first_name        = "Test"
+	last_name         = "User"
+	email             = "test@example.com"
+	phone             = "+1234567890"
+	is_phone_verified = true
+	initial_password  = "Password1!"
+}
+`, frame.ProviderSnippet, frame.ResourceType, frame.OrgID, frame.UniqueResourcesID)
+
+	configWithoutVerified := fmt.Sprintf(`%s
+resource "%s" "default" {
+	org_id           = "%s"
+	user_name        = "%s"
+	first_name       = "Test"
+	last_name        = "User"
+	email            = "test@example.com"
+	phone            = "+1234567890"
+	initial_password = "Password1!"
+}
+`, frame.ProviderSnippet, frame.ResourceType, frame.OrgID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: configWithVerified,
+			},
+			{
+				Config: configWithoutVerified,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "is_phone_verified", "true"),
+				),
+			},
+			{
+				Config:             configWithoutVerified,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: false,
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

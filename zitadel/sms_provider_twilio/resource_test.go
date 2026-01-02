@@ -26,7 +26,7 @@ func TestAccSMSProviderTwilio(t *testing.T) {
 		exampleProperty, "987654321",
 		sms_provider_twilio.TokenVar, exampleSecret, "updatedSecret",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		test_utils.ChainImportStateIdFuncs(
@@ -36,7 +36,7 @@ func TestAccSMSProviderTwilio(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetSMSProvider(frame, &admin.GetSMSProviderRequest{Id: frame.State(state).ID})
