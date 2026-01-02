@@ -126,6 +126,7 @@ func NewProviderPV6(option ...zitadelgo.Option) provider.Provider {
 
 type providerModel struct {
 	Insecure       types.Bool   `tfsdk:"insecure"`
+	SkipTLSVerify  types.Bool   `tfsdk:"skip_tls_verify"`
 	Domain         types.String `tfsdk:"domain"`
 	Port           types.String `tfsdk:"port"`
 	AccessToken    types.String `tfsdk:"access_token"`
@@ -152,6 +153,10 @@ func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnost
 				Optional:    true,
 				Description: helper.InsecureDescription,
 			},
+			helper.SkipTLSVerifyVar: {
+				Type:        types.BoolType,
+				Optional:    true,
+				Description: helper.SkipTLSVerifyDescription,
 			helper.AccessTokenVar: {
 				Type:        types.StringType,
 				Optional:    true,
@@ -197,6 +202,7 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 
 	info, err := helper.GetClientInfo(ctx,
 		config.Insecure.ValueBool(),
+		config.SkipTLSVerify.ValueBool(),
 		config.Domain.ValueString(),
 		config.AccessToken.ValueString(),
 		config.Token.ValueString(),
@@ -310,6 +316,10 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: helper.InsecureDescription,
 			},
+			helper.SkipTLSVerifyVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: helper.SkipTLSVerifyDescription,
 			helper.AccessTokenVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -477,6 +487,7 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 
 	clientinfo, err := helper.GetClientInfo(ctx,
 		d.Get(helper.InsecureVar).(bool),
+		d.Get(helper.SkipTLSVerifyVar).(bool),
 		d.Get(helper.DomainVar).(string),
 		d.Get(helper.AccessTokenVar).(string),
 		d.Get(helper.TokenVar).(string),
