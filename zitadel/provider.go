@@ -14,6 +14,10 @@ import (
 	zitadelgo "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_event"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_function"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_request"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_response"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_api"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_key"
@@ -261,6 +265,10 @@ func Provider() *schema.Provider {
 			"zitadel_project_roles":              project_role.ListDatasources(),
 			"zitadel_action":                     action.GetDatasource(),
 			"zitadel_action_target":              action_target.GetDatasource(),
+			"zitadel_action_execution_request":   action_execution_request.GetDatasource(),
+			"zitadel_action_execution_response":  action_execution_response.GetDatasource(),
+			"zitadel_action_execution_function":  action_execution_function.GetDatasource(),
+			"zitadel_action_execution_event":     action_execution_event.GetDatasource(),
 			"zitadel_webkey":                     webkey.GetDatasource(),
 			"zitadel_application_oidc":           application_oidc.GetDatasource(),
 			"zitadel_application_oidcs":          application_oidc.ListDatasources(),
@@ -280,7 +288,9 @@ func Provider() *schema.Provider {
 			"zitadel_idp_oauth":                  idp_oauth.GetDatasource(),
 			"zitadel_idp_oidc":                   idp_oidc.GetDatasource(),
 			"zitadel_org_jwt_idp":                org_idp_jwt.GetDatasource(),
+			"zitadel_org_idp_jwt":                org_idp_jwt.GetDatasource(),
 			"zitadel_org_oidc_idp":               org_idp_oidc.GetDatasource(),
+			"zitadel_org_idp_oidc":               org_idp_oidc.GetDatasource(),
 			"zitadel_org_idp_github":             org_idp_github.GetDatasource(),
 			"zitadel_org_idp_github_es":          org_idp_github_es.GetDatasource(),
 			"zitadel_org_idp_gitlab":             org_idp_gitlab.GetDatasource(),
@@ -383,6 +393,10 @@ func Provider() *schema.Provider {
 			"zitadel_action_target":                      action_target.GetResource(),
 			"zitadel_webkey":                             webkey.GetResource(),
 			"zitadel_active_webkey":                      active_webkey.GetResource(),
+			"zitadel_action_execution_request":           action_execution_request.GetResource(),
+			"zitadel_action_execution_response":          action_execution_response.GetResource(),
+			"zitadel_action_execution_function":          action_execution_function.GetResource(),
+			"zitadel_action_execution_event":             action_execution_event.GetResource(),
 			"zitadel_application_oidc":                   application_oidc.GetResource(),
 			"zitadel_application_api":                    application_api.GetResource(),
 			"zitadel_application_saml":                   application_saml.GetResource(),
