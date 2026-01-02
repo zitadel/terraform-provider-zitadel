@@ -30,9 +30,9 @@ func TestAccProjectRole(t *testing.T) {
 		exampleProperty, updatedProperty,
 		"", "", "",
 		true,
-		checkRemoteProperty(*frame, projectID),
+		checkRemoteProperty(frame, projectID),
 		regexp.MustCompile(fmt.Sprintf("^%s_%s_(%s|%s)$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern, exampleProperty, updatedProperty)),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_role.ProjectIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_role.KeyVar),
@@ -41,7 +41,7 @@ func TestAccProjectRole(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, projectID string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.ListProjectRoles(frame, &management.ListProjectRolesRequest{

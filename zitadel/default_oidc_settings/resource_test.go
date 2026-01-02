@@ -25,14 +25,14 @@ func TestAccDefaultOIDCSettings(t *testing.T) {
 		exampleProperty, "456h0m0s",
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		test_utils.ImportNothing,
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetOIDCSettings(frame, &admin.GetOIDCSettingsRequest{})

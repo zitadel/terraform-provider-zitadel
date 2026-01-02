@@ -31,9 +31,9 @@ func TestAccTriggerActions(t *testing.T) {
 		exampleProperty, updatedProperty,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame, flowType),
+		checkRemoteProperty(frame, flowType),
 		regexp.MustCompile(fmt.Sprintf("^%s_([A-Z_]+)_(%s|%s)$", helper.ZitadelGeneratedIdPattern, exampleProperty, updatedProperty)),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, flowType), exampleProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, flowType), exampleProperty),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, trigger_actions.FlowTypeVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, trigger_actions.TriggerTypeVar),
@@ -42,7 +42,7 @@ func TestAccTriggerActions(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, flowType string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, flowType string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			flowTypeValues := helper.EnumValueMap(trigger_actions.FlowTypes())
