@@ -12,21 +12,25 @@ func GetResource() *schema.Resource {
 			loginDefaultOrgVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "The login UI will use the settings of the default org (and not from the instance) if no organization context is set",
 			},
 			userSchemaVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.",
 			},
 			oidcTokenExchangeVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.",
 			},
 			improvedPerformanceVar: {
 				Type:     schema.TypeSet,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 					ValidateFunc: validation.StringInSlice([]string{
@@ -41,27 +45,32 @@ func GetResource() *schema.Resource {
 			oidcSingleV1SessionTerminationVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.",
 			},
 			enableBackChannelLogoutVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "If the flag is enabled, you'll be able to use the OIDC Back-Channel Logout to be notified in your application about terminated user sessions.",
 			},
 			loginV2Var: {
 				Type:     schema.TypeList,
 				Optional: true,
+				Computed: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						loginV2RequiredVar: {
 							Type:        schema.TypeBool,
-							Required:    true,
+							Optional:    true,
+							Computed:    true,
 							Description: "Require that all users must use the new login UI. If enabled, all users will be redirected to the login V2 regardless of the application's preference.",
 						},
 						loginV2BaseURIVar: {
 							Type:        schema.TypeString,
 							Optional:    true,
+							Computed:    true,
 							Description: "Optionally specify a base uri of the login UI. If unspecified the default URI will be used.",
 						},
 					},
@@ -71,6 +80,7 @@ func GetResource() *schema.Resource {
 			permissionCheckV2Var: {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "Enable a newer, more performant, permission check used for v2 and v3 resource based APIs.",
 			},
 		},

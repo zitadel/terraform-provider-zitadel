@@ -35,12 +35,9 @@ Resource representing the feature flags configuration for an instance.
 <a id="nestedblock--login_v2"></a>
 ### Nested Schema for `login_v2`
 
-Required:
-
-- `required` (Boolean) Require that all users must use the new login UI. If enabled, all users will be redirected to the login V2 regardless of the application's preference.
-
 Optional:
 
 - `base_uri` (String) Optionally specify a base uri of the login UI. If unspecified the default URI will be used.
+- `required` (Boolean) Require that all users must use the new login UI. If enabled, all users will be redirected to the login V2 regardless of the application's preference.
 
 

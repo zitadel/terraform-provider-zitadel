@@ -1,7 +1,7 @@
-// zitadel/instance_features/resource_test.go
 package instance_features_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -19,18 +19,31 @@ resource "zitadel_instance_features" "default" {
 }
 	`
 
+	resourceExampleUpdated := `
+resource "zitadel_instance_features" "default" {
+	login_default_org = false
+	user_schema = true
+}
+	`
+
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		nil,
-		test_utils.ReplaceAll(resourceExample, "", ""),
-		"", "",
+		func(property, secret string) string {
+			if property == resourceExample {
+				return resourceExample
+			}
+			return resourceExampleUpdated
+		},
+		resourceExample,
+		resourceExampleUpdated,
 		"", "", "",
 		false,
 		func(_ string) resource.TestCheckFunc {
 			return func(_ *terraform.State) error { return nil }
 		},
-		nil,
+		regexp.MustCompile("^instance$"),
 		func(_ *terraform.State) error { return nil },
 		test_utils.ChainImportStateIdFuncs(
 			func(_ *terraform.State) (string, error) { return "instance", nil },
