@@ -38,16 +38,44 @@ data "zitadel_application_oidc" "default" {
 - `additional_origins` (List of String) Additional origins
 - `app_type` (String) App type
 - `auth_method_type` (String) Auth method type
+- `back_channel_logout_uri` (String) ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout
 - `client_id` (String, Sensitive) Client ID
 - `clock_skew` (String) Clockskew
+- `compliance_problems` (List of Object) lists the problems for non-compliancy (see [below for nested schema](#nestedatt--compliance_problems))
 - `dev_mode` (Boolean) Dev mode
 - `grant_types` (List of String) Grant types
 - `id` (String) The ID of this resource.
 - `id_token_role_assertion` (Boolean) ID token role assertion
 - `id_token_userinfo_assertion` (Boolean) Token userinfo assertion
+- `login_version` (List of Object) Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default. (see [below for nested schema](#nestedatt--login_version))
 - `name` (String) Name of the application
+- `none_compliant` (Boolean) specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant
 - `post_logout_redirect_uris` (List of String) Post logout redirect URIs
 - `redirect_uris` (List of String) RedirectURIs
 - `response_types` (List of String) Response type
 - `skip_native_app_success_page` (Boolean) Skip the successful login page on native apps and directly redirect the user to the callback.
 - `version` (String) Version
+
+<a id="nestedatt--compliance_problems"></a>
+### Nested Schema for `compliance_problems`
+
+Read-Only:
+
+- `key` (String)
+- `message` (String)
+
+
+<a id="nestedatt--login_version"></a>
+### Nested Schema for `login_version`
+
+Read-Only:
+
+- `login_v1` (Boolean)
+- `login_v2` (List of Object) (see [below for nested schema](#nestedobjatt--login_version--login_v2))
+
+<a id="nestedobjatt--login_version--login_v2"></a>
+### Nested Schema for `login_version.login_v2`
+
+Read-Only:
+
+- `base_uri` (String)

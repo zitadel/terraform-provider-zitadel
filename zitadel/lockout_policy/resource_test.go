@@ -33,14 +33,14 @@ func TestAccLockoutPolicy(t *testing.T) {
 		exampleProperty, 10,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		checkRemoteProperty(*frame)(0),
+		checkRemoteProperty(frame)(0),
 		test_utils.ImportOrgId(frame),
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
 	return func(expect uint64) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetLockoutPolicy(frame, &management.GetLockoutPolicyRequest{})

@@ -29,9 +29,9 @@ func TestAccOrgIDPJWT(t *testing.T) {
 		exampleProperty, updatedProperty,
 		"", "", "",
 		true,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame), updatedProperty),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), updatedProperty),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 			test_utils.ImportOrgId(frame),
@@ -39,7 +39,7 @@ func TestAccOrgIDPJWT(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetOrgIDPByID(frame, &management.GetOrgIDPByIDRequest{

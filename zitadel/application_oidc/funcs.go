@@ -79,6 +79,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		clockSkewVar,
 		additionalOriginsVar,
 		skipNativeAppSuccessPageVar,
+		BackChannelLogoutURIVar,
+		LoginVersionVar,
 	) {
 		respTypes := make([]app.OIDCResponseType, 0)
 		for _, respType := range d.Get(responseTypesVar).([]interface{}) {
@@ -110,6 +112,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			AdditionalOrigins:        interfaceToStringSlice(d.Get(additionalOriginsVar)),
 			ClockSkew:                durationpb.New(dur),
 			SkipNativeAppSuccessPage: d.Get(skipNativeAppSuccessPageVar).(bool),
+			BackChannelLogoutUri:     d.Get(BackChannelLogoutURIVar).(string),
+			LoginVersion:             getLoginVersion(d),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update applicationOIDC: %v", err)
@@ -163,7 +167,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		AdditionalOrigins:        interfaceToStringSlice(d.Get(additionalOriginsVar)),
 		Version:                  app.OIDCVersion(app.OIDCVersion_value[d.Get(versionVar).(string)]),
 		SkipNativeAppSuccessPage: d.Get(skipNativeAppSuccessPageVar).(bool),
+		BackChannelLogoutUri:     d.Get(BackChannelLogoutURIVar).(string),
+		LoginVersion:             getLoginVersion(d),
 	})
+	if err != nil {
+		return diag.Errorf("failed to create applicationOIDC: %v", err)
+	}
 
 	set := map[string]interface{}{
 		ClientIDVar:     resp.GetClientId(),
@@ -175,11 +184,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if err != nil {
-		return diag.Errorf("failed to create applicationOIDC: %v", err)
-	}
 	d.SetId(resp.GetAppId())
-	return nil
+	return read(ctx, d, m)
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -219,6 +225,35 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		clockSkew = "0s"
 	}
 
+	complianceProblems := make([]interface{}, 0)
+	for _, p := range oidc.GetComplianceProblems() {
+		complianceProblems = append(complianceProblems, map[string]interface{}{
+			ComplianceProblemKeyVar:     p.GetKey(),
+			ComplianceProblemMessageVar: p.GetLocalizedMessage(),
+		})
+	}
+
+	loginVersion := []interface{}{}
+	if oidc.GetLoginVersion() != nil {
+		switch oidc.GetLoginVersion().GetVersion().(type) {
+		case *app.LoginVersion_LoginV1:
+			loginVersion = append(loginVersion, map[string]interface{}{
+				LoginV1Var: true,
+			})
+		case *app.LoginVersion_LoginV2:
+			v2 := oidc.GetLoginVersion().GetLoginV2()
+			v2Map := map[string]interface{}{}
+
+			if baseUri := v2.GetBaseUri(); baseUri != "" {
+				v2Map[BaseURIVar] = baseUri
+			}
+
+			loginVersion = append(loginVersion, map[string]interface{}{
+				LoginV2Var: []interface{}{v2Map},
+			})
+		}
+	}
+
 	set := map[string]interface{}{
 		helper.OrgIDVar:             oidcApp.GetDetails().GetResourceOwner(),
 		NameVar:                     oidcApp.GetName(),
@@ -238,7 +273,16 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		additionalOriginsVar:        oidc.GetAdditionalOrigins(),
 		ClientIDVar:                 oidc.GetClientId(),
 		skipNativeAppSuccessPageVar: oidc.GetSkipNativeAppSuccessPage(),
+		NoneCompliantVar:            oidc.GetNoneCompliant(),
+		ComplianceProblemsVar:       complianceProblems,
+		BackChannelLogoutURIVar:     oidc.GetBackChannelLogoutUri(),
 	}
+
+	// Only set login_version if it has content
+	if len(loginVersion) > 0 {
+		set[LoginVersionVar] = loginVersion
+	}
+
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of applicationOIDC: %v", k, err)
@@ -255,6 +299,57 @@ func interfaceToStringSlice(in interface{}) []string {
 		ret = append(ret, item.(string))
 	}
 	return ret
+}
+
+func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
+	v, ok := d.GetOk(LoginVersionVar)
+	if !ok {
+		return nil
+	}
+
+	list := v.([]interface{})
+	if len(list) == 0 {
+		return nil
+	}
+
+	if list[0] == nil {
+		return nil
+	}
+
+	item := list[0].(map[string]interface{})
+
+	if loginV1, ok := item[LoginV1Var]; ok && loginV1.(bool) {
+		return &app.LoginVersion{
+			Version: &app.LoginVersion_LoginV1{
+				LoginV1: &app.LoginV1{},
+			},
+		}
+	}
+
+	if v2, ok := item[LoginV2Var]; ok && v2 != nil {
+		v2List := v2.([]interface{})
+		if len(v2List) > 0 {
+			// Add nil check HERE before type assertion
+			if v2List[0] == nil {
+				return nil
+			}
+			v2Item := v2List[0].(map[string]interface{})
+			var uri *string
+			if baseURI, ok := v2Item[BaseURIVar]; ok && baseURI.(string) != "" {
+				uriStr := baseURI.(string)
+				uri = &uriStr
+			}
+			return &app.LoginVersion{
+				Version: &app.LoginVersion_LoginV2{
+					LoginV2: &app.LoginV2{
+						BaseUri: uri,
+					},
+				},
+			}
+		}
+	}
+
+	return nil
 }
 
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -294,7 +389,6 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 		ids[i] = res.Id
 	}
-	// If the ID is blank, the datasource is deleted and not usable.
 	d.SetId("-")
 	return diag.FromErr(d.Set(appIDsVar, ids))
 }

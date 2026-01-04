@@ -31,9 +31,9 @@ func TestAccMachineKey(t *testing.T) {
 		exampleProperty, "2051-01-01T00:00:00Z",
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame, userID),
+		checkRemoteProperty(frame, userID),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, userID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, machine_key.UserIDVar),
@@ -56,9 +56,9 @@ func TestAccMachineKeyWithPublicKey(t *testing.T) {
 		exampleProperty, "2051-01-01T00:00:00Z",
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame, userID),
+		checkRemoteProperty(frame, userID),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, userID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, machine_key.UserIDVar),
@@ -90,7 +90,7 @@ func importStateAttributeBase64(frame test_utils.BaseTestFrame, attr string) res
 	}
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetMachineKeyByIDs(frame, &management.GetMachineKeyByIDsRequest{

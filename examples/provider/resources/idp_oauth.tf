@@ -6,7 +6,7 @@ resource "zitadel_idp_oauth" "default" {
   token_endpoint         = "https://oauth2.googleapis.com/token"
   user_endpoint          = "https://openidconnect.googleapis.com/v1/userinfo"
   id_attribute           = "user_id"
-  scopes                 = ["openid", "profile", "email"]
+  scopes = ["openid", "profile", "email"]
   is_linking_allowed     = false
   is_creation_allowed    = true
   is_auto_creation       = false
