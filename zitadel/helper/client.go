@@ -15,6 +15,7 @@ import (
 	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/instance/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
+	orgv2 "github.com/zitadel/zitadel-go/v3/pkg/client/org/v2"
 	settingsv2 "github.com/zitadel/zitadel-go/v3/pkg/client/settings/v2"
 	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/webkey/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
@@ -208,6 +209,29 @@ func GetManagementClient(ctx context.Context, info *ClientInfo) (*management.Cli
 		}
 	}
 	return mgmtClient, nil
+}
+
+var orgClientLock = &sync.Mutex{}
+var orgClient *orgv2.Client
+
+func GetOrgClient(ctx context.Context, info *ClientInfo) (*orgv2.Client, error) {
+	if orgClient == nil {
+		orgClientLock.Lock()
+		defer orgClientLock.Unlock()
+		if orgClient == nil {
+			client, err := orgv2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			orgClient = client
+		}
+	}
+	return orgClient, nil
 }
 
 var adminClientLock = &sync.Mutex{}
