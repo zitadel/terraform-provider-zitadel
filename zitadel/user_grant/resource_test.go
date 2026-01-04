@@ -32,9 +32,9 @@ func TestAccUserGrant(t *testing.T) {
 		exampleProperty, updatedProperty,
 		"", "", "",
 		true,
-		checkRemoteProperty(*frame, userID),
+		checkRemoteProperty(frame, userID),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, userID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, user_grant.UserIDVar),
@@ -43,7 +43,7 @@ func TestAccUserGrant(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetUserGrantByID(frame, &management.GetUserGrantByIDRequest{

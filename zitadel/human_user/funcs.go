@@ -6,10 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	objectv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object/v2"
 	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -208,35 +206,49 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChanges(emailVar, isEmailVerifiedVar) {
-		emailUpdate := &userv2.SetHumanEmail{
-			Email: d.Get(emailVar).(string),
-		}
-		if d.Get(isEmailVerifiedVar).(bool) {
-			emailUpdate.Verification = &userv2.SetHumanEmail_IsVerified{
-				IsVerified: true,
-			}
-		}
+		oldEmail, newEmail := d.GetChange(emailVar)
+		_, isVerifiedInConfig := d.GetOk(isEmailVerifiedVar)
 
-		if humanUpdate == nil {
-			humanUpdate = &userv2.UpdateUserRequest_Human{}
+		if oldEmail == newEmail && !isVerifiedInConfig {
+			// Skip update - is_email_verified removed from config but email unchanged
+		} else {
+			emailUpdate := &userv2.SetHumanEmail{
+				Email: d.Get(emailVar).(string),
+			}
+			if d.Get(isEmailVerifiedVar).(bool) {
+				emailUpdate.Verification = &userv2.SetHumanEmail_IsVerified{
+					IsVerified: true,
+				}
+			}
+
+			if humanUpdate == nil {
+				humanUpdate = &userv2.UpdateUserRequest_Human{}
+			}
+			humanUpdate.Email = emailUpdate
 		}
-		humanUpdate.Email = emailUpdate
 	}
 
 	if d.HasChanges(phoneVar, isPhoneVerifiedVar) {
-		phoneUpdate := &userv2.SetHumanPhone{
-			Phone: d.Get(phoneVar).(string),
-		}
-		if d.Get(isPhoneVerifiedVar).(bool) {
-			phoneUpdate.Verification = &userv2.SetHumanPhone_IsVerified{
-				IsVerified: true,
-			}
-		}
+		oldPhone, newPhone := d.GetChange(phoneVar)
+		_, isVerifiedInConfig := d.GetOk(isPhoneVerifiedVar)
 
-		if humanUpdate == nil {
-			humanUpdate = &userv2.UpdateUserRequest_Human{}
+		if oldPhone == newPhone && !isVerifiedInConfig {
+			// Skip update - is_phone_verified removed from config but phone unchanged
+		} else {
+			phoneUpdate := &userv2.SetHumanPhone{
+				Phone: d.Get(phoneVar).(string),
+			}
+			if d.Get(isPhoneVerifiedVar).(bool) {
+				phoneUpdate.Verification = &userv2.SetHumanPhone_IsVerified{
+					IsVerified: true,
+				}
+			}
+
+			if humanUpdate == nil {
+				humanUpdate = &userv2.UpdateUserRequest_Human{}
+			}
+			humanUpdate.Phone = phoneUpdate
 		}
-		humanUpdate.Phone = phoneUpdate
 	}
 
 	if humanUpdate != nil {
@@ -328,6 +340,8 @@ func readFunc(forDatasource bool) func(ctx context.Context, d *schema.ResourceDa
 	}
 }
 
+// zitadel/human_user/funcs.go - replace list function
+
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started list")
 
@@ -336,29 +350,29 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetUserV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	req := &management.ListUsersRequest{}
-	var queries []*user.SearchQuery
+	req := &userv2.ListUsersRequest{}
+	var queries []*userv2.SearchQuery
 
-	queries = append(queries, &user.SearchQuery{
-		Query: &user.SearchQuery_TypeQuery{
-			TypeQuery: &user.TypeQuery{
-				Type: user.Type_TYPE_HUMAN,
+	queries = append(queries, &userv2.SearchQuery{
+		Query: &userv2.SearchQuery_TypeQuery{
+			TypeQuery: &userv2.TypeQuery{
+				Type: userv2.Type_TYPE_HUMAN,
 			},
 		},
 	})
 
 	if userName, ok := d.GetOk(UserNameVar); ok {
 		userNameMethod := d.Get(userNameMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_UserNameQuery{
-				UserNameQuery: &user.UserNameQuery{
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_UserNameQuery{
+				UserNameQuery: &userv2.UserNameQuery{
 					UserName: userName.(string),
-					Method:   object.TextQueryMethod(object.TextQueryMethod_value[userNameMethod]),
+					Method:   objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[userNameMethod]),
 				},
 			},
 		})
@@ -366,11 +380,11 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	if firstName, ok := d.GetOk(firstNameVar); ok {
 		firstNameMethod := d.Get(firstNameMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_FirstNameQuery{
-				FirstNameQuery: &user.FirstNameQuery{
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_FirstNameQuery{
+				FirstNameQuery: &userv2.FirstNameQuery{
 					FirstName: firstName.(string),
-					Method:    object.TextQueryMethod(object.TextQueryMethod_value[firstNameMethod]),
+					Method:    objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[firstNameMethod]),
 				},
 			},
 		})
@@ -378,11 +392,11 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	if lastName, ok := d.GetOk(lastNameVar); ok {
 		lastNameMethod := d.Get(lastNameMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_LastNameQuery{
-				LastNameQuery: &user.LastNameQuery{
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_LastNameQuery{
+				LastNameQuery: &userv2.LastNameQuery{
 					LastName: lastName.(string),
-					Method:   object.TextQueryMethod(object.TextQueryMethod_value[lastNameMethod]),
+					Method:   objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[lastNameMethod]),
 				},
 			},
 		})
@@ -390,11 +404,11 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	if nickName, ok := d.GetOk(nickNameVar); ok {
 		nickNameMethod := d.Get(nickNameMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_NickNameQuery{
-				NickNameQuery: &user.NickNameQuery{
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_NickNameQuery{
+				NickNameQuery: &userv2.NickNameQuery{
 					NickName: nickName.(string),
-					Method:   object.TextQueryMethod(object.TextQueryMethod_value[nickNameMethod]),
+					Method:   objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[nickNameMethod]),
 				},
 			},
 		})
@@ -402,11 +416,11 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	if displayName, ok := d.GetOk(DisplayNameVar); ok {
 		displayNameMethod := d.Get(displayNameMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_DisplayNameQuery{
-				DisplayNameQuery: &user.DisplayNameQuery{
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_DisplayNameQuery{
+				DisplayNameQuery: &userv2.DisplayNameQuery{
 					DisplayName: displayName.(string),
-					Method:      object.TextQueryMethod(object.TextQueryMethod_value[displayNameMethod]),
+					Method:      objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[displayNameMethod]),
 				},
 			},
 		})
@@ -414,11 +428,11 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	if email, ok := d.GetOk(emailVar); ok {
 		emailMethod := d.Get(emailMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_EmailQuery{
-				EmailQuery: &user.EmailQuery{
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_EmailQuery{
+				EmailQuery: &userv2.EmailQuery{
 					EmailAddress: email.(string),
-					Method:       object.TextQueryMethod(object.TextQueryMethod_value[emailMethod]),
+					Method:       objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[emailMethod]),
 				},
 			},
 		})
@@ -426,11 +440,11 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	if loginName, ok := d.GetOk(loginNameVar); ok {
 		loginNameMethod := d.Get(loginNameMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_LoginNameQuery{
-				LoginNameQuery: &user.LoginNameQuery{
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_LoginNameQuery{
+				LoginNameQuery: &userv2.LoginNameQuery{
 					LoginName: loginName.(string),
-					Method:    object.TextQueryMethod(object.TextQueryMethod_value[loginNameMethod]),
+					Method:    objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[loginNameMethod]),
 				},
 			},
 		})
@@ -445,7 +459,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	ids := make([]string, len(resp.Result))
 	for i, res := range resp.Result {
-		ids[i] = res.Id
+		ids[i] = res.UserId
 	}
 
 	d.SetId("-")

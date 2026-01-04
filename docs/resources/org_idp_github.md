@@ -17,7 +17,7 @@ resource "zitadel_org_idp_github" "default" {
   name                = "GitHub"
   client_id           = "86a165..."
   client_secret       = "*****afdbac18"
-  scopes              = ["openid", "profile", "email"]
+  scopes = ["openid", "profile", "email"]
   is_linking_allowed  = false
   is_creation_allowed = true
   is_auto_creation    = false

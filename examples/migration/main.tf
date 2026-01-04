@@ -39,7 +39,7 @@ resource "org" "org" {
 
 resource "user" "userTest" {
   depends_on = [data.zitadelV1Org.zitadelV1Org, org.org]
-  provider   = zitadel
+  provider = zitadel
 
   for_each = {
     for idx, user in data.zitadelV1Org.zitadelV1Org.users : user.user_name => user
@@ -68,7 +68,7 @@ resource "user" "userTest" {
 
 resource "project" "projectTest" {
   depends_on = [data.zitadelV1Org.zitadelV1Org, org.org]
-  provider   = zitadel
+  provider = zitadel
 
   for_each = {
     for idx, project in data.zitadelV1Org.zitadelV1Org.projects : project.name => project
@@ -86,7 +86,7 @@ resource "project" "projectTest" {
 
 resource "domain" "domainTest" {
   depends_on = [data.zitadelV1Org.zitadelV1Org, org.org]
-  provider   = zitadel
+  provider = zitadel
 
   for_each = {
     for idx, domain in data.zitadelV1Org.zitadelV1Org.domains : domain.name => domain

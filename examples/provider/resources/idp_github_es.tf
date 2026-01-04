@@ -2,7 +2,7 @@ resource "zitadel_idp_github_es" "default" {
   name                   = "GitHub Enterprise Server"
   client_id              = "86a165..."
   client_secret          = "*****afdbac18"
-  scopes                 = ["openid", "profile", "email"]
+  scopes = ["openid", "profile", "email"]
   authorization_endpoint = "https://auth.endpoint"
   token_endpoint         = "https://token.endpoint"
   user_endpoint          = "https://user.endpoint"

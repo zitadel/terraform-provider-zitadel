@@ -30,14 +30,14 @@ func TestAccDefaultDomainPolicy(t *testing.T) {
 		exampleProperty, !exampleProperty,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		test_utils.ImportNothing,
 	)
 }
 
-func checkRemoteProperty(frame test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {
 	return func(expect bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetDomainPolicy(frame, &admin.GetDomainPolicyRequest{})

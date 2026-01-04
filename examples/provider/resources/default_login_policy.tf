@@ -13,9 +13,9 @@ resource "zitadel_default_login_policy" "default" {
   second_factor_check_lifetime  = "24h0m0s"
   ignore_unknown_usernames      = true
   default_redirect_uri          = "localhost:8080"
-  second_factors                = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
-  multi_factors                 = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
-  idps                          = [data.zitadel_idp_google.default.id, data.zitadel_idp_azure_ad.default.id]
+  second_factors = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
+  multi_factors = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
+  idps = [data.zitadel_idp_google.default.id, data.zitadel_idp_azure_ad.default.id]
   allow_domain_discovery        = true
   disable_login_with_email      = true
   disable_login_with_phone      = true

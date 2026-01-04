@@ -7,8 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user"
+	objectv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object/v2"
 	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -213,6 +212,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	return nil
 }
 
+// zitadel/machine_user/funcs.go - replace list function
+
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started list")
 
@@ -221,29 +222,29 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetUserV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	req := &management.ListUsersRequest{}
-	var queries []*user.SearchQuery
+	req := &userv2.ListUsersRequest{}
+	var queries []*userv2.SearchQuery
 
-	queries = append(queries, &user.SearchQuery{
-		Query: &user.SearchQuery_TypeQuery{
-			TypeQuery: &user.TypeQuery{
-				Type: user.Type_TYPE_MACHINE,
+	queries = append(queries, &userv2.SearchQuery{
+		Query: &userv2.SearchQuery_TypeQuery{
+			TypeQuery: &userv2.TypeQuery{
+				Type: userv2.Type_TYPE_MACHINE,
 			},
 		},
 	})
 
 	if userName, ok := d.GetOk(UserNameVar); ok {
 		userNameMethod := d.Get(userNameMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_UserNameQuery{
-				UserNameQuery: &user.UserNameQuery{
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_UserNameQuery{
+				UserNameQuery: &userv2.UserNameQuery{
 					UserName: userName.(string),
-					Method:   object.TextQueryMethod(object.TextQueryMethod_value[userNameMethod]),
+					Method:   objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[userNameMethod]),
 				},
 			},
 		})
@@ -251,11 +252,11 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	if loginName, ok := d.GetOk(loginNameVar); ok {
 		loginNameMethod := d.Get(loginNameMethodVar).(string)
-		queries = append(queries, &user.SearchQuery{
-			Query: &user.SearchQuery_LoginNameQuery{
-				LoginNameQuery: &user.LoginNameQuery{
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_LoginNameQuery{
+				LoginNameQuery: &userv2.LoginNameQuery{
 					LoginName: loginName.(string),
-					Method:    object.TextQueryMethod(object.TextQueryMethod_value[loginNameMethod]),
+					Method:    objectv2.TextQueryMethod(objectv2.TextQueryMethod_value[loginNameMethod]),
 				},
 			},
 		})
@@ -270,7 +271,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	ids := make([]string, len(resp.Result))
 	for i, res := range resp.Result {
-		ids[i] = res.Id
+		ids[i] = res.UserId
 	}
 
 	d.SetId("-")
