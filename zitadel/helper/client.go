@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/action/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	featurev2 "github.com/zitadel/zitadel-go/v3/pkg/client/feature/v2"
 	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/instance/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
@@ -164,6 +165,29 @@ func GetActionClient(ctx context.Context, info *ClientInfo) (*actionV2.Client, e
 		}
 	}
 	return actionClient, nil
+}
+
+var featureClientLock = &sync.Mutex{}
+var featureClient *featurev2.Client
+
+func GetFeatureClient(ctx context.Context, info *ClientInfo) (*featurev2.Client, error) {
+	if featureClient == nil {
+		featureClientLock.Lock()
+		defer featureClientLock.Unlock()
+		if featureClient == nil {
+			client, err := featurev2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel feature client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			featureClient = client
+		}
+	}
+	return featureClient, nil
 }
 
 var webkeyClientLock = &sync.Mutex{}
