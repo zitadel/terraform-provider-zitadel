@@ -7,7 +7,7 @@ resource "zitadel_organization" "with_admins" {
   admins = [
     {
       user_id = "123456789012345678"
-      roles = ["ORG_OWNER"]
+      roles   = ["ORG_OWNER"]
     }
   ]
 }

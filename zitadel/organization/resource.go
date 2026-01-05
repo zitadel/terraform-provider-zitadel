@@ -25,6 +25,7 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeList,
 				Optional:    true,
 				ForceNew:    true,
+				ConfigMode:  schema.SchemaConfigModeAttr,
 				Description: "List of users to be granted organization admin roles",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{

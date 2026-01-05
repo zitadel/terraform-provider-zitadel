@@ -26,13 +26,26 @@ resource "zitadel_org" "default" {
 
 ### Optional
 
+- `admins` (Block Set) Admin users for the organization (see [below for nested schema](#nestedblock--admins))
 - `is_default` (Boolean) True sets the org as default org for the instance. Only one org can be default org. Nothing happens if you set it to false until you set another org as default org.
+- `org_id` (String) Optionally set a custom unique ID for the organization. If omitted, ZITADEL will generate one.
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `primary_domain` (String) Primary domain of the org
 - `state` (String) State of the org
+
+<a id="nestedblock--admins"></a>
+### Nested Schema for `admins`
+
+Required:
+
+- `user_id` (String) ID of existing user to grant admin access
+
+Optional:
+
+- `roles` (List of String) Roles to assign (defaults to ORG_OWNER if empty)
 
 ## Import
 

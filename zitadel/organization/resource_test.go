@@ -18,15 +18,34 @@ import (
 
 func TestAccOrganization(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_organization")
+
+	userDep := fmt.Sprintf(`
+resource "zitadel_human_user" "dep" {
+  org_id            = "%s"
+  user_name         = "test-admin-%s@zitadel.com"
+  first_name        = "Test"
+  last_name         = "Admin"
+  email             = "test-admin-%s@zitadel.com"
+  is_email_verified = true
+  initial_password  = "Password1!"
+}
+`, frame.OrgID, frame.UniqueResourcesID, frame.UniqueResourcesID)
+
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleProperty := test_utils.AttributeValue(t, organization.NameVar, exampleAttributes).AsString()
 	initialProperty := "initialorgname_" + frame.UniqueResourcesID
 	updatedProperty := "updatedorgname_" + frame.UniqueResourcesID
+
+	resourceFunc := func(property string, secret string) string {
+		content := test_utils.ReplaceAll(resourceExample, exampleProperty, "")(property, secret)
+		return strings.ReplaceAll(content, "\"123456789012345678\"", "zitadel_human_user.dep.id")
+	}
+
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
-		nil,
-		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		[]string{userDep},
+		resourceFunc,
 		initialProperty, updatedProperty,
 		"", "", "",
 		false,
