@@ -44,6 +44,7 @@ devbox.json
 devbox.lock
 
 vendor
+dist
 
 # Claude
 .claude

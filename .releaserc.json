@@ -1,0 +1,47 @@
+{
+  "branches": [
+    "main",
+    {
+      "name": "beta",
+      "prerelease": "beta"
+    }
+  ],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    [
+      "@mridang/semantic-release-peer-version",
+      {
+        "repo": "zitadel/zitadel"
+      }
+    ],
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/exec",
+      {
+        "publishCmd": "GORELEASER_CURRENT_TAG=v${nextRelease.version} goreleaser release --clean --skip=publish,announce,validate"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "successComment": false,
+        "failComment": false,
+        "assets": [
+          {
+            "path": "dist/*.zip"
+          },
+          {
+            "path": "dist/*_SHA256SUMS"
+          },
+          {
+            "path": "dist/*_SHA256SUMS.sig"
+          },
+          {
+            "path": "terraform-registry-manifest.json",
+            "name": "terraform-provider-zitadel_${nextRelease.version}_manifest.json"
+          }
+        ]
+      }
+    ]
+  ]
+}
