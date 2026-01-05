@@ -55,6 +55,7 @@ resource "zitadel_human_user" "default" {
 - `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `phone` (String) Phone of the user
 - `preferred_language` (String) Preferred language of the user
+- `user_id` (String) The ID of this resource. Optionally set a custom unique ID. If omitted, ZITADEL will generate one.
 
 ### Read-Only
 
