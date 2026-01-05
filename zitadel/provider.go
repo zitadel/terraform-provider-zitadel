@@ -90,6 +90,9 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_saml"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_metadata"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/organization"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/organization_domain"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/organization_metadata"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_age_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_complexity_policy"
@@ -249,6 +252,12 @@ func Provider() *schema.Provider {
 	return &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
 			"zitadel_zitadel":                    GetZitadelDatasource(),
+			"zitadel_organization":               organization.GetDatasource(),
+			"zitadel_organizations":              organization.ListDatasources(),
+			"zitadel_organization_domain":        organization_domain.GetDatasource(),
+			"zitadel_organization_domains":       organization_domain.ListDatasources(),
+			"zitadel_organization_metadata":      organization_metadata.GetDatasource(),
+			"zitadel_organization_metadatas":     organization_metadata.ListDatasources(),
 			"zitadel_org":                        org.GetDatasource(),
 			"zitadel_orgs":                       org.ListDatasources(),
 			"zitadel_human_user":                 human_user.GetDatasource(),
@@ -377,6 +386,9 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"zitadel_organization":                       organization.GetResource(),
+			"zitadel_organization_domain":                organization_domain.GetResource(),
+			"zitadel_organization_metadata":              organization_metadata.GetResource(),
 			"zitadel_org":                                org.GetResource(),
 			"zitadel_human_user":                         human_user.GetResource(),
 			"zitadel_machine_user":                       machine_user.GetResource(),

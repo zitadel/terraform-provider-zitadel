@@ -1,0 +1,1 @@
+terraform import zitadel_organization_metadata.imported '123456789012345678:example_key'
