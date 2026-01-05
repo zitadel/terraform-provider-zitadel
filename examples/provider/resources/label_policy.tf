@@ -11,15 +11,15 @@ resource "zitadel_label_policy" "default" {
   font_color_dark        = "#ffffff"
   disable_watermark      = false
   set_active             = true
-  logo_hash              = filemd5("/path/to/logo.jpg")
+  logo_hash = filemd5("/path/to/logo.jpg")
   logo_path              = "/path/to/logo.jpg"
-  logo_dark_hash         = filemd5("/path/to/logo_dark.jpg")
+  logo_dark_hash = filemd5("/path/to/logo_dark.jpg")
   logo_dark_path         = "/path/to/logo_dark.jpg"
-  icon_hash              = filemd5("/path/to/icon.jpg")
+  icon_hash = filemd5("/path/to/icon.jpg")
   icon_path              = "/path/to/icon.jpg"
-  icon_dark_hash         = filemd5("/path/to/icon_dark.jpg")
+  icon_dark_hash = filemd5("/path/to/icon_dark.jpg")
   icon_dark_path         = "/path/to/icon_dark.jpg"
-  font_hash              = filemd5("/path/to/font.tff")
+  font_hash = filemd5("/path/to/font.tff")
   font_path              = "/path/to/font.tff"
   theme_mode             = "THEME_MODE_DARK"
 }

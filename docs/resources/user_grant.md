@@ -15,7 +15,7 @@ Resource representing the authorization given to a user directly, including the 
 resource "zitadel_user_grant" "default" {
   project_id = data.zitadel_project.default.id
   org_id     = data.zitadel_org.default.id
-  role_keys  = ["super-user"]
+  role_keys = ["super-user"]
   user_id    = data.zitadel_human_user.default.id
 }
 ```
@@ -29,7 +29,7 @@ resource "zitadel_user_grant" "default" {
 
 ### Optional
 
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `project_grant_id` (String) ID of the granted project
 - `project_id` (String) ID of the project
 - `role_keys` (Set of String) List of roles granted

@@ -14,14 +14,14 @@ Resource representing an LDAP IDP on the instance.
 ```terraform
 resource "zitadel_idp_ldap" "default" {
   name                 = "LDAP"
-  servers              = ["ldaps://my.primary.server:389", "ldaps://my.secondary.server:389"]
+  servers = ["ldaps://my.primary.server:389", "ldaps://my.secondary.server:389"]
   start_tls            = false
   base_dn              = "dc=example,dc=com"
   bind_dn              = "cn=admin,dc=example,dc=com"
   bind_password        = "Password1!"
   user_base            = "dn"
-  user_object_classes  = ["inetOrgPerson"]
-  user_filters         = ["uid", "email"]
+  user_object_classes = ["inetOrgPerson"]
+  user_filters = ["uid", "email"]
   timeout              = "10s"
   id_attribute         = "uid"
   first_name_attribute = "firstname"
@@ -70,6 +70,7 @@ resource "zitadel_idp_ldap" "default" {
 - `preferred_language_attribute` (String) User attribute for the preferred language
 - `preferred_username_attribute` (String) User attribute for the preferred username
 - `profile_attribute` (String) User attribute for the profile
+- `root_ca` (String) Root CA for self-signed certificates for TLS connections to LDAP servers. It is intended to be filled with the contents of a .pem file.
 
 ### Read-Only
 

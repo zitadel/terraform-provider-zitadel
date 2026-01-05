@@ -31,14 +31,14 @@ func TestAccDomainPolicy(t *testing.T) {
 		exampleProperty, !exampleProperty,
 		"", "", "",
 		false,
-		checkRemoteProperty(*otherFrame),
+		checkRemoteProperty(otherFrame),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		checkRemoteProperty(*otherFrame)(false),
+		checkRemoteProperty(otherFrame)(false),
 		test_utils.ImportOrgId(otherFrame),
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame) func(bool) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(bool) resource.TestCheckFunc {
 	return func(expect bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetDomainPolicy(frame, &management.GetDomainPolicyRequest{})

@@ -18,7 +18,7 @@
     [
       "@semantic-release/exec",
       {
-        "publishCmd": "GORELEASER_ALLOW_TAGS=true GORELEASER_CURRENT_TAG=v${nextRelease.version} goreleaser release --clean --skip=publish,announce,validate"
+        "publishCmd": "GORELEASER_CURRENT_TAG=v${nextRelease.version} goreleaser release --clean --skip=publish,announce,validate"
       }
     ],
     [
@@ -28,7 +28,17 @@
         "failComment": false,
         "assets": [
           {
-            "path": "dist/*"
+            "path": "dist/*.zip"
+          },
+          {
+            "path": "dist/*_SHA256SUMS"
+          },
+          {
+            "path": "dist/*_SHA256SUMS.sig"
+          },
+          {
+            "path": "terraform-registry-manifest.json",
+            "name": "terraform-provider-zitadel_${nextRelease.version}_manifest.json"
           }
         ]
       }

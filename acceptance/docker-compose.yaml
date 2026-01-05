@@ -8,7 +8,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
       timeout: 60s
       retries: 5
@@ -16,7 +16,7 @@ services:
 
   zitadel:
     user: '${ZITADEL_DEV_UID}'
-    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v4.2.0}'
+    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v4.7.0}'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"
@@ -24,7 +24,7 @@ services:
       - ./keys:/keys
       - ./zitadel.yaml:/zitadel.yaml
     healthcheck:
-      test: ['CMD', '/app/zitadel', 'ready', "--config", "/zitadel.yaml"]
+      test: [ 'CMD', '/app/zitadel', 'ready', "--config", "/zitadel.yaml" ]
       interval: '2s'
       timeout: '30s'
       retries: 60

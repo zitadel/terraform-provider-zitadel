@@ -28,6 +28,7 @@ func GetResource() *schema.Resource {
 			UserFiltersVar:       UserFiltersResourceField,
 			TimeoutVar:           TimeoutResourceField,
 			IdAttributeVar:       IdAttributeResourceField,
+			RootCAVar:            RootCAResourceField,
 
 			FirstNameAttributeVar:         FirstNameAttributeResourceField,
 			LastNameAttributeVar:          LastNameAttributeResourceField,

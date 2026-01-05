@@ -45,3 +45,6 @@ devbox.lock
 
 vendor
 dist
+
+# Claude
+.claude

@@ -27,9 +27,9 @@ func TestAccOrgMetadata(t *testing.T) {
 		exampleProperty, updatedProperty,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, keyProperty)),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, org_metadata.KeyVar),
 			test_utils.ImportOrgId(frame),
@@ -37,7 +37,7 @@ func TestAccOrgMetadata(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetOrgMetadata(frame, &management.GetOrgMetadataRequest{

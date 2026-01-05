@@ -7,7 +7,7 @@ data "zitadel_application_apis" "default" {
 
 data "zitadel_application_api" "default" {
   for_each = toset(data.zitadel_application_apis.default.app_ids)
-  id       = each.value
+  id = each.value
 }
 
 output "app_api_names" {

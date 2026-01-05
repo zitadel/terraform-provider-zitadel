@@ -38,7 +38,7 @@ func TestAccProjectGrantMember(t *testing.T) {
 		exampleProperty, "PROJECT_GRANT_OWNER_VIEWER",
 		"", "", "",
 		true,
-		checkRemoteProperty(*frame, projectID, grantID, userID),
+		checkRemoteProperty(frame, projectID, grantID, userID),
 		regexp.MustCompile(fmt.Sprintf(
 			"^%s_%s_%s_%s$",
 			helper.ZitadelGeneratedIdPattern,
@@ -46,7 +46,7 @@ func TestAccProjectGrantMember(t *testing.T) {
 			helper.ZitadelGeneratedIdPattern,
 			helper.ZitadelGeneratedIdPattern,
 		)),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID, grantID, userID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID, grantID, userID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant_member.ProjectIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_grant_member.GrantIDVar),
@@ -56,7 +56,7 @@ func TestAccProjectGrantMember(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, projectID, grantID, userID string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectID, grantID, userID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.ListProjectGrantMembers(frame, &management.ListProjectGrantMembersRequest{

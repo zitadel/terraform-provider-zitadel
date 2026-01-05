@@ -2,14 +2,15 @@ package org
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org"
+	orgv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -20,12 +21,12 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetAdminClient(ctx, clientinfo)
+	client, err := helper.GetOrgV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.RemoveOrg(ctx, &admin.RemoveOrgRequest{
-		OrgId: d.Id(),
+	_, err = client.DeleteOrganization(ctx, &orgv2.DeleteOrganizationRequest{
+		OrganizationId: d.Id(),
 	})
 	if err != nil {
 		return diag.FromErr(err)
@@ -40,18 +41,52 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+
+	client, err := helper.GetOrgV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	resp, err := client.AddOrg(ctx, &management.AddOrgRequest{
+
+	req := &orgv2.AddOrganizationRequest{
 		Name: d.Get(NameVar).(string),
-	})
+	}
+
+	if orgID, ok := d.GetOk(OrgIDInputVar); ok {
+		orgIDStr := orgID.(string)
+		req.OrganizationId = &orgIDStr
+	}
+
+	if admins, ok := d.GetOk(adminsVar); ok {
+		adminSet := admins.(*schema.Set)
+		for _, admin := range adminSet.List() {
+			adminMap := admin.(map[string]interface{})
+			userId := adminMap["user_id"].(string)
+
+			adminReq := &orgv2.AddOrganizationRequest_Admin{
+				UserType: &orgv2.AddOrganizationRequest_Admin_UserId{
+					UserId: userId,
+				},
+			}
+
+			if roles, ok := adminMap["roles"]; ok && roles != nil {
+				rolesList := roles.([]interface{})
+				for _, role := range rolesList {
+					adminReq.Roles = append(adminReq.Roles, role.(string))
+				}
+			}
+
+			req.Admins = append(req.Admins, adminReq)
+		}
+	}
+
+	resp, err := client.AddOrganization(ctx, req)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	orgId := resp.GetId()
+
+	orgId := resp.GetOrganizationId()
 	d.SetId(orgId)
+
 	if val, ok := d.GetOk(IsDefaultVar); ok && val.(bool) {
 		adminClient, err := helper.GetAdminClient(ctx, clientinfo)
 		if err != nil {
@@ -73,21 +108,22 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	// If try updating the name to the same value API will return an error.
+
 	if d.HasChange(NameVar) {
-		client, err := helper.GetManagementClient(ctx, clientinfo)
+		client, err := helper.GetOrgV2Client(ctx, clientinfo)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 
-		_, err = client.UpdateOrg(helper.CtxSetOrgID(ctx, d.Id()), &management.UpdateOrgRequest{
-			Name: d.Get(NameVar).(string),
+		_, err = client.UpdateOrganization(ctx, &orgv2.UpdateOrganizationRequest{
+			OrganizationId: d.Id(),
+			Name:           d.Get(NameVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update org: %v", err)
 		}
 	}
-	// To unset the default org, we need to set another org as default org.
+
 	if isDefault, ok := d.GetOk(IsDefaultVar); ok && isDefault.(bool) && d.HasChange(IsDefaultVar) {
 		adminClient, err := helper.GetAdminClient(ctx, clientinfo)
 		if err != nil {
@@ -114,12 +150,20 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 		return diag.FromErr(err)
 	}
 	orgID := helper.GetID(d, OrgIDVar)
+	tflog.Info(ctx, fmt.Sprintf("Reading org ID: %s", orgID))
 	resp, err := client.GetOrgByID(ctx, &admin.GetOrgByIDRequest{
 		Id: orgID,
 	})
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+		tflog.Info(ctx, "Org not found, clearing from state")
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
+		tflog.Error(ctx, fmt.Sprintf("Error getting org: %v", err))
 		return diag.Errorf("error while getting org by id %s: %v", orgID, err)
 	}
+	tflog.Info(ctx, "Org found, updating state")
 	remoteOrg := resp.GetOrg()
 	d.SetId(remoteOrg.Id)
 	if err := d.Set(NameVar, remoteOrg.Name); err != nil {
@@ -201,7 +245,6 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	for i, org := range resp.Result {
 		orgIDs[i] = org.Id
 	}
-	// If the ID is blank, the datasource is deleted and not usable.
 	d.SetId("-")
 	return diag.FromErr(d.Set(orgIDsVar, orgIDs))
 }

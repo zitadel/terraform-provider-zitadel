@@ -6,7 +6,7 @@ jobs:
 
   lint:
 
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-24.04-8
 
     permissions:
       contents: read
@@ -30,13 +30,11 @@ jobs:
           touch acceptance/keys/org-level-admin-sa.json
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.53.3
+          version: v2.6.2
           github-token: ${{ github.token }}
           only-new-issues: true
-          skip-pkg-cache: true
-          skip-build-cache: true
 
   test:
 
@@ -69,7 +67,7 @@ jobs:
       run: go mod download
 
     - name: Run Acceptance Tests
-      run: TF_ACC=1 go test -coverprofile=profile.cov ./...
+      run: TF_ACC=1 go test -p 1 -coverprofile=profile.cov ./...
 
     - name: Publish Coverage
       uses: codecov/codecov-action@v3.1.4
