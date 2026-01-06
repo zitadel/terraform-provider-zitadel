@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/instance/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/acceptance"
@@ -13,8 +13,8 @@ import (
 
 type InstanceTestFrame struct {
 	BaseTestFrame
-	*admin.Client
-	InstanceID string
+	AdminClient admin.AdminServiceClient
+	InstanceID  string
 }
 
 func NewInstanceTestFrame(t *testing.T, resourceType string) *InstanceTestFrame {
@@ -29,19 +29,19 @@ func NewInstanceTestFrame(t *testing.T, resourceType string) *InstanceTestFrame 
 		t.Fatalf("setting up test context failed: %v", err)
 	}
 
-	instanceClient, err := helper.GetInstanceClient(ctx, baseFrame.ClientInfo)
+	instanceClient, err := helper.GetInstanceClient(baseFrame.Context, baseFrame.ClientInfo)
 	if err != nil {
 		t.Fatalf("failed to get instance client: %v", err)
 	}
 
-	instanceResp, err := instanceClient.GetInstance(ctx, &instanceV2.GetInstanceRequest{})
+	instanceResp, err := instanceClient.GetInstance(baseFrame.Context, &instanceV2.GetInstanceRequest{})
 	if err != nil {
 		t.Fatalf("failed to get instance: %v", err)
 	}
 
 	return &InstanceTestFrame{
 		BaseTestFrame: *baseFrame,
-		Client:        adminClient,
+		AdminClient:   adminClient,
 		InstanceID:    instanceResp.Instance.Id,
 	}
 }

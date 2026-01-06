@@ -132,14 +132,16 @@ func NewProviderPV6(option ...zitadelgo.Option) provider.Provider {
 }
 
 type providerModel struct {
-	Insecure       types.Bool   `tfsdk:"insecure"`
-	Domain         types.String `tfsdk:"domain"`
-	Port           types.String `tfsdk:"port"`
-	AccessToken    types.String `tfsdk:"access_token"`
-	Token          types.String `tfsdk:"token"`
-	JWTFile        types.String `tfsdk:"jwt_file"`
-	JWTProfileFile types.String `tfsdk:"jwt_profile_file"`
-	JWTProfileJSON types.String `tfsdk:"jwt_profile_json"`
+	Insecure              types.Bool              `tfsdk:"insecure"`
+	Domain                types.String            `tfsdk:"domain"`
+	Port                  types.String            `tfsdk:"port"`
+	AccessToken           types.String            `tfsdk:"access_token"`
+	Token                 types.String            `tfsdk:"token"`
+	JWTFile               types.String            `tfsdk:"jwt_file"`
+	JWTProfileFile        types.String            `tfsdk:"jwt_profile_file"`
+	JWTProfileJSON        types.String            `tfsdk:"jwt_profile_json"`
+	InsecureSkipVerifyTLS types.Bool              `tfsdk:"insecure_skip_verify_tls"`
+	TransportHeaders      map[string]types.String `tfsdk:"transport_headers"`
 }
 
 func (p *providerPV6) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -190,6 +192,16 @@ func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnost
 				Optional:    true,
 				Description: helper.PortDescription,
 			},
+			helper.InsecureSkipVerifyTLSVar: {
+				Type:        types.BoolType,
+				Optional:    true,
+				Description: helper.InsecureSkipVerifyTLSDescription,
+			},
+			helper.TransportHeadersVar: {
+				Type:        types.MapType{ElemType: types.StringType},
+				Optional:    true,
+				Description: helper.TransportHeadersDescription,
+			},
 		},
 	}, nil
 }
@@ -202,6 +214,11 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
+	transportHeaders := make(map[string]string)
+	for k, v := range config.TransportHeaders {
+		transportHeaders[k] = v.ValueString()
+	}
+
 	info, err := helper.GetClientInfo(ctx,
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
@@ -211,6 +228,8 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		config.JWTProfileFile.ValueString(),
 		config.JWTProfileJSON.ValueString(),
 		config.Port.ValueString(),
+		config.InsecureSkipVerifyTLS.ValueBool(),
+		transportHeaders,
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to handle provider config", err.Error())
@@ -388,6 +407,17 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: helper.PortDescription,
 			},
+			helper.InsecureSkipVerifyTLSVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: helper.InsecureSkipVerifyTLSDescription,
+			},
+			helper.TransportHeadersVar: {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: helper.TransportHeadersDescription,
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"zitadel_organization":                       organization.GetResource(),
@@ -499,6 +529,13 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, diag.Errorf("only one authentication method may be configured")
 	}
 
+	transportHeaders := make(map[string]string)
+	if v, ok := d.GetOk(helper.TransportHeadersVar); ok {
+		for k, v := range v.(map[string]interface{}) {
+			transportHeaders[k] = v.(string)
+		}
+	}
+
 	clientinfo, err := helper.GetClientInfo(ctx,
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
@@ -508,6 +545,8 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		d.Get(helper.JWTProfileFileVar).(string),
 		d.Get(helper.JWTProfileJSONVar).(string),
 		d.Get(helper.PortVar).(string),
+		d.Get(helper.InsecureSkipVerifyTLSVar).(bool),
+		transportHeaders,
 	)
 	if err != nil {
 		return nil, diag.FromErr(err)

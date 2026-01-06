@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	mgmtclient "github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/idp"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/policy"
@@ -257,7 +256,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	return nil
 }
 
-func getIDPOwnerType(ctx context.Context, client *mgmtclient.Client, id string) (idp.IDPOwnerType, error) {
+func getIDPOwnerType(ctx context.Context, client management.ManagementServiceClient, id string) (idp.IDPOwnerType, error) {
 	ownertype := idp.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
 	templateProvider, err := client.GetProviderByID(ctx, &management.GetProviderByIDRequest{Id: id})
 	err = helper.IgnoreIfNotFoundError(err)

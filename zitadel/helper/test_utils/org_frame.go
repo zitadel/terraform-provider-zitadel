@@ -6,8 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
-	mgmt "github.com/zitadel/zitadel-go/v3/pkg/client/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/acceptance"
@@ -16,14 +15,14 @@ import (
 
 type OrgTestFrame struct {
 	BaseTestFrame
-	*mgmt.Client
-	Admin                  *admin.Client
+	management.ManagementServiceClient
+	Admin                  admin.AdminServiceClient
 	OrgID                  string
 	AsOrgDefaultDependency string
 }
 
 func (o *OrgTestFrame) useOrgContext(orgID string) (err error) {
-	o.Client, err = helper.GetManagementClient(o.Context, o.BaseTestFrame.ClientInfo)
+	o.ManagementServiceClient, err = helper.GetManagementClient(o.Context, o.BaseTestFrame.ClientInfo)
 	if err != nil {
 		return err
 	}
@@ -47,21 +46,22 @@ func NewOrgTestFrame(t *testing.T, resourceType string) *OrgTestFrame {
 	if err = orgFrame.useOrgContext(""); err != nil {
 		t.Fatalf("setting up test context failed: %v", err)
 	}
-	org, err := orgFrame.GetOrgByDomainGlobal(baseFrame, &management.GetOrgByDomainGlobalRequest{Domain: "zitadel." + cfg.Domain})
+
+	org, err := orgFrame.GetOrgByDomainGlobal(baseFrame.Context, &management.GetOrgByDomainGlobalRequest{Domain: "zitadel." + cfg.Domain})
 	if err != nil {
 		t.Fatalf("failed to get org by domain: %v", err)
 	}
 	orgFrame.OrgID = org.GetOrg().GetId()
 	orgFrame.AsOrgDefaultDependency = fmt.Sprintf(`
 data "zitadel_org" "default" {
-	id = "%s"
+  id = "%s"
 }
 `, orgFrame.OrgID)
 	return orgFrame
 }
 
 func (o OrgTestFrame) AnotherOrg(t *testing.T, name string) *OrgTestFrame {
-	org, err := o.Client.AddOrg(o, &management.AddOrgRequest{
+	org, err := o.AddOrg(o.Context, &management.AddOrgRequest{
 		Name: name,
 	})
 	if err != nil {

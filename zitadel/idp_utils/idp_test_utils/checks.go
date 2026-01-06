@@ -15,7 +15,7 @@ import (
 func CheckCreationAllowed(frame test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {
 	return func(expectAllowed bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			remoteProvider, err := frame.Client.GetProviderByID(frame, &admin.GetProviderByIDRequest{Id: frame.State(state).ID})
+			remoteProvider, err := frame.GetProviderByID(frame, &admin.GetProviderByIDRequest{Id: frame.State(state).ID})
 			if err != nil {
 				return err
 			}

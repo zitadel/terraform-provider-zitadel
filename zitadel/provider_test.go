@@ -52,6 +52,8 @@ func TestClientInfo_Schemes(t *testing.T) {
 				"",        // jwtProfileFile
 				dummyJSON, // jwtProfileJSON
 				"",        // port
+				false,     // insecureSkipVerifyTLS
+				nil,       // transportHeaders
 			)
 			if err != nil {
 				t.Fatalf("GetClientInfo() error = %v", err)
@@ -104,6 +106,8 @@ func TestClientInfo_Files(t *testing.T) {
 				tt.jwtProfile, // jwtProfileFile
 				"",            // jwtProfileJSON
 				"",            // port
+				false,         // insecureSkipVerifyTLS
+				nil,           // transportHeaders
 			)
 			if (err != nil) != tt.wantError {
 				t.Errorf("GetClientInfo() error = %v, wantError %v", err, tt.wantError)

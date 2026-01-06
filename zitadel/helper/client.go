@@ -4,23 +4,25 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	oidcclient "github.com/zitadel/oidc/v3/pkg/client"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
-	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/action/v2"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
-	featurev2 "github.com/zitadel/zitadel-go/v3/pkg/client/feature/v2"
-	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/instance/v2"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
-	orgV2 "github.com/zitadel/zitadel-go/v3/pkg/client/org/v2"
-	settingsv2 "github.com/zitadel/zitadel-go/v3/pkg/client/settings/v2"
-	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/user/v2"
-	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/webkey/v2"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
+	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	featurev2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/feature/v2"
+	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/instance/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	orgV2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org/v2"
+	settingsv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/settings/v2"
+	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
+	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/webkey/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/zitadel"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -46,309 +48,205 @@ const (
 )
 
 type ClientInfo struct {
+	// Configuration for lazy client creation
+	zitadelConfig *zitadel.Zitadel
+	authOptions   []client.Option
+
+	// Lazy client instance (created on first use)
+	clientOnce sync.Once
+	clientInst *client.Client
+	clientErr  error
+
+	// Legacy fields for backward compatibility
 	Domain  string
 	Issuer  string
 	KeyPath string
 	Data    []byte
-	Options []zitadel.Option
 }
 
-func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+// ensureClient creates the client on first use (lazy initialization)
+func (c *ClientInfo) ensureClient(ctx context.Context) error {
+	c.clientOnce.Do(func() {
+		c.clientInst, c.clientErr = client.New(ctx, c.zitadelConfig, c.authOptions...)
+	})
+	return c.clientErr
+}
+
+func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string, insecureSkipVerifyTLS bool, transportHeaders map[string]string) (*ClientInfo, error) {
 	domain = strings.TrimPrefix(domain, "http://")
 	domain = strings.TrimPrefix(domain, "https://")
-	options := make([]zitadel.Option, 0)
+
+	// Build zitadel.Zitadel options
+	zitadelOpts := make([]zitadel.Option, 0)
 	keyPath := ""
+
+	// Handle port configuration
+	if insecure {
+		if port == "" || port == "80" {
+			zitadelOpts = append(zitadelOpts, zitadel.WithInsecure("80"))
+		} else {
+			zitadelOpts = append(zitadelOpts, zitadel.WithInsecure(port))
+		}
+	} else if port != "" && port != "443" {
+		portNum, err := strconv.Atoi(port)
+		if err == nil {
+			zitadelOpts = append(zitadelOpts, zitadel.WithPort(uint16(portNum)))
+		}
+	}
+
+	// Add insecure_skip_verify_tls option
+	if insecureSkipVerifyTLS {
+		zitadelOpts = append(zitadelOpts, zitadel.WithInsecureSkipVerifyTLS())
+	}
+
+	// Add transport headers
+	for k, v := range transportHeaders {
+		zitadelOpts = append(zitadelOpts, zitadel.WithTransportHeader(k, v))
+	}
+
+	// Create zitadel.Zitadel instance
+	z := zitadel.New(domain, zitadelOpts...)
+
+	// Build client options for authentication
+	clientOpts := make([]client.Option, 0)
+
+	// Set up authentication
+	var tokenSourceInit client.TokenSourceInitializer
 	if accessToken != "" {
-		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{
-			AccessToken: accessToken,
-			TokenType:   "Bearer",
-		})
-		options = append(options, zitadel.WithTokenSource(tokenSource))
+		tokenSourceInit = func(ctx context.Context, issuer string) (oauth2.TokenSource, error) {
+			return oauth2.StaticTokenSource(&oauth2.Token{
+				AccessToken: accessToken,
+				TokenType:   "Bearer",
+			}), nil
+		}
+		keyPath = ""
 	} else if token != "" {
 		if _, err := os.Stat(token); err != nil {
 			return nil, fmt.Errorf("failed to read token file: %v", err)
 		}
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
+		keyFile, err := oidcclient.ConfigFromKeyFile(token)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load key file: %v", err)
+		}
+		// CRITICAL: Include scopes for JWT authentication
+		tokenSourceInit = client.JWTAuthentication(keyFile, oidc.ScopeOpenID, client.ScopeZitadelAPI())
 		keyPath = token
 	} else if jwtFile != "" {
 		jwt, err := os.ReadFile(jwtFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read JWT file: %v", err)
 		}
-		options = append(options, zitadel.WithJWTDirectTokenSource(string(jwt)))
+		tokenSourceInit = func(ctx context.Context, issuer string) (oauth2.TokenSource, error) {
+			return oauth2.StaticTokenSource(&oauth2.Token{
+				AccessToken: string(jwt),
+				TokenType:   "Bearer",
+			}), nil
+		}
 	} else if jwtProfileFile != "" {
 		if _, err := os.Stat(jwtProfileFile); err != nil {
 			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
 		}
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
+		keyFile, err := oidcclient.ConfigFromKeyFile(jwtProfileFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load jwt profile file: %v", err)
+		}
+		// CRITICAL: Include scopes for JWT authentication
+		tokenSourceInit = client.JWTAuthentication(keyFile, oidc.ScopeOpenID, client.ScopeZitadelAPI())
 		keyPath = jwtProfileFile
 	} else if jwtProfileJSON != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
+		keyFile, err := oidcclient.ConfigFromKeyFileData([]byte(jwtProfileJSON))
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse JWT profile JSON: %v", err)
+		}
+		// CRITICAL: Include scopes for JWT authentication
+		tokenSourceInit = client.JWTAuthentication(keyFile, oidc.ScopeOpenID, client.ScopeZitadelAPI())
 	} else {
 		return nil, fmt.Errorf("either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
 	}
 
-	issuerScheme := "https://"
-	if insecure {
-		options = append(options, zitadel.WithInsecure())
-		issuerScheme = "http://"
-	}
+	clientOpts = append(clientOpts, client.WithAuth(tokenSourceInit))
 
-	issuerPort := port
-	if port == "80" && insecure || port == "443" && !insecure {
-		issuerPort = ""
-	}
-
-	issuer := issuerScheme + domain
-	if issuerPort != "" {
-		issuer += ":" + issuerPort
-	}
-
-	clientDomain := domain + ":" + port
-	if port == "" {
-		clientDomain = domain + ":443"
-		if insecure {
-			clientDomain = domain + ":80"
-		}
-	}
-
+	// Return ClientInfo with lazy client creation (no global singleton)
 	return &ClientInfo{
-		clientDomain,
-		issuer,
-		keyPath,
-		[]byte(jwtProfileJSON),
-		options,
+		zitadelConfig: z,
+		authOptions:   clientOpts,
+		Domain:        z.Host(),
+		Issuer:        z.Origin(),
+		KeyPath:       keyPath,
+		Data:          []byte(jwtProfileJSON),
 	}, nil
 }
 
-var securitySettingsClientLock = &sync.Mutex{}
-var securitySettingsClient *settingsv2.Client
+// Service client getters - all use lazy client creation
 
-func GetSecuritySettingsClient(ctx context.Context, info *ClientInfo) (*settingsv2.Client, error) {
-	if securitySettingsClient == nil {
-		securitySettingsClientLock.Lock()
-		defer securitySettingsClientLock.Unlock()
-		if securitySettingsClient == nil {
-			client, err := settingsv2.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			securitySettingsClient = client
-		}
+func GetSecuritySettingsClient(ctx context.Context, info *ClientInfo) (settingsv2.SettingsServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return securitySettingsClient, nil
+	return info.clientInst.SettingsServiceV2(), nil
 }
 
-var orgClientLock = &sync.Mutex{}
-var orgClient *orgV2.Client
-
-func GetOrgClient(ctx context.Context, info *ClientInfo) (*orgV2.Client, error) {
-	if orgClient == nil {
-		orgClientLock.Lock()
-		defer orgClientLock.Unlock()
-		if orgClient == nil {
-			client, err := orgV2.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			orgClient = client
-		}
+func GetOrgClient(ctx context.Context, info *ClientInfo) (orgV2.OrganizationServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return orgClient, nil
+	return info.clientInst.OrganizationServiceV2(), nil
 }
 
-var actionClientLock = &sync.Mutex{}
-var actionClient *actionV2.Client
-
-func GetActionClient(ctx context.Context, info *ClientInfo) (*actionV2.Client, error) {
-	if actionClient == nil {
-		actionClientLock.Lock()
-		defer actionClientLock.Unlock()
-		if actionClient == nil {
-			client, err := actionV2.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			actionClient = client
-		}
+func GetActionClient(ctx context.Context, info *ClientInfo) (actionV2.ActionServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return actionClient, nil
+	return info.clientInst.ActionServiceV2(), nil
 }
 
-var featureClientLock = &sync.Mutex{}
-var featureClient *featurev2.Client
-
-func GetFeatureClient(ctx context.Context, info *ClientInfo) (*featurev2.Client, error) {
-	if featureClient == nil {
-		featureClientLock.Lock()
-		defer featureClientLock.Unlock()
-		if featureClient == nil {
-			client, err := featurev2.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel feature client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			featureClient = client
-		}
+func GetFeatureClient(ctx context.Context, info *ClientInfo) (featurev2.FeatureServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return featureClient, nil
+	return info.clientInst.FeatureServiceV2(), nil
 }
 
-var webkeyClientLock = &sync.Mutex{}
-var webkeyClient *webkeys.Client
-
-func GetWebKeyClient(ctx context.Context, info *ClientInfo) (*webkeys.Client, error) {
-	if webkeyClient == nil {
-		webkeyClientLock.Lock()
-		defer webkeyClientLock.Unlock()
-		if webkeyClient == nil {
-			client, err := webkeys.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			webkeyClient = client
-		}
+func GetWebKeyClient(ctx context.Context, info *ClientInfo) (webkeys.WebKeyServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return webkeyClient, nil
+	return info.clientInst.WebkeyServiceV2(), nil
 }
 
-var mgmtClientLock = &sync.Mutex{}
-var mgmtClient *management.Client
-
-func GetManagementClient(ctx context.Context, info *ClientInfo) (*management.Client, error) {
-	if mgmtClient == nil {
-		mgmtClientLock.Lock()
-		defer mgmtClientLock.Unlock()
-		if mgmtClient == nil {
-			client, err := management.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			mgmtClient = client
-		}
+func GetManagementClient(ctx context.Context, info *ClientInfo) (management.ManagementServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return mgmtClient, nil
+	return info.clientInst.ManagementService(), nil
 }
 
-var orgV2ClientLock = &sync.Mutex{}
-var orgV2Client *orgV2.Client
-
-func GetOrgV2Client(ctx context.Context, info *ClientInfo) (*orgV2.Client, error) {
-	if orgV2Client == nil {
-		orgV2ClientLock.Lock()
-		defer orgV2ClientLock.Unlock()
-		if orgV2Client == nil {
-			client, err := orgV2.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel org v2 client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			orgV2Client = client
-		}
+func GetOrgV2Client(ctx context.Context, info *ClientInfo) (orgV2.OrganizationServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return orgV2Client, nil
+	return info.clientInst.OrganizationServiceV2(), nil
 }
 
-var userV2ClientLock = &sync.Mutex{}
-var userV2Client *userv2.Client
-
-func GetUserV2Client(ctx context.Context, info *ClientInfo) (*userv2.Client, error) {
-	if userV2Client == nil {
-		userV2ClientLock.Lock()
-		defer userV2ClientLock.Unlock()
-		if userV2Client == nil {
-			client, err := userv2.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel user v2 client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			userV2Client = client
-		}
+func GetUserV2Client(ctx context.Context, info *ClientInfo) (userv2.UserServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return userV2Client, nil
+	return info.clientInst.UserServiceV2(), nil
 }
 
-var adminClientLock = &sync.Mutex{}
-var adminClient *admin.Client
-
-func GetAdminClient(ctx context.Context, info *ClientInfo) (*admin.Client, error) {
-	if adminClient == nil {
-		adminClientLock.Lock()
-		defer adminClientLock.Unlock()
-		if adminClient == nil {
-			client, err := admin.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			adminClient = client
-		}
+func GetAdminClient(ctx context.Context, info *ClientInfo) (admin.AdminServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return adminClient, nil
+	return info.clientInst.AdminService(), nil
 }
 
-var instanceClientLock = &sync.Mutex{}
-var instanceClient *instanceV2.Client
-
-func GetInstanceClient(ctx context.Context, info *ClientInfo) (*instanceV2.Client, error) {
-	if instanceClient == nil {
-		instanceClientLock.Lock()
-		defer instanceClientLock.Unlock()
-		if instanceClient == nil {
-			client, err := instanceV2.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			instanceClient = client
-		}
+func GetInstanceClient(ctx context.Context, info *ClientInfo) (instanceV2.InstanceServiceClient, error) {
+	if err := info.ensureClient(ctx); err != nil {
+		return nil, err
 	}
-	return instanceClient, nil
+	return info.clientInst.InstanceServiceV2(), nil
 }
 
 func CtxWithID(ctx context.Context, d *schema.ResourceData) context.Context {
