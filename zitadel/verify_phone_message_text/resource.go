@@ -38,8 +38,10 @@ func (r *verifyPhoneMessageTextResource) Metadata(_ context.Context, req resourc
 	resp.TypeName = req.ProviderTypeName + "_verify_phone_message_text"
 }
 
-func (r *verifyPhoneMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaMessageCustomText(ctx)
+func (r *verifyPhoneMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
+	resp.Schema = s
 }
 
 func (r *verifyPhoneMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {

@@ -37,10 +37,11 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Metadata(_ context.Context, r
 	resp.TypeName = req.ProviderTypeName + "_default_verify_email_otp_message_text"
 }
 
-func (r *defaultVerifyEmailOTPMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	s, d := text.GenSchemaMessageCustomText(ctx)
+func (r *defaultVerifyEmailOTPMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
-	return s, d
+	resp.Schema = s
 }
 
 func (r *defaultVerifyEmailOTPMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {

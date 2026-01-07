@@ -38,8 +38,10 @@ func (r *passwordResetMessageTextResource) Metadata(_ context.Context, req resou
 	resp.TypeName = req.ProviderTypeName + "_password_reset_message_text"
 }
 
-func (r *passwordResetMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaMessageCustomText(ctx)
+func (r *passwordResetMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
+	resp.Schema = s
 }
 
 func (r *passwordResetMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {

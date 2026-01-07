@@ -38,8 +38,10 @@ func (r *verifySMSOTPMessageTextResource) Metadata(_ context.Context, req resour
 	resp.TypeName = req.ProviderTypeName + "_verify_sms_otp_message_text"
 }
 
-func (r *verifySMSOTPMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaMessageCustomText(ctx)
+func (r *verifySMSOTPMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
+	resp.Schema = s
 }
 
 func (r *verifySMSOTPMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
