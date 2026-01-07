@@ -38,8 +38,10 @@ func (r *verifyEmailOTPMessageTextResource) Metadata(_ context.Context, req reso
 	resp.TypeName = req.ProviderTypeName + "_verify_email_otp_message_text"
 }
 
-func (r *verifyEmailOTPMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaMessageCustomText(ctx)
+func (r *verifyEmailOTPMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
+	resp.Schema = s
 }
 
 func (r *verifyEmailOTPMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {

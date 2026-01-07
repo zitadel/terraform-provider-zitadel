@@ -4,10 +4,9 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	fdiag "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
+	providerschema "github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -146,52 +145,44 @@ func (p *providerPV6) Metadata(_ context.Context, _ provider.MetadataRequest, re
 	resp.TypeName = "zitadel"
 }
 
-func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnostics) {
-	return tfsdk.Schema{
-		Attributes: map[string]tfsdk.Attribute{
-			helper.DomainVar: {
-				Type:        types.StringType,
+func (p *providerPV6) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
+	resp.Schema = providerschema.Schema{
+		Attributes: map[string]providerschema.Attribute{
+			helper.DomainVar: providerschema.StringAttribute{
 				Required:    true,
 				Description: helper.DomainDescription,
 			},
-			helper.InsecureVar: {
-				Type:        types.BoolType,
+			helper.InsecureVar: providerschema.BoolAttribute{
 				Optional:    true,
 				Description: helper.InsecureDescription,
 			},
-			helper.AccessTokenVar: {
-				Type:        types.StringType,
+			helper.AccessTokenVar: providerschema.StringAttribute{
 				Optional:    true,
 				Sensitive:   true,
 				Description: helper.AccessTokenDescription,
 			},
-			helper.TokenVar: {
-				Type:        types.StringType,
+			helper.TokenVar: providerschema.StringAttribute{
 				Optional:    true,
 				Description: helper.TokenDescription,
 			},
-			helper.JWTFileVar: {
-				Type:        types.StringType,
+			helper.JWTFileVar: providerschema.StringAttribute{
 				Optional:    true,
 				Description: helper.JWTFileDescription,
 			},
-			helper.JWTProfileFileVar: {
-				Type:        types.StringType,
+			helper.JWTProfileFileVar: providerschema.StringAttribute{
 				Optional:    true,
 				Description: helper.JWTProfileFileDescription,
 			},
-			helper.JWTProfileJSONVar: {
-				Type:        types.StringType,
+			helper.JWTProfileJSONVar: providerschema.StringAttribute{
 				Optional:    true,
 				Description: helper.JWTProfileJSONDescription,
 			},
-			helper.PortVar: {
-				Type:        types.StringType,
+			helper.PortVar: providerschema.StringAttribute{
 				Optional:    true,
 				Description: helper.PortDescription,
 			},
 		},
-	}, nil
+	}
 }
 
 func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {

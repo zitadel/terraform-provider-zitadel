@@ -37,10 +37,11 @@ func (r *defaultPasswordChangeMessageTextResource) Metadata(_ context.Context, r
 	resp.TypeName = req.ProviderTypeName + "_default_password_change_message_text"
 }
 
-func (r *defaultPasswordChangeMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	s, d := text.GenSchemaMessageCustomText(ctx)
+func (r *defaultPasswordChangeMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
-	return s, d
+	resp.Schema = s
 }
 
 func (r *defaultPasswordChangeMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {

@@ -38,8 +38,10 @@ func (r *passwordlessRegistrationMessageTextResource) Metadata(_ context.Context
 	resp.TypeName = req.ProviderTypeName + "_passwordless_registration_message_text"
 }
 
-func (r *passwordlessRegistrationMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaMessageCustomText(ctx)
+func (r *passwordlessRegistrationMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
+	resp.Schema = s
 }
 
 func (r *passwordlessRegistrationMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {

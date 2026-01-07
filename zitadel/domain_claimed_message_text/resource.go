@@ -38,8 +38,10 @@ func (r *domainClaimedMessageTextResource) Metadata(_ context.Context, req resou
 	resp.TypeName = req.ProviderTypeName + "_domain_claimed_message_text"
 }
 
-func (r *domainClaimedMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaMessageCustomText(ctx)
+func (r *domainClaimedMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
+	resp.Schema = s
 }
 
 func (r *domainClaimedMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
