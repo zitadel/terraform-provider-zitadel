@@ -29,14 +29,14 @@ func TestAccInstanceMember(t *testing.T) {
 		exampleProperty, "IAM_OWNER_VIEWER",
 		"", "", "",
 		true,
-		checkRemoteProperty(*frame, userID),
+		checkRemoteProperty(frame, userID),
 		regexp.MustCompile(fmt.Sprintf("^%s_%s$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern)),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, userID), ""),
 		test_utils.ImportStateAttribute(frame.BaseTestFrame, instance_member.UserIDVar),
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.Admin.ListIAMMembers(frame, &admin.ListIAMMembersRequest{

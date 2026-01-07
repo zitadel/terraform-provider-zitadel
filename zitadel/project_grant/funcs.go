@@ -102,7 +102,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get projectgrant")
+		return diag.Errorf("failed to get projectgrant: %v", err)
 	}
 
 	projectGrant := resp.GetProjectGrant()

@@ -48,9 +48,16 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	roles := helper.GetOkSetToStringSlice(d, RolesVar)
+	for _, role := range roles {
+		if !strings.HasPrefix(role, "IAM_") {
+			return diag.Errorf("invalid role '%s': instance member roles must start with 'IAM_' (e.g., IAM_OWNER, IAM_OWNER_VIEWER)", role)
+		}
+	}
+
 	_, err = client.UpdateIAMMember(ctx, &admin.UpdateIAMMemberRequest{
 		UserId: d.Get(UserIDVar).(string),
-		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
+		Roles:  roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to update instance member: %v", err)
@@ -72,9 +79,16 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	userID := d.Get(UserIDVar).(string)
+	roles := helper.GetOkSetToStringSlice(d, RolesVar)
+	for _, role := range roles {
+		if !strings.HasPrefix(role, "IAM_") {
+			return diag.Errorf("invalid role '%s': instance member roles must start with 'IAM_' (e.g., IAM_OWNER, IAM_OWNER_VIEWER)", role)
+		}
+	}
+
 	resp, err := client.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
 		UserId: userID,
-		Roles:  helper.GetOkSetToStringSlice(d, RolesVar),
+		Roles:  roles,
 	})
 	if err != nil {
 		return diag.Errorf("failed to create instance member: %v", err)
@@ -111,7 +125,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to list instance members")
+		return diag.Errorf("failed to list instance members: %v", err)
 	}
 
 	if len(resp.Result) == 1 {
@@ -135,9 +149,4 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 func getInstanceMemberID(instance string, userID string) string {
 	return instance + "_" + userID
-}
-
-func splitInstanceMemberID(memberID string) (string, string) {
-	parts := strings.Split(memberID, "_")
-	return parts[0], parts[1]
 }

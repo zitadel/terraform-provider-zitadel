@@ -1,13 +1,17 @@
+version: "2"
+
 run:
   timeout: 10m
+
 linters:
-  disable-all: true
+  default: none
+
+formatters:
   enable:
-    - typecheck
     - gci
-linters-settings:
-  gci:
-    sections:
-    - standard
-    - default
-    - prefix(github.com/zitadel/terraform-provider-zitadel/v2)
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/zitadel/terraform-provider-zitadel/v2)

@@ -28,9 +28,9 @@ resource "zitadel_login_policy" "default" {
   second_factor_check_lifetime  = "24h0m0s"
   ignore_unknown_usernames      = true
   default_redirect_uri          = "localhost:8080"
-  second_factors                = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
-  multi_factors                 = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
-  idps                          = [data.zitadel_idp_google.default.id, data.zitadel_idp_azure_ad.default.id]
+  second_factors = ["SECOND_FACTOR_TYPE_OTP", "SECOND_FACTOR_TYPE_U2F"]
+  multi_factors = ["MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"]
+  idps = [data.zitadel_idp_google.default.id, data.zitadel_idp_azure_ad.default.id]
   allow_domain_discovery        = true
   disable_login_with_email      = true
   disable_login_with_phone      = true
@@ -64,7 +64,7 @@ resource "zitadel_login_policy" "default" {
 - `disable_login_with_phone` (Boolean) defines if user can additionally (to the loginname) be identified by their verified phone number
 - `idps` (Set of String) allowed idps to login or register
 - `multi_factors` (Set of String) allowed multi factors
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `second_factors` (Set of String) allowed second factors
 
 ### Read-Only

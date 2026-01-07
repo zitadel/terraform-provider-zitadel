@@ -21,7 +21,7 @@ data "zitadel_application_samls" "default" {
 
 data "zitadel_application_saml" "default" {
   for_each = toset(data.zitadel_application_samls.default.app_ids)
-  id       = each.value
+  id = each.value
 }
 
 output "app_saml_names" {

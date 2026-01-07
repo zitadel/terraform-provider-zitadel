@@ -24,15 +24,15 @@ resource "zitadel_default_label_policy" "default" {
   font_color_dark        = "#ffffff"
   disable_watermark      = false
   set_active             = true
-  logo_hash              = filemd5("/path/to/logo.jpg")
+  logo_hash = filemd5("/path/to/logo.jpg")
   logo_path              = "/path/to/logo.jpg"
-  logo_dark_hash         = filemd5("/path/to/logo_dark.jpg")
+  logo_dark_hash = filemd5("/path/to/logo_dark.jpg")
   logo_dark_path         = "/path/to/logo_dark.jpg"
-  icon_hash              = filemd5("/path/to/icon.jpg")
+  icon_hash = filemd5("/path/to/icon.jpg")
   icon_path              = "/path/to/icon.jpg"
-  icon_dark_hash         = filemd5("/path/to/icon_dark.jpg")
+  icon_dark_hash = filemd5("/path/to/icon_dark.jpg")
   icon_dark_path         = "/path/to/icon_dark.jpg"
-  font_hash              = filemd5("/path/to/font.tff")
+  font_hash = filemd5("/path/to/font.tff")
   font_path              = "/path/to/font.tff"
   theme_mode             = "THEME_MODE_DARK"
 }
@@ -48,7 +48,7 @@ resource "zitadel_default_label_policy" "default" {
 - `disable_watermark` (Boolean) disable watermark
 - `font_color` (String) hex value for font color
 - `font_color_dark` (String) hex value for font color dark theme
-- `hide_login_name_suffix` (Boolean) hides the org suffix on the login form if the scope "urn:zitadel:iam:org:domain:primary:{domainname}" is set. Details about this scope in https://zitadel.ch/docs/concepts#Reserved_Scopes
+- `hide_login_name_suffix` (Boolean) hides the org suffix on the login form if the scope "urn:zitadel:iam:org:domain:primary:{domainname}" is set. Details about this scope in https://zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes
 - `primary_color` (String) hex value for primary color
 - `primary_color_dark` (String) hex value for primary color dark theme
 - `warn_color` (String) hex value for warn color

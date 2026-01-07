@@ -17,7 +17,7 @@ resource "zitadel_project_grant_member" "default" {
   project_id = data.zitadel_project.default.id
   user_id    = data.zitadel_human_user.default.id
   grant_id   = "123456789012345678"
-  roles      = ["PROJECT_GRANT_OWNER"]
+  roles = ["PROJECT_GRANT_OWNER"]
 }
 ```
 
@@ -33,7 +33,7 @@ resource "zitadel_project_grant_member" "default" {
 
 ### Optional
 
-- `org_id` (String) ID of the organization
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 
 ### Read-Only
 

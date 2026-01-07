@@ -28,9 +28,9 @@ func TestAccPersonalAccessToken(t *testing.T) {
 		exampleProperty, updatedProperty,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame, userID),
+		checkRemoteProperty(frame, userID),
 		helper.ZitadelGeneratedIdOnlyRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, userID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, pat.UserIDVar),
@@ -40,7 +40,7 @@ func TestAccPersonalAccessToken(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.GetPersonalAccessTokenByIDs(frame, &management.GetPersonalAccessTokenByIDsRequest{

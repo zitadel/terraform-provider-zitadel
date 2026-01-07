@@ -49,7 +49,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return nil
 	}
 	if err != nil {
-		return diag.Errorf("failed to get metadata object")
+		return diag.Errorf("failed to get metadata object: %v", err)
 	}
 	value := string(resp.GetMetadata().GetValue())
 	set := map[string]interface{}{
