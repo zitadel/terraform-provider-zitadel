@@ -22,10 +22,14 @@ const (
 )
 
 var (
-	loginSchema       resourceschema.Schema
-	loginAttrTypes    map[string]attr.Type
-	messageSchema     resourceschema.Schema
-	messageAttrTypes  map[string]attr.Type
+	loginSchema           resourceschema.Schema
+	loginAttrTypes        map[string]attr.Type
+	messageSchema         resourceschema.Schema
+	messageAttrTypes      map[string]attr.Type
+	attributeDescriptions = map[string]string{
+		"success_login_text.auto_redirect_description": "Text to describe that auto-redirect should happen after successful login",
+		"success_login_text.redirected_description":    "Text to describe that the window can be closed after redirect",
+	}
 	skipProtoRootKeys = map[string]struct{}{
 		idAttr:       {},
 		orgIDAttr:    {},
@@ -34,12 +38,12 @@ var (
 )
 
 func init() {
-	loginSchemaAttrs, loginTypes := buildSchemaForMessage((&textpb.LoginCustomText{}).ProtoReflect().Descriptor())
+	loginSchemaAttrs, loginTypes := buildSchemaForMessage((&textpb.LoginCustomText{}).ProtoReflect().Descriptor(), "")
 	augmentRootAttributes(loginSchemaAttrs, loginTypes)
 	loginSchema = resourceschema.Schema{Attributes: loginSchemaAttrs}
 	loginAttrTypes = loginTypes
 
-	messageSchemaAttrs, messageTypes := buildSchemaForMessage((&textpb.MessageCustomText{}).ProtoReflect().Descriptor())
+	messageSchemaAttrs, messageTypes := buildSchemaForMessage((&textpb.MessageCustomText{}).ProtoReflect().Descriptor(), "")
 	augmentRootAttributes(messageSchemaAttrs, messageTypes)
 	messageSchema = resourceschema.Schema{Attributes: messageSchemaAttrs}
 	messageAttrTypes = messageTypes
@@ -75,23 +79,30 @@ func CopyMessageCustomTextToTerraform(ctx context.Context, obj *textpb.MessageCu
 	return copyToTerraform(ctx, obj, tf, messageAttrTypes)
 }
 
-func buildSchemaForMessage(desc protoreflect.MessageDescriptor) (map[string]resourceschema.Attribute, map[string]attr.Type) {
+func buildSchemaForMessage(desc protoreflect.MessageDescriptor, prefix string) (map[string]resourceschema.Attribute, map[string]attr.Type) {
 	attrs := make(map[string]resourceschema.Attribute, desc.Fields().Len())
 	attrTypes := make(map[string]attr.Type, desc.Fields().Len())
 
 	for i := 0; i < desc.Fields().Len(); i++ {
 		field := desc.Fields().Get(i)
 		name := string(field.Name())
+		path := name
+		if prefix != "" {
+			path = prefix + "." + name
+		}
 		if name == "details" {
 			continue
 		}
 
 		switch field.Kind() {
 		case protoreflect.StringKind:
-			attrs[name] = resourceschema.StringAttribute{Optional: true}
+			attrs[name] = resourceschema.StringAttribute{
+				Optional:    true,
+				Description: attributeDescriptions[path],
+			}
 			attrTypes[name] = types.StringType
 		case protoreflect.MessageKind:
-			childAttrs, childTypes := buildSchemaForMessage(field.Message())
+			childAttrs, childTypes := buildSchemaForMessage(field.Message(), path)
 			attrs[name] = resourceschema.SingleNestedAttribute{
 				Optional:   true,
 				Attributes: childAttrs,
@@ -110,8 +121,8 @@ func buildSchemaForMessage(desc protoreflect.MessageDescriptor) (map[string]reso
 
 func augmentRootAttributes(attrs map[string]resourceschema.Attribute, attrTypes map[string]attr.Type) {
 	attrs[idAttr] = resourceschema.StringAttribute{Computed: true}
-	attrs[orgIDAttr] = resourceschema.StringAttribute{Optional: true}
-	attrs[languageAttr] = resourceschema.StringAttribute{Optional: true}
+	attrs[orgIDAttr] = resourceschema.StringAttribute{Required: true}
+	attrs[languageAttr] = resourceschema.StringAttribute{Required: true}
 
 	attrTypes[idAttr] = types.StringType
 	attrTypes[orgIDAttr] = types.StringType
