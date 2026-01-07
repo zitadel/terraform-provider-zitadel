@@ -47,12 +47,12 @@ func init() {
 
 // GenSchemaLoginCustomText returns the schema for LoginCustomText.
 func GenSchemaLoginCustomText(_ context.Context) (resourceschema.Schema, diag.Diagnostics) {
-	return loginSchema, nil
+	return cloneSchema(loginSchema), nil
 }
 
 // GenSchemaMessageCustomText returns the schema for MessageCustomText.
 func GenSchemaMessageCustomText(_ context.Context) (resourceschema.Schema, diag.Diagnostics) {
-	return messageSchema, nil
+	return cloneSchema(messageSchema), nil
 }
 
 // CopyLoginCustomTextFromTerraform populates the proto object from the Terraform value.
@@ -116,6 +116,34 @@ func augmentRootAttributes(attrs map[string]resourceschema.Attribute, attrTypes 
 	attrTypes[idAttr] = types.StringType
 	attrTypes[orgIDAttr] = types.StringType
 	attrTypes[languageAttr] = types.StringType
+}
+
+func cloneSchema(schema resourceschema.Schema) resourceschema.Schema {
+	schema.Attributes = cloneAttributes(schema.Attributes)
+	return schema
+}
+
+func cloneAttributes(attrs map[string]resourceschema.Attribute) map[string]resourceschema.Attribute {
+	if attrs == nil {
+		return nil
+	}
+
+	cloned := make(map[string]resourceschema.Attribute, len(attrs))
+	for k, v := range attrs {
+		cloned[k] = cloneAttribute(v)
+	}
+	return cloned
+}
+
+func cloneAttribute(attr resourceschema.Attribute) resourceschema.Attribute {
+	switch a := attr.(type) {
+	case resourceschema.SingleNestedAttribute:
+		c := a
+		c.Attributes = cloneAttributes(a.Attributes)
+		return c
+	default:
+		return attr
+	}
 }
 
 func copyFromTerraform(ctx context.Context, tf types.Object, obj proto.Message, attrTypes map[string]attr.Type) diag.Diagnostics {

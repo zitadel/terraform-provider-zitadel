@@ -99,7 +99,7 @@ func (r *passwordlessRegistrationMessageTextResource) Create(ctx context.Context
 		return
 	}
 
-	setID(plan, orgID, language)
+	resp.Diagnostics.Append(setID(ctx, &plan, orgID, language)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
@@ -132,7 +132,7 @@ func (r *passwordlessRegistrationMessageTextResource) Read(ctx context.Context, 
 		return
 	}
 
-	setID(state, orgID, language)
+	resp.Diagnostics.Append(setID(ctx, &state, orgID, language)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
@@ -183,7 +183,7 @@ func (r *passwordlessRegistrationMessageTextResource) Update(ctx context.Context
 		return
 	}
 
-	setID(plan, orgID, language)
+	resp.Diagnostics.Append(setID(ctx, &plan, orgID, language)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
@@ -206,11 +206,19 @@ func (r *passwordlessRegistrationMessageTextResource) Delete(ctx context.Context
 	}
 }
 
-func setID(obj types.Object, orgID string, language string) {
+func setID(ctx context.Context, obj *types.Object, orgID string, language string) diag.Diagnostics {
 	attrs := obj.Attributes()
 	attrs["id"] = types.StringValue(orgID + "_" + language)
 	attrs[helper.OrgIDVar] = types.StringValue(orgID)
 	attrs[LanguageVar] = types.StringValue(language)
+
+	newObj, d := types.ObjectValue(obj.AttributeTypes(ctx), attrs)
+	if d.HasError() {
+		return d
+	}
+
+	*obj = newObj
+	return nil
 }
 
 func getID(ctx context.Context, obj types.Object) (string, string) {
