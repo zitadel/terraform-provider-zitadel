@@ -37,10 +37,11 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Metadata(_ context.Context, r
 	resp.TypeName = req.ProviderTypeName + "_default_verify_email_otp_message_text"
 }
 
-func (r *defaultVerifyEmailOTPMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	s, d := text.GenSchemaMessageCustomText(ctx)
+func (r *defaultVerifyEmailOTPMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
-	return s, d
+	resp.Schema = s
 }
 
 func (r *defaultVerifyEmailOTPMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -98,7 +99,7 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Create(ctx context.Context, r
 		return
 	}
 
-	setID(plan, language)
+	resp.Diagnostics.Append(setID(ctx, &plan, language)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
@@ -131,7 +132,7 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Read(ctx context.Context, req
 		return
 	}
 
-	setID(state, language)
+	resp.Diagnostics.Append(setID(ctx, &state, language)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
@@ -182,7 +183,7 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Update(ctx context.Context, r
 		return
 	}
 
-	setID(plan, language)
+	resp.Diagnostics.Append(setID(ctx, &plan, language)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
@@ -205,10 +206,18 @@ func (r *defaultVerifyEmailOTPMessageTextResource) Delete(ctx context.Context, r
 	}
 }
 
-func setID(obj types.Object, language string) {
+func setID(ctx context.Context, obj *types.Object, language string) diag.Diagnostics {
 	attrs := obj.Attributes()
 	attrs["id"] = types.StringValue(language)
 	attrs[LanguageVar] = types.StringValue(language)
+
+	newObj, d := types.ObjectValue(obj.AttributeTypes(ctx), attrs)
+	if d.HasError() {
+		return d
+	}
+
+	*obj = newObj
+	return nil
 }
 
 func getID(ctx context.Context, obj types.Object) string {
