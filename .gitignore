@@ -34,6 +34,13 @@ override.tf.json
 .idea
 .run
 
+.go
+
+
+devbox.json
+devbox.lock
+.devbox
+
 # local binary
 terraform-provider-zitadel
 
