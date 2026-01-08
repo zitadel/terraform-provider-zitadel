@@ -53,7 +53,7 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string, insecureSkipVerifyTLS bool, transportHeaders map[string]string) (*ClientInfo, error) {
 	domain = strings.TrimPrefix(domain, "http://")
 	domain = strings.TrimPrefix(domain, "https://")
 	options := make([]zitadel.Option, 0)
@@ -110,6 +110,16 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		if insecure {
 			clientDomain = domain + ":80"
 		}
+	}
+
+	// Add new TLS skip verify option
+	if insecureSkipVerifyTLS {
+		options = append(options, zitadel.WithInsecureSkipVerifyTLS())
+	}
+
+	// Add transport headers
+	for k, v := range transportHeaders {
+		options = append(options, zitadel.WithTransportHeader(k, v))
 	}
 
 	return &ClientInfo{
