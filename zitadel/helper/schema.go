@@ -10,7 +10,11 @@ import (
 )
 
 const (
-	OrgIDVar = "org_id"
+	OrgIDVar                         = "org_id"
+	InsecureSkipVerifyTLSVar         = "insecure_skip_verify_tls"
+	InsecureSkipVerifyTLSDescription = "Disable TLS certificate verification. Only use in development/testing environments with self-signed certificates."
+	TransportHeadersVar              = "transport_headers"
+	TransportHeadersDescription      = "Custom headers to add to both HTTP (authentication) and gRPC (API) requests. Useful for proxy authentication (e.g., GCP IAP with Proxy-Authorization header)."
 )
 
 var (
