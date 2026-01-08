@@ -30,9 +30,9 @@ func TestAccOrgMember(t *testing.T) {
 		exampleProperty, updatedProperty,
 		"", "", "",
 		true,
-		checkRemoteProperty(*frame, userID),
+		checkRemoteProperty(frame, userID),
 		regexp.MustCompile(fmt.Sprintf("^%s_%s$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern)),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, userID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, userID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, org_member.UserIDVar),
 			test_utils.ImportOrgId(frame),
@@ -40,7 +40,7 @@ func TestAccOrgMember(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, userID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.ListOrgMembers(frame, &management.ListOrgMembersRequest{

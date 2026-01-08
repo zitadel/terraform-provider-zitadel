@@ -32,14 +32,14 @@ func TestDefaultPasswordAgePolicy(t *testing.T) {
 		maxAgeDays, 60,
 		"", "", "",
 		false,
-		checkRemoteProperty(*frame),
+		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
 		test_utils.CheckNothing,
 		test_utils.ImportNothing,
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
 	return func(expect uint64) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.Admin.GetPasswordAgePolicy(frame, &admin.GetPasswordAgePolicyRequest{})

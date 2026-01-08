@@ -32,9 +32,9 @@ func TestAccProjectMember(t *testing.T) {
 		exampleProperty, "PROJECT_OWNER_VIEWER",
 		"", "", "",
 		true,
-		checkRemoteProperty(*frame, projectID, userID),
+		checkRemoteProperty(frame, projectID, userID),
 		regexp.MustCompile(fmt.Sprintf("^%s_%s_%s$", helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern, helper.ZitadelGeneratedIdPattern)),
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(*frame, projectID, userID), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, projectID, userID), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_member.ProjectIDVar),
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, project_member.UserIDVar),
@@ -43,7 +43,7 @@ func TestAccProjectMember(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame test_utils.OrgTestFrame, projectID, userID string) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectID, userID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			resp, err := frame.ListProjectMembers(frame, &management.ListProjectMembersRequest{
