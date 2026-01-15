@@ -7,8 +7,6 @@ description: |-
 
 # zitadel_human_user (Resource)
 
-**Caution: Email can only be set verified if a password is set for the user, either with initial_password or during runtime**
-
 Resource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.
 
 ## Example Usage
