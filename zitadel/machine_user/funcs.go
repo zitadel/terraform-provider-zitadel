@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	objectv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user"
 	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -80,12 +81,41 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	d.SetId(respUser.Id)
 
-	if d.Get(WithSecretVar).(bool) {
+	if desiredType := d.Get(accessTokenTypeVar).(string); desiredType != defaultAccessTokenType {
 		managementClient, err := helper.GetManagementClient(ctx, clientinfo)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 
+		_, err = managementClient.UpdateMachine(helper.CtxWithOrgID(ctx, d), &management.UpdateMachineRequest{
+			UserId:          respUser.Id,
+			Name:            name,
+			Description:     d.Get(DescriptionVar).(string),
+			AccessTokenType: user.AccessTokenType(user.AccessTokenType_value[desiredType]),
+		})
+		if err != nil {
+			return diag.Errorf("failed to set access token type for machine user: %v", err)
+		}
+
+		if d.Get(WithSecretVar).(bool) {
+			resp, err := managementClient.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
+				UserId: respUser.Id,
+			})
+			if err != nil {
+				return diag.Errorf("failed to generate machine user secret: %v", err)
+			}
+			if err := d.Set(clientIDVar, resp.GetClientId()); err != nil {
+				return diag.Errorf("failed to set %s of user: %v", clientIDVar, err)
+			}
+			if err := d.Set(clientSecretVar, resp.GetClientSecret()); err != nil {
+				return diag.Errorf("failed to set %s of user: %v", clientSecretVar, err)
+			}
+		}
+	} else if d.Get(WithSecretVar).(bool) {
+		managementClient, err := helper.GetManagementClient(ctx, clientinfo)
+		if err != nil {
+			return diag.FromErr(err)
+		}
 		resp, err := managementClient.GenerateMachineSecret(helper.CtxWithOrgID(ctx, d), &management.GenerateMachineSecretRequest{
 			UserId: respUser.Id,
 		})
@@ -125,25 +155,25 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		req.Username = &username
 	}
 
-	if d.HasChanges(nameVar, DescriptionVar) {
-		machineUpdate := &userv2.UpdateUserRequest_Machine{}
-
-		if d.HasChange(nameVar) {
-			name := d.Get(nameVar).(string)
-			machineUpdate.Name = &name
-		}
-		if d.HasChange(DescriptionVar) {
-			desc := d.Get(DescriptionVar).(string)
-			machineUpdate.Description = &desc
-		}
-
-		req.UserType = &userv2.UpdateUserRequest_Machine_{
-			Machine: machineUpdate,
+	if req.Username != nil || req.UserType != nil {
+		_, err = client.UpdateUser(helper.CtxWithOrgID(ctx, d), req)
+		if err != nil {
+			return diag.Errorf("failed to update machine user: %v", err)
 		}
 	}
 
-	if req.Username != nil || req.UserType != nil {
-		_, err = client.UpdateUser(helper.CtxWithOrgID(ctx, d), req)
+	if d.HasChanges(nameVar, DescriptionVar, accessTokenTypeVar) {
+		managementClient, err := helper.GetManagementClient(ctx, clientinfo)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		_, err = managementClient.UpdateMachine(helper.CtxWithOrgID(ctx, d), &management.UpdateMachineRequest{
+			UserId:          d.Id(),
+			Name:            d.Get(nameVar).(string),
+			Description:     d.Get(DescriptionVar).(string),
+			AccessTokenType: user.AccessTokenType(user.AccessTokenType_value[d.Get(accessTokenTypeVar).(string)]),
+		})
 		if err != nil {
 			return diag.Errorf("failed to update machine user: %v", err)
 		}
@@ -231,8 +261,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	d.SetId(user.GetUserId())
 	return nil
 }
-
-// zitadel/machine_user/funcs.go - replace list function
 
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started list")
