@@ -33,3 +33,10 @@ resource "zitadel_default_oidc_settings" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```bash
+# The resource can be imported using the ID format `<>`, e.g.
+terraform import zitadel_default_oidc_settings.imported ''
+```
