@@ -13,7 +13,7 @@ Resource representing a SAML IDP on the instance.
 
 ```terraform
 resource "zitadel_idp_saml" "default" {
-  name                = "LDAP"
+  name                = "My Generic SAML IDP"
   binding             = "SAML_BINDING_POST"
   with_signed_request = true
   is_linking_allowed  = false
