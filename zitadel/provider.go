@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_init_message_text"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_invite_user_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_label_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_lockout_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_login_policy"
@@ -50,6 +51,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/email_provider_smtp"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/human_user"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_apple"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_azure_ad"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_github"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_github_es"
@@ -64,6 +66,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_custom_domain"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_custom_domains"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_features"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_trusted_domain"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_trusted_domains"
@@ -75,6 +78,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/machine_user"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/notification_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_apple"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_azure_ad"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_github"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_github_es"
@@ -88,6 +92,9 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_saml"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_metadata"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/organization"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/organization_domain"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/organization_metadata"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_age_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_change_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/password_complexity_policy"
@@ -103,6 +110,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/sms_provider_http"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/sms_provider_twilio"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/smtp_config"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/system_features"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/trigger_actions"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/user_grant"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/user_metadata"
@@ -125,14 +133,16 @@ func NewProviderPV6(option ...zitadelgo.Option) provider.Provider {
 }
 
 type providerModel struct {
-	Insecure       types.Bool   `tfsdk:"insecure"`
-	Domain         types.String `tfsdk:"domain"`
-	Port           types.String `tfsdk:"port"`
-	AccessToken    types.String `tfsdk:"access_token"`
-	Token          types.String `tfsdk:"token"`
-	JWTFile        types.String `tfsdk:"jwt_file"`
-	JWTProfileFile types.String `tfsdk:"jwt_profile_file"`
-	JWTProfileJSON types.String `tfsdk:"jwt_profile_json"`
+	Insecure              types.Bool              `tfsdk:"insecure"`
+	Domain                types.String            `tfsdk:"domain"`
+	Port                  types.String            `tfsdk:"port"`
+	AccessToken           types.String            `tfsdk:"access_token"`
+	Token                 types.String            `tfsdk:"token"`
+	JWTFile               types.String            `tfsdk:"jwt_file"`
+	JWTProfileFile        types.String            `tfsdk:"jwt_profile_file"`
+	JWTProfileJSON        types.String            `tfsdk:"jwt_profile_json"`
+	InsecureSkipVerifyTLS types.Bool              `tfsdk:"insecure_skip_verify_tls"`
+	TransportHeaders      map[string]types.String `tfsdk:"transport_headers"`
 }
 
 func (p *providerPV6) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -183,6 +193,16 @@ func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnost
 				Optional:    true,
 				Description: helper.PortDescription,
 			},
+			helper.InsecureSkipVerifyTLSVar: {
+				Type:        types.BoolType,
+				Optional:    true,
+				Description: helper.InsecureSkipVerifyTLSDescription,
+			},
+			helper.TransportHeadersVar: {
+				Type:        types.MapType{ElemType: types.StringType},
+				Optional:    true,
+				Description: helper.TransportHeadersDescription,
+			},
 		},
 	}, nil
 }
@@ -195,6 +215,11 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
+	transportHeaders := make(map[string]string)
+	for k, v := range config.TransportHeaders {
+		transportHeaders[k] = v.ValueString()
+	}
+
 	info, err := helper.GetClientInfo(ctx,
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
@@ -204,6 +229,8 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		config.JWTProfileFile.ValueString(),
 		config.JWTProfileJSON.ValueString(),
 		config.Port.ValueString(),
+		config.InsecureSkipVerifyTLS.ValueBool(),
+		transportHeaders,
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to handle provider config", err.Error())
@@ -240,6 +267,7 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 		default_verify_sms_otp_message_text.New,
 		verify_email_otp_message_text.New,
 		verify_sms_otp_message_text.New,
+		default_invite_user_message_text.New,
 	}
 }
 
@@ -247,6 +275,12 @@ func Provider() *schema.Provider {
 	return &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
 			"zitadel_zitadel":                    GetZitadelDatasource(),
+			"zitadel_organization":               organization.GetDatasource(),
+			"zitadel_organizations":              organization.ListDatasources(),
+			"zitadel_organization_domain":        organization_domain.GetDatasource(),
+			"zitadel_organization_domains":       organization_domain.ListDatasources(),
+			"zitadel_organization_metadata":      organization_metadata.GetDatasource(),
+			"zitadel_organization_metadatas":     organization_metadata.ListDatasources(),
 			"zitadel_org":                        org.GetDatasource(),
 			"zitadel_orgs":                       org.ListDatasources(),
 			"zitadel_human_user":                 human_user.GetDatasource(),
@@ -277,10 +311,12 @@ func Provider() *schema.Provider {
 			"zitadel_idp_gitlab_self_hosted":     idp_gitlab_self_hosted.GetDatasource(),
 			"zitadel_idp_google":                 idp_google.GetDatasource(),
 			"zitadel_idp_azure_ad":               idp_azure_ad.GetDatasource(),
+			"zitadel_idp_apple":                  idp_apple.GetDatasource(),
 			"zitadel_idp_ldap":                   idp_ldap.GetDatasource(),
 			"zitadel_idp_saml":                   idp_saml.GetDatasource(),
 			"zitadel_idp_oauth":                  idp_oauth.GetDatasource(),
 			"zitadel_idp_oidc":                   idp_oidc.GetDatasource(),
+			"zitadel_org_idp_apple":              org_idp_apple.GetDatasource(),
 			"zitadel_org_jwt_idp":                org_idp_jwt.GetDatasource(),
 			"zitadel_org_idp_jwt":                org_idp_jwt.GetDatasource(),
 			"zitadel_org_oidc_idp":               org_idp_oidc.GetDatasource(),
@@ -298,6 +334,8 @@ func Provider() *schema.Provider {
 			"zitadel_instance":                   instance.GetDatasource(),
 			"zitadel_instance_custom_domains":    instance_custom_domains.GetDatasource(),
 			"zitadel_instance_trusted_domains":   instance_trusted_domains.GetDatasource(),
+			"zitadel_instance_features":          instance_features.GetDatasource(),
+			"zitadel_system_features":            system_features.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
 			helper.DomainVar: {
@@ -371,8 +409,22 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: helper.PortDescription,
 			},
+			helper.InsecureSkipVerifyTLSVar: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: helper.InsecureSkipVerifyTLSDescription,
+			},
+			helper.TransportHeadersVar: {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: helper.TransportHeadersDescription,
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"zitadel_organization":                       organization.GetResource(),
+			"zitadel_organization_domain":                organization_domain.GetResource(),
+			"zitadel_organization_metadata":              organization_metadata.GetResource(),
 			"zitadel_org":                                org.GetResource(),
 			"zitadel_human_user":                         human_user.GetResource(),
 			"zitadel_machine_user":                       machine_user.GetResource(),
@@ -419,6 +471,7 @@ func Provider() *schema.Provider {
 			"zitadel_smtp_config":                        smtp_config.GetResource(),
 			"zitadel_default_notification_policy":        default_notification_policy.GetResource(),
 			"zitadel_notification_policy":                notification_policy.GetResource(),
+			"zitadel_idp_apple":                          idp_apple.GetResource(),
 			"zitadel_idp_github":                         idp_github.GetResource(),
 			"zitadel_idp_github_es":                      idp_github_es.GetResource(),
 			"zitadel_idp_gitlab":                         idp_gitlab.GetResource(),
@@ -429,6 +482,7 @@ func Provider() *schema.Provider {
 			"zitadel_idp_saml":                           idp_saml.GetResource(),
 			"zitadel_idp_oauth":                          idp_oauth.GetResource(),
 			"zitadel_idp_oidc":                           idp_oidc.GetResource(),
+			"zitadel_org_idp_apple":                      org_idp_apple.GetResource(),
 			"zitadel_org_idp_jwt":                        org_idp_jwt.GetResource(),
 			"zitadel_org_idp_oidc":                       org_idp_oidc.GetResource(),
 			"zitadel_org_idp_github":                     org_idp_github.GetResource(),
@@ -448,6 +502,8 @@ func Provider() *schema.Provider {
 			"zitadel_email_provider_smtp":                email_provider_smtp.GetResource(),
 			"zitadel_email_provider_http":                email_provider_http.GetResource(),
 			"zitadel_default_security_settings":          default_security_settings.GetResource(),
+			"zitadel_instance_features":                  instance_features.GetResource(),
+			"zitadel_system_features":                    system_features.GetResource(),
 		},
 		ConfigureContextFunc: ProviderConfigure,
 	}
@@ -475,6 +531,13 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, diag.Errorf("only one authentication method may be configured")
 	}
 
+	transportHeaders := make(map[string]string)
+	if v, ok := d.GetOk(helper.TransportHeadersVar); ok {
+		for k, v := range v.(map[string]interface{}) {
+			transportHeaders[k] = v.(string)
+		}
+	}
+
 	clientinfo, err := helper.GetClientInfo(ctx,
 		d.Get(helper.InsecureVar).(bool),
 		d.Get(helper.DomainVar).(string),
@@ -484,6 +547,8 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		d.Get(helper.JWTProfileFileVar).(string),
 		d.Get(helper.JWTProfileJSONVar).(string),
 		d.Get(helper.PortVar).(string),
+		d.Get(helper.InsecureSkipVerifyTLSVar).(bool),
+		transportHeaders,
 	)
 	if err != nil {
 		return nil, diag.FromErr(err)

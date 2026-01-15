@@ -12,10 +12,13 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/action/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	featurev2 "github.com/zitadel/zitadel-go/v3/pkg/client/feature/v2"
 	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/instance/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
+	orgV2 "github.com/zitadel/zitadel-go/v3/pkg/client/org/v2"
 	settingsv2 "github.com/zitadel/zitadel-go/v3/pkg/client/settings/v2"
+	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/user/v2"
 	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/webkey/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"golang.org/x/oauth2"
@@ -50,7 +53,7 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string) (*ClientInfo, error) {
+func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string, insecureSkipVerifyTLS bool, transportHeaders map[string]string) (*ClientInfo, error) {
 	domain = strings.TrimPrefix(domain, "http://")
 	domain = strings.TrimPrefix(domain, "https://")
 	options := make([]zitadel.Option, 0)
@@ -109,6 +112,16 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		}
 	}
 
+	// Add new TLS skip verify option
+	if insecureSkipVerifyTLS {
+		options = append(options, zitadel.WithInsecureSkipVerifyTLS())
+	}
+
+	// Add transport headers
+	for k, v := range transportHeaders {
+		options = append(options, zitadel.WithTransportHeader(k, v))
+	}
+
 	return &ClientInfo{
 		clientDomain,
 		issuer,
@@ -141,6 +154,29 @@ func GetSecuritySettingsClient(ctx context.Context, info *ClientInfo) (*settings
 	return securitySettingsClient, nil
 }
 
+var orgClientLock = &sync.Mutex{}
+var orgClient *orgV2.Client
+
+func GetOrgClient(ctx context.Context, info *ClientInfo) (*orgV2.Client, error) {
+	if orgClient == nil {
+		orgClientLock.Lock()
+		defer orgClientLock.Unlock()
+		if orgClient == nil {
+			client, err := orgV2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			orgClient = client
+		}
+	}
+	return orgClient, nil
+}
+
 var actionClientLock = &sync.Mutex{}
 var actionClient *actionV2.Client
 
@@ -162,6 +198,29 @@ func GetActionClient(ctx context.Context, info *ClientInfo) (*actionV2.Client, e
 		}
 	}
 	return actionClient, nil
+}
+
+var featureClientLock = &sync.Mutex{}
+var featureClient *featurev2.Client
+
+func GetFeatureClient(ctx context.Context, info *ClientInfo) (*featurev2.Client, error) {
+	if featureClient == nil {
+		featureClientLock.Lock()
+		defer featureClientLock.Unlock()
+		if featureClient == nil {
+			client, err := featurev2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel feature client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			featureClient = client
+		}
+	}
+	return featureClient, nil
 }
 
 var webkeyClientLock = &sync.Mutex{}
@@ -208,6 +267,52 @@ func GetManagementClient(ctx context.Context, info *ClientInfo) (*management.Cli
 		}
 	}
 	return mgmtClient, nil
+}
+
+var orgV2ClientLock = &sync.Mutex{}
+var orgV2Client *orgV2.Client
+
+func GetOrgV2Client(ctx context.Context, info *ClientInfo) (*orgV2.Client, error) {
+	if orgV2Client == nil {
+		orgV2ClientLock.Lock()
+		defer orgV2ClientLock.Unlock()
+		if orgV2Client == nil {
+			client, err := orgV2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel org v2 client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			orgV2Client = client
+		}
+	}
+	return orgV2Client, nil
+}
+
+var userV2ClientLock = &sync.Mutex{}
+var userV2Client *userv2.Client
+
+func GetUserV2Client(ctx context.Context, info *ClientInfo) (*userv2.Client, error) {
+	if userV2Client == nil {
+		userV2ClientLock.Lock()
+		defer userV2ClientLock.Unlock()
+		if userV2Client == nil {
+			client, err := userv2.NewClient(ctx,
+				info.Issuer, info.Domain,
+				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+				info.Options...,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to start zitadel user v2 client: %v", err)
+			}
+			time.Sleep(time.Second * 2)
+			userV2Client = client
+		}
+	}
+	return userV2Client, nil
 }
 
 var adminClientLock = &sync.Mutex{}

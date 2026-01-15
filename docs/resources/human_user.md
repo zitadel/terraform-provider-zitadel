@@ -7,8 +7,6 @@ description: |-
 
 # zitadel_human_user (Resource)
 
-**Caution: Email can only be set verified if a password is set for the user, either with initial_password or during runtime**
-
 Resource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.
 
 ## Example Usage
@@ -55,6 +53,7 @@ resource "zitadel_human_user" "default" {
 - `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `phone` (String) Phone of the user
 - `preferred_language` (String) Preferred language of the user
+- `user_id` (String) The ID of this resource. Optionally set a custom unique ID. If omitted, ZITADEL will generate one.
 
 ### Read-Only
 

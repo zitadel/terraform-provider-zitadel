@@ -34,6 +34,13 @@ override.tf.json
 .idea
 .run
 
+.go
+
+
+devbox.json
+devbox.lock
+.devbox
+
 # local binary
 terraform-provider-zitadel
 
@@ -44,6 +51,7 @@ devbox.json
 devbox.lock
 
 vendor
+dist
 
 # Claude
 .claude

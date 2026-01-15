@@ -2,11 +2,14 @@ package zitadel
 
 import (
 	"context"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -52,6 +55,8 @@ func TestClientInfo_Schemes(t *testing.T) {
 				"",        // jwtProfileFile
 				dummyJSON, // jwtProfileJSON
 				"",        // port
+				false,     // insecureSkipVerifyTLS
+				nil,       // transportHeaders
 			)
 			if err != nil {
 				t.Fatalf("GetClientInfo() error = %v", err)
@@ -104,12 +109,169 @@ func TestClientInfo_Files(t *testing.T) {
 				tt.jwtProfile, // jwtProfileFile
 				"",            // jwtProfileJSON
 				"",            // port
+				false,         // insecureSkipVerifyTLS
+				nil,           // transportHeaders
 			)
 			if (err != nil) != tt.wantError {
 				t.Errorf("GetClientInfo() error = %v, wantError %v", err, tt.wantError)
 			}
 		})
 	}
+}
+
+func expectedResourceTemplate(name string, includeImport bool) string {
+	content := `---
+page_title: "{{.Name}} {{.Type}} - {{.ProviderName}}"
+subcategory: ""
+description: |-
+{{ .Description | plainmarkdown | trimspace | prefixlines "  " }}
+---
+
+# {{.Name}} ({{.Type}})
+
+{{ .Description | trimspace }}
+
+## Example Usage
+
+{{ tffile "examples/provider/resources/` + name + `.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
+`
+	if includeImport {
+		content += `
+## Import
+
+{{ codefile "bash" "examples/provider/resources/` + name + `-import.sh" }}
+`
+	}
+	return content
+}
+
+func expectedDataSourceTemplate(name string) string {
+	return `---
+page_title: "{{.Name}} {{.Type}} - {{.ProviderName}}"
+subcategory: ""
+description: |-
+{{ .Description | plainmarkdown | trimspace | prefixlines "  " }}
+---
+
+# {{.Name}} ({{.Type}})
+
+{{ .Description | trimspace }}
+
+## Example Usage
+
+{{ tffile "examples/provider/data-sources/` + name + `.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
+`
+}
+
+func TestDocumentationTemplates(t *testing.T) {
+	sdkProvider := Provider()
+	frameworkProvider := NewProviderPV6()
+
+	t.Run("resources", func(t *testing.T) {
+		type resourceInfo struct {
+			hasImport bool
+		}
+
+		ctx := context.Background()
+		resources := make(map[string]resourceInfo)
+
+		for name, res := range sdkProvider.ResourcesMap {
+			name := strings.TrimPrefix(name, "zitadel_")
+			resources[name] = resourceInfo{hasImport: res.Importer != nil}
+		}
+
+		for _, factory := range frameworkProvider.Resources(ctx) {
+			res := factory()
+			var resp resource.MetadataResponse
+			res.Metadata(ctx, resource.MetadataRequest{ProviderTypeName: "zitadel"}, &resp)
+			name := strings.TrimPrefix(resp.TypeName, "zitadel_")
+			info := resources[name]
+			if _, ok := res.(resource.ResourceWithImportState); ok {
+				info.hasImport = true
+			}
+			resources[name] = info
+		}
+
+		names := make([]string, 0, len(resources))
+		for name := range resources {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+
+		for _, name := range names {
+			name := name
+			info := resources[name]
+			t.Run(name, func(t *testing.T) {
+				templatePath := filepath.Join("..", "templates", "resources", name+".md.tmpl")
+				content, err := os.ReadFile(templatePath)
+				if err != nil {
+					t.Fatalf("failed to read template %s: %v", templatePath, err)
+				}
+
+				expected := expectedResourceTemplate(name, info.hasImport)
+				if string(content) != expected {
+					t.Fatalf("template %s does not match expected format", templatePath)
+				}
+
+				examplePath := filepath.Join("..", "examples", "provider", "resources", name+".tf")
+				if _, err := os.Stat(examplePath); err != nil {
+					t.Fatalf("example file %s missing: %v", examplePath, err)
+				}
+
+				if info.hasImport {
+					importPath := filepath.Join("..", "examples", "provider", "resources", name+"-import.sh")
+					if _, err := os.Stat(importPath); err != nil {
+						t.Fatalf("import example %s missing: %v", importPath, err)
+					}
+				}
+			})
+		}
+	})
+
+	t.Run("data_sources", func(t *testing.T) {
+		ctx := context.Background()
+		dataSources := make(map[string]struct{})
+		for name := range sdkProvider.DataSourcesMap {
+			dataSources[strings.TrimPrefix(name, "zitadel_")] = struct{}{}
+		}
+		for _, factory := range frameworkProvider.DataSources(ctx) {
+			ds := factory()
+			var resp datasource.MetadataResponse
+			ds.Metadata(ctx, datasource.MetadataRequest{ProviderTypeName: "zitadel"}, &resp)
+			dataSources[strings.TrimPrefix(resp.TypeName, "zitadel_")] = struct{}{}
+		}
+
+		names := make([]string, 0, len(dataSources))
+		for name := range dataSources {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+
+		for _, name := range names {
+			name := name
+			t.Run(name, func(t *testing.T) {
+				templatePath := filepath.Join("..", "templates", "data-sources", name+".md.tmpl")
+				content, err := os.ReadFile(templatePath)
+				if err != nil {
+					t.Fatalf("failed to read template %s: %v", templatePath, err)
+				}
+
+				expected := expectedDataSourceTemplate(name)
+				if string(content) != expected {
+					t.Fatalf("template %s does not match expected format", templatePath)
+				}
+
+				examplePath := filepath.Join("..", "examples", "provider", "data-sources", name+".tf")
+				if _, err := os.Stat(examplePath); err != nil {
+					t.Fatalf("example file %s missing: %v", examplePath, err)
+				}
+			})
+		}
+	})
 }
 
 // TestDocumentation verifies that the generated documentation in the docs/
