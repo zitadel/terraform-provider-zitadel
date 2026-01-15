@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/machine_user"
 )
 
-func TestAccMachineUser(t *testing.T) {
+func TestAccMachineUserWithoutSecret(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_machine_user")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	exampleUsername := test_utils.AttributeValue(t, machine_user.UserNameVar, exampleAttributes).AsString()
@@ -42,6 +42,36 @@ func TestAccMachineUser(t *testing.T) {
 	)
 }
 
+func TestAccMachineUserWithSecret(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_machine_user")
+	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
+	exampleUsername := test_utils.AttributeValue(t, machine_user.UserNameVar, exampleAttributes).AsString()
+	resourceExample = strings.Replace(resourceExample, exampleUsername, frame.UniqueResourcesID, 1)
+	exampleProperty := test_utils.AttributeValue(t, machine_user.DescriptionVar, exampleAttributes).AsString()
+	exampleWithSecret := strconv.FormatBool(test_utils.AttributeValue(t, machine_user.WithSecretVar, exampleAttributes).True())
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency},
+		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleWithSecret),
+		exampleProperty, "updatedproperty",
+		"", "true", "true",
+		false,
+		checkRemotePropertyWithSecret(frame),
+		helper.ZitadelGeneratedIdOnlyRegex,
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			func(state *terraform.State) (string, error) {
+				return strconv.FormatBool(true), nil
+			},
+			test_utils.ImportOrgId(frame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, "client_id"),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, "client_secret"),
+		),
+	)
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
@@ -55,5 +85,15 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.T
 			}
 			return nil
 		}
+	}
+}
+
+func checkRemotePropertyWithSecret(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
+		return resource.ComposeAggregateTestCheckFunc(
+			checkRemoteProperty(frame)(expect),
+			resource.TestCheckResourceAttrSet(frame.TerraformName, "client_id"),
+			resource.TestCheckResourceAttrSet(frame.TerraformName, "client_secret"),
+		)
 	}
 }
