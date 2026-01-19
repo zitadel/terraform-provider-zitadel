@@ -164,15 +164,15 @@ func TestImportWithAttributes(t *testing.T) {
 			},
 		},
 	}, {
-		name: `<[org_id]> with 'invalid id' fails`,
+		name: `<[org_id]> with custom org_id 'my-custom-org' works`,
 		args: args{
 			attrs: []importAttribute{ImportOptionalOrgAttribute},
-			id:    "invalid id",
+			id:    "my-custom-org",
 		},
 		want: want{
-			expectErrorWithIDFormat: "<[org_id]>",
-			expectErrorWithMinParts: -1,
-			expectErrorWithMaxParts: -1,
+			attributes: map[string]interface{}{
+				"id": "my-custom-org",
+			},
 		},
 	}, {
 		name: `<required_id[:optional_id]> with empty id and '123...:123...' works`,
@@ -289,4 +289,59 @@ func (m mockState) Set(key string, value interface{}) error {
 
 func concat(attr ...string) string {
 	return strings.Join(attr, ":")
+}
+
+// TestOrgIDPResourcesImportWithCustomOrgID tests that all org IDP resources
+// can import with custom org IDs (not just 18-digit ZITADEL-generated IDs).
+// This is a regression test for https://github.com/zitadel/terraform-provider-zitadel/issues/344
+func TestOrgIDPResourcesImportWithCustomOrgID(t *testing.T) {
+	validIDPId := "123456789012345678"
+	customOrgID := "my-custom-org-id"
+
+	// All org IDP resources use ImportWithIDAndOptionalOrg which has the format:
+	// <idp_id>:<org_id> where org_id is optional
+	idpResources := []string{
+		"zitadel_org_idp_apple",
+		"zitadel_org_idp_azure_ad",
+		"zitadel_org_idp_github",
+		"zitadel_org_idp_github_es",
+		"zitadel_org_idp_gitlab",
+		"zitadel_org_idp_gitlab_self_hosted",
+		"zitadel_org_idp_google",
+		"zitadel_org_idp_jwt",
+		"zitadel_org_idp_ldap",
+		"zitadel_org_idp_oauth",
+		"zitadel_org_idp_oidc",
+		"zitadel_org_idp_saml",
+	}
+
+	for _, resource := range idpResources {
+		t.Run(resource+" import with custom org_id", func(t *testing.T) {
+			// Simulate the import with format: <idp_id>:<custom_org_id>
+			state := newMockState()
+			importID := concat(validIDPId, customOrgID)
+			state.SetId(importID)
+
+			// All org IDP resources use ImportWithIDAndOptionalOrg("id")
+			// which internally uses: [ConvertID for id, ConvertNonEmpty for org_id]
+			attrs := []importAttribute{
+				NewImportAttribute("id", ConvertID, false),
+				ImportOptionalOrgAttribute,
+			}
+
+			err := importWithAttributes(state, attrs...)
+			if err != nil {
+				t.Errorf("%s: import with custom org_id failed: %v", resource, err)
+				return
+			}
+
+			// Verify the state was set correctly
+			if state["id"] != validIDPId {
+				t.Errorf("%s: expected id=%s, got %s", resource, validIDPId, state["id"])
+			}
+			if state[OrgIDVar] != customOrgID {
+				t.Errorf("%s: expected org_id=%s, got %s", resource, customOrgID, state[OrgIDVar])
+			}
+		})
+	}
 }
