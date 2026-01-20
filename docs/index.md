@@ -53,12 +53,28 @@ provider "zitadel" {
 
 ### Optional
 
-- `access_token` (String, Sensitive) Personal Access Token to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required
+- `access_token` (String, Sensitive) Personal Access Token to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' is required
 - `insecure` (Boolean) Use insecure connection
 - `insecure_skip_verify_tls` (Boolean) Disable TLS certificate verification. Only use in development/testing environments with self-signed certificates.
-- `jwt_file` (String) Path to the file containing presigned JWT to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required
-- `jwt_profile_file` (String) Path to the file containing credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required
-- `jwt_profile_json` (String) JSON value of credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required
+- `jwt_file` (String) Path to the file containing presigned JWT to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' is required
+- `jwt_profile_file` (String) Path to the file containing credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' is required
+- `jwt_profile_json` (String) JSON value of credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' is required
 - `port` (String) Used port if not the default ports 80 or 443 are configured
+- `system_api` (Block List, Max: 1) Configuration block for authenticating with the ZITADEL System API using a PEM encoded key. (see [below for nested schema](#nestedblock--system_api))
 - `token` (String) Path to the file containing credentials to connect to ZITADEL
 - `transport_headers` (Map of String) Custom headers to add to both HTTP (authentication) and gRPC (API) requests. Useful for proxy authentication (e.g., GCP IAP with Proxy-Authorization header).
+
+<a id="nestedblock--system_api"></a>
+### Nested Schema for `system_api`
+
+Required:
+
+- `user` (String) User ID configured for the System API key. Used as both issuer and subject in the self-signed JWT.
+
+Optional:
+
+- `audience` (String) Audience to set on the System API JWT. Defaults to the issuer derived from domain/port if omitted.
+- `key` (String, Sensitive) PEM encoded private key for a ZITADEL System API user. Either 'key_file'/'key' or the 'private_key'+'public_key' pair is required when using System API authentication.
+- `key_file` (String) Path to the PEM encoded private key for a ZITADEL System API user. Either 'key_file'/'key' or the 'private_key'+'public_key' pair is required when using System API authentication.
+- `private_key` (String, Sensitive) PEM encoded private key for a ZITADEL System API user when provided separately from the public key. Use together with 'public_key'.
+- `public_key` (String) PEM encoded public key for a ZITADEL System API user when provided separately from the private key. Use together with 'private_key'.

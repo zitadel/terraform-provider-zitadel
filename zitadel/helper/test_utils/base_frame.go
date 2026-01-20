@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-mux/tf5to6server"
 	"github.com/hashicorp/terraform-plugin-mux/tf6muxserver"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel"
@@ -53,6 +54,10 @@ provider "zitadel" {
 KEY
 }
 `, domain, insecure, port, string(jwtProfileJson))
+	return buildBaseTestFrame(ctx, resourceType, domain, providerSnippet, zitadelProvider), nil
+}
+
+func buildBaseTestFrame(ctx context.Context, resourceType, domain, providerSnippet string, zitadelProvider *schema.Provider) *BaseTestFrame {
 	clientInfo := zitadelProvider.Meta().(*helper.ClientInfo)
 	uniqueID := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 	terraformName := fmt.Sprintf("%s.default", resourceType)
@@ -85,7 +90,7 @@ KEY
 			return muxServer.ProviderServer(), nil
 		},
 	}
-	return frame, nil
+	return frame
 }
 
 func (b *BaseTestFrame) State(state *terraform.State) *terraform.InstanceState {
