@@ -54,6 +54,10 @@ func TestClientInfo_Schemes(t *testing.T) {
 				"",        // jwtFile
 				"",        // jwtProfileFile
 				dummyJSON, // jwtProfileJSON
+				"",        // systemAPIKeyFile
+				"",        // systemAPIKey
+				"",        // systemAPIUser
+				"",        // systemAPIAudience
 				"",        // port
 				false,     // insecureSkipVerifyTLS
 				nil,       // transportHeaders
@@ -108,6 +112,10 @@ func TestClientInfo_Files(t *testing.T) {
 				tt.jwtFile,    // jwtFile
 				tt.jwtProfile, // jwtProfileFile
 				"",            // jwtProfileJSON
+				"",            // systemAPIKeyFile
+				"",            // systemAPIKey
+				"",            // systemAPIUser
+				"",            // systemAPIAudience
 				"",            // port
 				false,         // insecureSkipVerifyTLS
 				nil,           // transportHeaders
@@ -287,10 +295,27 @@ func TestDocumentationTemplates(t *testing.T) {
 //
 // Then commit the updated documentation files.
 func TestDocumentation(t *testing.T) {
+	repoRoot, err := filepath.Abs("..")
+	if err != nil {
+		t.Fatalf("failed to resolve repository root: %v", err)
+	}
+	gocache := filepath.Join(repoRoot, ".gocache")
+	gomodcache := filepath.Join(repoRoot, ".go")
+	if err := os.MkdirAll(gocache, 0o755); err != nil {
+		t.Fatalf("failed to create gocache dir: %v", err)
+	}
+	if err := os.MkdirAll(gomodcache, 0o755); err != nil {
+		t.Fatalf("failed to create gomodcache dir: %v", err)
+	}
+
 	generate := exec.Command("go", "run",
 		"github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.14.1",
 		"generate")
 	generate.Dir = ".."
+	generate.Env = append(os.Environ(),
+		"GOCACHE="+gocache,
+		"GOMODCACHE="+gomodcache,
+	)
 	if output, err := generate.CombinedOutput(); err != nil {
 		t.Fatalf("tfplugindocs generate failed: %v\n%s", err, output)
 	}
