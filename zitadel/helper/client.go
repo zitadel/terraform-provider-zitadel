@@ -32,17 +32,31 @@ const (
 	InsecureVar               = "insecure"
 	InsecureDescription       = "Use insecure connection"
 	AccessTokenVar            = "access_token"
-	AccessTokenDescription    = "Personal Access Token to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	AccessTokenDescription    = "Personal Access Token to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' is required"
 	TokenVar                  = "token"
 	TokenDescription          = "Path to the file containing credentials to connect to ZITADEL"
 	PortVar                   = "port"
 	PortDescription           = "Used port if not the default ports 80 or 443 are configured"
 	JWTFileVar                = "jwt_file"
-	JWTFileDescription        = "Path to the file containing presigned JWT to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTFileDescription        = "Path to the file containing presigned JWT to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' is required"
 	JWTProfileFileVar         = "jwt_profile_file"
-	JWTProfileFileDescription = "Path to the file containing credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTProfileFileDescription = "Path to the file containing credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' is required"
 	JWTProfileJSONVar         = "jwt_profile_json"
-	JWTProfileJSONDescription = "JSON value of credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required"
+	JWTProfileJSONDescription = "JSON value of credentials to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' is required"
+	SystemAPIVar              = "system_api"
+	SystemAPIDescription      = "Configuration block for authenticating with the ZITADEL System API using a PEM encoded key."
+	SystemAPIKeyFileAttr      = "key_file"
+	SystemAPIKeyFileDesc      = "Path to the PEM encoded private key for a ZITADEL System API user. Either 'key_file'/'key' or the 'private_key'+'public_key' pair is required when using System API authentication."
+	SystemAPIKeyAttr          = "key"
+	SystemAPIKeyDesc          = "PEM encoded private key for a ZITADEL System API user. Either 'key_file'/'key' or the 'private_key'+'public_key' pair is required when using System API authentication."
+	SystemAPIPrivateKeyAttr   = "private_key"
+	SystemAPIPrivateKeyDesc   = "PEM encoded private key for a ZITADEL System API user when provided separately from the public key. Use together with 'public_key'."
+	SystemAPIPublicKeyAttr    = "public_key"
+	SystemAPIPublicKeyDesc    = "PEM encoded public key for a ZITADEL System API user when provided separately from the private key. Use together with 'private_key'."
+	SystemAPIUserAttr         = "user"
+	SystemAPIUserDesc         = "User ID configured for the System API key. Used as both issuer and subject in the self-signed JWT."
+	SystemAPIAudienceAttr     = "audience"
+	SystemAPIAudienceDesc     = "Audience to set on the System API JWT. Defaults to the issuer derived from domain/port if omitted."
 )
 
 type ClientInfo struct {
@@ -53,40 +67,11 @@ type ClientInfo struct {
 	Options []zitadel.Option
 }
 
-func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, port string, insecureSkipVerifyTLS bool, transportHeaders map[string]string) (*ClientInfo, error) {
+func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, systemAPIKeyFile string, systemAPIKey string, systemAPIPrivateKey string, systemAPIPublicKey string, systemAPIUser string, systemAPIAudience string, port string, insecureSkipVerifyTLS bool, transportHeaders map[string]string) (*ClientInfo, error) {
 	domain = strings.TrimPrefix(domain, "http://")
 	domain = strings.TrimPrefix(domain, "https://")
+
 	options := make([]zitadel.Option, 0)
-	keyPath := ""
-	if accessToken != "" {
-		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{
-			AccessToken: accessToken,
-			TokenType:   "Bearer",
-		})
-		options = append(options, zitadel.WithTokenSource(tokenSource))
-	} else if token != "" {
-		if _, err := os.Stat(token); err != nil {
-			return nil, fmt.Errorf("failed to read token file: %v", err)
-		}
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
-		keyPath = token
-	} else if jwtFile != "" {
-		jwt, err := os.ReadFile(jwtFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read JWT file: %v", err)
-		}
-		options = append(options, zitadel.WithJWTDirectTokenSource(string(jwt)))
-	} else if jwtProfileFile != "" {
-		if _, err := os.Stat(jwtProfileFile); err != nil {
-			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
-		}
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
-		keyPath = jwtProfileFile
-	} else if jwtProfileJSON != "" {
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
-	} else {
-		return nil, fmt.Errorf("either 'access_token', 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
-	}
 
 	issuerScheme := "https://"
 	if insecure {
@@ -112,21 +97,86 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		}
 	}
 
-	// Add new TLS skip verify option
 	if insecureSkipVerifyTLS {
 		options = append(options, zitadel.WithInsecureSkipVerifyTLS())
 	}
 
-	// Add transport headers
 	for k, v := range transportHeaders {
 		options = append(options, zitadel.WithTransportHeader(k, v))
+	}
+
+	keyPath := ""
+	var keyData []byte
+
+	switch {
+	case accessToken != "":
+		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken, TokenType: "Bearer"})
+		options = append(options, zitadel.WithTokenSource(tokenSource))
+	case token != "":
+		if _, err := os.Stat(token); err != nil {
+			return nil, fmt.Errorf("failed to read token file: %v", err)
+		}
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
+		keyPath = token
+	case jwtFile != "":
+		jwt, err := os.ReadFile(jwtFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read JWT file: %v", err)
+		}
+		options = append(options, zitadel.WithJWTDirectTokenSource(string(jwt)))
+	case jwtProfileFile != "":
+		if _, err := os.Stat(jwtProfileFile); err != nil {
+			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
+		}
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
+		keyPath = jwtProfileFile
+	case jwtProfileJSON != "":
+		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
+		keyData = []byte(jwtProfileJSON)
+	case systemAPIKeyFile != "" || systemAPIKey != "" || systemAPIPrivateKey != "" || systemAPIPublicKey != "":
+		if systemAPIUser == "" {
+			return nil, fmt.Errorf("system_api.user is required when using System API authentication")
+		}
+
+		var keyPEM []byte
+		switch {
+		case systemAPIPrivateKey != "" || systemAPIPublicKey != "":
+			if systemAPIPrivateKey == "" || systemAPIPublicKey == "" {
+				return nil, fmt.Errorf("both system_api.private_key and system_api.public_key must be set when providing split keys")
+			}
+			keyPEM = []byte(systemAPIPrivateKey)
+			if err := verifyMatchingPublicKey(keyPEM, []byte(systemAPIPublicKey)); err != nil {
+				return nil, fmt.Errorf("system api keys do not match: %w", err)
+			}
+		case systemAPIKeyFile != "":
+			data, err := os.ReadFile(systemAPIKeyFile)
+			if err != nil {
+				return nil, fmt.Errorf("failed to read system_api_key_file: %v", err)
+			}
+			keyPEM = data
+		default:
+			keyPEM = []byte(systemAPIKey)
+		}
+
+		audience := systemAPIAudience
+		if audience == "" {
+			audience = issuer
+		}
+
+		ts, err := NewSystemAPITokenSourceFromPEM(keyPEM, systemAPIUser, audience)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create system api token source: %w", err)
+		}
+		options = append(options, zitadel.WithTokenSource(ts))
+	default:
+		return nil, fmt.Errorf("either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' (with 'key', 'key_file', or both 'private_key' and 'public_key') is required")
 	}
 
 	return &ClientInfo{
 		clientDomain,
 		issuer,
 		keyPath,
-		[]byte(jwtProfileJSON),
+		keyData,
 		options,
 	}, nil
 }

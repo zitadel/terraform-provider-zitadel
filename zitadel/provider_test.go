@@ -54,6 +54,12 @@ func TestClientInfo_Schemes(t *testing.T) {
 				"",        // jwtFile
 				"",        // jwtProfileFile
 				dummyJSON, // jwtProfileJSON
+				"",        // systemAPIKeyFile
+				"",        // systemAPIKey
+				"",        // systemAPIPrivateKey
+				"",        // systemAPIPublicKey
+				"",        // systemAPIUser
+				"",        // systemAPIAudience
 				"",        // port
 				false,     // insecureSkipVerifyTLS
 				nil,       // transportHeaders
@@ -108,6 +114,12 @@ func TestClientInfo_Files(t *testing.T) {
 				tt.jwtFile,    // jwtFile
 				tt.jwtProfile, // jwtProfileFile
 				"",            // jwtProfileJSON
+				"",            // systemAPIKeyFile
+				"",            // systemAPIKey
+				"",            // systemAPIPrivateKey
+				"",            // systemAPIPublicKey
+				"",            // systemAPIUser
+				"",            // systemAPIAudience
 				"",            // port
 				false,         // insecureSkipVerifyTLS
 				nil,           // transportHeaders

@@ -141,8 +141,18 @@ type providerModel struct {
 	JWTFile               types.String            `tfsdk:"jwt_file"`
 	JWTProfileFile        types.String            `tfsdk:"jwt_profile_file"`
 	JWTProfileJSON        types.String            `tfsdk:"jwt_profile_json"`
+	SystemAPI             []systemAPIModel        `tfsdk:"system_api"`
 	InsecureSkipVerifyTLS types.Bool              `tfsdk:"insecure_skip_verify_tls"`
 	TransportHeaders      map[string]types.String `tfsdk:"transport_headers"`
+}
+
+type systemAPIModel struct {
+	KeyFile    types.String `tfsdk:"key_file"`
+	Key        types.String `tfsdk:"key"`
+	PrivateKey types.String `tfsdk:"private_key"`
+	PublicKey  types.String `tfsdk:"public_key"`
+	User       types.String `tfsdk:"user"`
+	Audience   types.String `tfsdk:"audience"`
 }
 
 func (p *providerPV6) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -204,6 +214,47 @@ func (p *providerPV6) GetSchema(_ context.Context) (tfsdk.Schema, fdiag.Diagnost
 				Description: helper.TransportHeadersDescription,
 			},
 		},
+		Blocks: map[string]tfsdk.Block{
+			helper.SystemAPIVar: {
+				Description: helper.SystemAPIDescription,
+				NestingMode: tfsdk.BlockNestingModeList,
+				MaxItems:    1,
+				Attributes: map[string]tfsdk.Attribute{
+					helper.SystemAPIKeyFileAttr: {
+						Type:        types.StringType,
+						Optional:    true,
+						Description: helper.SystemAPIKeyFileDesc,
+					},
+					helper.SystemAPIKeyAttr: {
+						Type:        types.StringType,
+						Optional:    true,
+						Sensitive:   true,
+						Description: helper.SystemAPIKeyDesc,
+					},
+					helper.SystemAPIPrivateKeyAttr: {
+						Type:        types.StringType,
+						Optional:    true,
+						Sensitive:   true,
+						Description: helper.SystemAPIPrivateKeyDesc,
+					},
+					helper.SystemAPIPublicKeyAttr: {
+						Type:        types.StringType,
+						Optional:    true,
+						Description: helper.SystemAPIPublicKeyDesc,
+					},
+					helper.SystemAPIUserAttr: {
+						Type:        types.StringType,
+						Required:    true,
+						Description: helper.SystemAPIUserDesc,
+					},
+					helper.SystemAPIAudienceAttr: {
+						Type:        types.StringType,
+						Optional:    true,
+						Description: helper.SystemAPIAudienceDesc,
+					},
+				},
+			},
+		},
 	}, nil
 }
 
@@ -220,6 +271,58 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		transportHeaders[k] = v.ValueString()
 	}
 
+	credentials := 0
+	var systemKeyFile, systemKey, systemPrivateKey, systemPublicKey, systemUser, systemAudience string
+	if len(config.SystemAPI) > 0 {
+		sa := config.SystemAPI[0]
+		if !sa.KeyFile.IsNull() && !sa.KeyFile.IsUnknown() {
+			systemKeyFile = sa.KeyFile.ValueString()
+		}
+		if !sa.Key.IsNull() && !sa.Key.IsUnknown() {
+			systemKey = sa.Key.ValueString()
+		}
+		if !sa.PrivateKey.IsNull() && !sa.PrivateKey.IsUnknown() {
+			systemPrivateKey = sa.PrivateKey.ValueString()
+		}
+		if !sa.PublicKey.IsNull() && !sa.PublicKey.IsUnknown() {
+			systemPublicKey = sa.PublicKey.ValueString()
+		}
+		if !sa.User.IsNull() && !sa.User.IsUnknown() {
+			systemUser = sa.User.ValueString()
+		}
+		if !sa.Audience.IsNull() && !sa.Audience.IsUnknown() {
+			systemAudience = sa.Audience.ValueString()
+		}
+	}
+
+	if !config.AccessToken.IsNull() && !config.AccessToken.IsUnknown() && config.AccessToken.ValueString() != "" {
+		credentials++
+	}
+	if !config.Token.IsNull() && !config.Token.IsUnknown() && config.Token.ValueString() != "" {
+		credentials++
+	}
+	if !config.JWTFile.IsNull() && !config.JWTFile.IsUnknown() && config.JWTFile.ValueString() != "" {
+		credentials++
+	}
+	if !config.JWTProfileFile.IsNull() && !config.JWTProfileFile.IsUnknown() && config.JWTProfileFile.ValueString() != "" {
+		credentials++
+	}
+	if !config.JWTProfileJSON.IsNull() && !config.JWTProfileJSON.IsUnknown() && config.JWTProfileJSON.ValueString() != "" {
+		credentials++
+	}
+	if systemKeyFile != "" || systemKey != "" || systemPrivateKey != "" || systemPublicKey != "" {
+		credentials++
+	}
+
+	if credentials == 0 {
+		resp.Diagnostics.AddError("invalid provider config", "one authentication method must be configured")
+		return
+	}
+	if credentials > 1 {
+		resp.Diagnostics.AddError("invalid provider config", "only one authentication method may be configured")
+		return
+	}
+
 	info, err := helper.GetClientInfo(ctx,
 		config.Insecure.ValueBool(),
 		config.Domain.ValueString(),
@@ -228,6 +331,12 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		config.JWTFile.ValueString(),
 		config.JWTProfileFile.ValueString(),
 		config.JWTProfileJSON.ValueString(),
+		systemKeyFile,
+		systemKey,
+		systemPrivateKey,
+		systemPublicKey,
+		systemUser,
+		systemAudience,
 		config.Port.ValueString(),
 		config.InsecureSkipVerifyTLS.ValueBool(),
 		transportHeaders,
@@ -358,6 +467,7 @@ func Provider() *schema.Provider {
 					helper.JWTFileVar,
 					helper.JWTProfileFileVar,
 					helper.JWTProfileJSONVar,
+					helper.SystemAPIVar,
 				},
 			},
 			helper.TokenVar: {
@@ -369,6 +479,7 @@ func Provider() *schema.Provider {
 					helper.JWTFileVar,
 					helper.JWTProfileFileVar,
 					helper.JWTProfileJSONVar,
+					helper.SystemAPIVar,
 				},
 			},
 			helper.JWTFileVar: {
@@ -380,6 +491,7 @@ func Provider() *schema.Provider {
 					helper.TokenVar,
 					helper.JWTProfileFileVar,
 					helper.JWTProfileJSONVar,
+					helper.SystemAPIVar,
 				},
 			},
 			helper.JWTProfileFileVar: {
@@ -391,6 +503,7 @@ func Provider() *schema.Provider {
 					helper.TokenVar,
 					helper.JWTFileVar,
 					helper.JWTProfileJSONVar,
+					helper.SystemAPIVar,
 				},
 			},
 			helper.JWTProfileJSONVar: {
@@ -402,6 +515,56 @@ func Provider() *schema.Provider {
 					helper.TokenVar,
 					helper.JWTFileVar,
 					helper.JWTProfileFileVar,
+					helper.SystemAPIVar,
+				},
+			},
+			helper.SystemAPIVar: {
+				Type:        schema.TypeList,
+				Optional:    true,
+				MaxItems:    1,
+				Description: helper.SystemAPIDescription,
+				ConflictsWith: []string{
+					helper.AccessTokenVar,
+					helper.TokenVar,
+					helper.JWTFileVar,
+					helper.JWTProfileFileVar,
+					helper.JWTProfileJSONVar,
+				},
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						helper.SystemAPIKeyFileAttr: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: helper.SystemAPIKeyFileDesc,
+						},
+						helper.SystemAPIKeyAttr: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Sensitive:   true,
+							Description: helper.SystemAPIKeyDesc,
+						},
+						helper.SystemAPIPrivateKeyAttr: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Sensitive:   true,
+							Description: helper.SystemAPIPrivateKeyDesc,
+						},
+						helper.SystemAPIPublicKeyAttr: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: helper.SystemAPIPublicKeyDesc,
+						},
+						helper.SystemAPIUserAttr: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: helper.SystemAPIUserDesc,
+						},
+						helper.SystemAPIAudienceAttr: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: helper.SystemAPIAudienceDesc,
+						},
+					},
 				},
 			},
 			helper.PortVar: {
@@ -511,6 +674,31 @@ func Provider() *schema.Provider {
 
 func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	credentials := 0
+	var systemKeyFile, systemKey, systemPrivateKey, systemPublicKey, systemUser, systemAudience string
+	if v, ok := d.GetOk(helper.SystemAPIVar); ok {
+		list := v.([]interface{})
+		if len(list) > 0 && list[0] != nil {
+			m := list[0].(map[string]interface{})
+			if v, ok := m[helper.SystemAPIKeyFileAttr]; ok {
+				systemKeyFile = v.(string)
+			}
+			if v, ok := m[helper.SystemAPIKeyAttr]; ok {
+				systemKey = v.(string)
+			}
+			if v, ok := m[helper.SystemAPIPrivateKeyAttr]; ok {
+				systemPrivateKey = v.(string)
+			}
+			if v, ok := m[helper.SystemAPIPublicKeyAttr]; ok {
+				systemPublicKey = v.(string)
+			}
+			if v, ok := m[helper.SystemAPIUserAttr]; ok {
+				systemUser = v.(string)
+			}
+			if v, ok := m[helper.SystemAPIAudienceAttr]; ok {
+				systemAudience = v.(string)
+			}
+		}
+	}
 	for _, k := range []string{
 		helper.AccessTokenVar,
 		helper.TokenVar,
@@ -523,6 +711,9 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 				credentials++
 			}
 		}
+	}
+	if systemKeyFile != "" || systemKey != "" || systemPrivateKey != "" || systemPublicKey != "" {
+		credentials++
 	}
 	if credentials == 0 {
 		return nil, diag.Errorf("one authentication method must be configured")
@@ -546,6 +737,12 @@ func ProviderConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		d.Get(helper.JWTFileVar).(string),
 		d.Get(helper.JWTProfileFileVar).(string),
 		d.Get(helper.JWTProfileJSONVar).(string),
+		systemKeyFile,
+		systemKey,
+		systemPrivateKey,
+		systemPublicKey,
+		systemUser,
+		systemAudience,
 		d.Get(helper.PortVar).(string),
 		d.Get(helper.InsecureSkipVerifyTLSVar).(bool),
 		transportHeaders,
