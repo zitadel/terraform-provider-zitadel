@@ -108,34 +108,32 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 	keyPath := ""
 	var keyData []byte
 
-	if accessToken != "" {
-		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{
-			AccessToken: accessToken,
-			TokenType:   "Bearer",
-		})
+	switch {
+	case accessToken != "":
+		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken, TokenType: "Bearer"})
 		options = append(options, zitadel.WithTokenSource(tokenSource))
-	} else if token != "" {
+	case token != "":
 		if _, err := os.Stat(token); err != nil {
 			return nil, fmt.Errorf("failed to read token file: %v", err)
 		}
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
 		keyPath = token
-	} else if jwtFile != "" {
+	case jwtFile != "":
 		jwt, err := os.ReadFile(jwtFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read JWT file: %v", err)
 		}
 		options = append(options, zitadel.WithJWTDirectTokenSource(string(jwt)))
-	} else if jwtProfileFile != "" {
+	case jwtProfileFile != "":
 		if _, err := os.Stat(jwtProfileFile); err != nil {
 			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
 		}
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
 		keyPath = jwtProfileFile
-	} else if jwtProfileJSON != "" {
+	case jwtProfileJSON != "":
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
 		keyData = []byte(jwtProfileJSON)
-	} else if systemAPIKeyFile != "" || systemAPIKey != "" || systemAPIPrivateKey != "" || systemAPIPublicKey != "" {
+	case systemAPIKeyFile != "" || systemAPIKey != "" || systemAPIPrivateKey != "" || systemAPIPublicKey != "":
 		if systemAPIUser == "" {
 			return nil, fmt.Errorf("system_api.user is required when using System API authentication")
 		}
@@ -170,7 +168,7 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 			return nil, fmt.Errorf("failed to create system api token source: %w", err)
 		}
 		options = append(options, zitadel.WithTokenSource(ts))
-	} else {
+	default:
 		return nil, fmt.Errorf("either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' (with 'key', 'key_file', or both 'private_key' and 'public_key') is required")
 	}
 

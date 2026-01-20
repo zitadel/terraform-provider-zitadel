@@ -271,6 +271,7 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		transportHeaders[k] = v.ValueString()
 	}
 
+	credentials := 0
 	var systemKeyFile, systemKey, systemPrivateKey, systemPublicKey, systemUser, systemAudience string
 	if len(config.SystemAPI) > 0 {
 		sa := config.SystemAPI[0]
@@ -292,6 +293,34 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		if !sa.Audience.IsNull() && !sa.Audience.IsUnknown() {
 			systemAudience = sa.Audience.ValueString()
 		}
+	}
+
+	if !config.AccessToken.IsNull() && !config.AccessToken.IsUnknown() && config.AccessToken.ValueString() != "" {
+		credentials++
+	}
+	if !config.Token.IsNull() && !config.Token.IsUnknown() && config.Token.ValueString() != "" {
+		credentials++
+	}
+	if !config.JWTFile.IsNull() && !config.JWTFile.IsUnknown() && config.JWTFile.ValueString() != "" {
+		credentials++
+	}
+	if !config.JWTProfileFile.IsNull() && !config.JWTProfileFile.IsUnknown() && config.JWTProfileFile.ValueString() != "" {
+		credentials++
+	}
+	if !config.JWTProfileJSON.IsNull() && !config.JWTProfileJSON.IsUnknown() && config.JWTProfileJSON.ValueString() != "" {
+		credentials++
+	}
+	if systemKeyFile != "" || systemKey != "" || systemPrivateKey != "" || systemPublicKey != "" {
+		credentials++
+	}
+
+	if credentials == 0 {
+		resp.Diagnostics.AddError("invalid provider config", "one authentication method must be configured")
+		return
+	}
+	if credentials > 1 {
+		resp.Diagnostics.AddError("invalid provider config", "only one authentication method may be configured")
+		return
 	}
 
 	info, err := helper.GetClientInfo(ctx,

@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
@@ -119,9 +118,6 @@ func verifyMatchingPublicKey(privatePEM, publicPEM []byte) error {
 		return fmt.Errorf("invalid RSA key modulus")
 	}
 	if priv.PublicKey.E != pub.E || priv.PublicKey.N.Cmp(pub.N) != 0 {
-		return fmt.Errorf("public key does not match private key")
-	}
-	if !reflect.DeepEqual(priv.PublicKey, *pub) {
 		return fmt.Errorf("public key does not match private key")
 	}
 	return nil
