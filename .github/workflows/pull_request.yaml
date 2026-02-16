@@ -6,7 +6,7 @@ jobs:
 
   lint:
 
-    runs-on: depot-ubuntu-24.04-8
+    runs-on: ubuntu-latest
 
     permissions:
       contents: read
