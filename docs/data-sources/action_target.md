@@ -30,5 +30,6 @@ data "zitadel_action_target" "default" {
 - `id` (String) The ID of this resource.
 - `interrupt_on_error` (Boolean) Define if any error stops the whole execution.
 - `name` (String) The name of the target.
+- `payload_type` (String) The payload type of the target.
 - `target_type` (String) The type of the target.
 - `timeout` (String) Timeout defines the duration until ZITADEL cancels the execution.

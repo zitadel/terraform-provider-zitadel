@@ -50,6 +50,22 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "Define if any error stops the whole execution. Note: this is not used for REST_ASYNC target type.",
 			},
+			PayloadTypeVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     payloadTypeJSON,
+				Description: "The payload type of the target. (PAYLOAD_TYPE_JSON, PAYLOAD_TYPE_JWT, PAYLOAD_TYPE_JWE)",
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					val := value.(string)
+					validValues := []string{payloadTypeJSON, payloadTypeJWT, payloadTypeJWE}
+					for _, valid := range validValues {
+						if val == valid {
+							return nil
+						}
+					}
+					return diag.Errorf("%s: invalid value %s, allowed values: %s", path, val, strings.Join(validValues, ", "))
+				},
+			},
 			SigningKeyVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
