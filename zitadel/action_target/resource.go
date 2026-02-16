@@ -53,7 +53,7 @@ func GetResource() *schema.Resource {
 			PayloadTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     payloadTypeJSON,
+				Computed:    true,
 				Description: "The payload type of the target. (PAYLOAD_TYPE_JSON, PAYLOAD_TYPE_JWT, PAYLOAD_TYPE_JWE)",
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					val := value.(string)

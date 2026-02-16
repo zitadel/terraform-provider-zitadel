@@ -240,7 +240,12 @@ func payloadTypeToString(pt actionv2.PayloadType) string {
 		return payloadTypeJWT
 	case actionv2.PayloadType_PAYLOAD_TYPE_JWE:
 		return payloadTypeJWE
+	case actionv2.PayloadType_PAYLOAD_TYPE_UNSPECIFIED:
+		// UNSPECIFIED means the target was created before payload_type was added
+		// or it's using the API default, which is JSON
+		return payloadTypeJSON
 	default:
+		// Unknown payload type, fall back to JSON as the safe default
 		return payloadTypeJSON
 	}
 }

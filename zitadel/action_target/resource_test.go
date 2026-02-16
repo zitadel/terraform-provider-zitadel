@@ -23,6 +23,7 @@ func TestAccTarget(t *testing.T) {
 	resourceExample = strings.Replace(resourceExample, nameAttribute, frame.UniqueResourcesID, 1)
 
 	exampleProperty := test_utils.AttributeValue(t, action_target.EndpointVar, exampleAttributes).AsString()
+	examplePayloadType := test_utils.AttributeValue(t, action_target.PayloadTypeVar, exampleAttributes).AsString()
 	updatedProperty := exampleProperty + "-updated"
 
 	test_utils.RunLifecyleTest(
@@ -34,9 +35,9 @@ func TestAccTarget(t *testing.T) {
 		updatedProperty,
 		"", "", "",
 		true,
-		checkRemoteProperty(frame),
+		checkRemoteProperty(frame, examplePayloadType),
 		test_utils.ZitadelGeneratedIdOnlyRegex,
-		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, examplePayloadType), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 		),
@@ -44,7 +45,7 @@ func TestAccTarget(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame, expectedPayloadType string) func(string) resource.TestCheckFunc {
 	return func(expectedEndpoint string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
 			client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
@@ -61,6 +62,10 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resou
 			actualEndpoint := remoteResource.GetTarget().GetEndpoint()
 			if actualEndpoint != expectedEndpoint {
 				return fmt.Errorf("expected endpoint %q, but got %q", expectedEndpoint, actualEndpoint)
+			}
+			actualPayloadType := remoteResource.GetTarget().GetPayloadType().String()
+			if actualPayloadType != expectedPayloadType {
+				return fmt.Errorf("expected payload_type %q, but got %q", expectedPayloadType, actualPayloadType)
 			}
 			return nil
 		}
