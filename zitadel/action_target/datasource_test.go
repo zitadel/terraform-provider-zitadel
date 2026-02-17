@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
 func TestAccActionTargetDatasource(t *testing.T) {
-	t.Skip("Skipping: flaky due to eventual consistency after action_execution tests on same instance")
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
-	resourceDep := fmt.Sprintf(`
+	config := fmt.Sprintf(`
+%s
 resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/datasource-test"
@@ -19,29 +21,29 @@ resource "zitadel_action_target" "default" {
   interrupt_on_error = false
   payload_type       = "PAYLOAD_TYPE_JSON"
 }
-`, frame.UniqueResourcesID)
 
-	config := `
 data "zitadel_action_target" "default" {
   target_id = zitadel_action_target.default.id
 }
-`
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
 
-	test_utils.RunDatasourceTest(
-		t,
-		frame.BaseTestFrame,
-		config,
-		[]string{resourceDep},
-		nil,
-		map[string]string{
-			"name":               frame.UniqueResourcesID,
-			"endpoint":           "https://example.com/datasource-test",
-			"target_type":        "REST_WEBHOOK",
-			"timeout":            "10s",
-			"interrupt_on_error": "false",
-			"payload_type":       "PAYLOAD_TYPE_JSON",
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair("data.zitadel_action_target.default", "id", "zitadel_action_target.default", "id"),
+					resource.TestCheckResourceAttr("data.zitadel_action_target.default", "name", frame.UniqueResourcesID),
+					resource.TestCheckResourceAttr("data.zitadel_action_target.default", "endpoint", "https://example.com/datasource-test"),
+					resource.TestCheckResourceAttr("data.zitadel_action_target.default", "target_type", "REST_WEBHOOK"),
+					resource.TestCheckResourceAttr("data.zitadel_action_target.default", "timeout", "10s"),
+					resource.TestCheckResourceAttr("data.zitadel_action_target.default", "interrupt_on_error", "false"),
+					resource.TestCheckResourceAttr("data.zitadel_action_target.default", "payload_type", "PAYLOAD_TYPE_JSON"),
+				),
+			},
 		},
-	)
+	})
 }
 
 func TestAccActionTargetDatasourcePayloadTypeJWT(t *testing.T) {
