@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	actionv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -54,16 +55,9 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "The payload type of the target. (PAYLOAD_TYPE_JSON, PAYLOAD_TYPE_JWT, PAYLOAD_TYPE_JWE)",
+				Description: "The payload type of the target" + helper.DescriptionEnumValuesList(actionv2.PayloadType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					val := value.(string)
-					validValues := []string{payloadTypeJSON, payloadTypeJWT, payloadTypeJWE}
-					for _, valid := range validValues {
-						if val == valid {
-							return nil
-						}
-					}
-					return diag.Errorf("%s: invalid value %s, allowed values: %s", path, val, strings.Join(validValues, ", "))
+					return helper.EnumValueValidation(PayloadTypeVar, value, actionv2.PayloadType_value)
 				},
 			},
 			SigningKeyVar: {
