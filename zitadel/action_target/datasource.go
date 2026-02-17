@@ -41,7 +41,7 @@ func GetDatasource() *schema.Resource {
 			PayloadTypeVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The payload type of the target. Supported values: \"JSON\", \"FORM\".",
+				Description: "The payload type of the target.",
 			},
 		},
 		ReadContext: read,

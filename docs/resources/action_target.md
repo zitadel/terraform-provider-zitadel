@@ -35,7 +35,7 @@ resource "zitadel_action_target" "default" {
 
 ### Optional
 
-- `payload_type` (String) The payload type of the target. (PAYLOAD_TYPE_JSON, PAYLOAD_TYPE_JWT, PAYLOAD_TYPE_JWE)
+- `payload_type` (String) The payload type of the target, supported values: PAYLOAD_TYPE_UNSPECIFIED, PAYLOAD_TYPE_JSON, PAYLOAD_TYPE_JWT, PAYLOAD_TYPE_JWE
 
 ### Read-Only
 
