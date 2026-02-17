@@ -89,3 +89,49 @@ data "zitadel_action_target" "test" {
 		})
 	}
 }
+
+func TestAccActionTargetDatasourceTargetTypes(t *testing.T) {
+	tests := []struct {
+		name             string
+		targetType       string
+		interruptOnError bool
+	}{
+		{"REST_WEBHOOK", "REST_WEBHOOK", true},
+		{"REST_CALL", "REST_CALL", true},
+		{"REST_ASYNC", "REST_ASYNC", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
+			config := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "test" {
+  name               = "%s"
+  endpoint           = "https://example.com/datasource-test"
+  target_type        = "%s"
+  timeout            = "10s"
+  interrupt_on_error = %t
+  payload_type       = "PAYLOAD_TYPE_JSON"
+}
+
+data "zitadel_action_target" "test" {
+  target_id = zitadel_action_target.test.id
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID, tt.targetType, tt.interruptOnError)
+
+			resource.Test(t, resource.TestCase{
+				ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+				Steps: []resource.TestStep{
+					{
+						Config: config,
+						Check: resource.ComposeTestCheckFunc(
+							resource.TestCheckResourceAttrPair("data.zitadel_action_target.test", "id", "zitadel_action_target.test", "id"),
+							resource.TestCheckResourceAttr("data.zitadel_action_target.test", "target_type", tt.targetType),
+						),
+					},
+				},
+			})
+		})
+	}
+}

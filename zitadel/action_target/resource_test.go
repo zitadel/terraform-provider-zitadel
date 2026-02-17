@@ -137,3 +137,78 @@ func checkPayloadType(frame *test_utils.InstanceTestFrame, expectedPayloadType s
 		return nil
 	}
 }
+
+func TestAccTargetTypes(t *testing.T) {
+	tests := []struct {
+		name             string
+		targetType       string
+		interruptOnError bool
+	}{
+		{"REST_WEBHOOK", "REST_WEBHOOK", true},
+		{"REST_CALL", "REST_CALL", true},
+		{"REST_ASYNC", "REST_ASYNC", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
+			resourceConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "test" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "%s"
+  timeout            = "10s"
+  interrupt_on_error = %t
+  payload_type       = "PAYLOAD_TYPE_JSON"
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID, tt.targetType, tt.interruptOnError)
+
+			resource.Test(t, resource.TestCase{
+				ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+				Steps: []resource.TestStep{
+					{
+						Config: resourceConfig,
+						Check: resource.ComposeTestCheckFunc(
+							resource.TestCheckResourceAttr("zitadel_action_target.test", "target_type", tt.targetType),
+							checkTargetType(frame, tt.targetType),
+						),
+					},
+				},
+			})
+		})
+	}
+}
+
+func checkTargetType(frame *test_utils.InstanceTestFrame, expectedTargetType string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
+		if err != nil {
+			return fmt.Errorf("failed to get client: %w", err)
+		}
+		rs, ok := state.RootModule().Resources["zitadel_action_target.test"]
+		if !ok {
+			return fmt.Errorf("resource not found")
+		}
+		remoteResource, err := client.GetTarget(
+			context.Background(),
+			&actionv2.GetTargetRequest{Id: rs.Primary.ID},
+		)
+		if err != nil {
+			return err
+		}
+		target := remoteResource.GetTarget()
+		var actualTargetType string
+		if target.GetRestWebhook() != nil {
+			actualTargetType = "REST_WEBHOOK"
+		} else if target.GetRestCall() != nil {
+			actualTargetType = "REST_CALL"
+		} else if target.GetRestAsync() != nil {
+			actualTargetType = "REST_ASYNC"
+		}
+		if actualTargetType != expectedTargetType {
+			return fmt.Errorf("expected target_type %q, but got %q", expectedTargetType, actualTargetType)
+		}
+		return nil
+	}
+}
