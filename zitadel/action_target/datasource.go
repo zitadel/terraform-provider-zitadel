@@ -38,6 +38,11 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Define if any error stops the whole execution.",
 			},
+			PayloadTypeVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The payload type of the target.",
+			},
 		},
 		ReadContext: read,
 	}

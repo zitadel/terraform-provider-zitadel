@@ -14,10 +14,11 @@ Resource representing a target, which can be used in executions.
 ```terraform
 resource "zitadel_action_target" "default" {
   name               = "test-target-name"
-  endpoint = "https://httpstat.us/200"
+  endpoint           = "https://example.com/target"
   target_type        = "REST_WEBHOOK"
   timeout            = "15s"
-  interrupt_on_error = true
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JSON"
 }
 ```
 
@@ -31,6 +32,10 @@ resource "zitadel_action_target" "default" {
 - `name` (String) The name of the target.
 - `target_type` (String) The type of the target. (REST_WEBHOOK, REST_CALL, REST_ASYNC)
 - `timeout` (String) Timeout defines the duration until ZITADEL cancels the execution.
+
+### Optional
+
+- `payload_type` (String) The payload type of the target, supported values: PAYLOAD_TYPE_UNSPECIFIED, PAYLOAD_TYPE_JSON, PAYLOAD_TYPE_JWT, PAYLOAD_TYPE_JWE
 
 ### Read-Only
 
