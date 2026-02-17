@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	actionv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/action/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -49,6 +50,15 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeBool,
 				Required:    true,
 				Description: "Define if any error stops the whole execution. Note: this is not used for REST_ASYNC target type.",
+			},
+			PayloadTypeVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The payload type of the target" + helper.DescriptionEnumValuesList(actionv2.PayloadType_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(PayloadTypeVar, value, actionv2.PayloadType_value)
+				},
 			},
 			SigningKeyVar: {
 				Type:        schema.TypeString,
