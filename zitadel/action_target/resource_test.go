@@ -161,6 +161,53 @@ resource "zitadel_action_target" "default" {
 	})
 }
 
+func TestAccActionTargetPayloadTypeUpdate(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JSON"
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JWT"
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "payload_type", "PAYLOAD_TYPE_JSON"),
+					checkRemoteProperty(frame, "PAYLOAD_TYPE_JSON")(""),
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "payload_type", "PAYLOAD_TYPE_JWT"),
+					checkRemoteProperty(frame, "PAYLOAD_TYPE_JWT")(""),
+				),
+			},
+		},
+	})
+}
+
 func TestAccActionTargetTypeRestWebhook(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceConfig := fmt.Sprintf(`
