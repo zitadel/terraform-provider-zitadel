@@ -10,7 +10,7 @@ import (
 func TestAccActionTargetDatasource(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceDep := fmt.Sprintf(`
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/datasource-test"
   target_type        = "REST_WEBHOOK"
@@ -21,8 +21,8 @@ resource "zitadel_action_target" "test" {
 `, frame.UniqueResourcesID)
 
 	config := `
-data "zitadel_action_target" "test" {
-  target_id = zitadel_action_target.test.id
+data "zitadel_action_target" "default" {
+  target_id = zitadel_action_target.default.id
 }
 `
 
@@ -46,7 +46,7 @@ data "zitadel_action_target" "test" {
 func TestAccActionTargetDatasourcePayloadTypeJWT(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceDep := fmt.Sprintf(`
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/datasource-test"
   target_type        = "REST_ASYNC"
@@ -57,8 +57,8 @@ resource "zitadel_action_target" "test" {
 `, frame.UniqueResourcesID)
 
 	config := `
-data "zitadel_action_target" "test" {
-  target_id = zitadel_action_target.test.id
+data "zitadel_action_target" "default" {
+  target_id = zitadel_action_target.default.id
 }
 `
 
@@ -77,7 +77,7 @@ data "zitadel_action_target" "test" {
 func TestAccActionTargetDatasourcePayloadTypeJWE(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceDep := fmt.Sprintf(`
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/datasource-test"
   target_type        = "REST_ASYNC"
@@ -88,8 +88,8 @@ resource "zitadel_action_target" "test" {
 `, frame.UniqueResourcesID)
 
 	config := `
-data "zitadel_action_target" "test" {
-  target_id = zitadel_action_target.test.id
+data "zitadel_action_target" "default" {
+  target_id = zitadel_action_target.default.id
 }
 `
 
@@ -108,7 +108,7 @@ data "zitadel_action_target" "test" {
 func TestAccActionTargetDatasourceTargetTypeRestWebhook(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceDep := fmt.Sprintf(`
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/datasource-test"
   target_type        = "REST_WEBHOOK"
@@ -119,8 +119,8 @@ resource "zitadel_action_target" "test" {
 `, frame.UniqueResourcesID)
 
 	config := `
-data "zitadel_action_target" "test" {
-  target_id = zitadel_action_target.test.id
+data "zitadel_action_target" "default" {
+  target_id = zitadel_action_target.default.id
 }
 `
 
@@ -139,7 +139,7 @@ data "zitadel_action_target" "test" {
 func TestAccActionTargetDatasourceTargetTypeRestCall(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceDep := fmt.Sprintf(`
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/datasource-test"
   target_type        = "REST_CALL"
@@ -150,8 +150,8 @@ resource "zitadel_action_target" "test" {
 `, frame.UniqueResourcesID)
 
 	config := `
-data "zitadel_action_target" "test" {
-  target_id = zitadel_action_target.test.id
+data "zitadel_action_target" "default" {
+  target_id = zitadel_action_target.default.id
 }
 `
 
@@ -170,7 +170,7 @@ data "zitadel_action_target" "test" {
 func TestAccActionTargetDatasourceTargetTypeRestAsync(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceDep := fmt.Sprintf(`
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/datasource-test"
   target_type        = "REST_ASYNC"
@@ -181,8 +181,8 @@ resource "zitadel_action_target" "test" {
 `, frame.UniqueResourcesID)
 
 	config := `
-data "zitadel_action_target" "test" {
-  target_id = zitadel_action_target.test.id
+data "zitadel_action_target" "default" {
+  target_id = zitadel_action_target.default.id
 }
 `
 

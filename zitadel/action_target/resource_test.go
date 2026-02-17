@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
-func TestAccTarget(t *testing.T) {
+func TestAccActionTarget(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 
@@ -48,23 +48,28 @@ func TestAccTarget(t *testing.T) {
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame, expectedPayloadType string) func(string) resource.TestCheckFunc {
 	return func(expectedEndpoint string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
+			rs, ok := state.RootModule().Resources[frame.TerraformName]
+			if !ok {
+				return fmt.Errorf("not found: %s", frame.TerraformName)
+			}
+
 			client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
 			if err != nil {
 				return fmt.Errorf("failed to get client: %w", err)
 			}
 			remoteResource, err := client.GetTarget(
 				context.Background(),
-				&actionv2.GetTargetRequest{Id: frame.State(state).ID},
+				&actionv2.GetTargetRequest{Id: rs.Primary.ID},
 			)
 			if err != nil {
 				return err
 			}
 			actualEndpoint := remoteResource.GetTarget().GetEndpoint()
-			if actualEndpoint != expectedEndpoint {
+			if expectedEndpoint != "" && actualEndpoint != expectedEndpoint {
 				return fmt.Errorf("expected endpoint %q, but got %q", expectedEndpoint, actualEndpoint)
 			}
 			actualPayloadType := remoteResource.GetTarget().GetPayloadType().String()
-			if actualPayloadType != expectedPayloadType {
+			if expectedPayloadType != "" && actualPayloadType != expectedPayloadType {
 				return fmt.Errorf("expected payload_type %q, but got %q", expectedPayloadType, actualPayloadType)
 			}
 			return nil
@@ -72,11 +77,11 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame, expectedPayloadTyp
 	}
 }
 
-func TestAccTargetPayloadTypeJSON(t *testing.T) {
+func TestAccActionTargetPayloadTypeJSON(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceConfig := fmt.Sprintf(`
 %s
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/test"
   target_type        = "REST_ASYNC"
@@ -92,19 +97,19 @@ resource "zitadel_action_target" "test" {
 			{
 				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("zitadel_action_target.test", "payload_type", "PAYLOAD_TYPE_JSON"),
-					checkPayloadType(frame, "PAYLOAD_TYPE_JSON"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "payload_type", "PAYLOAD_TYPE_JSON"),
+					checkRemoteProperty(frame, "PAYLOAD_TYPE_JSON")(""),
 				),
 			},
 		},
 	})
 }
 
-func TestAccTargetPayloadTypeJWT(t *testing.T) {
+func TestAccActionTargetPayloadTypeJWT(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceConfig := fmt.Sprintf(`
 %s
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/test"
   target_type        = "REST_ASYNC"
@@ -120,19 +125,19 @@ resource "zitadel_action_target" "test" {
 			{
 				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("zitadel_action_target.test", "payload_type", "PAYLOAD_TYPE_JWT"),
-					checkPayloadType(frame, "PAYLOAD_TYPE_JWT"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "payload_type", "PAYLOAD_TYPE_JWT"),
+					checkRemoteProperty(frame, "PAYLOAD_TYPE_JWT")(""),
 				),
 			},
 		},
 	})
 }
 
-func TestAccTargetPayloadTypeJWE(t *testing.T) {
+func TestAccActionTargetPayloadTypeJWE(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceConfig := fmt.Sprintf(`
 %s
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/test"
   target_type        = "REST_ASYNC"
@@ -148,44 +153,19 @@ resource "zitadel_action_target" "test" {
 			{
 				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("zitadel_action_target.test", "payload_type", "PAYLOAD_TYPE_JWE"),
-					checkPayloadType(frame, "PAYLOAD_TYPE_JWE"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "payload_type", "PAYLOAD_TYPE_JWE"),
+					checkRemoteProperty(frame, "PAYLOAD_TYPE_JWE")(""),
 				),
 			},
 		},
 	})
 }
 
-func checkPayloadType(frame *test_utils.InstanceTestFrame, expectedPayloadType string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
-		if err != nil {
-			return fmt.Errorf("failed to get client: %w", err)
-		}
-		rs, ok := state.RootModule().Resources["zitadel_action_target.test"]
-		if !ok {
-			return fmt.Errorf("resource not found")
-		}
-		remoteResource, err := client.GetTarget(
-			context.Background(),
-			&actionv2.GetTargetRequest{Id: rs.Primary.ID},
-		)
-		if err != nil {
-			return err
-		}
-		actualPayloadType := remoteResource.GetTarget().GetPayloadType().String()
-		if actualPayloadType != expectedPayloadType {
-			return fmt.Errorf("expected payload_type %q, but got %q", expectedPayloadType, actualPayloadType)
-		}
-		return nil
-	}
-}
-
-func TestAccTargetTypeRestWebhook(t *testing.T) {
+func TestAccActionTargetTypeRestWebhook(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceConfig := fmt.Sprintf(`
 %s
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/test"
   target_type        = "REST_WEBHOOK"
@@ -201,7 +181,7 @@ resource "zitadel_action_target" "test" {
 			{
 				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("zitadel_action_target.test", "target_type", "REST_WEBHOOK"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "target_type", "REST_WEBHOOK"),
 					checkTargetType(frame, "REST_WEBHOOK"),
 				),
 			},
@@ -209,11 +189,11 @@ resource "zitadel_action_target" "test" {
 	})
 }
 
-func TestAccTargetTypeRestCall(t *testing.T) {
+func TestAccActionTargetTypeRestCall(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceConfig := fmt.Sprintf(`
 %s
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/test"
   target_type        = "REST_CALL"
@@ -229,7 +209,7 @@ resource "zitadel_action_target" "test" {
 			{
 				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("zitadel_action_target.test", "target_type", "REST_CALL"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "target_type", "REST_CALL"),
 					checkTargetType(frame, "REST_CALL"),
 				),
 			},
@@ -237,11 +217,11 @@ resource "zitadel_action_target" "test" {
 	})
 }
 
-func TestAccTargetTypeRestAsync(t *testing.T) {
+func TestAccActionTargetTypeRestAsync(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
 	resourceConfig := fmt.Sprintf(`
 %s
-resource "zitadel_action_target" "test" {
+resource "zitadel_action_target" "default" {
   name               = "%s"
   endpoint           = "https://example.com/test"
   target_type        = "REST_ASYNC"
@@ -257,7 +237,7 @@ resource "zitadel_action_target" "test" {
 			{
 				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("zitadel_action_target.test", "target_type", "REST_ASYNC"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "target_type", "REST_ASYNC"),
 					checkTargetType(frame, "REST_ASYNC"),
 				),
 			},
@@ -267,13 +247,14 @@ resource "zitadel_action_target" "test" {
 
 func checkTargetType(frame *test_utils.InstanceTestFrame, expectedTargetType string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
+		rs, ok := state.RootModule().Resources[frame.TerraformName]
+		if !ok {
+			return fmt.Errorf("not found: %s", frame.TerraformName)
+		}
+
 		client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
 		if err != nil {
 			return fmt.Errorf("failed to get client: %w", err)
-		}
-		rs, ok := state.RootModule().Resources["zitadel_action_target.test"]
-		if !ok {
-			return fmt.Errorf("resource not found")
 		}
 		remoteResource, err := client.GetTarget(
 			context.Background(),
