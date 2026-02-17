@@ -71,3 +71,69 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame, expectedPayloadTyp
 		}
 	}
 }
+
+func TestAccTargetPayloadTypes(t *testing.T) {
+	tests := []struct {
+		name        string
+		payloadType string
+	}{
+		{"JSON", "PAYLOAD_TYPE_JSON"},
+		{"JWT", "PAYLOAD_TYPE_JWT"},
+		{"JWE", "PAYLOAD_TYPE_JWE"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
+			resourceConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "test" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "%s"
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID, tt.payloadType)
+
+			resource.Test(t, resource.TestCase{
+				ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+				Steps: []resource.TestStep{
+					{
+						Config: resourceConfig,
+						Check: resource.ComposeTestCheckFunc(
+							resource.TestCheckResourceAttr("zitadel_action_target.test", "payload_type", tt.payloadType),
+							checkPayloadType(frame, tt.payloadType),
+						),
+					},
+				},
+			})
+		})
+	}
+}
+
+func checkPayloadType(frame *test_utils.InstanceTestFrame, expectedPayloadType string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
+		if err != nil {
+			return fmt.Errorf("failed to get client: %w", err)
+		}
+		rs, ok := state.RootModule().Resources["zitadel_action_target.test"]
+		if !ok {
+			return fmt.Errorf("resource not found")
+		}
+		remoteResource, err := client.GetTarget(
+			context.Background(),
+			&actionv2.GetTargetRequest{Id: rs.Primary.ID},
+		)
+		if err != nil {
+			return err
+		}
+		actualPayloadType := remoteResource.GetTarget().GetPayloadType().String()
+		if actualPayloadType != expectedPayloadType {
+			return fmt.Errorf("expected payload_type %q, but got %q", expectedPayloadType, actualPayloadType)
+		}
+		return nil
+	}
+}
