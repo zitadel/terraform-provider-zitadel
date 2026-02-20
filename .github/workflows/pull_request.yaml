@@ -14,12 +14,12 @@ jobs:
     steps:
 
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
           cache: false
@@ -46,12 +46,12 @@ jobs:
     steps:
 
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v6
       with:
         go-version-file: 'go.mod'
 
@@ -70,7 +70,7 @@ jobs:
       run: TF_ACC=1 go test -p 1 -coverprofile=profile.cov ./...
 
     - name: Publish Coverage
-      uses: codecov/codecov-action@v3.1.4
+      uses: codecov/codecov-action@v5.5.2
       with:
         file: profile.cov
         name: acceptance-tests
@@ -83,7 +83,7 @@ jobs:
 
     - name: Archive Docker Compose Logs
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: pull-request-tests
         path: |
