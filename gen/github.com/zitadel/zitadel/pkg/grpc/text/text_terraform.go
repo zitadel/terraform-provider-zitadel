@@ -198,7 +198,7 @@ func copyToTerraform(ctx context.Context, obj proto.Message, tf *types.Object, a
 
 	current := objectToMap(ctx, *tf, targetAttrTypes)
 	if obj != nil {
-		raw, err := (protojson.MarshalOptions{EmitUnpopulated: true}).Marshal(obj)
+		raw, err := (protojson.MarshalOptions{EmitUnpopulated: true, UseProtoNames: true}).Marshal(obj)
 		if err != nil {
 			diags.AddError("failed to marshal text object", err.Error())
 			return diags

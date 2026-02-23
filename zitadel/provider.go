@@ -250,6 +250,11 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
+	if len(config.SystemAPI) > 1 {
+		resp.Diagnostics.AddError("invalid configuration", "at most one system_api block is allowed")
+		return
+	}
+
 	transportHeaders := make(map[string]string)
 	for k, v := range config.TransportHeaders {
 		transportHeaders[k] = v.ValueString()
