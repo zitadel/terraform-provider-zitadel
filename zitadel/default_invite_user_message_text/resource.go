@@ -37,10 +37,11 @@ func (r *defaultInviteUserMessageTextResource) Metadata(_ context.Context, req r
 	resp.TypeName = req.ProviderTypeName + "_default_invite_user_message_text"
 }
 
-func (r *defaultInviteUserMessageTextResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	s, d := text.GenSchemaMessageCustomText(ctx)
+func (r *defaultInviteUserMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaMessageCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
-	return s, d
+	resp.Schema = s
 }
 
 func (r *defaultInviteUserMessageTextResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {

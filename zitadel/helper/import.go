@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	ImportOptionalOrgAttribute = NewImportAttribute(OrgIDVar, ConvertID, true)
+	ImportOptionalOrgAttribute = NewImportAttribute(OrgIDVar, ConvertNonEmpty, true)
 	emptyIDAttribute           = NewImportAttribute(`""`, ConvertEmpty, false)
 	SemicolonPlaceholder       = "__SEMICOLON__"
 )

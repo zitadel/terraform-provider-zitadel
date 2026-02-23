@@ -15,8 +15,8 @@ Resource representing the default oidc settings.
 resource "zitadel_default_oidc_settings" "default" {
   access_token_lifetime         = "12h0m0s"
   id_token_lifetime             = "12h0m0s"
-  refresh_token_expiration      = "720h0m0s"
-  refresh_token_idle_expiration = "2160h0m0s"
+  refresh_token_expiration      = "2160h0m0s"
+  refresh_token_idle_expiration = "720h0m0s"
 }
 ```
 
@@ -33,3 +33,10 @@ resource "zitadel_default_oidc_settings" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+```bash
+# The resource can be imported using the ID format `<>`, e.g.
+terraform import zitadel_default_oidc_settings.imported ''
+```
