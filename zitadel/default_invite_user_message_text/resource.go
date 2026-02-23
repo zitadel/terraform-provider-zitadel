@@ -225,7 +225,6 @@ func getID(ctx context.Context, obj types.Object) string {
 }
 
 func getPlanAttrs(ctx context.Context, plan tfsdk.Plan, diag diag.Diagnostics) string {
-
 	var language string
 	diag.Append(plan.GetAttribute(ctx, path.Root(LanguageVar), &language)...)
 	if diag.HasError() {
