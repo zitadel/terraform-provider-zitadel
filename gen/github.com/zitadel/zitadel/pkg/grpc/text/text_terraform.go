@@ -275,7 +275,11 @@ func mapToAttrValues(ctx context.Context, data map[string]any, attrTypes map[str
 					break
 				}
 				if s, ok := raw.(string); ok {
-					values[name] = types.StringValue(s)
+					if s == "" {
+						values[name] = types.StringNull()
+					} else {
+						values[name] = types.StringValue(s)
+					}
 					break
 				}
 			}
