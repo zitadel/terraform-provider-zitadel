@@ -251,7 +251,7 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 	}
 
 	if len(config.SystemAPI) > 1 {
-		resp.Diagnostics.AddError("invalid configuration", "at most one system_api block is allowed")
+		resp.Diagnostics.AddError("invalid provider config", "at most one system_api block is allowed")
 		return
 	}
 
