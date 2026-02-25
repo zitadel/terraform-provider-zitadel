@@ -8,7 +8,7 @@ import (
 )
 
 func TestAccOrganizationDatasource(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_organization")
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_organization")
 	resourceDep := fmt.Sprintf(`
 resource "zitadel_organization" "default" {
   name = "%s"
@@ -33,7 +33,7 @@ data "zitadel_organization" "default" {
 }
 
 func TestAccOrganizationsDatasource(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_organizations")
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_organizations")
 	config := `
 data "zitadel_organizations" "default" {
   state = "ORGANIZATION_STATE_ACTIVE"
