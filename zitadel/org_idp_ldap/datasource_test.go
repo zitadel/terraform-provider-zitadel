@@ -20,7 +20,7 @@ resource "zitadel_org_idp_ldap" "default" {
   bind_password        = "password"
   user_base            = "ou=users,dc=example,dc=com"
   user_object_classes  = ["inetOrgPerson"]
-  user_filters         = ["(uid={{.Username}})"]
+  user_filters         = ["uid"]
   timeout              = "10s"
   is_linking_allowed   = false
   is_creation_allowed  = true
