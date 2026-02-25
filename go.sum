@@ -243,10 +243,8 @@ github.com/zitadel/oidc/v3 v3.45.1 h1:x7J8NywTUtLR9T5uu2dufae3gJrl6VVpIfvGZy+kzJ
 github.com/zitadel/oidc/v3 v3.45.1/go.mod h1:oFArtAPTXEA4ajkIe/JfBjv7hhlD0kr///UqaO3Uzd0=
 github.com/zitadel/schema v1.3.1 h1:QT3kwiRIRXXLVAs6gCK/u044WmUVh6IlbLXUsn6yRQU=
 github.com/zitadel/schema v1.3.1/go.mod h1:071u7D2LQacy1HAN+YnMd/mx1qVE2isb0Mjeqg46xnU=
-github.com/zitadel/zitadel-go/v3 v3.20.3 h1:8mVdZLCGoNONC/FDHG2fPMtC9W6hWucNflxkUmPe2o4=
-github.com/zitadel/zitadel-go/v3 v3.20.3/go.mod h1:sn5guqryshSbnEluWTAAk/siXywEF7s4RUZ+W8A/8JA=
-github.com/zitadel/zitadel-go/v3 v3.21.0 h1:Jw52QyizuDqu/WGdrM39cHPcGyqh+G3FHbI9DT/HHnw=
-github.com/zitadel/zitadel-go/v3 v3.21.0/go.mod h1:sn5guqryshSbnEluWTAAk/siXywEF7s4RUZ+W8A/8JA=
+github.com/zitadel/zitadel-go/v3 v3.26.1 h1:tDtKuYAB7VOYKfddvTOOmwrqJq75iB0jUMOQQ9omGVc=
+github.com/zitadel/zitadel-go/v3 v3.26.1/go.mod h1:sn5guqryshSbnEluWTAAk/siXywEF7s4RUZ+W8A/8JA=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=
 go.opentelemetry.io/auto/sdk v1.2.1/go.mod h1:KRTj+aOaElaLi+wW1kO/DZRXwkF4C5xPbEe3ZiIhN7Y=
 go.opentelemetry.io/otel v1.38.0 h1:RkfdswUDRimDg0m2Az18RKOsnI8UDzppJAtj01/Ymk8=
