@@ -47,7 +47,7 @@ var (
 		Description: "Whether the SAML IDP requires signed requests",
 	}
 	WithSignedRequestDatasourceField = &schema.Schema{
-		Type:        schema.TypeString,
+		Type:        schema.TypeBool,
 		Computed:    true,
 		Description: "Whether the SAML IDP requires signed requests",
 	}

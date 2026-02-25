@@ -42,8 +42,6 @@ func TestAccProjectsDatasources_ID_Name_Match(t *testing.T) {
 	config, attributes := test_utils.ReadExample(t, test_utils.Datasources, datasourceName)
 	exampleName := test_utils.AttributeValue(t, project.NameVar, attributes).AsString()
 	projectName := fmt.Sprintf("%s-%s", exampleName, frame.UniqueResourcesID)
-	// for-each is not supported in acceptance tests, so we cut the example down to the first block
-	// https://github.com/hashicorp/terraform-plugin-sdk/issues/536
 	config = strings.Join(strings.Split(config, "\n")[0:5], "\n")
 	config = strings.Replace(config, exampleName, projectName, 1)
 	_, projectID := project_test_dep.Create(t, frame, projectName)
@@ -66,8 +64,6 @@ func TestAccProjectsDatasources_ID_Name_Mismatch(t *testing.T) {
 	config, attributes := test_utils.ReadExample(t, test_utils.Datasources, datasourceName)
 	exampleName := test_utils.AttributeValue(t, project.NameVar, attributes).AsString()
 	projectName := fmt.Sprintf("%s-%s", exampleName, frame.UniqueResourcesID)
-	// for-each is not supported in acceptance tests, so we cut the example down to the first block
-	// https://github.com/hashicorp/terraform-plugin-sdk/issues/536
 	config = strings.Join(strings.Split(config, "\n")[0:5], "\n")
 	config = strings.Replace(config, exampleName, "mismatch", 1)
 	_, projectID := project_test_dep.Create(t, frame, projectName)
