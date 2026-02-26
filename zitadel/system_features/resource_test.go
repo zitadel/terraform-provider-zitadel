@@ -11,6 +11,7 @@ import (
 )
 
 func TestAccSystemFeatures(t *testing.T) {
+	t.Skip("skipped due to missing system-level permissions (AUTH-5mWD2)")
 	frame := test_utils.NewSystemTestFrame(t, "zitadel_system_features")
 
 	resourceExample := `
