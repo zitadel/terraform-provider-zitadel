@@ -57,6 +57,7 @@ resource "zitadel_organization_metadata" "default" {
 	config := `
 data "zitadel_organization_metadatas" "default" {
   organization_id = zitadel_organization.default.id
+  depends_on      = [zitadel_organization_metadata.default]
 }`
 
 	test_utils.RunDatasourceTest(
@@ -65,6 +66,8 @@ data "zitadel_organization_metadatas" "default" {
 		config,
 		[]string{orgDep, metadataDep},
 		nil,
-		map[string]string{},
+		map[string]string{
+			"metadata.0.value": "test_value",
+		},
 	)
 }

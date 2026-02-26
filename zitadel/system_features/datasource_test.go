@@ -7,10 +7,10 @@ import (
 )
 
 func TestAccSystemFeaturesDatasource(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_system_features")
+	frame := test_utils.NewSystemTestFrame(t, "zitadel_system_features")
 	test_utils.RunDatasourceTest(
 		t,
-		frame.BaseTestFrame,
+		*frame,
 		`data "zitadel_system_features" "default" {}`,
 		nil,
 		nil,
