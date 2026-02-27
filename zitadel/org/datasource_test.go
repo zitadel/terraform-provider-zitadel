@@ -40,8 +40,6 @@ func TestAccOrgsDatasources_ID_Name_Match(t *testing.T) {
 	exampleName := test_utils.AttributeValue(t, org.NameVar, attributes).AsString()
 	exampleDomain := test_utils.AttributeValue(t, org.DomainVar, attributes).AsString()
 	orgName := fmt.Sprintf("%s-%s", exampleName, frame.UniqueResourcesID)
-	// for-each is not supported in acceptance tests, so we cut the example down to the first block
-	// https://github.com/hashicorp/terraform-plugin-sdk/issues/536
 	config = strings.Join(strings.Split(config, "\n")[0:7], "\n")
 	config = strings.Replace(config, exampleName, orgName, 1)
 	config = strings.Replace(config, exampleDomain, orgName, 1)

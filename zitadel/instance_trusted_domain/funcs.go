@@ -38,7 +38,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	d.SetId(fmt.Sprintf("%s/%s", instanceID, domain))
-	return read(ctx, d, m)
+	if err := d.Set(InstanceIDVar, instanceID); err != nil {
+		return diag.Errorf("failed to set %s: %v", InstanceIDVar, err)
+	}
+	if err := d.Set(DomainVar, domain); err != nil {
+		return diag.Errorf("failed to set %s: %v", DomainVar, err)
+	}
+	return nil
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

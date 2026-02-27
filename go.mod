@@ -15,7 +15,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.38.1
 	github.com/zclconf/go-cty v1.17.0
 	github.com/zitadel/oidc/v3 v3.45.1
-	github.com/zitadel/zitadel-go/v3 v3.21.0
+	github.com/zitadel/zitadel-go/v3 v3.26.1
 	golang.org/x/oauth2 v0.34.0
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.11

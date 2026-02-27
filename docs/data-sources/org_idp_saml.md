@@ -39,4 +39,4 @@ data "zitadel_org_idp_saml" "default" {
 - `is_linking_allowed` (Boolean) enabled if users are able to link an existing ZITADEL user with an external account
 - `metadata_xml` (String) The metadata XML as plain string
 - `name` (String) Name of the IDP
-- `with_signed_request` (String) Whether the SAML IDP requires signed requests
+- `with_signed_request` (Boolean) Whether the SAML IDP requires signed requests

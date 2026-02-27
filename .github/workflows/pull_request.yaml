@@ -63,11 +63,16 @@ jobs:
       working-directory: acceptance
       run: docker compose run setup
 
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_wrapper: false
+
     - name: Download Go Modules
       run: go mod download
 
     - name: Run Acceptance Tests
-      run: TF_ACC=1 go test -p 1 -coverprofile=profile.cov ./...
+      run: TF_ACC=1 TF_ACC_TERRAFORM_PATH=$(which terraform) go test -p 1 -coverprofile=profile.cov ./...
 
     - name: Publish Coverage
       uses: codecov/codecov-action@v3.1.4
