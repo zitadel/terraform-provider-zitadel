@@ -14,12 +14,12 @@ jobs:
     steps:
 
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
           cache: false
@@ -46,12 +46,12 @@ jobs:
     steps:
 
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v6
       with:
         go-version-file: 'go.mod'
 
@@ -64,7 +64,7 @@ jobs:
       run: docker compose run setup
 
     - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v3
+      uses: hashicorp/setup-terraform@v4
       with:
         terraform_wrapper: false
 
@@ -75,7 +75,7 @@ jobs:
       run: TF_ACC=1 TF_ACC_TERRAFORM_PATH=$(which terraform) go test -p 1 -coverprofile=profile.cov ./...
 
     - name: Publish Coverage
-      uses: codecov/codecov-action@v3.1.4
+      uses: codecov/codecov-action@v5.5.2
       with:
         file: profile.cov
         name: acceptance-tests
@@ -88,7 +88,7 @@ jobs:
 
     - name: Archive Docker Compose Logs
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: pull-request-tests
         path: |
