@@ -100,7 +100,7 @@ func TestOrgLevelPermissionsCanReadOwnOrg(t *testing.T) {
 	t.Logf("Created service account key")
 
 	// Step 5: Create ClientInfo for org-level SA
-	orgLevelClientInfo, err := helper.GetClientInfo(ctx, false, frame.ClientInfo.Domain, "", "", "", "", saKeyJSON, "", false, nil)
+	orgLevelClientInfo, err := helper.GetClientInfo(ctx, false, frame.ClientInfo.Domain, "", "", "", "", saKeyJSON, "", "", "", "", "", "", "", false, nil)
 	if err != nil {
 		t.Fatalf("Failed to create org-level client info: %v", err)
 	}
@@ -220,7 +220,7 @@ func TestOrgLevelPermissionsCannotReadOwnOrgLegacy(t *testing.T) {
 	t.Logf("Created service account key")
 
 	// Step 5: Create ClientInfo for org-level SA
-	orgLevelClientInfo, err := helper.GetClientInfo(ctx, false, frame.ClientInfo.Domain, "", "", "", "", saKeyJSON, "", false, nil)
+	orgLevelClientInfo, err := helper.GetClientInfo(ctx, false, frame.ClientInfo.Domain, "", "", "", "", saKeyJSON, "", "", "", "", "", "", "", false, nil)
 	if err != nil {
 		t.Fatalf("Failed to create org-level client info: %v", err)
 	}
@@ -327,7 +327,7 @@ func TestOrgLevelPermissionsCannotGetDefaultOrg(t *testing.T) {
 	}
 	saKeyJSON := string(addKeyResp.KeyDetails)
 
-	orgLevelClientInfo, err := helper.GetClientInfo(ctx, false, frame.ClientInfo.Domain, "", "", "", "", saKeyJSON, "", false, nil)
+	orgLevelClientInfo, err := helper.GetClientInfo(ctx, false, frame.ClientInfo.Domain, "", "", "", "", saKeyJSON, "", "", "", "", "", "", "", false, nil)
 	if err != nil {
 		t.Fatalf("Failed to create org-level client info: %v", err)
 	}
@@ -446,6 +446,7 @@ func TestIamOrgManagerCanDestroyOrg(t *testing.T) {
 		domain,
 		"", "", "", "",
 		saKeyJSON,
+		"", "", "", "", "", "",
 		port,
 		false,
 		nil,
