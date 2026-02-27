@@ -38,8 +38,10 @@ func (r *loginTextsResource) Metadata(_ context.Context, req resource.MetadataRe
 	resp.TypeName = req.ProviderTypeName + "_login_texts"
 }
 
-func (r *loginTextsResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return text.GenSchemaLoginCustomText(ctx)
+func (r *loginTextsResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	s, diags := text.GenSchemaLoginCustomText(ctx)
+	resp.Diagnostics.Append(diags...)
+	resp.Schema = s
 }
 
 func (r *loginTextsResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -97,7 +99,7 @@ func (r *loginTextsResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	setID(plan, orgID, language)
+	resp.Diagnostics.Append(setID(ctx, &plan, orgID, language)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
@@ -130,7 +132,7 @@ func (r *loginTextsResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-	setID(state, orgID, language)
+	resp.Diagnostics.Append(setID(ctx, &state, orgID, language)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
@@ -181,7 +183,7 @@ func (r *loginTextsResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
-	setID(plan, orgID, language)
+	resp.Diagnostics.Append(setID(ctx, &plan, orgID, language)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 }
 
@@ -204,11 +206,19 @@ func (r *loginTextsResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 }
 
-func setID(obj types.Object, orgID string, language string) {
+func setID(ctx context.Context, obj *types.Object, orgID string, language string) diag.Diagnostics {
 	attrs := obj.Attributes()
 	attrs["id"] = types.StringValue(orgID + "_" + language)
 	attrs[helper.OrgIDVar] = types.StringValue(orgID)
 	attrs[LanguageVar] = types.StringValue(language)
+
+	newObj, d := types.ObjectValue(obj.AttributeTypes(ctx), attrs)
+	if d.HasError() {
+		return d
+	}
+
+	*obj = newObj
+	return nil
 }
 
 func getID(ctx context.Context, obj types.Object) (string, string) {
