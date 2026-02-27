@@ -36,6 +36,48 @@ func TestAccSMSProviderTwilio(t *testing.T) {
 	)
 }
 
+func TestAccSMSProviderTwilioActivation(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
+
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid           = "test_sid"
+  token         = "test_token"
+  sender_number = "123456789"
+  set_active    = false
+}
+`, frame.ProviderSnippet)
+
+	activatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid           = "test_sid"
+  token         = "test_token"
+  sender_number = "123456789"
+  set_active    = true
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "false"),
+				),
+			},
+			{
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

@@ -38,6 +38,71 @@ func TestAccAppSAML(t *testing.T) {
 	)
 }
 
+func TestAccAppSAMLMetadataUpdate(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_saml")
+	_, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
+
+	initialMetadata := `<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+                     entityID="http://example.com/saml/metadata">
+    <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                                     Location="http://example.com/saml/acs"
+                                     index="1" />
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>`
+
+	updatedMetadata := `<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+                     entityID="http://example.com/saml/metadata-updated">
+    <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                                     Location="http://example.com/saml/acs-updated"
+                                     index="1" />
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>`
+
+	initialConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_application_saml" "default" {
+  org_id       = data.zitadel_org.default.id
+  project_id   = %q
+  name         = %q
+  metadata_xml = %q
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, projectID, frame.UniqueResourcesID, initialMetadata)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_application_saml" "default" {
+  org_id       = data.zitadel_org.default.id
+  project_id   = %q
+  name         = %q
+  metadata_xml = %q
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, projectID, frame.UniqueResourcesID, updatedMetadata)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "name", frame.UniqueResourcesID),
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "name", frame.UniqueResourcesID),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

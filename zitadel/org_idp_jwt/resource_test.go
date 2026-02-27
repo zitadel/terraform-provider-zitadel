@@ -39,6 +39,60 @@ func TestAccOrgIDPJWT(t *testing.T) {
 	)
 }
 
+func TestAccOrgIDPJWTNameUpdate(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_org_idp_jwt")
+
+	initialConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_org_idp_jwt" "default" {
+  org_id        = data.zitadel_org.default.id
+  name          = "initial_%s"
+  styling_type  = "STYLING_TYPE_UNSPECIFIED"
+  jwt_endpoint  = "https://example.com/jwt"
+  issuer        = "https://example.com"
+  keys_endpoint = "https://example.com/keys"
+  header_name   = "x-auth-token"
+  auto_register = false
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.UniqueResourcesID)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_org_idp_jwt" "default" {
+  org_id        = data.zitadel_org.default.id
+  name          = "updated_%s"
+  styling_type  = "STYLING_TYPE_UNSPECIFIED"
+  jwt_endpoint  = "https://example.com/jwt"
+  issuer        = "https://example.com"
+  keys_endpoint = "https://example.com/keys"
+  header_name   = "x-auth-token"
+  auto_register = true
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "name", "initial_"+frame.UniqueResourcesID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "auto_register", "false"),
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "name", "updated_"+frame.UniqueResourcesID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "auto_register", "true"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

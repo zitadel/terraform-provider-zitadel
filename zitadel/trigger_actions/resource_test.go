@@ -42,6 +42,38 @@ func TestAccTriggerActions(t *testing.T) {
 	)
 }
 
+func TestAccTriggerActionsExternalAuthFlow(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_trigger_actions")
+	actionDep, actionID := action_test_dep.Create(t, frame)
+
+	resourceConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_trigger_actions" "default" {
+  org_id       = data.zitadel_org.default.id
+  flow_type    = "FLOW_TYPE_EXTERNAL_AUTHENTICATION"
+  trigger_type = "TRIGGER_TYPE_POST_AUTHENTICATION"
+  action_ids   = ["%s"]
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, actionID)
+
+	_ = actionDep
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: resourceConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "flow_type", "FLOW_TYPE_EXTERNAL_AUTHENTICATION"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "trigger_type", "TRIGGER_TYPE_POST_AUTHENTICATION"),
+					checkRemoteProperty(frame, "FLOW_TYPE_EXTERNAL_AUTHENTICATION")("TRIGGER_TYPE_POST_AUTHENTICATION"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, flowType string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

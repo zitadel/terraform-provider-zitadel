@@ -136,6 +136,62 @@ resource "%s" "default" {
 	})
 }
 
+func TestAccHumanUserProfileVariations(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_human_user")
+
+	initialConfig := fmt.Sprintf(`%s
+resource "%s" "default" {
+	org_id             = "%s"
+	user_name          = "%s"
+	first_name         = "Test"
+	last_name          = "User"
+	email              = "profile-test@example.com"
+	is_email_verified  = true
+	nick_name          = "testy"
+	preferred_language = "en"
+	gender             = "GENDER_FEMALE"
+	initial_password   = "Password1!"
+}
+`, frame.ProviderSnippet, frame.ResourceType, frame.OrgID, frame.UniqueResourcesID)
+
+	updatedConfig := fmt.Sprintf(`%s
+resource "%s" "default" {
+	org_id             = "%s"
+	user_name          = "%s"
+	first_name         = "Test"
+	last_name          = "User"
+	email              = "profile-test@example.com"
+	is_email_verified  = true
+	nick_name          = "updated-nick"
+	preferred_language = "de"
+	gender             = "GENDER_MALE"
+	initial_password   = "Password1!"
+}
+`, frame.ProviderSnippet, frame.ResourceType, frame.OrgID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "nick_name", "testy"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "preferred_language", "en"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "gender", "GENDER_FEMALE"),
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "nick_name", "updated-nick"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "preferred_language", "de"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "gender", "GENDER_MALE"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

@@ -292,6 +292,73 @@ resource "zitadel_action_target" "default" {
 	})
 }
 
+func TestAccActionTargetFieldUpdates(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
+
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JSON"
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
+
+	nameUpdatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s-renamed"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JSON"
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
+
+	timeoutUpdatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s-renamed"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "30s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JSON"
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "name", frame.UniqueResourcesID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "timeout", "10s"),
+				),
+			},
+			{
+				Config: nameUpdatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "name", frame.UniqueResourcesID+"-renamed"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "timeout", "10s"),
+				),
+			},
+			{
+				Config: timeoutUpdatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "name", frame.UniqueResourcesID+"-renamed"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "timeout", "30s"),
+				),
+			},
+		},
+	})
+}
+
 func checkTargetType(frame *test_utils.InstanceTestFrame, expectedTargetType string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		rs, ok := state.RootModule().Resources[frame.TerraformName]
