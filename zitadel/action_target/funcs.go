@@ -92,6 +92,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
+	if d.HasChange(PayloadTypeVar) {
+		payloadType := d.Get(PayloadTypeVar).(string)
+		req.PayloadType = stringToPayloadType(payloadType)
+	}
+
 	_, err = client.UpdateTarget(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to update target: %v", err)
@@ -118,9 +123,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	req := &actionv2.CreateTargetRequest{
-		Name:     d.Get(NameVar).(string),
-		Endpoint: d.Get(EndpointVar).(string),
-		Timeout:  durationpb.New(timeout),
+		Name:        d.Get(NameVar).(string),
+		Endpoint:    d.Get(EndpointVar).(string),
+		Timeout:     durationpb.New(timeout),
+		PayloadType: stringToPayloadType(d.Get(PayloadTypeVar).(string)),
 	}
 
 	targetType := d.Get(TargetTypeVar).(string)
@@ -183,9 +189,10 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	target := resp.GetTarget()
 	if target != nil {
 		set := map[string]interface{}{
-			NameVar:     target.GetName(),
-			EndpointVar: target.GetEndpoint(),
-			TimeoutVar:  target.GetTimeout().AsDuration().String(),
+			NameVar:        target.GetName(),
+			EndpointVar:    target.GetEndpoint(),
+			TimeoutVar:     target.GetTimeout().AsDuration().String(),
+			PayloadTypeVar: payloadTypeToString(target.GetPayloadType()),
 		}
 
 		if target.GetRestWebhook() != nil {
@@ -210,4 +217,35 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	d.SetId("")
 	return nil
+}
+
+func stringToPayloadType(s string) actionv2.PayloadType {
+	switch s {
+	case payloadTypeJSON:
+		return actionv2.PayloadType_PAYLOAD_TYPE_JSON
+	case payloadTypeJWT:
+		return actionv2.PayloadType_PAYLOAD_TYPE_JWT
+	case payloadTypeJWE:
+		return actionv2.PayloadType_PAYLOAD_TYPE_JWE
+	default:
+		return actionv2.PayloadType_PAYLOAD_TYPE_JSON
+	}
+}
+
+func payloadTypeToString(pt actionv2.PayloadType) string {
+	switch pt {
+	case actionv2.PayloadType_PAYLOAD_TYPE_JSON:
+		return payloadTypeJSON
+	case actionv2.PayloadType_PAYLOAD_TYPE_JWT:
+		return payloadTypeJWT
+	case actionv2.PayloadType_PAYLOAD_TYPE_JWE:
+		return payloadTypeJWE
+	case actionv2.PayloadType_PAYLOAD_TYPE_UNSPECIFIED:
+		// UNSPECIFIED means the target was created before payload_type was added
+		// or it's using the API default, which is JSON
+		return payloadTypeJSON
+	default:
+		// Unknown payload type, fall back to JSON as the safe default
+		return payloadTypeJSON
+	}
 }

@@ -11,8 +11,7 @@ import (
 )
 
 func TestAccSystemFeatures(t *testing.T) {
-	t.Skip("System features require system-level permissions not available in test environment")
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_system_features")
+	frame := test_utils.NewSystemTestFrame(t, "zitadel_system_features")
 
 	resourceExample := `
 resource "zitadel_system_features" "default" {
@@ -29,7 +28,7 @@ resource "zitadel_system_features" "default" {
 
 	test_utils.RunLifecyleTest(
 		t,
-		frame.BaseTestFrame,
+		*frame,
 		nil,
 		func(property, secret string) string {
 			if property == resourceExample {

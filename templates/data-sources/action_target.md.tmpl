@@ -1,18 +1,16 @@
 ---
-page_title: "{{.Type}} {{.Name}} - {{.ProviderName}}"
+page_title: "{{.Name}} {{.Type}} - {{.ProviderName}}"
 subcategory: ""
 description: |-
 {{ .Description | plainmarkdown | trimspace | prefixlines "  " }}
 ---
 
-# {{.Type}} ({{.Name}})
+# {{.Name}} ({{.Type}})
 
 {{ .Description | trimspace }}
 
-{{ if .HasExample -}}
 ## Example Usage
 
-{{tffile .ExampleFile }}
-{{- end }}
+{{ tffile "examples/provider/data-sources/action_target.tf" }}
 
 {{ .SchemaMarkdown | trimspace }}

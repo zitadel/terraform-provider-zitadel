@@ -14,7 +14,7 @@ Resource representing a SAML IdP on the organization.
 ```terraform
 resource "zitadel_org_idp_saml" "default" {
   org_id              = data.zitadel_org.default.id
-  name                = "LDAP"
+  name                = "My Generic SAML IDP"
   binding             = "SAML_BINDING_POST"
   with_signed_request = true
   is_linking_allowed  = false
@@ -79,14 +79,6 @@ EOM
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-
-## Loading the XML Metadata
-
-If you don't want to pass the XML metadata inline, you have plenty of options. For example:
-- [local_file Data Source](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file)
-- [http Data Source](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http)
-- [terracurl_request Data Source](https://registry.terraform.io/providers/devops-rob/terracurl/latest/docs/data-sources/request)
-- ...
 
 ## Import
 

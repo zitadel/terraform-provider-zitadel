@@ -1,6 +1,6 @@
 resource "zitadel_org_idp_saml" "default" {
   org_id              = data.zitadel_org.default.id
-  name                = "LDAP"
+  name                = "My Generic SAML IDP"
   binding             = "SAML_BINDING_POST"
   with_signed_request = true
   is_linking_allowed  = false

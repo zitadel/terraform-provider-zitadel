@@ -9,24 +9,6 @@ description: |-
 
 Resource representing the SMTP configuration of an instance.
 
----
-**NOTE**
-
-Breaking changes in update to ZITADEL provider v2.0.0, please remove and reimport the SMTP configuration into the Terraform state, as the logic for the ID in this resource changed.
-
-```bash
-# Find out the state path of your SMTP resource
-export SMTP_CONFIG=$(terraform state list | grep 'smtp_config')
-
-# Remove the current state of your SMTP resource
-terraform state rm ${SMTP_CONFIG}
-
-# Reimport your SMTP resource
-terraform import ${SMTP_CONFIG} "${SMTP_CONFIG_ID}:${SMTP_CONFIG_PASSWORD}"
-```
-
----
-
 ## Example Usage
 
 ```terraform

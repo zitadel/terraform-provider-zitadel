@@ -18,10 +18,6 @@ func GetDatasource() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "ID of the organization",
-				ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
-					_, err := helper.ConvertID(i.(string))
-					return diag.FromErr(err)
-				},
 			},
 			NameVar: {
 				Type:        schema.TypeString,

@@ -1,7 +1,8 @@
 package user_metadata
 
 const (
-	UserIDVar = "user_id"
-	KeyVar    = "key"
-	ValueVar  = "value"
+	UserIDVar   = "user_id"
+	KeyVar      = "key"
+	ValueVar    = "value"
+	metadataVar = "metadata"
 )
