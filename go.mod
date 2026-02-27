@@ -5,6 +5,7 @@ go 1.24.0
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.3.0
 	github.com/gabriel-vasile/mimetype v1.4.1
+	github.com/go-jose/go-jose/v4 v4.1.3
 	github.com/gogo/protobuf v1.3.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.4
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
@@ -16,7 +17,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
 	github.com/zclconf/go-cty v1.13.1
 	github.com/zitadel/oidc/v3 v3.45.1
-	github.com/zitadel/zitadel-go/v3 v3.21.0
+	github.com/zitadel/zitadel-go/v3 v3.26.1
 	golang.org/x/oauth2 v0.34.0
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.11
@@ -26,7 +27,6 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.3 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-test/deep v1.0.7 // indirect

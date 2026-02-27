@@ -160,10 +160,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err := d.Set(IsPrimaryVar, remoteDomain.IsPrimary); err != nil {
 		return diag.Errorf("failed to set is_primary: %v", err)
 	}
-	validationType := org.DomainValidationType_name[int32(remoteDomain.ValidationType)]
-	if err := d.Set(ValidationTypeVar, validationType); err != nil {
-		return diag.Errorf("failed to set validation_type: %v", err)
-	}
 
 	return nil
 }

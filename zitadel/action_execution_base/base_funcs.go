@@ -44,11 +44,12 @@ func ReadExecutionBase(
 			continue
 		}
 
-		if *idPtr == d.Id() {
+		if *idPtr == helper.GetID(d, IDVar) {
 			if len(execution.GetTargets()) == 0 {
 				d.SetId("")
 				return nil, nil
 			}
+			d.SetId(*idPtr)
 			return execution, nil
 		}
 	}
