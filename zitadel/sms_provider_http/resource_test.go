@@ -34,7 +34,7 @@ func TestAccSMSHttpProvider(t *testing.T) {
 	)
 }
 
-func TestAccSmsHttpProviderActivation(t *testing.T) {
+func TestAccSMSHttpProviderActivation(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_http")
 
 	initialConfig := fmt.Sprintf(`
