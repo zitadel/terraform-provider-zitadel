@@ -41,6 +41,55 @@ func TestAccProjectRole(t *testing.T) {
 	)
 }
 
+func TestAccProjectRoleDisplayNameUpdate(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_role")
+	_, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
+
+	initialConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_project_role" "default" {
+  org_id       = data.zitadel_org.default.id
+  project_id   = "%s"
+  role_key     = "%s"
+  display_name = "Initial Role Name"
+  group        = "initial_group"
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, projectID, frame.UniqueResourcesID)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_project_role" "default" {
+  org_id       = data.zitadel_org.default.id
+  project_id   = "%s"
+  role_key     = "%s"
+  display_name = "Updated Role Name"
+  group        = "updated_group"
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, projectID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "display_name", "Initial Role Name"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "group", "initial_group"),
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "display_name", "Updated Role Name"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "group", "updated_group"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectID string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

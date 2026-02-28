@@ -165,6 +165,63 @@ resource "zitadel_application_oidc" "default" {
 	)
 }
 
+func TestAccAppOIDCConfigUpdate(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_oidc")
+	_, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
+
+	initialConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_application_oidc" "default" {
+  org_id                      = data.zitadel_org.default.id
+  project_id                  = "%s"
+  name                        = "%s"
+  redirect_uris               = ["https://localhost.com/callback"]
+  response_types              = ["OIDC_RESPONSE_TYPE_CODE"]
+  grant_types                 = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
+  dev_mode                    = false
+  access_token_role_assertion = false
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, projectID, frame.UniqueResourcesID)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_application_oidc" "default" {
+  org_id                      = data.zitadel_org.default.id
+  project_id                  = "%s"
+  name                        = "%s"
+  redirect_uris               = ["https://localhost.com/callback", "https://localhost.com/callback2"]
+  response_types              = ["OIDC_RESPONSE_TYPE_CODE"]
+  grant_types                 = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
+  dev_mode                    = true
+  access_token_role_assertion = true
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, projectID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "dev_mode", "false"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "access_token_role_assertion", "false"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "redirect_uris.#", "1"),
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "dev_mode", "true"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "access_token_role_assertion", "true"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "redirect_uris.#", "2"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

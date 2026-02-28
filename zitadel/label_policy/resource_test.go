@@ -56,6 +56,68 @@ func TestAccLabelPolicy(t *testing.T) {
 	)
 }
 
+func TestAccLabelPolicyActivation(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_label_policy")
+
+	initialConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_label_policy" "default" {
+  org_id                = data.zitadel_org.default.id
+  primary_color         = "#5469d4"
+  hide_login_name_suffix = false
+  warn_color            = "#cd3d56"
+  background_color      = "#ffffff"
+  font_color            = "#000000"
+  primary_color_dark    = "#2073c4"
+  background_color_dark = "#111827"
+  warn_color_dark       = "#ff3b5b"
+  font_color_dark       = "#ffffff"
+  disable_watermark     = false
+  set_active            = true
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_label_policy" "default" {
+  org_id                = data.zitadel_org.default.id
+  primary_color         = "#22c55e"
+  hide_login_name_suffix = false
+  warn_color            = "#cd3d56"
+  background_color      = "#ffffff"
+  font_color            = "#000000"
+  primary_color_dark    = "#2073c4"
+  background_color_dark = "#111827"
+  warn_color_dark       = "#ff3b5b"
+  font_color_dark       = "#ffffff"
+  disable_watermark     = false
+  set_active            = true
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "primary_color", "#5469d4"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "primary_color", "#22c55e"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

@@ -35,6 +35,84 @@ func TestAccEmailHttpProvider(t *testing.T) {
 	)
 }
 
+func TestAccEmailHttpProviderDescriptionUpdate(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_email_provider_http")
+
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_email_provider_http" "default" {
+  endpoint    = "https://relay.example.com/emails"
+  description = "initial description"
+}
+`, frame.ProviderSnippet)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_email_provider_http" "default" {
+  endpoint    = "https://relay.example.com/emails"
+  description = "updated description"
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "description", "initial description"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "endpoint", "https://relay.example.com/emails"),
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "description", "updated description"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "endpoint", "https://relay.example.com/emails"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccEmailHttpProviderActivation(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_email_provider_http")
+
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_email_provider_http" "default" {
+  endpoint   = "https://relay.example.com/emails"
+  set_active = false
+}
+`, frame.ProviderSnippet)
+
+	activatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_email_provider_http" "default" {
+  endpoint   = "https://relay.example.com/emails"
+  set_active = true
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "false"),
+				),
+			},
+			{
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
