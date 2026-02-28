@@ -90,13 +90,13 @@ resource "zitadel_application_saml" "default" {
 			{
 				Config: initialConfig,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(frame.TerraformName, "name", frame.UniqueResourcesID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "metadata_xml", initialMetadata),
 				),
 			},
 			{
 				Config: updatedConfig,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(frame.TerraformName, "name", frame.UniqueResourcesID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "metadata_xml", updatedMetadata),
 				),
 			},
 		},

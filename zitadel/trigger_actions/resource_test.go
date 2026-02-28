@@ -49,15 +49,14 @@ func TestAccTriggerActionsExternalAuthFlow(t *testing.T) {
 	resourceConfig := fmt.Sprintf(`
 %s
 %s
+%s
 resource "zitadel_trigger_actions" "default" {
   org_id       = data.zitadel_org.default.id
   flow_type    = "FLOW_TYPE_EXTERNAL_AUTHENTICATION"
   trigger_type = "TRIGGER_TYPE_POST_AUTHENTICATION"
   action_ids   = ["%s"]
 }
-`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, actionID)
-
-	_ = actionDep
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, actionDep, actionID)
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
