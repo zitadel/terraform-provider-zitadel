@@ -57,6 +57,9 @@ func TestAccTriggerActionsExternalAuthFlow(t *testing.T) {
 		t.Fatalf("failed to create second action: %v", err)
 	}
 	action2ID := action2.GetId()
+	t.Cleanup(func() {
+		_, _ = frame.DeleteAction(frame, &management.DeleteActionRequest{Id: action2ID})
+	})
 
 	resourceConfig := fmt.Sprintf(`
 %s
