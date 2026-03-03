@@ -8,10 +8,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/machine_user"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 )
 
 func TestAccMachineUserBearerWithoutSecret(t *testing.T) {
