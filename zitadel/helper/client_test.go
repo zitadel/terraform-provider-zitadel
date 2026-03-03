@@ -16,6 +16,11 @@ func TestIgnoreIfNotFoundError(t *testing.T) {
 	}{
 		{
 			name:    "nil error returns nil",
+			err:     nil,
+			wantNil: true,
+		},
+		{
+			name:    "not found error returns nil",
 			err:     status.Error(codes.NotFound, "not found"),
 			wantNil: true,
 		},
