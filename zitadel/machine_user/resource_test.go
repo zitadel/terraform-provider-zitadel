@@ -175,7 +175,11 @@ resource "zitadel_machine_user" "default" {
 			},
 			{
 				Config: configWithoutSecret,
-				Check:  checkRemoteProperty(frame)("toggle secret test"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					checkRemoteProperty(frame)("toggle secret test"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "client_id", ""),
+					resource.TestCheckResourceAttr(frame.TerraformName, "client_secret", ""),
+				),
 			},
 		},
 	})
