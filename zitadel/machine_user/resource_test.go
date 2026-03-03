@@ -8,11 +8,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
-
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/machine_user"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 )
 
 func TestAccMachineUserBearerWithoutSecret(t *testing.T) {
@@ -129,6 +128,56 @@ func TestAccMachineUserJWTWithSecret(t *testing.T) {
 			test_utils.ImportStateAttribute(frame.BaseTestFrame, "client_secret"),
 		),
 	)
+}
+
+func TestAccMachineUserToggleSecret(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_machine_user")
+
+	configWithoutSecret := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_machine_user" "default" {
+  org_id      = data.zitadel_org.default.id
+  user_name   = "%s"
+  name        = "%s"
+  description = "toggle secret test"
+  with_secret = false
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.UniqueResourcesID, frame.UniqueResourcesID)
+
+	configWithSecret := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_machine_user" "default" {
+  org_id      = data.zitadel_org.default.id
+  user_name   = "%s"
+  name        = "%s"
+  description = "toggle secret test"
+  with_secret = true
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.UniqueResourcesID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: configWithoutSecret,
+				Check:  checkRemoteProperty(frame)("toggle secret test"),
+			},
+			{
+				Config: configWithSecret,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					checkRemoteProperty(frame)("toggle secret test"),
+					resource.TestCheckResourceAttrSet(frame.TerraformName, "client_id"),
+					resource.TestCheckResourceAttrSet(frame.TerraformName, "client_secret"),
+				),
+			},
+			{
+				Config: configWithoutSecret,
+				Check:  checkRemoteProperty(frame)("toggle secret test"),
+			},
+		},
+	})
 }
 
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {

@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
@@ -15,14 +14,16 @@ func TestAccInstanceFeatures(t *testing.T) {
 
 	resourceExample := `
 resource "zitadel_instance_features" "default" {
-	login_default_org = true
+	login_default_org    = true
+	improved_performance = ["IMPROVED_PERFORMANCE_PROJECT_GRANT"]
 }
 	`
 
 	resourceExampleUpdated := `
 resource "zitadel_instance_features" "default" {
-	login_default_org = false
-	user_schema = true
+	login_default_org    = false
+	user_schema          = true
+	improved_performance = ["IMPROVED_PERFORMANCE_PROJECT_GRANT", "IMPROVED_PERFORMANCE_PROJECT"]
 }
 	`
 

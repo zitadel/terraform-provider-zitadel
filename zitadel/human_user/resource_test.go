@@ -7,11 +7,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
-
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/human_user"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 )
 
 func TestAccHumanUser(t *testing.T) {
@@ -186,6 +185,69 @@ resource "%s" "default" {
 					resource.TestCheckResourceAttr(frame.TerraformName, "nick_name", "updated-nick"),
 					resource.TestCheckResourceAttr(frame.TerraformName, "preferred_language", "de"),
 					resource.TestCheckResourceAttr(frame.TerraformName, "gender", "GENDER_MALE"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccHumanUserHashedPassword(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_human_user")
+
+	// bcrypt hash of "Password1!"
+	bcryptHash := "$2a$10$aMBv5IKMQ8VpyrBse8Vi5eyHjsvUcuUQXUBphMOfDnbPHGRPOmDXK"
+
+	config := fmt.Sprintf(`%s
+%s
+resource "%s" "default" {
+	org_id                  = data.zitadel_org.default.id
+	user_name               = "%s"
+	first_name              = "Hashed"
+	last_name               = "User"
+	email                   = "hashed@example.com"
+	is_email_verified       = true
+	initial_hashed_password = "%s"
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.ResourceType, frame.UniqueResourcesID, bcryptHash)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check:  checkRemoteProperty(frame)("Hashed User"),
+			},
+		},
+	})
+}
+
+func TestAccHumanUserCustomID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_human_user")
+
+	customID := frame.UniqueResourcesID
+
+	config := fmt.Sprintf(`%s
+%s
+resource "%s" "default" {
+	org_id           = data.zitadel_org.default.id
+	user_id          = "%s"
+	user_name        = "%s_custom"
+	first_name       = "Custom"
+	last_name        = "ID"
+	email            = "custom-id@example.com"
+	is_email_verified = true
+	initial_password = "Password1!"
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.ResourceType, customID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "user_id", customID),
+					checkRemoteProperty(frame)("Custom ID"),
 				),
 			},
 		},

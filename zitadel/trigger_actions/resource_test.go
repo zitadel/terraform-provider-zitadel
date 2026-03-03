@@ -5,15 +5,16 @@ import (
 	"regexp"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
-
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action/action_test_dep"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/trigger_actions"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func TestAccTriggerActions(t *testing.T) {
@@ -45,6 +46,16 @@ func TestAccTriggerActions(t *testing.T) {
 func TestAccTriggerActionsExternalAuthFlow(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_trigger_actions")
 	actionDep, actionID := action_test_dep.Create(t, frame)
+	action2, err := frame.CreateAction(frame, &management.CreateActionRequest{
+		Name:          frame.UniqueResourcesID + "2",
+		Script:        "not a script 2",
+		Timeout:       durationpb.New(10 * time.Second),
+		AllowedToFail: true,
+	})
+	if err != nil {
+		t.Fatalf("failed to create second action: %v", err)
+	}
+	action2ID := action2.GetId()
 
 	resourceConfig := fmt.Sprintf(`
 %s
@@ -58,11 +69,31 @@ resource "zitadel_trigger_actions" "default" {
 }
 `, frame.ProviderSnippet, frame.AsOrgDefaultDependency, actionDep, actionID)
 
+	updatedConfig := fmt.Sprintf(`
+%s
+%s
+%s
+resource "zitadel_trigger_actions" "default" {
+  org_id       = data.zitadel_org.default.id
+  flow_type    = "FLOW_TYPE_EXTERNAL_AUTHENTICATION"
+  trigger_type = "TRIGGER_TYPE_POST_AUTHENTICATION"
+  action_ids   = ["%s"]
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, actionDep, action2ID)
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
 		Steps: []resource.TestStep{
 			{
 				Config: resourceConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "flow_type", "FLOW_TYPE_EXTERNAL_AUTHENTICATION"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "trigger_type", "TRIGGER_TYPE_POST_AUTHENTICATION"),
+					checkRemoteProperty(frame, "FLOW_TYPE_EXTERNAL_AUTHENTICATION")("TRIGGER_TYPE_POST_AUTHENTICATION"),
+				),
+			},
+			{
+				Config: updatedConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "flow_type", "FLOW_TYPE_EXTERNAL_AUTHENTICATION"),
 					resource.TestCheckResourceAttr(frame.TerraformName, "trigger_type", "TRIGGER_TYPE_POST_AUTHENTICATION"),
