@@ -131,6 +131,60 @@ func TestAccMachineUserJWTWithSecret(t *testing.T) {
 	)
 }
 
+func TestAccMachineUserToggleSecret(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_machine_user")
+
+	configWithoutSecret := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_machine_user" "default" {
+  org_id      = data.zitadel_org.default.id
+  user_name   = "%s"
+  name        = "%s"
+  description = "toggle secret test"
+  with_secret = false
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.UniqueResourcesID, frame.UniqueResourcesID)
+
+	configWithSecret := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_machine_user" "default" {
+  org_id      = data.zitadel_org.default.id
+  user_name   = "%s"
+  name        = "%s"
+  description = "toggle secret test"
+  with_secret = true
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.UniqueResourcesID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: configWithoutSecret,
+				Check:  checkRemoteProperty(frame)("toggle secret test"),
+			},
+			{
+				Config: configWithSecret,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					checkRemoteProperty(frame)("toggle secret test"),
+					resource.TestCheckResourceAttrSet(frame.TerraformName, "client_id"),
+					resource.TestCheckResourceAttrSet(frame.TerraformName, "client_secret"),
+				),
+			},
+			{
+				Config: configWithoutSecret,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					checkRemoteProperty(frame)("toggle secret test"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "client_id", ""),
+					resource.TestCheckResourceAttr(frame.TerraformName, "client_secret", ""),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

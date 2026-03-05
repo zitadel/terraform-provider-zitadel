@@ -192,6 +192,69 @@ resource "%s" "default" {
 	})
 }
 
+func TestAccHumanUserHashedPassword(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_human_user")
+
+	// bcrypt hash of "Password1!"
+	bcryptHash := "$2a$10$aMBv5IKMQ8VpyrBse8Vi5eyHjsvUcuUQXUBphMOfDnbPHGRPOmDXK"
+
+	config := fmt.Sprintf(`%s
+%s
+resource "%s" "default" {
+	org_id                  = data.zitadel_org.default.id
+	user_name               = "%s"
+	first_name              = "Hashed"
+	last_name               = "User"
+	email                   = "hashed@example.com"
+	is_email_verified       = true
+	initial_hashed_password = "%s"
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.ResourceType, frame.UniqueResourcesID, bcryptHash)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check:  checkRemoteProperty(frame)("Hashed User"),
+			},
+		},
+	})
+}
+
+func TestAccHumanUserCustomID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_human_user")
+
+	customID := frame.UniqueResourcesID
+
+	config := fmt.Sprintf(`%s
+%s
+resource "%s" "default" {
+	org_id           = data.zitadel_org.default.id
+	user_id          = "%s"
+	user_name        = "%s_custom"
+	first_name       = "Custom"
+	last_name        = "ID"
+	email            = "custom-id@example.com"
+	is_email_verified = true
+	initial_password = "Password1!"
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.ResourceType, customID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "user_id", customID),
+					checkRemoteProperty(frame)("Custom ID"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
