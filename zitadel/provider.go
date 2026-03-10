@@ -67,6 +67,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_custom_domains"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_features"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_member"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_restrictions"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_trusted_domain"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/instance_trusted_domains"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/label_policy"
@@ -435,6 +436,7 @@ func Provider() *schema.Provider {
 			"zitadel_instance_custom_domains":    instance_custom_domains.GetDatasource(),
 			"zitadel_instance_trusted_domains":   instance_trusted_domains.GetDatasource(),
 			"zitadel_instance_features":          instance_features.GetDatasource(),
+			"zitadel_instance_restrictions":      instance_restrictions.GetDatasource(),
 			"zitadel_system_features":            system_features.GetDatasource(),
 		},
 		Schema: map[string]*schema.Schema{
@@ -657,6 +659,7 @@ func Provider() *schema.Provider {
 			"zitadel_email_provider_http":                email_provider_http.GetResource(),
 			"zitadel_default_security_settings":          default_security_settings.GetResource(),
 			"zitadel_instance_features":                  instance_features.GetResource(),
+			"zitadel_instance_restrictions":              instance_restrictions.GetResource(),
 			"zitadel_system_features":                    system_features.GetResource(),
 		},
 		ConfigureContextFunc: ProviderConfigure,
