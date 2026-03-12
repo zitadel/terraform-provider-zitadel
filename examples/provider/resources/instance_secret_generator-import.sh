@@ -1,0 +1,1 @@
+terraform import zitadel_instance_secret_generator.password_reset password_reset_code
