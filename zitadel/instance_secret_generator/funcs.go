@@ -39,6 +39,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started update")
 
+	if !d.HasChanges(lengthVar, expiryVar, includeLowerLettersVar, includeUpperLettersVar, includeDigitsVar, includeSymbolsVar) {
+		return nil
+	}
+
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
@@ -55,9 +59,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("invalid generator_type %q", generatorType)
 	}
 
-	// Read current state from server to seed expiry when not explicitly
-	// configured (expiry is the only field where GetOk reliably detects
-	// presence since its zero-value "" is never a valid duration).
+	// The proto uses value types for all fields (except expiry), so every
+	// field must be sent. Seed from the current server state and only
+	// override fields that actually changed.
 	current, err := client.GetSecretGenerator(ctx, &admin.GetSecretGeneratorRequest{
 		GeneratorType: genType,
 	})
@@ -65,22 +69,38 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get current secret generator state: %v", err)
 	}
 
+	sg := current.GetSecretGenerator()
 	req := &admin.UpdateSecretGeneratorRequest{
 		GeneratorType:       genType,
-		Length:              uint32(d.Get(lengthVar).(int)),
-		Expiry:              current.GetSecretGenerator().GetExpiry(),
-		IncludeLowerLetters: d.Get(includeLowerLettersVar).(bool),
-		IncludeUpperLetters: d.Get(includeUpperLettersVar).(bool),
-		IncludeDigits:       d.Get(includeDigitsVar).(bool),
-		IncludeSymbols:      d.Get(includeSymbolsVar).(bool),
+		Length:              sg.GetLength(),
+		Expiry:              sg.GetExpiry(),
+		IncludeLowerLetters: sg.GetIncludeLowerLetters(),
+		IncludeUpperLetters: sg.GetIncludeUpperLetters(),
+		IncludeDigits:       sg.GetIncludeDigits(),
+		IncludeSymbols:      sg.GetIncludeSymbols(),
 	}
 
-	if v, ok := d.GetOk(expiryVar); ok {
-		expiry, err := time.ParseDuration(v.(string))
+	if d.HasChange(lengthVar) {
+		req.Length = uint32(d.Get(lengthVar).(int))
+	}
+	if d.HasChange(expiryVar) {
+		expiry, err := time.ParseDuration(d.Get(expiryVar).(string))
 		if err != nil {
 			return diag.Errorf("failed to parse expiry: %v", err)
 		}
 		req.Expiry = durationpb.New(expiry)
+	}
+	if d.HasChange(includeLowerLettersVar) {
+		req.IncludeLowerLetters = d.Get(includeLowerLettersVar).(bool)
+	}
+	if d.HasChange(includeUpperLettersVar) {
+		req.IncludeUpperLetters = d.Get(includeUpperLettersVar).(bool)
+	}
+	if d.HasChange(includeDigitsVar) {
+		req.IncludeDigits = d.Get(includeDigitsVar).(bool)
+	}
+	if d.HasChange(includeSymbolsVar) {
+		req.IncludeSymbols = d.Get(includeSymbolsVar).(bool)
 	}
 
 	_, err = client.UpdateSecretGenerator(ctx, req)
