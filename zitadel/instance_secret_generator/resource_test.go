@@ -72,7 +72,8 @@ resource "zitadel_instance_secret_generator" "partial" {
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
 		Steps: []resource.TestStep{
 			{
-				Config: partialConfig,
+				Config:             partialConfig,
+				ExpectNonEmptyPlan: true,
 				Check: func(state *terraform.State) error {
 					client, err := helper.GetAdminClient(context.Background(), frame.ClientInfo)
 					if err != nil {
