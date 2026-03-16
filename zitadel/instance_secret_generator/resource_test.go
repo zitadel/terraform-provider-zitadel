@@ -57,6 +57,44 @@ resource "zitadel_instance_secret_generator" "default" {
 	)
 }
 
+func TestAccInstanceSecretGeneratorPartialConfig(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_instance_secret_generator")
+
+	// Apply with only generator_type set; all other fields should be
+	// adopted from the server and not clobbered to zero values.
+	partialConfig := fmt.Sprintf(`%s
+resource "zitadel_instance_secret_generator" "partial" {
+  generator_type = "otp_sms"
+}
+`, frame.ProviderSnippet)
+
+	resource.ParallelTest(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: partialConfig,
+				Check: func(state *terraform.State) error {
+					client, err := helper.GetAdminClient(context.Background(), frame.ClientInfo)
+					if err != nil {
+						return fmt.Errorf("failed to get client: %w", err)
+					}
+					resp, err := client.GetSecretGenerator(context.Background(), &admin.GetSecretGeneratorRequest{
+						GeneratorType: settings.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_SMS,
+					})
+					if err != nil {
+						return fmt.Errorf("getting secret generator failed: %w", err)
+					}
+					sg := resp.GetSecretGenerator()
+					if sg.GetLength() == 0 {
+						return fmt.Errorf("expected length to be preserved from server, but got 0")
+					}
+					return nil
+				},
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {
 	return func(expect bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
