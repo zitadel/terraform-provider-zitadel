@@ -24,11 +24,3 @@ var generatorTypeMap = map[string]settings.SecretGeneratorType{
 	"verify_email_code":      settings.SecretGeneratorType_SECRET_GENERATOR_TYPE_VERIFY_EMAIL_CODE,
 	"verify_phone_code":      settings.SecretGeneratorType_SECRET_GENERATOR_TYPE_VERIFY_PHONE_CODE,
 }
-
-var generatorTypeReverseMap = func() map[settings.SecretGeneratorType]string {
-	m := make(map[settings.SecretGeneratorType]string, len(generatorTypeMap))
-	for k, v := range generatorTypeMap {
-		m[v] = k
-	}
-	return m
-}()
