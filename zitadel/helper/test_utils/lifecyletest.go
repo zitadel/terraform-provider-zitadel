@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
+var nonEmptyPlanErrRe = regexp.MustCompile(`\bthe plan was not empty\b`)
+
 func RunLifecyleTest[P comparable](
 	t *testing.T,
 	frame BaseTestFrame,
@@ -74,7 +76,7 @@ func RunLifecyleTest[P comparable](
 		CheckDestroy: CheckAMinute(checkDestroy),
 		Steps:        steps,
 		ErrorCheck: func(err error) error {
-			if err != nil && allowNonEmptyPlan && os.Getenv("CI") == "true" && strings.Contains(err.Error(), "the plan was not empty") {
+			if err != nil && allowNonEmptyPlan && os.Getenv("CI") == "true" && nonEmptyPlanErrRe.MatchString(err.Error()) {
 				t.Logf("Ignoring non-empty plan error because we can't guarantee consistency: %s", err.Error())
 				return nil
 			}
