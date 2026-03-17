@@ -8,7 +8,9 @@ import (
 )
 
 func TestAccActionExecutionEventDatasource_Event(t *testing.T) {
-	t.Skip("skipped due to eventual consistency in the Zitadel API causing flaky failures")
+	if testing.Short() {
+		t.Skip("skipping acceptance test in short mode")
+	}
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_event")
 	targetDep := fmt.Sprintf(`
 resource "zitadel_action_target" "default" {
@@ -44,7 +46,9 @@ data "zitadel_action_execution_event" "default" {
 }
 
 func TestAccActionExecutionEventDatasource_Group(t *testing.T) {
-	t.Skip("skipped due to eventual consistency in the Zitadel API causing flaky failures")
+	if testing.Short() {
+		t.Skip("skipping acceptance test in short mode")
+	}
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_event")
 	targetDep := fmt.Sprintf(`
 resource "zitadel_action_target" "default" {
@@ -80,7 +84,9 @@ data "zitadel_action_execution_event" "default" {
 }
 
 func TestAccActionExecutionEventDatasource_All(t *testing.T) {
-	t.Skip("skipped due to eventual consistency in the Zitadel API causing flaky failures")
+	if testing.Short() {
+		t.Skip("skipping acceptance test in short mode")
+	}
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_event")
 	targetDep := fmt.Sprintf(`
 resource "zitadel_action_target" "default" {
