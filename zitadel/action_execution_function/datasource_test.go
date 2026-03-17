@@ -8,6 +8,7 @@ import (
 )
 
 func TestAccActionExecutionFunctionDatasource(t *testing.T) {
+	t.Skip("skipped due to eventual consistency in the Zitadel API causing flaky failures")
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_function")
 	targetDep := fmt.Sprintf(`
 resource "zitadel_action_target" "default" {
