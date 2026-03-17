@@ -16,7 +16,9 @@ import (
 )
 
 func TestAccActionExecution_Event(t *testing.T) {
-	t.Skip("skipped due to eventual consistency in the Zitadel API causing flaky failures")
+	if testing.Short() {
+		t.Skip("skipped due to eventual consistency in the Zitadel API causing flaky failures")
+	}
 	t.Run("event", func(t *testing.T) {
 		frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_event")
 		targetFrame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
