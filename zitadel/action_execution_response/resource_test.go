@@ -2,6 +2,7 @@ package action_execution_response_test
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -16,7 +17,9 @@ import (
 )
 
 func TestAccActionExecution_Response(t *testing.T) {
-	t.Skip("skipped due to eventual consistency in the Zitadel API causing flaky failures")
+	if os.Getenv("CI") != "" {
+		t.Skip("skipped due to eventual consistency in the Zitadel API causing flaky failures")
+	}
 	t.Run("method", func(t *testing.T) {
 		frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_response")
 		targetFrame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
