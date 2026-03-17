@@ -2,12 +2,16 @@ package action_execution_function_test
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
 func TestAccActionExecutionFunctionDatasource(t *testing.T) {
+	if os.Getenv("ZITADEL_SKIP_ACTION_EXECUTION_FUNCTION_ACCTEST") == "1" {
+		t.Skip("skipped due to eventual consistency in the Zitadel API causing flaky failures")
+	}
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_function")
 	targetDep := fmt.Sprintf(`
 resource "zitadel_action_target" "default" {

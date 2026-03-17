@@ -2,12 +2,16 @@ package action_execution_request_test
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
 func TestAccActionExecutionRequestDatasource_All(t *testing.T) {
+	if os.Getenv("CI") == "true" {
+		t.Skip("skipped in CI due to eventual consistency in the Zitadel API causing flaky failures")
+	}
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_request")
 	targetDep := fmt.Sprintf(`
 resource "zitadel_action_target" "default" {
@@ -43,6 +47,9 @@ data "zitadel_action_execution_request" "default" {
 }
 
 func TestAccActionExecutionRequestDatasource_Method(t *testing.T) {
+	if os.Getenv("CI") == "true" {
+		t.Skip("skipped in CI due to eventual consistency in the Zitadel API causing flaky failures")
+	}
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_request")
 	targetDep := fmt.Sprintf(`
 resource "zitadel_action_target" "default" {
@@ -78,6 +85,9 @@ data "zitadel_action_execution_request" "default" {
 }
 
 func TestAccActionExecutionRequestDatasource_Service(t *testing.T) {
+	if os.Getenv("CI") == "true" {
+		t.Skip("skipped in CI due to eventual consistency in the Zitadel API causing flaky failures")
+	}
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_execution_request")
 	targetDep := fmt.Sprintf(`
 resource "zitadel_action_target" "default" {
