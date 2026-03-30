@@ -35,7 +35,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		TargetId: targetID,
 		KeyId:    keyID,
 	})
-	if err != nil && helper.IgnorePreconditionError(err) != nil {
+	if err != nil && helper.IgnorePreconditionError(err) != nil && helper.IgnoreIfNotFoundError(err) != nil {
 		return diag.Errorf("failed to deactivate public key before removal: %v", err)
 	}
 
@@ -43,7 +43,7 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		TargetId: targetID,
 		KeyId:    keyID,
 	})
-	if err != nil {
+	if err != nil && helper.IgnoreIfNotFoundError(err) != nil {
 		return diag.Errorf("failed to delete public key: %v", err)
 	}
 	return nil
