@@ -131,19 +131,30 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	key := keys[0]
+
+	// Only overwrite public_key in state if it is currently unset (e.g., during import).
+	// PEM formatting may differ between the configured value and the API response,
+	// which would cause perpetual diffs and forced recreation.
 	set := map[string]interface{}{
 		targetIDVar:    targetID,
 		keyIDVar:       key.GetKeyId(),
-		publicKeyVar:   string(key.GetPublicKey()),
 		activeVar:      key.GetActive(),
 		fingerprintVar: key.GetFingerprint(),
 	}
 
+	if currentPublicKey, _ := d.Get(publicKeyVar).(string); currentPublicKey == "" {
+		set[publicKeyVar] = string(key.GetPublicKey())
+	}
+
 	if key.GetExpirationDate() != nil && key.GetExpirationDate().IsValid() {
 		set[expirationDateVar] = key.GetExpirationDate().AsTime().Format(time.RFC3339)
+	} else {
+		set[expirationDateVar] = ""
 	}
 	if key.GetCreationDate() != nil && key.GetCreationDate().IsValid() {
 		set[creationDateVar] = key.GetCreationDate().AsTime().Format(time.RFC3339)
+	} else {
+		set[creationDateVar] = ""
 	}
 
 	for k, v := range set {
