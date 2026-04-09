@@ -53,6 +53,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	d.SetId(resp.Id)
 
+	if err := d.Set(SigningKeyVar, resp.SigningKey); err != nil {
+		return diag.Errorf("failed to set signing_key: %v", err)
+	}
+
 	if d.Get(setActiveVar).(bool) {
 		if _, err := client.ActivateSMSProvider(ctx, &admin.ActivateSMSProviderRequest{Id: d.Id()}); err != nil {
 			return diag.Errorf("failed to activate sms http provider config: %v", err)
@@ -120,6 +124,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		EndPointVar:    resp.GetConfig().GetHttp().GetEndpoint(),
 		DescriptionVar: resp.GetConfig().GetDescription(),
+		SigningKeyVar:  d.Get(SigningKeyVar).(string),
 		setActiveVar:   d.Get(setActiveVar).(bool),
 	}
 

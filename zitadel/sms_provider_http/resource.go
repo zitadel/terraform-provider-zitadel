@@ -25,11 +25,17 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Set the SMS provider as active after creating/updating.",
 			},
+			SigningKeyVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Sensitive:   true,
+				Description: "Key used to sign and check payload sent to the HTTP provider",
+			},
 		},
 		CreateContext: create,
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithID(IDVar),
+		Importer:      helper.ImportWithIDAndOptionalSecret(IDVar, SigningKeyVar),
 	}
 }

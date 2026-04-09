@@ -34,6 +34,7 @@ resource "zitadel_sms_provider_http" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `signing_key` (String, Sensitive) Key used to sign and check payload sent to the HTTP provider
 
 ## Import
 
