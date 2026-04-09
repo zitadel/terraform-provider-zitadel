@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/policy"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
@@ -100,6 +101,60 @@ resource "zitadel_login_policy" "default" {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "second_factors.#", "2"),
 					resource.TestCheckResourceAttr(frame.TerraformName, "multi_factors.#", "1"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccLoginPolicyRefreshDetectsExternalSecondFactorRemoval(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_login_policy")
+
+	config := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_login_policy" "default" {
+  org_id                        = data.zitadel_org.default.id
+  user_login                    = true
+  allow_register                = false
+  allow_external_idp            = false
+  force_mfa                     = false
+  force_mfa_local_only          = false
+  passwordless_type             = "PASSWORDLESS_TYPE_ALLOWED"
+  hide_password_reset           = false
+  password_check_lifetime       = "240h0m0s"
+  external_login_check_lifetime = "240h0m0s"
+  multi_factor_check_lifetime   = "24h0m0s"
+  mfa_init_skip_lifetime        = "720h0m0s"
+  second_factor_check_lifetime  = "24h0m0s"
+  ignore_unknown_usernames      = false
+  default_redirect_uri          = "localhost:8080"
+  second_factors                = ["SECOND_FACTOR_TYPE_OTP"]
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "second_factors.#", "1"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "second_factors.0", "SECOND_FACTOR_TYPE_OTP"),
+				),
+			},
+			{
+				PreConfig: func() {
+					if _, err := frame.RemoveSecondFactorFromLoginPolicy(frame, &management.RemoveSecondFactorFromLoginPolicyRequest{
+						Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
+					}); err != nil {
+						t.Fatalf("failed to externally remove OTP factor: %v", err)
+					}
+				},
+				RefreshState:       true,
+				ExpectNonEmptyPlan: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "second_factors.#", "0"),
 				),
 			},
 		},

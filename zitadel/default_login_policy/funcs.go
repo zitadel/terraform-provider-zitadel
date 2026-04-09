@@ -233,37 +233,31 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.Errorf("failed to get login policy secondfactors: %v", err)
 	}
-	if len(respSecond.GetResult()) > 0 {
-		factors := make([]string, 0)
-		for _, item := range respSecond.GetResult() {
-			factors = append(factors, item.String())
-		}
-		set[secondFactorsVar] = factors
+	secondFactors := make([]string, 0, len(respSecond.GetResult()))
+	for _, item := range respSecond.GetResult() {
+		secondFactors = append(secondFactors, item.String())
 	}
+	set[secondFactorsVar] = secondFactors
 
 	respMulti, err := client.ListLoginPolicyMultiFactors(ctx, &admin.ListLoginPolicyMultiFactorsRequest{})
 	if err != nil {
 		return diag.Errorf("failed to get login policy multifactors: %v", err)
 	}
-	if len(respMulti.GetResult()) > 0 {
-		factors := make([]string, 0)
-		for _, item := range respMulti.GetResult() {
-			factors = append(factors, item.String())
-		}
-		set[multiFactorsVar] = factors
+	multiFactors := make([]string, 0, len(respMulti.GetResult()))
+	for _, item := range respMulti.GetResult() {
+		multiFactors = append(multiFactors, item.String())
 	}
+	set[multiFactorsVar] = multiFactors
 
 	respIDPs, err := client.ListLoginPolicyIDPs(ctx, &admin.ListLoginPolicyIDPsRequest{})
 	if err != nil {
 		return diag.Errorf("failed to get login policy idps: %v", err)
 	}
-	if len(respIDPs.GetResult()) > 0 {
-		idps := make([]string, 0)
-		for _, idpItem := range respIDPs.GetResult() {
-			idps = append(idps, idpItem.IdpId)
-		}
-		set[idpsVar] = idps
+	idps := make([]string, 0, len(respIDPs.GetResult()))
+	for _, idpItem := range respIDPs.GetResult() {
+		idps = append(idps, idpItem.IdpId)
 	}
+	set[idpsVar] = idps
 
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
