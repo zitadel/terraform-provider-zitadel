@@ -106,11 +106,15 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	d.SetId(resp.GetKey().GetId())
 
 	set := map[string]interface{}{
-		ExpirationDateVar: resp.GetKey().GetExpirationDate().AsTime().Format(time.RFC3339),
-		ProjectIDVar:      projectID,
-		AppIDVar:          appID,
-		helper.OrgIDVar:   d.Get(helper.OrgIDVar).(string),
-		keyTypeVar:        resp.GetKey().GetType().String(),
+		ProjectIDVar:    projectID,
+		AppIDVar:        appID,
+		helper.OrgIDVar: d.Get(helper.OrgIDVar).(string),
+		keyTypeVar:      resp.GetKey().GetType().String(),
+	}
+	if exp := resp.GetKey().GetExpirationDate(); exp != nil && exp.IsValid() {
+		set[ExpirationDateVar] = exp.AsTime().Format(time.RFC3339)
+	} else {
+		set[ExpirationDateVar] = ""
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
