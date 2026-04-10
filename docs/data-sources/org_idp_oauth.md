@@ -43,4 +43,5 @@ data "zitadel_org_idp_oauth" "default" {
 - `name` (String) Name of the IDP
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 - `token_endpoint` (String) The token endpoint
+- `use_pkce` (Boolean) Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.
 - `user_endpoint` (String) The user endpoint

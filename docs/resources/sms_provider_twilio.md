@@ -13,10 +13,12 @@ Resource representing the SMS provider Twilio configuration of an instance.
 
 ```terraform
 resource "zitadel_sms_provider_twilio" "default" {
-  sid           = "sid"
-  sender_number = "019920892"
-  token         = "twilio_token"
-  set_active    = false
+  sid                = "sid"
+  sender_number      = "019920892"
+  token              = "twilio_token"
+  set_active         = false
+  verify_service_sid = ""
+  description        = "My Twilio SMS Provider"
 }
 ```
 
@@ -31,7 +33,9 @@ resource "zitadel_sms_provider_twilio" "default" {
 
 ### Optional
 
+- `description` (String) Description of the SMS provider.
 - `set_active` (Boolean) Set the SMS provider as active after creating/updating.
+- `verify_service_sid` (String) Twilio Verify Service SID used for phone verification.
 
 ### Read-Only
 

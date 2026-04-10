@@ -40,8 +40,8 @@ func TestAccActionTarget(t *testing.T) {
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame, examplePayloadType), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, action_target.SigningKeyVar),
 		),
-		action_target.SigningKeyVar,
 	)
 }
 

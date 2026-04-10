@@ -28,10 +28,14 @@ data "zitadel_idp_saml" "default" {
 
 - `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `binding` (String) The binding
+- `federated_logout_enabled` (Boolean) If enabled, ZITADEL will send a logout request to the identity provider when the user terminates the session in ZITADEL.
 - `is_auto_creation` (Boolean) enabled if a new account in ZITADEL are created automatically on login with an external account
 - `is_auto_update` (Boolean) enabled if a the ZITADEL account fields are updated automatically on each login
 - `is_creation_allowed` (Boolean) enabled if users are able to create a new account in ZITADEL when using an external account
 - `is_linking_allowed` (Boolean) enabled if users are able to link an existing ZITADEL user with an external account
 - `metadata_xml` (String) The metadata XML as plain string
 - `name` (String) Name of the IDP
+- `name_id_format` (String) The nameid-format requested
+- `signature_algorithm` (String) Signature Algorithm used to sign SAML requests and responses.
+- `transient_mapping_attribute_name` (String) Name of the attribute used to map the user in case the nameid-format is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
 - `with_signed_request` (Boolean) Whether the SAML IDP requires signed requests

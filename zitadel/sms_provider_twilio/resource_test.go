@@ -78,6 +78,101 @@ resource "zitadel_sms_provider_twilio" "default" {
 	})
 }
 
+func TestAccSMSProviderTwilioVerifyServiceSid(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
+	resourceConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid                = "test_sid"
+  token              = "test_token"
+  sender_number      = "123456789"
+  verify_service_sid = "VA1234567890abcdef1234567890abcdef"
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: resourceConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "verify_service_sid", "VA1234567890abcdef1234567890abcdef"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSMSProviderTwilioDescription(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
+	resourceConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid           = "test_sid"
+  token         = "test_token"
+  sender_number = "123456789"
+  description   = "My Twilio provider"
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: resourceConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "description", "My Twilio provider"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSMSProviderTwilioFieldUpdate(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid                = "test_sid"
+  token              = "test_token"
+  sender_number      = "123456789"
+  verify_service_sid = "VA1234567890abcdef1234567890abcdef"
+  description        = "Initial description"
+}
+`, frame.ProviderSnippet)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid                = "test_sid"
+  token              = "test_token"
+  sender_number      = "123456789"
+  verify_service_sid = "VA0987654321fedcba0987654321fedcba"
+  description        = "Updated description"
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "verify_service_sid", "VA1234567890abcdef1234567890abcdef"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "description", "Initial description"),
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "verify_service_sid", "VA0987654321fedcba0987654321fedcba"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "description", "Updated description"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

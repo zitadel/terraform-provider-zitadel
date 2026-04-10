@@ -31,6 +31,16 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Set the SMS provider as active after creating/updating.",
 			},
+			VerifyServiceSidVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Twilio Verify Service SID used for phone verification.",
+			},
+			DescriptionVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Description of the SMS provider.",
+			},
 		},
 		CreateContext: create,
 		DeleteContext: delete,

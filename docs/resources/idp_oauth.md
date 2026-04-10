@@ -26,6 +26,7 @@ resource "zitadel_idp_oauth" "default" {
   is_auto_creation       = false
   is_auto_update         = true
   auto_linking           = "AUTO_LINKING_OPTION_USERNAME"
+  use_pkce               = false
 }
 ```
 
@@ -50,6 +51,7 @@ resource "zitadel_idp_oauth" "default" {
 - `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `name` (String) Name of the IDP
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
+- `use_pkce` (Boolean) Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.
 
 ### Read-Only
 

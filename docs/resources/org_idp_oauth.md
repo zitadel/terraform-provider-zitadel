@@ -27,6 +27,7 @@ resource "zitadel_org_idp_oauth" "default" {
   is_auto_creation       = false
   is_auto_update         = true
   auto_linking           = "AUTO_LINKING_OPTION_USERNAME"
+  use_pkce               = false
 }
 ```
 
@@ -52,6 +53,7 @@ resource "zitadel_org_idp_oauth" "default" {
 - `name` (String) Name of the IDP
 - `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
+- `use_pkce` (Boolean) Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.
 
 ### Read-Only
 
