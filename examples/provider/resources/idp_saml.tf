@@ -1,13 +1,17 @@
 resource "zitadel_idp_saml" "default" {
-  name                = "My Generic SAML IDP"
-  binding             = "SAML_BINDING_POST"
-  with_signed_request = true
-  is_linking_allowed  = false
-  is_creation_allowed = true
-  is_auto_creation    = false
-  is_auto_update      = true
-  auto_linking        = "AUTO_LINKING_OPTION_USERNAME"
-  metadata_xml        = <<EOM
+  name                             = "My Generic SAML IDP"
+  binding                          = "SAML_BINDING_POST"
+  with_signed_request              = true
+  name_id_format                   = "SAML_NAME_ID_FORMAT_EMAIL_ADDRESS"
+  transient_mapping_attribute_name = ""
+  federated_logout_enabled         = false
+  signature_algorithm              = "SAML_SIGNATURE_RSA_SHA256"
+  is_linking_allowed               = false
+  is_creation_allowed              = true
+  is_auto_creation                 = false
+  is_auto_update                   = true
+  auto_linking                     = "AUTO_LINKING_OPTION_USERNAME"
+  metadata_xml                     = <<EOM
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://saml.example.com/entityid" validUntil="2034-05-15T14:21:58.979Z">
   <md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">

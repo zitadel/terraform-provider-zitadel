@@ -22,12 +22,18 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	nameIdFormat := idp.SAMLNameIDFormat(idp.SAMLNameIDFormat_value[idp_utils.StringValue(d, idp_saml.NameIdFormatVar)])
+	federatedLogoutEnabled := idp_utils.BoolValue(d, idp_saml.FederatedLogoutEnabledVar)
 	resp, err := client.AddSAMLProvider(helper.CtxWithOrgID(ctx, d), &management.AddSAMLProviderRequest{
-		Name:              idp_utils.StringValue(d, idp_utils.NameVar),
-		Binding:           idp.SAMLBinding(idp.SAMLBinding_value[idp_utils.StringValue(d, idp_saml.BindingVar)]),
-		WithSignedRequest: idp_utils.BoolValue(d, idp_saml.WithSignedRequestVar),
-		Metadata:          &management.AddSAMLProviderRequest_MetadataXml{MetadataXml: []byte(idp_utils.StringValue(d, idp_saml.MetadataXMLVar))},
-		ProviderOptions:   idp_utils.ProviderOptionsValue(d),
+		Name:                          idp_utils.StringValue(d, idp_utils.NameVar),
+		Binding:                       idp.SAMLBinding(idp.SAMLBinding_value[idp_utils.StringValue(d, idp_saml.BindingVar)]),
+		WithSignedRequest:             idp_utils.BoolValue(d, idp_saml.WithSignedRequestVar),
+		Metadata:                      &management.AddSAMLProviderRequest_MetadataXml{MetadataXml: []byte(idp_utils.StringValue(d, idp_saml.MetadataXMLVar))},
+		ProviderOptions:               idp_utils.ProviderOptionsValue(d),
+		NameIdFormat:                  &nameIdFormat,
+		TransientMappingAttributeName: helper.StringPtr(idp_utils.StringValue(d, idp_saml.TransientMappingAttributeNameVar)),
+		FederatedLogoutEnabled:        &federatedLogoutEnabled,
+		SignatureAlgorithm:            idp.SAMLSignatureAlgorithm(idp.SAMLSignatureAlgorithm_value[idp_utils.StringValue(d, idp_saml.SignatureAlgorithmVar)]),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
@@ -45,13 +51,19 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	nameIdFormat := idp.SAMLNameIDFormat(idp.SAMLNameIDFormat_value[idp_utils.StringValue(d, idp_saml.NameIdFormatVar)])
+	federatedLogoutEnabled := idp_utils.BoolValue(d, idp_saml.FederatedLogoutEnabledVar)
 	_, err = client.UpdateSAMLProvider(helper.CtxWithOrgID(ctx, d), &management.UpdateSAMLProviderRequest{
-		Id:                d.Id(),
-		Name:              idp_utils.StringValue(d, idp_utils.NameVar),
-		Binding:           idp.SAMLBinding(idp.SAMLBinding_value[idp_utils.StringValue(d, idp_saml.BindingVar)]),
-		WithSignedRequest: idp_utils.BoolValue(d, idp_saml.WithSignedRequestVar),
-		Metadata:          &management.UpdateSAMLProviderRequest_MetadataXml{MetadataXml: []byte(idp_utils.StringValue(d, idp_saml.MetadataXMLVar))},
-		ProviderOptions:   idp_utils.ProviderOptionsValue(d),
+		Id:                            d.Id(),
+		Name:                          idp_utils.StringValue(d, idp_utils.NameVar),
+		Binding:                       idp.SAMLBinding(idp.SAMLBinding_value[idp_utils.StringValue(d, idp_saml.BindingVar)]),
+		WithSignedRequest:             idp_utils.BoolValue(d, idp_saml.WithSignedRequestVar),
+		Metadata:                      &management.UpdateSAMLProviderRequest_MetadataXml{MetadataXml: []byte(idp_utils.StringValue(d, idp_saml.MetadataXMLVar))},
+		ProviderOptions:               idp_utils.ProviderOptionsValue(d),
+		NameIdFormat:                  &nameIdFormat,
+		TransientMappingAttributeName: helper.StringPtr(idp_utils.StringValue(d, idp_saml.TransientMappingAttributeNameVar)),
+		FederatedLogoutEnabled:        &federatedLogoutEnabled,
+		SignatureAlgorithm:            idp.SAMLSignatureAlgorithm(idp.SAMLSignatureAlgorithm_value[idp_utils.StringValue(d, idp_saml.SignatureAlgorithmVar)]),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update idp: %v", err)
@@ -81,16 +93,20 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	specificCfg := cfg.GetSaml()
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
-		helper.OrgIDVar:                idp.GetDetails().GetResourceOwner(),
-		idp_utils.NameVar:              idp.GetName(),
-		idp_saml.MetadataXMLVar:        string(specificCfg.GetMetadataXml()),
-		idp_saml.BindingVar:            specificCfg.GetBinding().String(),
-		idp_saml.WithSignedRequestVar:  specificCfg.GetWithSignedRequest(),
-		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
-		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),
-		idp_utils.IsAutoCreationVar:    generalCfg.GetIsAutoCreation(),
-		idp_utils.IsAutoUpdateVar:      generalCfg.GetIsAutoUpdate(),
-		idp_utils.AutoLinkingVar:       idp_utils.AutoLinkingString(generalCfg.GetAutoLinking()),
+		helper.OrgIDVar:                           idp.GetDetails().GetResourceOwner(),
+		idp_utils.NameVar:                         idp.GetName(),
+		idp_saml.MetadataXMLVar:                   string(specificCfg.GetMetadataXml()),
+		idp_saml.BindingVar:                       specificCfg.GetBinding().String(),
+		idp_saml.WithSignedRequestVar:             specificCfg.GetWithSignedRequest(),
+		idp_saml.NameIdFormatVar:                  specificCfg.GetNameIdFormat().String(),
+		idp_saml.TransientMappingAttributeNameVar: specificCfg.GetTransientMappingAttributeName(),
+		idp_saml.FederatedLogoutEnabledVar:        specificCfg.GetFederatedLogoutEnabled(),
+		idp_saml.SignatureAlgorithmVar:            specificCfg.GetSignatureAlgorithm().String(),
+		idp_utils.IsLinkingAllowedVar:             generalCfg.GetIsLinkingAllowed(),
+		idp_utils.IsCreationAllowedVar:            generalCfg.GetIsCreationAllowed(),
+		idp_utils.IsAutoCreationVar:               generalCfg.GetIsAutoCreation(),
+		idp_utils.IsAutoUpdateVar:                 generalCfg.GetIsAutoUpdate(),
+		idp_utils.AutoLinkingVar:                  idp_utils.AutoLinkingString(generalCfg.GetAutoLinking()),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

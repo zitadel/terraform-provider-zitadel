@@ -13,15 +13,19 @@ Resource representing a SAML IDP on the instance.
 
 ```terraform
 resource "zitadel_idp_saml" "default" {
-  name                = "My Generic SAML IDP"
-  binding             = "SAML_BINDING_POST"
-  with_signed_request = true
-  is_linking_allowed  = false
-  is_creation_allowed = true
-  is_auto_creation    = false
-  is_auto_update      = true
-  auto_linking        = "AUTO_LINKING_OPTION_USERNAME"
-  metadata_xml        = <<EOM
+  name                             = "My Generic SAML IDP"
+  binding                          = "SAML_BINDING_POST"
+  with_signed_request              = true
+  name_id_format                   = "SAML_NAME_ID_FORMAT_EMAIL_ADDRESS"
+  transient_mapping_attribute_name = ""
+  federated_logout_enabled         = false
+  signature_algorithm              = "SAML_SIGNATURE_RSA_SHA256"
+  is_linking_allowed               = false
+  is_creation_allowed              = true
+  is_auto_creation                 = false
+  is_auto_update                   = true
+  auto_linking                     = "AUTO_LINKING_OPTION_USERNAME"
+  metadata_xml                     = <<EOM
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://saml.example.com/entityid" validUntil="2034-05-15T14:21:58.979Z">
   <md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
@@ -71,7 +75,11 @@ EOM
 
 - `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `binding` (String) The binding, supported values: SAML_BINDING_UNSPECIFIED, SAML_BINDING_POST, SAML_BINDING_REDIRECT, SAML_BINDING_ARTIFACT
+- `federated_logout_enabled` (Boolean) If enabled, ZITADEL will send a logout request to the identity provider when the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
 - `name` (String) Name of the IDP
+- `name_id_format` (String) The nameid-format requested, supported values: SAML_NAME_ID_FORMAT_UNSPECIFIED, SAML_NAME_ID_FORMAT_EMAIL_ADDRESS, SAML_NAME_ID_FORMAT_PERSISTENT, SAML_NAME_ID_FORMAT_TRANSIENT
+- `signature_algorithm` (String) Signature Algorithm used to sign SAML requests and responses. Can be used only if `with_signed_request` is true., supported values: SAML_SIGNATURE_UNSPECIFIED, SAML_SIGNATURE_RSA_SHA1, SAML_SIGNATURE_RSA_SHA256, SAML_SIGNATURE_RSA_SHA512
+- `transient_mapping_attribute_name` (String) Name of the attribute used to map the user in case the nameid-format is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
 - `with_signed_request` (Boolean) Whether the SAML IDP requires signed requests
 
 ### Read-Only

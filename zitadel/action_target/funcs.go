@@ -195,6 +195,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			PayloadTypeVar: payloadTypeToString(target.GetPayloadType()),
 		}
 
+		// Preserve signing_key from existing state. The datasource schema does
+		// not include signing_key, so d.Get returns nil there and must be skipped.
+		if v := d.Get(SigningKeyVar); v != nil {
+			set[SigningKeyVar] = v.(string)
+		}
+
 		if target.GetRestWebhook() != nil {
 			set[TargetTypeVar] = targetTypeRestWebhook
 			set[InterruptOnErrorVar] = target.GetRestWebhook().GetInterruptOnError()
