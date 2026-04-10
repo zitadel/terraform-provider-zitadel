@@ -12,4 +12,5 @@ resource "zitadel_idp_oauth" "default" {
   is_auto_creation       = false
   is_auto_update         = true
   auto_linking           = "AUTO_LINKING_OPTION_USERNAME"
+  use_pkce               = false
 }

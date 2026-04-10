@@ -9,6 +9,7 @@ const (
 	TokenEndpointVar         = "token_endpoint"
 	UserEndpointVar          = "user_endpoint"
 	IdAttributeVar           = "id_attribute"
+	UsePKCEVar               = "use_pkce"
 )
 
 var (
@@ -51,5 +52,16 @@ var (
 		Type:        schema.TypeString,
 		Computed:    true,
 		Description: "The id attribute",
+	}
+	UsePKCEResourceField = &schema.Schema{
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Computed:    true,
+		Description: "Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.",
+	}
+	UsePKCEDatasourceField = &schema.Schema{
+		Type:        schema.TypeBool,
+		Computed:    true,
+		Description: "Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.",
 	}
 )

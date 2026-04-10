@@ -31,6 +31,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		IdAttribute:           idp_utils.StringValue(d, idp_oauth.IdAttributeVar),
 		Scopes:                idp_utils.ScopesValue(d),
 		ProviderOptions:       idp_utils.ProviderOptionsValue(d),
+		UsePkce:               idp_utils.BoolValue(d, idp_oauth.UsePKCEVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
@@ -59,6 +60,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		IdAttribute:           idp_utils.StringValue(d, idp_oauth.IdAttributeVar),
 		Scopes:                idp_utils.ScopesValue(d),
 		ProviderOptions:       idp_utils.ProviderOptionsValue(d),
+		UsePkce:               idp_utils.BoolValue(d, idp_oauth.UsePKCEVar),
 	})
 	if err != nil {
 		return diag.Errorf("failed to update idp: %v", err)
@@ -102,6 +104,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_utils.IsAutoCreationVar:        generalCfg.GetIsAutoCreation(),
 		idp_utils.IsAutoUpdateVar:          generalCfg.GetIsAutoUpdate(),
 		idp_utils.AutoLinkingVar:           idp_utils.AutoLinkingString(generalCfg.GetAutoLinking()),
+		idp_oauth.UsePKCEVar:               specificCfg.GetUsePkce(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

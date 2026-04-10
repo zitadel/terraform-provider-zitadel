@@ -45,9 +45,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	resp, err := client.AddSMSProviderTwilio(ctx, &admin.AddSMSProviderTwilioRequest{
-		Sid:          d.Get(sidVar).(string),
-		Token:        d.Get(TokenVar).(string),
-		SenderNumber: d.Get(SenderNumberVar).(string),
+		Sid:              d.Get(sidVar).(string),
+		Token:            d.Get(TokenVar).(string),
+		SenderNumber:     d.Get(SenderNumberVar).(string),
+		VerifyServiceSid: d.Get(VerifyServiceSidVar).(string),
+		Description:      d.Get(DescriptionVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create sms provider twilio: %v", err)
@@ -76,11 +78,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(SenderNumberVar, sidVar) {
+	if d.HasChanges(SenderNumberVar, sidVar, VerifyServiceSidVar, DescriptionVar) {
 		_, err = client.UpdateSMSProviderTwilio(ctx, &admin.UpdateSMSProviderTwilioRequest{
-			Id:           d.Id(),
-			Sid:          d.Get(sidVar).(string),
-			SenderNumber: d.Get(SenderNumberVar).(string),
+			Id:               d.Id(),
+			Sid:              d.Get(sidVar).(string),
+			SenderNumber:     d.Get(SenderNumberVar).(string),
+			VerifyServiceSid: d.Get(VerifyServiceSidVar).(string),
+			Description:      d.Get(DescriptionVar).(string),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update sms provider twilio: %v", err)
@@ -130,9 +134,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	set := map[string]interface{}{
-		sidVar:          resp.GetConfig().GetTwilio().GetSid(),
-		SenderNumberVar: resp.GetConfig().GetTwilio().GetSenderNumber(),
-		setActiveVar:    d.Get(setActiveVar).(bool),
+		sidVar:              resp.GetConfig().GetTwilio().GetSid(),
+		SenderNumberVar:     resp.GetConfig().GetTwilio().GetSenderNumber(),
+		VerifyServiceSidVar: resp.GetConfig().GetTwilio().GetVerifyServiceSid(),
+		DescriptionVar:      resp.GetConfig().GetDescription(),
+		setActiveVar:        d.Get(setActiveVar).(bool),
 	}
 	if token, ok := d.GetOk(TokenVar); ok {
 		set[TokenVar] = token
