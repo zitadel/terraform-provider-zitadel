@@ -34,6 +34,7 @@ resource "zitadel_smtp_config" "default" {
 
 ### Optional
 
+- `description` (String) Description of the SMTP configuration.
 - `password` (String, Sensitive) Password used to communicate with your SMTP server.
 - `reply_to_address` (String) Address to reply to.
 - `set_active` (Boolean) Set the SMTP configuration active after creating/updating.

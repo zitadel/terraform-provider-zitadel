@@ -35,6 +35,7 @@ resource "zitadel_action_target" "default" {
 
 ### Optional
 
+- `expiration_signing_key` (String) Expiration duration for the signing key. When set during update, the old signing key will remain valid for the specified duration to allow for a graceful key rotation.
 - `payload_type` (String) The payload type of the target, supported values: PAYLOAD_TYPE_UNSPECIFIED, PAYLOAD_TYPE_JSON, PAYLOAD_TYPE_JWT, PAYLOAD_TYPE_JWE
 
 ### Read-Only
