@@ -81,7 +81,7 @@ Required:
 Required:
 
 - `key` (String) The key of the metadata entry.
-- `value` (String) The value of the metadata entry (base64 encoded).
+- `value` (String) The value of the metadata entry.
 
 ## Import
 

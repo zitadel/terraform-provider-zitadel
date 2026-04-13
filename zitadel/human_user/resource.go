@@ -140,6 +140,8 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 				Description: "A list of identity provider links to add to the user during creation. Useful for migration scenarios.",
+				// We ignore if the value changes after creation or import
+				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						idpLinkIDPIDVar: {
@@ -174,6 +176,8 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 				Description: "A list of metadata key-value pairs to set on the user during creation.",
+				// We ignore if the value changes after creation or import
+				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						metadataKeyVar: {
@@ -184,7 +188,7 @@ func GetResource() *schema.Resource {
 						metadataValueVar: {
 							Type:        schema.TypeString,
 							Required:    true,
-							Description: "The value of the metadata entry (base64 encoded).",
+							Description: "The value of the metadata entry.",
 						},
 					},
 				},
