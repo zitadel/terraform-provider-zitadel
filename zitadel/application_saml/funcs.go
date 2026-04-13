@@ -61,14 +61,22 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChanges(MetadataXMLVar) {
-		_, err = client.UpdateSAMLAppConfig(helper.CtxWithOrgID(ctx, d), &management.UpdateSAMLAppConfigRequest{
-			ProjectId: projectID,
-			AppId:     d.Id(),
-			Metadata: &management.UpdateSAMLAppConfigRequest_MetadataXml{
+	if d.HasChanges(MetadataXMLVar, MetadataURLVar, LoginVersionVar) {
+		req := &management.UpdateSAMLAppConfigRequest{
+			ProjectId:    projectID,
+			AppId:        d.Id(),
+			LoginVersion: getLoginVersion(d),
+		}
+		if v, ok := d.GetOk(MetadataURLVar); ok && v.(string) != "" {
+			req.Metadata = &management.UpdateSAMLAppConfigRequest_MetadataUrl{
+				MetadataUrl: v.(string),
+			}
+		} else {
+			req.Metadata = &management.UpdateSAMLAppConfigRequest_MetadataXml{
 				MetadataXml: []byte(d.Get(MetadataXMLVar).(string)),
-			},
-		})
+			}
+		}
+		_, err = client.UpdateSAMLAppConfig(helper.CtxWithOrgID(ctx, d), req)
 		if err != nil {
 			return diag.Errorf("failed to update applicationSAML: %v", err)
 		}
@@ -89,11 +97,22 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.AddSAMLApp(helper.CtxWithOrgID(ctx, d), &management.AddSAMLAppRequest{
-		ProjectId: d.Get(ProjectIDVar).(string),
-		Name:      d.Get(NameVar).(string),
-		Metadata:  &management.AddSAMLAppRequest_MetadataXml{MetadataXml: []byte(d.Get(MetadataXMLVar).(string))},
-	})
+	req := &management.AddSAMLAppRequest{
+		ProjectId:    d.Get(ProjectIDVar).(string),
+		Name:         d.Get(NameVar).(string),
+		LoginVersion: getLoginVersion(d),
+	}
+	if v, ok := d.GetOk(MetadataURLVar); ok && v.(string) != "" {
+		req.Metadata = &management.AddSAMLAppRequest_MetadataUrl{
+			MetadataUrl: v.(string),
+		}
+	} else {
+		req.Metadata = &management.AddSAMLAppRequest_MetadataXml{
+			MetadataXml: []byte(d.Get(MetadataXMLVar).(string)),
+		}
+	}
+
+	resp, err := client.AddSAMLApp(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
 		return diag.Errorf("failed to create applicationSAML: %v", err)
 	}
@@ -123,18 +142,99 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get application saml: %v", err)
 	}
 
-	app := resp.GetApp()
+	samlApp := resp.GetApp()
+	samlConfig := samlApp.GetSamlConfig()
 	set := map[string]interface{}{
-		helper.OrgIDVar: app.GetDetails().GetResourceOwner(),
-		NameVar:         app.GetName(),
-		MetadataXMLVar:  string(app.GetSamlConfig().GetMetadataXml()),
+		helper.OrgIDVar: samlApp.GetDetails().GetResourceOwner(),
+		NameVar:         samlApp.GetName(),
 	}
+	// Only set metadata_xml if the user did not configure metadata_url,
+	// otherwise the resolved XML would cause a perpetual diff.
+	if _, urlSet := d.GetOk(MetadataURLVar); !urlSet {
+		set[MetadataXMLVar] = string(samlConfig.GetMetadataXml())
+	}
+
+	loginVersion := []interface{}{}
+	if samlConfig.GetLoginVersion() != nil {
+		switch samlConfig.GetLoginVersion().GetVersion().(type) {
+		case *app.LoginVersion_LoginV1:
+			loginVersion = append(loginVersion, map[string]interface{}{
+				LoginV1Var: true,
+			})
+		case *app.LoginVersion_LoginV2:
+			v2 := samlConfig.GetLoginVersion().GetLoginV2()
+			v2Map := map[string]interface{}{}
+
+			if baseUri := v2.GetBaseUri(); baseUri != "" {
+				v2Map[BaseURIVar] = baseUri
+			}
+
+			loginVersion = append(loginVersion, map[string]interface{}{
+				LoginV2Var: []interface{}{v2Map},
+			})
+		}
+	}
+
+	if len(loginVersion) > 0 {
+		set[LoginVersionVar] = loginVersion
+	}
+
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of applicationSAML: %v", k, err)
 		}
 	}
-	d.SetId(app.GetId())
+	d.SetId(samlApp.GetId())
+	return nil
+}
+
+func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
+	v, ok := d.GetOk(LoginVersionVar)
+	if !ok {
+		return nil
+	}
+
+	list := v.([]interface{})
+	if len(list) == 0 {
+		return nil
+	}
+
+	if list[0] == nil {
+		return nil
+	}
+
+	item := list[0].(map[string]interface{})
+
+	if loginV1, ok := item[LoginV1Var]; ok && loginV1.(bool) {
+		return &app.LoginVersion{
+			Version: &app.LoginVersion_LoginV1{
+				LoginV1: &app.LoginV1{},
+			},
+		}
+	}
+
+	if v2, ok := item[LoginV2Var]; ok && v2 != nil {
+		v2List := v2.([]interface{})
+		if len(v2List) > 0 {
+			if v2List[0] == nil {
+				return nil
+			}
+			v2Item := v2List[0].(map[string]interface{})
+			var uri *string
+			if baseURI, ok := v2Item[BaseURIVar]; ok && baseURI.(string) != "" {
+				uriStr := baseURI.(string)
+				uri = &uriStr
+			}
+			return &app.LoginVersion{
+				Version: &app.LoginVersion_LoginV2{
+					LoginV2: &app.LoginV2{
+						BaseUri: uri,
+					},
+				},
+			}
+		}
+	}
+
 	return nil
 }
 

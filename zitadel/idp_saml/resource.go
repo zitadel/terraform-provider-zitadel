@@ -15,6 +15,7 @@ func GetResource() *schema.Resource {
 			BindingVar:                       BindingResourceField,
 			WithSignedRequestVar:             WithSignedRequestResourceField,
 			MetadataXMLVar:                   MetadataXMLResourceField,
+			MetadataURLVar:                   MetadataURLResourceField,
 			NameIdFormatVar:                  NameIdFormatResourceField,
 			TransientMappingAttributeNameVar: TransientMappingAttributeNameResourceField,
 			FederatedLogoutEnabledVar:        FederatedLogoutEnabledResourceField,

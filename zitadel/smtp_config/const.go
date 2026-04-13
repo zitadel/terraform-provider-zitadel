@@ -9,5 +9,6 @@ const (
 	userVar           = "user"
 	PasswordVar       = "password"
 	replyToAddressVar = "reply_to_address"
+	DescriptionVar    = "description"
 	SetActiveVar      = "set_active"
 )

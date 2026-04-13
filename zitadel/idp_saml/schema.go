@@ -11,6 +11,7 @@ import (
 
 const (
 	MetadataXMLVar                   = "metadata_xml"
+	MetadataURLVar                   = "metadata_url"
 	BindingVar                       = "binding"
 	WithSignedRequestVar             = "with_signed_request"
 	NameIdFormatVar                  = "name_id_format"
@@ -35,14 +36,23 @@ var (
 		Description: "The binding",
 	}
 	MetadataXMLResourceField = &schema.Schema{
-		Type:        schema.TypeString,
-		Required:    true,
-		Description: "The metadata XML as plain string",
+		Type:          schema.TypeString,
+		Optional:      true,
+		Description:   "The metadata XML as plain string",
+		ConflictsWith: []string{MetadataURLVar},
+		AtLeastOneOf:  []string{MetadataXMLVar, MetadataURLVar},
 	}
 	MetadataXMLDatasourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Computed:    true,
 		Description: "The metadata XML as plain string",
+	}
+	MetadataURLResourceField = &schema.Schema{
+		Type:          schema.TypeString,
+		Optional:      true,
+		Description:   "URL to the metadata of the SAML identity provider",
+		ConflictsWith: []string{MetadataXMLVar},
+		AtLeastOneOf:  []string{MetadataXMLVar, MetadataURLVar},
 	}
 	WithSignedRequestResourceField = &schema.Schema{
 		Type:        schema.TypeBool,

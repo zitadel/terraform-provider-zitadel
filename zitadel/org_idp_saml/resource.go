@@ -17,6 +17,7 @@ func GetResource() *schema.Resource {
 			idp_utils.NameVar:                         idp_utils.NameResourceField,
 			idp_saml.BindingVar:                       idp_saml.BindingResourceField,
 			idp_saml.MetadataXMLVar:                   idp_saml.MetadataXMLResourceField,
+			idp_saml.MetadataURLVar:                   idp_saml.MetadataURLResourceField,
 			idp_saml.WithSignedRequestVar:             idp_saml.WithSignedRequestResourceField,
 			idp_saml.NameIdFormatVar:                  idp_saml.NameIdFormatResourceField,
 			idp_saml.TransientMappingAttributeNameVar: idp_saml.TransientMappingAttributeNameResourceField,

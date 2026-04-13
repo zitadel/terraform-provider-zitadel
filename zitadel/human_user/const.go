@@ -33,6 +33,15 @@ const (
 	initialHashedPasswordVar  = "initial_hashed_password"
 	initialSkipPasswordChange = "initial_skip_password_change"
 
+	idpLinksVar        = "idp_links"
+	idpLinkIDPIDVar    = "idp_id"
+	idpLinkUserIDVar   = "user_id"
+	idpLinkUserNameVar = "user_name"
+	totpSecretVar      = "totp_secret"
+	metadataVar        = "metadata"
+	metadataKeyVar     = "key"
+	metadataValueVar   = "value"
+
 	defaultGenderString      = "GENDER_UNSPECIFIED"
 	defaultPreferredLanguage = "und"
 )

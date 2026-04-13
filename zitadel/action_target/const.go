@@ -1,14 +1,15 @@
 package action_target
 
 const (
-	TargetIDVar         = "target_id"
-	NameVar             = "name"
-	EndpointVar         = "endpoint"
-	TargetTypeVar       = "target_type"
-	TimeoutVar          = "timeout"
-	InterruptOnErrorVar = "interrupt_on_error"
-	SigningKeyVar       = "signing_key"
-	PayloadTypeVar      = "payload_type"
+	TargetIDVar             = "target_id"
+	NameVar                 = "name"
+	EndpointVar             = "endpoint"
+	TargetTypeVar           = "target_type"
+	TimeoutVar              = "timeout"
+	InterruptOnErrorVar     = "interrupt_on_error"
+	SigningKeyVar           = "signing_key"
+	PayloadTypeVar          = "payload_type"
+	ExpirationSigningKeyVar = "expiration_signing_key"
 
 	targetTypeRestWebhook = "REST_WEBHOOK"
 	targetTypeRestCall    = "REST_CALL"

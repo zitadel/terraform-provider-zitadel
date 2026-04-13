@@ -2,11 +2,13 @@ package sms_provider_http
 
 import (
 	"context"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -78,12 +80,20 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(EndPointVar, DescriptionVar) {
-		_, err = client.UpdateSMSProviderHTTP(ctx, &admin.UpdateSMSProviderHTTPRequest{
+	if d.HasChanges(EndPointVar, DescriptionVar, ExpirationSigningKeyVar) {
+		req := &admin.UpdateSMSProviderHTTPRequest{
 			Id:          d.Id(),
 			Endpoint:    d.Get(EndPointVar).(string),
 			Description: d.Get(DescriptionVar).(string),
-		})
+		}
+		if v, ok := d.GetOk(ExpirationSigningKeyVar); ok && v.(string) != "" {
+			dur, err := time.ParseDuration(v.(string))
+			if err != nil {
+				return diag.Errorf("failed to parse expiration_signing_key duration: %v", err)
+			}
+			req.ExpirationSigningKey = durationpb.New(dur)
+		}
+		_, err = client.UpdateSMSProviderHTTP(ctx, req)
 		if err != nil {
 			return diag.Errorf("failed to update sms provider http: %v", err)
 		}

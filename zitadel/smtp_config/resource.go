@@ -46,6 +46,11 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Address to reply to.",
 			},
+			DescriptionVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Description of the SMTP configuration.",
+			},
 			SetActiveVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
