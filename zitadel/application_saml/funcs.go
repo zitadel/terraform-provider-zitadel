@@ -153,7 +153,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if _, urlSet := d.GetOk(MetadataURLVar); !urlSet {
 		set[MetadataXMLVar] = string(samlConfig.GetMetadataXml())
 	} else {
-		set[MetadataXMLVar] = ""
+		set[MetadataXMLVar] = nil
 	}
 
 	loginVersion := []interface{}{}
@@ -177,7 +177,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 	}
 
-	set[LoginVersionVar] = loginVersion
+	if len(loginVersion) > 0 {
+		set[LoginVersionVar] = loginVersion
+	}
 
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

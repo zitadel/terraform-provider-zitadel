@@ -120,7 +120,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if _, urlSet := d.GetOk(MetadataURLVar); !urlSet {
 		set[MetadataXMLVar] = string(specificCfg.GetMetadataXml())
 	} else {
-		set[MetadataXMLVar] = ""
+		set[MetadataXMLVar] = nil
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
