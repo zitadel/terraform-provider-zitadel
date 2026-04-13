@@ -124,7 +124,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of oidc idp: %v", k, err)
+			return diag.Errorf("failed to set %s of saml idp: %v", k, err)
 		}
 	}
 	d.SetId(idp.Id)
