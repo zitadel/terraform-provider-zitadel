@@ -152,6 +152,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	// otherwise the resolved XML would cause a perpetual diff.
 	if _, urlSet := d.GetOk(MetadataURLVar); !urlSet {
 		set[MetadataXMLVar] = string(samlConfig.GetMetadataXml())
+	} else {
+		set[MetadataXMLVar] = ""
 	}
 
 	loginVersion := []interface{}{}
@@ -175,9 +177,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 	}
 
-	if len(loginVersion) > 0 {
-		set[LoginVersionVar] = loginVersion
-	}
+	set[LoginVersionVar] = loginVersion
 
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
