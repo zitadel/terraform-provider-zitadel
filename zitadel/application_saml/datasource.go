@@ -34,6 +34,34 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Metadata as XML file",
 			},
+			LoginVersionVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						LoginV1Var: {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "Login V1",
+						},
+						LoginV2Var: {
+							Type:        schema.TypeList,
+							Computed:    true,
+							Description: "Login V2",
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									BaseURIVar: {
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "Optionally specify a base uri of the login UI. If unspecified the default URI will be used.",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		ReadContext: read,
 	}

@@ -93,9 +93,14 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			}
 			req.ExpirationSigningKey = durationpb.New(dur)
 		}
-		_, err = client.UpdateSMSProviderHTTP(ctx, req)
+		resp, err := client.UpdateSMSProviderHTTP(ctx, req)
 		if err != nil {
 			return diag.Errorf("failed to update sms provider http: %v", err)
+		}
+		if sk := resp.GetSigningKey(); sk != "" {
+			if err := d.Set(SigningKeyVar, sk); err != nil {
+				return diag.Errorf("failed to set signing_key after rotation: %v", err)
+			}
 		}
 	}
 
