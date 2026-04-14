@@ -135,6 +135,64 @@ func GetResource() *schema.Resource {
 				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
 				Description:      "Whether the user has to change the password on first login.",
 			},
+			idpLinksVar: {
+				Type:        schema.TypeList,
+				Optional:    true,
+				ForceNew:    true,
+				Description: "A list of identity provider links to add to the user during creation. Useful for migration scenarios.",
+				// We ignore if the value changes after creation or import
+				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						idpLinkIDPIDVar: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The ID of the identity provider.",
+						},
+						idpLinkUserIDVar: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The user ID at the identity provider.",
+						},
+						idpLinkUserNameVar: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The username at the identity provider.",
+						},
+					},
+				},
+			},
+			totpSecretVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Sensitive:   true,
+				Description: "TOTP secret for two-factor authentication. Only used during creation. Useful for migration scenarios.",
+				// We ignore if the value changes after creation or import
+				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
+			},
+			metadataVar: {
+				Type:        schema.TypeList,
+				Optional:    true,
+				ForceNew:    true,
+				Description: "A list of metadata key-value pairs to set on the user during creation.",
+				// We ignore if the value changes after creation or import
+				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						metadataKeyVar: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The key of the metadata entry.",
+						},
+						metadataValueVar: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The value of the metadata entry.",
+						},
+					},
+				},
+			},
 		},
 		ReadContext:   readFunc(false),
 		CreateContext: create,

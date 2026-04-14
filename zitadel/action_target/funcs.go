@@ -97,9 +97,24 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		req.PayloadType = stringToPayloadType(payloadType)
 	}
 
-	_, err = client.UpdateTarget(ctx, req)
+	if d.HasChange(ExpirationSigningKeyVar) {
+		if v, ok := d.GetOk(ExpirationSigningKeyVar); ok && v.(string) != "" {
+			dur, err := time.ParseDuration(v.(string))
+			if err != nil {
+				return diag.Errorf("failed to parse expiration_signing_key duration: %v", err)
+			}
+			req.ExpirationSigningKey = durationpb.New(dur)
+		}
+	}
+
+	resp, err := client.UpdateTarget(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to update target: %v", err)
+	}
+	if sk := resp.GetSigningKey(); sk != "" {
+		if err := d.Set(SigningKeyVar, sk); err != nil {
+			return diag.Errorf("failed to set signing_key after rotation: %v", err)
+		}
 	}
 	return nil
 }

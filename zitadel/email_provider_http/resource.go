@@ -26,6 +26,12 @@ func GetResource() *schema.Resource {
 				Sensitive:   true,
 				Description: "Key used to sign and check payload sent to the HTTP provider.",
 			},
+			ExpirationSigningKeyVar: {
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Expiration duration for the signing key. When set during update, the old signing key will remain valid for the specified duration to allow for a graceful key rotation.",
+				DiffSuppressFunc: helper.DurationDiffSuppress,
+			},
 			setActiveVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,

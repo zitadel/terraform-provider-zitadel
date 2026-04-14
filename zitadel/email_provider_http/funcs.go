@@ -2,11 +2,13 @@ package email_provider_http
 
 import (
 	"context"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -78,14 +80,27 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(EndpointVar, DescriptionVar) {
-		_, err = client.UpdateEmailProviderHTTP(ctx, &admin.UpdateEmailProviderHTTPRequest{
+	if d.HasChanges(EndpointVar, DescriptionVar, ExpirationSigningKeyVar) {
+		req := &admin.UpdateEmailProviderHTTPRequest{
 			Id:          d.Id(),
 			Endpoint:    d.Get(EndpointVar).(string),
 			Description: d.Get(DescriptionVar).(string),
-		})
+		}
+		if v, ok := d.GetOk(ExpirationSigningKeyVar); ok && v.(string) != "" {
+			dur, err := time.ParseDuration(v.(string))
+			if err != nil {
+				return diag.Errorf("failed to parse expiration_signing_key duration: %v", err)
+			}
+			req.ExpirationSigningKey = durationpb.New(dur)
+		}
+		resp, err := client.UpdateEmailProviderHTTP(ctx, req)
 		if err != nil {
 			return diag.Errorf("failed to update email provider http: %v", err)
+		}
+		if sk := resp.GetSigningKey(); sk != "" {
+			if err := d.Set(SigningKeyVar, sk); err != nil {
+				return diag.Errorf("failed to set signing_key after rotation: %v", err)
+			}
 		}
 	}
 

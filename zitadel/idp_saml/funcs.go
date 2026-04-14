@@ -23,17 +23,22 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	nameIdFormat := idp.SAMLNameIDFormat(idp.SAMLNameIDFormat_value[idp_utils.StringValue(d, NameIdFormatVar)])
 	federatedLogoutEnabled := idp_utils.BoolValue(d, FederatedLogoutEnabledVar)
-	resp, err := client.AddSAMLProvider(ctx, &admin.AddSAMLProviderRequest{
+	req := &admin.AddSAMLProviderRequest{
 		Name:                          idp_utils.StringValue(d, idp_utils.NameVar),
 		Binding:                       idp.SAMLBinding(idp.SAMLBinding_value[idp_utils.StringValue(d, BindingVar)]),
 		WithSignedRequest:             idp_utils.BoolValue(d, WithSignedRequestVar),
 		ProviderOptions:               idp_utils.ProviderOptionsValue(d),
-		Metadata:                      &admin.AddSAMLProviderRequest_MetadataXml{MetadataXml: []byte(idp_utils.StringValue(d, MetadataXMLVar))},
 		NameIdFormat:                  &nameIdFormat,
 		TransientMappingAttributeName: helper.StringPtr(idp_utils.StringValue(d, TransientMappingAttributeNameVar)),
 		FederatedLogoutEnabled:        &federatedLogoutEnabled,
 		SignatureAlgorithm:            idp.SAMLSignatureAlgorithm(idp.SAMLSignatureAlgorithm_value[idp_utils.StringValue(d, SignatureAlgorithmVar)]),
-	})
+	}
+	if v, ok := d.GetOk(MetadataURLVar); ok && v.(string) != "" {
+		req.Metadata = &admin.AddSAMLProviderRequest_MetadataUrl{MetadataUrl: v.(string)}
+	} else {
+		req.Metadata = &admin.AddSAMLProviderRequest_MetadataXml{MetadataXml: []byte(idp_utils.StringValue(d, MetadataXMLVar))}
+	}
+	resp, err := client.AddSAMLProvider(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to create idp: %v", err)
 	}
@@ -52,18 +57,23 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	nameIdFormat := idp.SAMLNameIDFormat(idp.SAMLNameIDFormat_value[idp_utils.StringValue(d, NameIdFormatVar)])
 	federatedLogoutEnabled := idp_utils.BoolValue(d, FederatedLogoutEnabledVar)
-	_, err = client.UpdateSAMLProvider(ctx, &admin.UpdateSAMLProviderRequest{
+	req := &admin.UpdateSAMLProviderRequest{
 		Id:                            d.Id(),
 		Name:                          idp_utils.StringValue(d, idp_utils.NameVar),
 		Binding:                       idp.SAMLBinding(idp.SAMLBinding_value[idp_utils.StringValue(d, BindingVar)]),
 		WithSignedRequest:             idp_utils.BoolValue(d, WithSignedRequestVar),
 		ProviderOptions:               idp_utils.ProviderOptionsValue(d),
-		Metadata:                      &admin.UpdateSAMLProviderRequest_MetadataXml{MetadataXml: []byte(idp_utils.StringValue(d, MetadataXMLVar))},
 		NameIdFormat:                  &nameIdFormat,
 		TransientMappingAttributeName: helper.StringPtr(idp_utils.StringValue(d, TransientMappingAttributeNameVar)),
 		FederatedLogoutEnabled:        &federatedLogoutEnabled,
 		SignatureAlgorithm:            idp.SAMLSignatureAlgorithm(idp.SAMLSignatureAlgorithm_value[idp_utils.StringValue(d, SignatureAlgorithmVar)]),
-	})
+	}
+	if v, ok := d.GetOk(MetadataURLVar); ok && v.(string) != "" {
+		req.Metadata = &admin.UpdateSAMLProviderRequest_MetadataUrl{MetadataUrl: v.(string)}
+	} else {
+		req.Metadata = &admin.UpdateSAMLProviderRequest_MetadataXml{MetadataXml: []byte(idp_utils.StringValue(d, MetadataXMLVar))}
+	}
+	_, err = client.UpdateSAMLProvider(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to update idp: %v", err)
 	}
@@ -93,7 +103,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	generalCfg := cfg.GetOptions()
 	set := map[string]interface{}{
 		idp_utils.NameVar:                idp.GetName(),
-		MetadataXMLVar:                   string(specificCfg.GetMetadataXml()),
 		BindingVar:                       specificCfg.GetBinding().String(),
 		WithSignedRequestVar:             specificCfg.GetWithSignedRequest(),
 		NameIdFormatVar:                  specificCfg.GetNameIdFormat().String(),
@@ -106,9 +115,16 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_utils.IsAutoUpdateVar:        generalCfg.GetIsAutoUpdate(),
 		idp_utils.AutoLinkingVar:         idp_utils.AutoLinkingString(generalCfg.GetAutoLinking()),
 	}
+	// Only set metadata_xml if the user did not configure metadata_url,
+	// otherwise the resolved XML would cause a perpetual diff.
+	if _, urlSet := d.GetOk(MetadataURLVar); !urlSet {
+		set[MetadataXMLVar] = string(specificCfg.GetMetadataXml())
+	} else {
+		set[MetadataXMLVar] = nil
+	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
-			return diag.Errorf("failed to set %s of oidc idp: %v", k, err)
+			return diag.Errorf("failed to set %s of saml idp: %v", k, err)
 		}
 	}
 	d.SetId(idp.Id)

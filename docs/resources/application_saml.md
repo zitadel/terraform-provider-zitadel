@@ -25,17 +25,34 @@ resource "zitadel_application_saml" "default" {
 
 ### Required
 
-- `metadata_xml` (String, Sensitive) Metadata as XML file
 - `name` (String) Name of the application
 - `project_id` (String) ID of the project
 
 ### Optional
 
+- `login_version` (Block List, Max: 1) Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default. (see [below for nested schema](#nestedblock--login_version))
+- `metadata_url` (String) Metadata URL to fetch the SAML metadata from
+- `metadata_xml` (String, Sensitive) Metadata as XML file
 - `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+<a id="nestedblock--login_version"></a>
+### Nested Schema for `login_version`
+
+Optional:
+
+- `login_v1` (Boolean) Login V1
+- `login_v2` (Block List, Max: 1) Login V2 (see [below for nested schema](#nestedblock--login_version--login_v2))
+
+<a id="nestedblock--login_version--login_v2"></a>
+### Nested Schema for `login_version.login_v2`
+
+Optional:
+
+- `base_uri` (String) Optionally specify a base uri of the login UI. If unspecified the default URI will be used.
 
 ## Import
 

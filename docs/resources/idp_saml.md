@@ -69,13 +69,14 @@ EOM
 - `is_auto_update` (Boolean) enable if a the ZITADEL account fields should be updated automatically on each login
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
 - `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
-- `metadata_xml` (String) The metadata XML as plain string
 
 ### Optional
 
 - `auto_linking` (String) Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches, supported values: AUTO_LINKING_OPTION_UNSPECIFIED, AUTO_LINKING_OPTION_USERNAME, AUTO_LINKING_OPTION_EMAIL
 - `binding` (String) The binding, supported values: SAML_BINDING_UNSPECIFIED, SAML_BINDING_POST, SAML_BINDING_REDIRECT, SAML_BINDING_ARTIFACT
 - `federated_logout_enabled` (Boolean) If enabled, ZITADEL will send a logout request to the identity provider when the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+- `metadata_url` (String) URL to the metadata of the SAML identity provider
+- `metadata_xml` (String) The metadata XML as plain string
 - `name` (String) Name of the IDP
 - `name_id_format` (String) The nameid-format requested, supported values: SAML_NAME_ID_FORMAT_UNSPECIFIED, SAML_NAME_ID_FORMAT_EMAIL_ADDRESS, SAML_NAME_ID_FORMAT_PERSISTENT, SAML_NAME_ID_FORMAT_TRANSIENT
 - `signature_algorithm` (String) Signature Algorithm used to sign SAML requests and responses. Can be used only if `with_signed_request` is true., supported values: SAML_SIGNATURE_UNSPECIFIED, SAML_SIGNATURE_RSA_SHA1, SAML_SIGNATURE_RSA_SHA256, SAML_SIGNATURE_RSA_SHA512

@@ -34,5 +34,21 @@ data "zitadel_application_saml" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `login_version` (List of Object) Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default. (see [below for nested schema](#nestedatt--login_version))
 - `metadata_xml` (String) Metadata as XML file
 - `name` (String) Name of the application
+
+<a id="nestedatt--login_version"></a>
+### Nested Schema for `login_version`
+
+Read-Only:
+
+- `login_v1` (Boolean)
+- `login_v2` (List of Object) (see [below for nested schema](#nestedobjatt--login_version--login_v2))
+
+<a id="nestedobjatt--login_version--login_v2"></a>
+### Nested Schema for `login_version.login_v2`
+
+Read-Only:
+
+- `base_uri` (String)

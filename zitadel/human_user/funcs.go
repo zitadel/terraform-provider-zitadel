@@ -125,12 +125,44 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
+	if v, ok := d.GetOk(idpLinksVar); ok {
+		links := v.([]interface{})
+		idpLinks := make([]*userv2.IDPLink, 0, len(links))
+		for _, link := range links {
+			linkMap := link.(map[string]interface{})
+			idpLinks = append(idpLinks, &userv2.IDPLink{
+				IdpId:    linkMap[idpLinkIDPIDVar].(string),
+				UserId:   linkMap[idpLinkUserIDVar].(string),
+				UserName: linkMap[idpLinkUserNameVar].(string),
+			})
+		}
+		humanUser.IdpLinks = idpLinks
+	}
+
+	if v, ok := d.GetOk(totpSecretVar); ok && v.(string) != "" {
+		secret := v.(string)
+		humanUser.TotpSecret = &secret
+	}
+
 	req := &userv2.CreateUserRequest{
 		OrganizationId: orgID,
 		Username:       &username,
 		UserType: &userv2.CreateUserRequest_Human_{
 			Human: humanUser,
 		},
+	}
+
+	if v, ok := d.GetOk(metadataVar); ok {
+		entries := v.([]interface{})
+		metadata := make([]*userv2.Metadata, 0, len(entries))
+		for _, entry := range entries {
+			entryMap := entry.(map[string]interface{})
+			metadata = append(metadata, &userv2.Metadata{
+				Key:   entryMap[metadataKeyVar].(string),
+				Value: []byte(entryMap[metadataValueVar].(string)),
+			})
+		}
+		humanUser.Metadata = metadata
 	}
 
 	if userID, ok := d.GetOk(UserIDVar); ok {
@@ -339,8 +371,6 @@ func readFunc(forDatasource bool) func(ctx context.Context, d *schema.ResourceDa
 		return nil
 	}
 }
-
-// zitadel/human_user/funcs.go - replace list function
 
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started list")

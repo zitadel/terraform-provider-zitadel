@@ -29,6 +29,7 @@ resource "zitadel_email_provider_http" "default" {
 ### Optional
 
 - `description` (String) Description of the email provider.
+- `expiration_signing_key` (String) Expiration duration for the signing key. When set during update, the old signing key will remain valid for the specified duration to allow for a graceful key rotation.
 - `set_active` (Boolean) Set the email provider as active after creating/updating.
 
 ### Read-Only
