@@ -72,7 +72,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to set validation_url: %v", err)
 	}
 
-	if d.Get(VerifyVar).(bool) {
+	verify := d.Get(VerifyVar).(bool)
+	if verify {
 		_, err = client.VerifyOrganizationDomain(ctx, &org.VerifyOrganizationDomainRequest{
 			OrganizationId: orgID,
 			Domain:         domain,
@@ -82,7 +83,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	return read(ctx, d, m)
+	if err := d.Set(IsVerifiedVar, verify); err != nil {
+		return diag.Errorf("failed to set %s: %v", IsVerifiedVar, err)
+	}
+	if err := d.Set(IsPrimaryVar, false); err != nil {
+		return diag.Errorf("failed to set %s: %v", IsPrimaryVar, err)
+	}
+	return nil
 }
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
