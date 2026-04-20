@@ -24,7 +24,7 @@ resource "zitadel_org_member" "default" {
 
 ### Required
 
-- `roles` (Set of String) List of roles granted. Organization member roles must start with 'ORG_' (e.g., ORG_OWNER, ORG_USER_MANAGER). See https://zitadel.com/docs/guides/manage/console/managers for available roles.
+- `roles` (Set of String) List of roles granted. Organization member roles must start with 'ORG_' (e.g., ORG_OWNER, ORG_USER_MANAGER). See https://zitadel.com/docs/guides/manage/console/administrators for available roles.
 - `user_id` (String) ID of the user
 
 ### Optional
