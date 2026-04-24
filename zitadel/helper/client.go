@@ -34,7 +34,7 @@ const (
 	AccessTokenVar            = "access_token"
 	AccessTokenDescription    = "Personal Access Token to connect to ZITADEL. Either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' is required"
 	TokenVar                  = "token"
-	TokenDescription          = "Path to the file containing credentials to connect to ZITADEL"
+	TokenDescription          = "Deprecated: Use 'access_token' for Personal Access Tokens or 'jwt_profile_file' for JWT Profile credentials instead. Path to the file containing a JWT Profile key to connect to ZITADEL."
 	PortVar                   = "port"
 	PortDescription           = "Used port if not the default ports 80 or 443 are configured"
 	JWTFileVar                = "jwt_file"

@@ -178,8 +178,9 @@ func (p *providerPV6) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Description: helper.AccessTokenDescription,
 			},
 			helper.TokenVar: providerschema.StringAttribute{
-				Optional:    true,
-				Description: helper.TokenDescription,
+				Optional:           true,
+				Description:        helper.TokenDescription,
+				DeprecationMessage: "Use jwt_profile_file instead. For Personal Access Tokens, use access_token.",
 			},
 			helper.JWTFileVar: providerschema.StringAttribute{
 				Optional:    true,
@@ -471,6 +472,7 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: helper.TokenDescription,
+				Deprecated:  "Use jwt_profile_file instead. For Personal Access Tokens, use access_token.",
 				ConflictsWith: []string{
 					helper.AccessTokenVar,
 					helper.JWTFileVar,
