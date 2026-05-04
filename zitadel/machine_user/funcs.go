@@ -31,6 +31,9 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		UserId: d.Id(),
 	})
 	if err != nil {
+		if helper.IsUnimplemented(err) {
+			return legacyDeleteUser(ctx, d, clientinfo)
+		}
 		return diag.Errorf("failed to delete user: %v", err)
 	}
 	return nil
@@ -77,6 +80,16 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	respUser, err := client.CreateUser(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
+		if helper.IsUnimplemented(err) {
+			if req.UserId != nil {
+				return diag.Errorf("custom user_id requires Zitadel server v4+")
+			}
+			diags := legacyCreateMachineUser(ctx, d, clientinfo)
+			if diags.HasError() {
+				return diags
+			}
+			return read(ctx, d, m)
+		}
 		return diag.Errorf("failed to create machine user: %v", err)
 	}
 	d.SetId(respUser.Id)
@@ -158,7 +171,16 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if req.Username != nil || req.UserType != nil {
 		_, err = client.UpdateUser(helper.CtxWithOrgID(ctx, d), req)
 		if err != nil {
-			return diag.Errorf("failed to update machine user: %v", err)
+			if helper.IsUnimplemented(err) {
+				if d.HasChange(UserNameVar) {
+					diags := legacyUpdateMachineUsername(ctx, d, clientinfo)
+					if diags.HasError() {
+						return diags
+					}
+				}
+			} else {
+				return diag.Errorf("failed to update machine user: %v", err)
+			}
 		}
 	}
 
@@ -232,11 +254,14 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	respUser, err := client.GetUserByID(helper.CtxWithOrgID(ctx, d), &userv2.GetUserByIDRequest{
 		UserId: helper.GetID(d, UserIDVar),
 	})
-	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
-		d.SetId("")
-		return nil
-	}
 	if err != nil {
+		if helper.IsUnimplemented(err) {
+			return legacyReadMachineUser(ctx, d, clientinfo)
+		}
+		if helper.IgnoreIfNotFoundError(err) == nil {
+			d.SetId("")
+			return nil
+		}
 		return diag.Errorf("failed to get user: %v", err)
 	}
 
@@ -314,6 +339,9 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	resp, err := client.ListUsers(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
+		if helper.IsUnimplemented(err) {
+			return legacyListMachineUsers(ctx, d, clientinfo)
+		}
 		return diag.Errorf("error while listing users: %v", err)
 	}
 

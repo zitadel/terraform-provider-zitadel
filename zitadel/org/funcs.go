@@ -29,6 +29,9 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		OrganizationId: d.Id(),
 	})
 	if err != nil {
+		if helper.IsUnimplemented(err) {
+			return legacyDeleteOrg(ctx, d, clientinfo)
+		}
 		return diag.FromErr(err)
 	}
 	d.SetId("")
@@ -120,7 +123,14 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			Name:           d.Get(NameVar).(string),
 		})
 		if err != nil {
-			return diag.Errorf("failed to update org: %v", err)
+			if helper.IsUnimplemented(err) {
+				diags := legacyUpdateOrg(ctx, d, clientinfo)
+				if diags.HasError() {
+					return diags
+				}
+			} else {
+				return diag.Errorf("failed to update org: %v", err)
+			}
 		}
 	}
 
