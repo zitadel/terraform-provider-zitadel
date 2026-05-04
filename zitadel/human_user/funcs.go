@@ -29,6 +29,9 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		UserId: d.Id(),
 	})
 	if err != nil {
+		if helper.IsUnimplemented(err) {
+			return legacyDeleteUser(ctx, d, clientinfo)
+		}
 		return diag.Errorf("failed to delete user: %v", err)
 	}
 	return nil
@@ -172,6 +175,25 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	respUser, err := client.CreateUser(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
+		if helper.IsUnimplemented(err) {
+			if req.UserId != nil {
+				return diag.Errorf("custom user_id requires Zitadel server v4+")
+			}
+			if humanUser.IdpLinks != nil {
+				return diag.Errorf("idp_links on create requires Zitadel server v4+")
+			}
+			if humanUser.TotpSecret != nil {
+				return diag.Errorf("totp_secret on create requires Zitadel server v4+")
+			}
+			if humanUser.Metadata != nil {
+				return diag.Errorf("metadata on create requires Zitadel server v4+")
+			}
+			diags := legacyCreateHumanUser(ctx, d, clientinfo)
+			if diags.HasError() {
+				return diags
+			}
+			return readFunc(false)(ctx, d, m)
+		}
 		return diag.Errorf("failed to create human user: %v", err)
 	}
 	d.SetId(respUser.Id)
@@ -292,6 +314,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if req.Username != nil || req.UserType != nil {
 		_, err = client.UpdateUser(helper.CtxWithOrgID(ctx, d), req)
 		if err != nil {
+			if helper.IsUnimplemented(err) {
+				return legacyUpdateHumanUser(ctx, d, clientinfo)
+			}
 			return diag.Errorf("failed to update human user: %v", err)
 		}
 	}
@@ -316,11 +341,14 @@ func readFunc(forDatasource bool) func(ctx context.Context, d *schema.ResourceDa
 		respUser, err := client.GetUserByID(helper.CtxWithOrgID(ctx, d), &userv2.GetUserByIDRequest{
 			UserId: helper.GetID(d, UserIDVar),
 		})
-		if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
-			d.SetId("")
-			return nil
-		}
 		if err != nil {
+			if helper.IsUnimplemented(err) {
+				return legacyReadHumanUser(ctx, d, clientinfo, forDatasource)
+			}
+			if helper.IgnoreIfNotFoundError(err) == nil {
+				d.SetId("")
+				return nil
+			}
 			return diag.Errorf("failed to get user: %v", err)
 		}
 
@@ -484,6 +512,9 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	resp, err := client.ListUsers(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
+		if helper.IsUnimplemented(err) {
+			return legacyListHumanUsers(ctx, d, clientinfo)
+		}
 		return diag.Errorf("error while listing users: %v", err)
 	}
 
