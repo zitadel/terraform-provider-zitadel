@@ -121,15 +121,15 @@ func (r *verifyPhoneMessageTextResource) Read(ctx context.Context, req resource.
 
 	zResp, err := client.GetCustomVerifyPhoneMessageText(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomVerifyPhoneMessageTextRequest{Language: language})
 	if err != nil {
-		return
-	}
-	if zResp.CustomText.IsDefault {
+		resp.Diagnostics.AddError("failed to read", err.Error())
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !zResp.CustomText.IsDefault {
+		resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(setID(ctx, &state, orgID, language)...)
