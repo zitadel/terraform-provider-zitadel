@@ -121,15 +121,15 @@ func (r *defaultLoginTextsResource) Read(ctx context.Context, req resource.ReadR
 
 	zResp, err := client.GetCustomLoginTexts(ctx, &admin.GetCustomLoginTextsRequest{Language: language})
 	if err != nil {
-		return
-	}
-	if zResp.CustomText.IsDefault {
+		resp.Diagnostics.AddError("failed to read", err.Error())
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyLoginCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !zResp.CustomText.IsDefault {
+		resp.Diagnostics.Append(text.CopyLoginCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(setID(ctx, &state, language)...)

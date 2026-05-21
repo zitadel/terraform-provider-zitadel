@@ -7,6 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	resourceschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	textpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/text"
@@ -120,7 +122,12 @@ func buildSchemaForMessage(desc protoreflect.MessageDescriptor, prefix string) (
 }
 
 func augmentRootAttributes(attrs map[string]resourceschema.Attribute, attrTypes map[string]attr.Type) {
-	attrs[idAttr] = resourceschema.StringAttribute{Computed: true}
+	attrs[idAttr] = resourceschema.StringAttribute{
+		Computed: true,
+		PlanModifiers: []planmodifier.String{
+			stringplanmodifier.UseStateForUnknown(),
+		},
+	}
 	attrs[orgIDAttr] = resourceschema.StringAttribute{Required: true}
 	attrs[languageAttr] = resourceschema.StringAttribute{Required: true}
 

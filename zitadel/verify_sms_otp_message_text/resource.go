@@ -121,15 +121,15 @@ func (r *verifySMSOTPMessageTextResource) Read(ctx context.Context, req resource
 
 	zResp, err := client.GetCustomVerifySMSOTPMessageText(helper.CtxSetOrgID(ctx, orgID), &management.GetCustomVerifySMSOTPMessageTextRequest{Language: language})
 	if err != nil {
-		return
-	}
-	if zResp.CustomText.IsDefault {
+		resp.Diagnostics.AddError("failed to read", err.Error())
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !zResp.CustomText.IsDefault {
+		resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(setID(ctx, &state, orgID, language)...)

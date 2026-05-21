@@ -121,15 +121,15 @@ func (r *defaultVerifyEmailMessageTextResource) Read(ctx context.Context, req re
 
 	zResp, err := client.GetCustomVerifyEmailMessageText(ctx, &admin.GetCustomVerifyEmailMessageTextRequest{Language: language})
 	if err != nil {
-		return
-	}
-	if zResp.CustomText.IsDefault {
+		resp.Diagnostics.AddError("failed to read", err.Error())
 		return
 	}
 
-	resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !zResp.CustomText.IsDefault {
+		resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(setID(ctx, &state, language)...)
