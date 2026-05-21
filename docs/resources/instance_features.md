@@ -23,7 +23,7 @@ resource "zitadel_instance_features" "default" {
   debug_oidc_parent_error            = false
   oidc_single_v1_session_termination = true
   enable_back_channel_logout         = true
-  login_v2 = {
+  login_v2 {
     required = true
     base_uri = "https://login.example.com"
   }
