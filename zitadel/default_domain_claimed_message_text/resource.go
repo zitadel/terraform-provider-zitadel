@@ -41,6 +41,8 @@ func (r *defaultDomainClaimedMessageTextResource) Schema(ctx context.Context, _ 
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
+	s.MarkdownDescription = "Instance-level default template for the domain claimed notification email. " +
+		"Org-level overrides are managed by `zitadel_domain_claimed_message_text`."
 	resp.Schema = s
 }
 

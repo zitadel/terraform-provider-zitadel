@@ -2,12 +2,12 @@
 page_title: "zitadel_machine_user Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.
+  Machine user (service account) under an organization. Backward-compatible: tries the user/v2 API first and falls back to the management API, so it works with both ZITADEL 3.x and 4.x.
 ---
 
 # zitadel_machine_user (Resource)
 
-Resource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.
+Machine user (service account) under an organization. Backward-compatible: tries the user/v2 API first and falls back to the management API, so it works with both ZITADEL 3.x and 4.x.
 
 ## Example Usage
 

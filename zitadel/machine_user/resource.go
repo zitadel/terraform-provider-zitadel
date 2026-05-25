@@ -11,7 +11,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing a serviceaccount situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
+		Description: "Machine user (service account) under an organization. Backward-compatible: tries the user/v2 API first and falls back to the management API, so it works with both ZITADEL 3.x and 4.x.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
 			UserIDVar: {

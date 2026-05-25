@@ -41,6 +41,8 @@ func (r *verifyEmailMessageTextResource) Metadata(_ context.Context, req resourc
 func (r *verifyEmailMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
+	s.MarkdownDescription = "Customizes the email address verification email sent to users (org-scoped). " +
+		"Instance-level defaults are managed by `zitadel_default_verify_email_message_text`."
 	resp.Schema = s
 }
 

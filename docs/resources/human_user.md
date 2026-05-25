@@ -2,12 +2,12 @@
 page_title: "zitadel_human_user Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.
+  Human user under an organization, using the user/v2 API. Requires ZITADEL 4.x.
 ---
 
 # zitadel_human_user (Resource)
 
-Resource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.
+Human user under an organization, using the user/v2 API. **Requires ZITADEL 4.x.**
 
 ## Example Usage
 

@@ -2,12 +2,12 @@
 page_title: "zitadel_passwordless_registration_message_text Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  
+  Customizes the passkey/passwordless registration invitation email sent to users (org-scoped). Instance-level defaults are managed by zitadel_default_passwordless_registration_message_text.
 ---
 
 # zitadel_passwordless_registration_message_text (Resource)
 
-
+Customizes the passkey/passwordless registration invitation email sent to users (org-scoped). Instance-level defaults are managed by `zitadel_default_passwordless_registration_message_text`.
 
 ## Example Usage
 

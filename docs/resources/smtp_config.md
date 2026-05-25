@@ -2,12 +2,12 @@
 page_title: "zitadel_smtp_config Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing the SMTP configuration of an instance.
+  Instance SMTP configuration. Deprecated: the underlying SMTP config API is marked deprecated in ZITADEL. Use zitadel_email_provider_smtp instead.
 ---
 
 # zitadel_smtp_config (Resource)
 
-Resource representing the SMTP configuration of an instance.
+Instance SMTP configuration. **Deprecated:** the underlying SMTP config API is marked deprecated in ZITADEL. Use `zitadel_email_provider_smtp` instead.
 
 ## Example Usage
 

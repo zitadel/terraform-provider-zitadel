@@ -8,7 +8,8 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing the SMTP configuration of an instance.",
+		Description:        "Instance SMTP configuration. **Deprecated:** the underlying SMTP config API is marked deprecated in ZITADEL. Use `zitadel_email_provider_smtp` instead.",
+		DeprecationMessage: "The underlying SMTP config API is marked deprecated in ZITADEL. Use zitadel_email_provider_smtp instead.",
 		Schema: map[string]*schema.Schema{
 			SenderAddressVar: {
 				Type:        schema.TypeString,

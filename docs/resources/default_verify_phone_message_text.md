@@ -2,12 +2,12 @@
 page_title: "zitadel_default_verify_phone_message_text Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  
+  Instance-level default template for the phone number verification SMS. Org-level overrides are managed by zitadel_verify_phone_message_text.
 ---
 
 # zitadel_default_verify_phone_message_text (Resource)
 
-
+Instance-level default template for the phone number verification SMS. Org-level overrides are managed by `zitadel_verify_phone_message_text`.
 
 ## Example Usage
 

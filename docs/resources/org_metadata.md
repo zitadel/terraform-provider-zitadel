@@ -2,12 +2,12 @@
 page_title: "zitadel_org_metadata Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Add a custom attribute to the organization like its location or an identifier in another system. You can use this information in your actions. This Terraform resource manages a single key-value pair.
+  Custom key-value metadata on an organization. Deprecated: use zitadel_organization_metadata which uses the metadata/v2 API (requires ZITADEL 4.x).
 ---
 
 # zitadel_org_metadata (Resource)
 
-Add a custom attribute to the organization like its location or an identifier in another system. You can use this information in your actions. This Terraform resource manages a single key-value pair.
+Custom key-value metadata on an organization. **Deprecated:** use `zitadel_organization_metadata` which uses the metadata/v2 API (requires ZITADEL 4.x).
 
 ## Example Usage
 

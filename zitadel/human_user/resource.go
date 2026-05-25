@@ -14,7 +14,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing a human user situated under an organization, which then can be authorized through memberships or direct grants on other resources.",
+		Description: "Human user under an organization, using the user/v2 API. **Requires ZITADEL 4.x.**",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
 			UserIDVar: {

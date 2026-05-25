@@ -41,6 +41,9 @@ func (r *defaultLoginTextsResource) Schema(ctx context.Context, _ resource.Schem
 	s, diags := text.GenSchemaLoginCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
+	s.MarkdownDescription = "Instance-level default text customizations for the **legacy login UI (v1)** at `/ui/login`. " +
+		"These settings have **no effect on the new hosted login v2** (`/ui/v2/login`). " +
+		"Org-level overrides are managed by `zitadel_login_texts`."
 	resp.Schema = s
 }
 

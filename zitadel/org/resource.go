@@ -8,7 +8,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing an organization in ZITADEL, which is the highest level after the instance and contains several other resource including policies if the configuration differs to the default policies on the instance.",
+		Description: "Organization resource that is backward-compatible with ZITADEL 3.x and 4.x: it tries the org/v2 API first and falls back to the management API automatically. For deployments that only target ZITADEL 4.x, prefer `zitadel_organization`.",
 		Schema: map[string]*schema.Schema{
 			NameVar: {
 				Type:        schema.TypeString,

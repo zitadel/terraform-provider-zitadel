@@ -41,6 +41,8 @@ func (r *defaultPasswordlessRegistrationMessageTextResource) Schema(ctx context.
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
+	s.MarkdownDescription = "Instance-level default template for the passkey/passwordless registration invitation email. " +
+		"Org-level overrides are managed by `zitadel_passwordless_registration_message_text`."
 	resp.Schema = s
 }
 

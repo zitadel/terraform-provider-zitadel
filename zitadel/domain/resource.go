@@ -8,7 +8,8 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing a domain of the organization.",
+		Description:        "Domain of an organization. **Deprecated:** use `zitadel_organization_domain` which uses the org/v2 API (requires ZITADEL 4.x).",
+		DeprecationMessage: "Use zitadel_organization_domain instead (org/v2 API, requires ZITADEL 4.x).",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
 			NameVar: {

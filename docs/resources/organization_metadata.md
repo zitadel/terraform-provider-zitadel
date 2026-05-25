@@ -2,12 +2,12 @@
 page_title: "zitadel_organization_metadata Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing metadata of an organization in ZITADEL. This resource manages a single key-value pair.
+  Custom key-value metadata on an organization, using the metadata/v2 API. Requires ZITADEL 4.x. For 3.x compatibility use zitadel_org_metadata.
 ---
 
 # zitadel_organization_metadata (Resource)
 
-Resource representing metadata of an organization in ZITADEL. This resource manages a single key-value pair.
+Custom key-value metadata on an organization, using the metadata/v2 API. **Requires ZITADEL 4.x.** For 3.x compatibility use `zitadel_org_metadata`.
 
 ## Example Usage
 

@@ -2,12 +2,12 @@
 page_title: "zitadel_default_init_message_text Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  
+  Instance-level default template for the account initialization email sent to newly created users. Org-level overrides are managed by zitadel_init_message_text.
 ---
 
 # zitadel_default_init_message_text (Resource)
 
-
+Instance-level default template for the account initialization email sent to newly created users. Org-level overrides are managed by `zitadel_init_message_text`.
 
 ## Example Usage
 

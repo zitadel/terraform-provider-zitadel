@@ -8,7 +8,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing metadata of an organization in ZITADEL. This resource manages a single key-value pair.",
+		Description: "Custom key-value metadata on an organization, using the metadata/v2 API. **Requires ZITADEL 4.x.** For 3.x compatibility use `zitadel_org_metadata`.",
 		Schema: map[string]*schema.Schema{
 			OrganizationIDVar: {
 				Type:        schema.TypeString,
