@@ -41,6 +41,8 @@ func (r *verifyEmailOTPMessageTextResource) Metadata(_ context.Context, req reso
 func (r *verifyEmailOTPMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
+	s.MarkdownDescription = "Customizes the one-time password (OTP) verification email sent to users (org-scoped). " +
+		"Instance-level defaults are managed by `zitadel_default_verify_email_otp_message_text`."
 	resp.Schema = s
 }
 

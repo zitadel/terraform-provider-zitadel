@@ -41,6 +41,8 @@ func (r *defaultPasswordChangeMessageTextResource) Schema(ctx context.Context, _
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
+	s.MarkdownDescription = "Instance-level default template for the notification email sent when a user's password changes. " +
+		"Org-level overrides are managed by `zitadel_password_change_message_text`."
 	resp.Schema = s
 }
 

@@ -2,12 +2,12 @@
 page_title: "zitadel_email_provider_smtp Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing the SMTP email provider configuration of an instance.
+  SMTP email provider configuration for an instance. This is the current API for configuring SMTP (replaces the deprecated zitadel_smtp_config).
 ---
 
 # zitadel_email_provider_smtp (Resource)
 
-Resource representing the SMTP email provider configuration of an instance.
+SMTP email provider configuration for an instance. This is the current API for configuring SMTP (replaces the deprecated `zitadel_smtp_config`).
 
 ## Example Usage
 

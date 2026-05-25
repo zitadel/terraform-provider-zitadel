@@ -41,6 +41,8 @@ func (r *defaultVerifySMSOTPMessageTextResource) Schema(ctx context.Context, _ r
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
+	s.MarkdownDescription = "Instance-level default template for the OTP verification SMS. " +
+		"Org-level overrides are managed by `zitadel_verify_sms_otp_message_text`."
 	resp.Schema = s
 }
 

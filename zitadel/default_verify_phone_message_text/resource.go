@@ -41,6 +41,8 @@ func (r *defaultVerifyPhoneMessageTextResource) Schema(ctx context.Context, _ re
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
+	s.MarkdownDescription = "Instance-level default template for the phone number verification SMS. " +
+		"Org-level overrides are managed by `zitadel_verify_phone_message_text`."
 	resp.Schema = s
 }
 

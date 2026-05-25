@@ -2,12 +2,12 @@
 page_title: "zitadel_organization_domain Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Resource representing a domain of an organization in ZITADEL.
+  Domain of an organization, using the org/v2 API. Requires ZITADEL 4.x. For 3.x compatibility use zitadel_domain.
 ---
 
 # zitadel_organization_domain (Resource)
 
-Resource representing a domain of an organization in ZITADEL.
+Domain of an organization, using the org/v2 API. **Requires ZITADEL 4.x.** For 3.x compatibility use `zitadel_domain`.
 
 ## Example Usage
 

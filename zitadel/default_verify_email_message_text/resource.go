@@ -41,6 +41,8 @@ func (r *defaultVerifyEmailMessageTextResource) Schema(ctx context.Context, _ re
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
+	s.MarkdownDescription = "Instance-level default template for the email address verification email. " +
+		"Org-level overrides are managed by `zitadel_verify_email_message_text`."
 	resp.Schema = s
 }
 

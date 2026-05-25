@@ -41,6 +41,8 @@ func (r *defaultInviteUserMessageTextResource) Schema(ctx context.Context, _ res
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
+	s.MarkdownDescription = "Instance-level default template for the user invitation email. " +
+		"There is no org-level override for this message type."
 	resp.Schema = s
 }
 

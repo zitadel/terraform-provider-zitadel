@@ -2,12 +2,12 @@
 page_title: "zitadel_login_texts Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  
+  Customizes the text displayed in the legacy login UI (v1) at /ui/login. These settings have no effect on the new hosted login v2 (/ui/v2/login). For hosted login v2 translations, use the ZITADEL SettingsService v2beta SetHostedLoginTranslation API directly. Instance-level defaults are managed by zitadel_default_login_texts.
 ---
 
 # zitadel_login_texts (Resource)
 
-
+Customizes the text displayed in the **legacy login UI (v1)** at `/ui/login`. These settings have **no effect on the new hosted login v2** (`/ui/v2/login`). For hosted login v2 translations, use the ZITADEL SettingsService v2beta `SetHostedLoginTranslation` API directly. Instance-level defaults are managed by `zitadel_default_login_texts`.
 
 ## Example Usage
 

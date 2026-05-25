@@ -2,12 +2,12 @@
 page_title: "zitadel_domain_claimed_message_text Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  
+  Customizes the notification email sent to users when a domain is claimed (org-scoped). Instance-level defaults are managed by zitadel_default_domain_claimed_message_text.
 ---
 
 # zitadel_domain_claimed_message_text (Resource)
 
-
+Customizes the notification email sent to users when a domain is claimed (org-scoped). Instance-level defaults are managed by `zitadel_default_domain_claimed_message_text`.
 
 ## Example Usage
 

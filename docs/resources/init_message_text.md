@@ -2,12 +2,12 @@
 page_title: "zitadel_init_message_text Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  
+  Customizes the account initialization email sent to newly created users (org-scoped). Instance-level defaults are managed by zitadel_default_init_message_text.
 ---
 
 # zitadel_init_message_text (Resource)
 
-
+Customizes the account initialization email sent to newly created users (org-scoped). Instance-level defaults are managed by `zitadel_default_init_message_text`.
 
 ## Example Usage
 

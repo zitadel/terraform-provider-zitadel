@@ -2,12 +2,12 @@
 page_title: "zitadel_verify_email_otp_message_text Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  
+  Customizes the one-time password (OTP) verification email sent to users (org-scoped). Instance-level defaults are managed by zitadel_default_verify_email_otp_message_text.
 ---
 
 # zitadel_verify_email_otp_message_text (Resource)
 
-
+Customizes the one-time password (OTP) verification email sent to users (org-scoped). Instance-level defaults are managed by `zitadel_default_verify_email_otp_message_text`.
 
 ## Example Usage
 

@@ -8,7 +8,8 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Add a custom attribute to the organization like its location or an identifier in another system. You can use this information in your actions. This Terraform resource manages a single key-value pair.",
+		Description:        "Custom key-value metadata on an organization. **Deprecated:** use `zitadel_organization_metadata` which uses the metadata/v2 API (requires ZITADEL 4.x).",
+		DeprecationMessage: "Use zitadel_organization_metadata instead (metadata/v2 API, requires ZITADEL 4.x).",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
 			KeyVar: {

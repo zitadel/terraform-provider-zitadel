@@ -41,6 +41,10 @@ func (r *loginTextsResource) Metadata(_ context.Context, req resource.MetadataRe
 func (r *loginTextsResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	s, diags := text.GenSchemaLoginCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
+	s.MarkdownDescription = "Customizes the text displayed in the **legacy login UI (v1)** at `/ui/login`. " +
+		"These settings have **no effect on the new hosted login v2** (`/ui/v2/login`). " +
+		"For hosted login v2 translations, use the ZITADEL SettingsService v2beta `SetHostedLoginTranslation` API directly. " +
+		"Instance-level defaults are managed by `zitadel_default_login_texts`."
 	resp.Schema = s
 }
 

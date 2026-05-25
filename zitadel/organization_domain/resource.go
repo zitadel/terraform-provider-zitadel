@@ -11,7 +11,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing a domain of an organization in ZITADEL.",
+		Description: "Domain of an organization, using the org/v2 API. **Requires ZITADEL 4.x.** For 3.x compatibility use `zitadel_domain`.",
 		Schema: map[string]*schema.Schema{
 			OrganizationIDVar: {
 				Type:        schema.TypeString,

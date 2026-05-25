@@ -8,7 +8,7 @@ import (
 
 func GetResource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Resource representing the SMTP email provider configuration of an instance.",
+		Description: "SMTP email provider configuration for an instance. This is the current API for configuring SMTP (replaces the deprecated `zitadel_smtp_config`).",
 		Schema: map[string]*schema.Schema{
 			SenderAddressVar: {
 				Type:        schema.TypeString,
