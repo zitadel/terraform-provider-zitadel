@@ -271,6 +271,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	set := map[string]interface{}{
+		// OrgID is intentionally not set here — Application v2 proto has no OrganizationId field.
+		// OrgID is preserved from Terraform config/state (set during create or import).
 		NameVar:                     app.GetName(),
 		redirectURIsVar:             oidc.GetRedirectUris(),
 		responseTypesVar:            responseTypes,
