@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/app"
+	apppb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/application/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -39,7 +39,7 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Required:    true,
-				Description: "Response type" + helper.DescriptionEnumValuesList(app.OIDCResponseType_name),
+				Description: "Response type" + helper.DescriptionEnumValuesList(apppb.OIDCResponseType_name),
 			},
 			grantTypesVar: {
 				Type: schema.TypeList,
@@ -47,25 +47,25 @@ func GetResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Required:    true,
-				Description: "Grant types" + helper.DescriptionEnumValuesList(app.OIDCGrantType_name),
+				Description: "Grant types" + helper.DescriptionEnumValuesList(apppb.OIDCGrantType_name),
 			},
 			appTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "App type" + helper.DescriptionEnumValuesList(app.OIDCAppType_name),
+				Description: "App type" + helper.DescriptionEnumValuesList(apppb.OIDCApplicationType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(appTypeVar, value, app.OIDCAppType_value)
+					return helper.EnumValueValidation(appTypeVar, value, apppb.OIDCApplicationType_value)
 				},
-				Default: app.OIDCAppType_name[0],
+				Default: apppb.OIDCApplicationType_name[0],
 			},
 			authMethodTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Auth method type" + helper.DescriptionEnumValuesList(app.OIDCAuthMethodType_name),
+				Description: "Auth method type" + helper.DescriptionEnumValuesList(apppb.OIDCAuthMethodType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(authMethodTypeVar, value, app.OIDCAuthMethodType_value)
+					return helper.EnumValueValidation(authMethodTypeVar, value, apppb.OIDCAuthMethodType_value)
 				},
-				Default: app.OIDCAuthMethodType_name[0],
+				Default: apppb.OIDCAuthMethodType_name[0],
 			},
 			postLogoutRedirectURIsVar: {
 				Type: schema.TypeList,
@@ -78,8 +78,8 @@ func GetResource() *schema.Resource {
 			versionVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Version" + helper.DescriptionEnumValuesList(app.OIDCVersion_name),
-				Default:     app.OIDCVersion_name[0],
+				Description: "Version" + helper.DescriptionEnumValuesList(apppb.OIDCVersion_name),
+				Default:     apppb.OIDCVersion_name[0],
 				ForceNew:    true,
 			},
 			devModeVar: {
@@ -90,11 +90,11 @@ func GetResource() *schema.Resource {
 			accessTokenTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Access token type" + helper.DescriptionEnumValuesList(app.OIDCTokenType_name),
+				Description: "Access token type" + helper.DescriptionEnumValuesList(apppb.OIDCTokenType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(accessTokenTypeVar, value, app.OIDCTokenType_value)
+					return helper.EnumValueValidation(accessTokenTypeVar, value, apppb.OIDCTokenType_value)
 				},
-				Default: app.OIDCTokenType_name[0],
+				Default: apppb.OIDCTokenType_name[0],
 			},
 			accessTokenRoleAssertionVar: {
 				Type:        schema.TypeBool,

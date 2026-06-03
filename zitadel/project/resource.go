@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project"
+	projectpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -46,9 +46,9 @@ func GetResource() *schema.Resource {
 			privateLabelingSettingVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Defines from where the private labeling should be triggered" + helper.DescriptionEnumValuesList(project.PrivateLabelingSetting_name),
-				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(privateLabelingSettingVar, value, project.PrivateLabelingSetting_value)
+			Description: "Defines from where the private labeling should be triggered" + helper.DescriptionEnumValuesList(projectpb.PrivateLabelingSetting_name),
+			ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+				return helper.EnumValueValidation(privateLabelingSettingVar, value, projectpb.PrivateLabelingSetting_value)
 				},
 				Default: defaultPrivateLabelingSetting,
 			},

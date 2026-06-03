@@ -2,13 +2,14 @@ package project
 
 import (
 	"context"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project"
+	filter "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/filter/v2"
+
+	projectpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -21,13 +22,13 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetProjectV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveProject(helper.CtxWithOrgID(ctx, d), &management.RemoveProjectRequest{
-		Id: d.Id(),
+	_, err = client.DeleteProject(ctx, &projectpb.DeleteProjectRequest{
+		ProjectId: d.Id(),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete project: %v", err)
@@ -43,18 +44,25 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetProjectV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.UpdateProject(helper.CtxWithOrgID(ctx, d), &management.UpdateProjectRequest{
-		Id:                     d.Id(),
-		Name:                   d.Get(NameVar).(string),
-		ProjectRoleCheck:       d.Get(roleCheckVar).(bool),
-		ProjectRoleAssertion:   d.Get(roleAssertionVar).(bool),
-		HasProjectCheck:        d.Get(hasProjectCheckVar).(bool),
-		PrivateLabelingSetting: project.PrivateLabelingSetting(project.PrivateLabelingSetting_value[d.Get(privateLabelingSettingVar).(string)]),
+	projectRoleAssertion := d.Get(roleAssertionVar).(bool)
+	authRequired := d.Get(roleCheckVar).(bool)
+	projectAccessRequired := d.Get(hasProjectCheckVar).(bool)
+	plSetting := projectpb.PrivateLabelingSetting(projectpb.PrivateLabelingSetting_value[d.Get(privateLabelingSettingVar).(string)])
+
+	name := d.Get(NameVar).(string)
+
+	_, err = client.UpdateProject(ctx, &projectpb.UpdateProjectRequest{
+		ProjectId:                d.Id(),
+		Name:                     &name,
+		ProjectRoleAssertion:     &projectRoleAssertion,
+		AuthorizationRequired:    &authRequired,
+		ProjectAccessRequired:    &projectAccessRequired,
+		PrivateLabelingSetting:   &plSetting,
 	})
 	if err != nil {
 		return diag.Errorf("failed to update project: %v", err)
@@ -71,23 +79,25 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetProjectV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	plSetting := d.Get(privateLabelingSettingVar).(string)
-	resp, err := client.AddProject(helper.CtxWithOrgID(ctx, d), &management.AddProjectRequest{
+	plSetting := projectpb.PrivateLabelingSetting(projectpb.PrivateLabelingSetting_value[d.Get(privateLabelingSettingVar).(string)])
+
+	resp, err := client.CreateProject(ctx, &projectpb.CreateProjectRequest{
+		OrganizationId:         d.Get(helper.OrgIDVar).(string),
 		Name:                   d.Get(NameVar).(string),
 		ProjectRoleAssertion:   d.Get(roleAssertionVar).(bool),
-		ProjectRoleCheck:       d.Get(roleCheckVar).(bool),
-		HasProjectCheck:        d.Get(hasProjectCheckVar).(bool),
-		PrivateLabelingSetting: project.PrivateLabelingSetting(project.PrivateLabelingSetting_value[plSetting]),
+		AuthorizationRequired:  d.Get(roleCheckVar).(bool),
+		ProjectAccessRequired:  d.Get(hasProjectCheckVar).(bool),
+		PrivateLabelingSetting: plSetting,
 	})
 	if err != nil {
 		return diag.Errorf("failed to create project: %v", err)
 	}
-	d.SetId(resp.GetId())
+	d.SetId(resp.GetProjectId())
 	return nil
 }
 
@@ -99,12 +109,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetProjectV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetProjectByID(helper.CtxWithOrgID(ctx, d), &management.GetProjectByIDRequest{Id: helper.GetID(d, ProjectIDVar)})
+	resp, err := client.GetProject(ctx, &projectpb.GetProjectRequest{ProjectId: helper.GetID(d, ProjectIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -113,22 +123,22 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get project: %v", err)
 	}
 
-	project := resp.GetProject()
+	p := resp.GetProject()
 	set := map[string]interface{}{
-		helper.OrgIDVar:           project.GetDetails().GetResourceOwner(),
-		stateVar:                  project.GetState().String(),
-		NameVar:                   project.GetName(),
-		roleAssertionVar:          project.GetProjectRoleAssertion(),
-		roleCheckVar:              project.GetProjectRoleCheck(),
-		hasProjectCheckVar:        project.GetHasProjectCheck(),
-		privateLabelingSettingVar: project.PrivateLabelingSetting.String(),
+		helper.OrgIDVar:           p.GetOrganizationId(),
+		stateVar:                  p.GetState().String(),
+		NameVar:                   p.GetName(),
+		roleAssertionVar:          p.GetProjectRoleAssertion(),
+		roleCheckVar:              p.GetAuthorizationRequired(),
+		hasProjectCheckVar:        p.GetProjectAccessRequired(),
+		privateLabelingSettingVar: p.GetPrivateLabelingSetting().String(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
 			return diag.Errorf("failed to set %s of project: %v", k, err)
 		}
 	}
-	d.SetId(project.GetId())
+	d.SetId(p.GetProjectId())
 
 	return nil
 }
@@ -141,32 +151,50 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetProjectV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	req := &management.ListProjectsRequest{}
+	req := &projectpb.ListProjectsRequest{
+		Filters: make([]*projectpb.ProjectSearchFilter, 0),
+	}
+
+	orgID := d.Get(helper.OrgIDVar).(string)
+	if orgID != "" {
+		req.Filters = append(req.Filters, &projectpb.ProjectSearchFilter{
+			Filter: &projectpb.ProjectSearchFilter_OrganizationIdFilter{
+				OrganizationIdFilter: &projectpb.ProjectOrganizationIDFilter{
+					OrganizationId: orgID,
+					Type:           projectpb.ProjectOrganizationIDFilter_OWNED,
+				},
+			},
+		})
+	}
+
 	if name != "" {
-		req.Queries = append(req.Queries,
-			&project.ProjectQuery{
-				Query: &project.ProjectQuery_NameQuery{
-					NameQuery: &project.ProjectNameQuery{
-						Name:   name,
-						Method: object.TextQueryMethod(object.TextQueryMethod_value[nameMethod]),
+		// Convert V1 text query method names to V2 filter method names
+		v2MethodStr := strings.Replace(nameMethod, "TEXT_QUERY_METHOD", "TEXT_FILTER_METHOD", 1)
+		v2Method := filter.TextFilterMethod(filter.TextFilterMethod_value[v2MethodStr])
+
+		req.Filters = append(req.Filters,
+			&projectpb.ProjectSearchFilter{
+				Filter: &projectpb.ProjectSearchFilter_ProjectNameFilter{
+					ProjectNameFilter: &projectpb.ProjectNameFilter{
+						ProjectName: name,
+						Method:      v2Method,
 					},
 				},
 			})
 	}
 
-	resp, err := client.ListProjects(helper.CtxWithOrgID(ctx, d), req)
+	resp, err := client.ListProjects(ctx, req)
 	if err != nil {
 		return diag.Errorf("error while getting project by name %s: %v", name, err)
 	}
-	ids := make([]string, len(resp.Result))
-	for i, res := range resp.Result {
-		ids[i] = res.Id
+	ids := make([]string, len(resp.GetProjects()))
+	for i, res := range resp.GetProjects() {
+		ids[i] = res.GetProjectId()
 	}
-	// If the ID is blank, the datasource is deleted and not usable.
 	d.SetId("-")
 	return diag.FromErr(d.Set(projectIDsVar, ids))
 }

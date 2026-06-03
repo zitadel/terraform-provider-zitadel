@@ -1,6 +1,6 @@
 package project
 
-import "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project"
+import projectpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project/v2"
 
 const (
 	ProjectIDVar              = "project_id"
@@ -15,5 +15,5 @@ const (
 )
 
 var (
-	defaultPrivateLabelingSetting = project.PrivateLabelingSetting_name[0]
+	defaultPrivateLabelingSetting = projectpb.PrivateLabelingSetting_name[0]
 )

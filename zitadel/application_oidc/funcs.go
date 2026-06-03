@@ -7,9 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/app"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
+	apppb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/application/v2"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -23,14 +21,14 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetAppV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.RemoveApp(helper.CtxWithOrgID(ctx, d), &management.RemoveAppRequest{
-		ProjectId: d.Get(ProjectIDVar).(string),
-		AppId:     d.Id(),
+	_, err = client.DeleteApplication(ctx, &apppb.DeleteApplicationRequest{
+		ApplicationId: d.Id(),
+		ProjectId:     d.Get(ProjectIDVar).(string),
 	})
 	if err != nil {
 		return diag.Errorf("failed to delete applicationOIDC: %v", err)
@@ -46,24 +44,19 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetAppV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	projectID := d.Get(ProjectIDVar).(string)
 
-	if d.HasChange(NameVar) {
-		_, err = client.UpdateApp(helper.CtxWithOrgID(ctx, d), &management.UpdateAppRequest{
-			ProjectId: projectID,
-			AppId:     d.Id(),
-			Name:      d.Get(NameVar).(string),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update application: %v", err)
-		}
-	}
+	// Build OIDC config update
+	oidcConfig := &apppb.UpdateOIDCApplicationConfigurationRequest{}
 
+	if d.HasChange(NameVar) {
+		// Name is on the top-level UpdateApplicationRequest, not in OIDC config
+	}
 	if d.HasChanges(
 		redirectURIsVar,
 		responseTypesVar,
@@ -82,43 +75,63 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		BackChannelLogoutURIVar,
 		LoginVersionVar,
 	) {
-		respTypes := make([]app.OIDCResponseType, 0)
+		respTypes := make([]apppb.OIDCResponseType, 0)
 		for _, respType := range d.Get(responseTypesVar).([]interface{}) {
-			respTypes = append(respTypes, app.OIDCResponseType(app.OIDCResponseType_value[respType.(string)]))
+			respTypes = append(respTypes, apppb.OIDCResponseType(apppb.OIDCResponseType_value[respType.(string)]))
 		}
-		grantTypes := make([]app.OIDCGrantType, 0)
+		grantTypes := make([]apppb.OIDCGrantType, 0)
 		for _, grantType := range d.Get(grantTypesVar).([]interface{}) {
-			grantTypes = append(grantTypes, app.OIDCGrantType(app.OIDCGrantType_value[grantType.(string)]))
+			grantTypes = append(grantTypes, apppb.OIDCGrantType(apppb.OIDCGrantType_value[grantType.(string)]))
 		}
 		dur, err := time.ParseDuration(d.Get(clockSkewVar).(string))
 		if err != nil {
 			return diag.FromErr(err)
 		}
 
-		_, err = client.UpdateOIDCAppConfig(helper.CtxWithOrgID(ctx, d), &management.UpdateOIDCAppConfigRequest{
-			ProjectId:                projectID,
-			AppId:                    d.Id(),
+		appType := apppb.OIDCApplicationType(apppb.OIDCApplicationType_value[d.Get(appTypeVar).(string)])
+		authType := apppb.OIDCAuthMethodType(apppb.OIDCAuthMethodType_value[d.Get(authMethodTypeVar).(string)])
+		accessTokenType := apppb.OIDCTokenType(apppb.OIDCTokenType_value[d.Get(accessTokenTypeVar).(string)])
+		accessTokenRoleAssertion := d.Get(accessTokenRoleAssertionVar).(bool)
+		idTokenRoleAssertion := d.Get(idTokenRoleAssertionVar).(bool)
+		idTokenUserinfoAssertion := d.Get(idTokenUserinfoAssertionVar).(bool)
+		skipNative := d.Get(skipNativeAppSuccessPageVar).(bool)
+
+		oidcConfig = &apppb.UpdateOIDCApplicationConfigurationRequest{
 			RedirectUris:             interfaceToStringSlice(d.Get(redirectURIsVar)),
 			ResponseTypes:            respTypes,
 			GrantTypes:               grantTypes,
-			AppType:                  app.OIDCAppType(app.OIDCAppType_value[d.Get(appTypeVar).(string)]),
-			AuthMethodType:           app.OIDCAuthMethodType(app.OIDCAuthMethodType_value[d.Get(authMethodTypeVar).(string)]),
+			ApplicationType:          &appType,
+			AuthMethodType:           &authType,
 			PostLogoutRedirectUris:   interfaceToStringSlice(d.Get(postLogoutRedirectURIsVar)),
-			DevMode:                  d.Get(devModeVar).(bool),
-			AccessTokenType:          app.OIDCTokenType(app.OIDCTokenType_value[d.Get(accessTokenTypeVar).(string)]),
-			AccessTokenRoleAssertion: d.Get(accessTokenRoleAssertionVar).(bool),
-			IdTokenRoleAssertion:     d.Get(idTokenRoleAssertionVar).(bool),
-			IdTokenUserinfoAssertion: d.Get(idTokenUserinfoAssertionVar).(bool),
+			AccessTokenType:          &accessTokenType,
+			AccessTokenRoleAssertion: &accessTokenRoleAssertion,
+			IdTokenRoleAssertion:     &idTokenRoleAssertion,
+			IdTokenUserinfoAssertion: &idTokenUserinfoAssertion,
 			AdditionalOrigins:        interfaceToStringSlice(d.Get(additionalOriginsVar)),
 			ClockSkew:                durationpb.New(dur),
-			SkipNativeAppSuccessPage: d.Get(skipNativeAppSuccessPageVar).(bool),
-			BackChannelLogoutUri:     d.Get(BackChannelLogoutURIVar).(string),
+			SkipNativeAppSuccessPage: &skipNative,
 			LoginVersion:             getLoginVersion(d),
-		})
-		if err != nil {
-			return diag.Errorf("failed to update applicationOIDC: %v", err)
+		}
+		val := d.Get(BackChannelLogoutURIVar).(string)
+		if val != "" {
+			oidcConfig.BackChannelLogoutUri = &val
 		}
 	}
+
+	name := d.Get(NameVar).(string)
+
+	_, err = client.UpdateApplication(ctx, &apppb.UpdateApplicationRequest{
+		ApplicationId: d.Id(),
+		ProjectId:     projectID,
+		Name:          name,
+		ApplicationType: &apppb.UpdateApplicationRequest_OidcConfiguration{
+			OidcConfiguration: oidcConfig,
+		},
+	})
+	if err != nil {
+		return diag.Errorf("failed to update applicationOIDC: %v", err)
+	}
+
 	return nil
 }
 
@@ -130,18 +143,18 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetAppV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	respTypes := make([]app.OIDCResponseType, 0)
+	respTypes := make([]apppb.OIDCResponseType, 0)
 	for _, respType := range d.Get(responseTypesVar).([]interface{}) {
-		respTypes = append(respTypes, app.OIDCResponseType(app.OIDCResponseType_value[respType.(string)]))
+		respTypes = append(respTypes, apppb.OIDCResponseType(apppb.OIDCResponseType_value[respType.(string)]))
 	}
-	grantTypes := make([]app.OIDCGrantType, 0)
+	grantTypes := make([]apppb.OIDCGrantType, 0)
 	for _, grantType := range d.Get(grantTypesVar).([]interface{}) {
-		grantTypes = append(grantTypes, app.OIDCGrantType(app.OIDCGrantType_value[grantType.(string)]))
+		grantTypes = append(grantTypes, apppb.OIDCGrantType(apppb.OIDCGrantType_value[grantType.(string)]))
 	}
 
 	dur, err := time.ParseDuration(d.Get(clockSkewVar).(string))
@@ -149,34 +162,39 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.AddOIDCApp(helper.CtxWithOrgID(ctx, d), &management.AddOIDCAppRequest{
-		ProjectId:                d.Get(ProjectIDVar).(string),
-		Name:                     d.Get(NameVar).(string),
-		RedirectUris:             interfaceToStringSlice(d.Get(redirectURIsVar)),
-		ResponseTypes:            respTypes,
-		GrantTypes:               grantTypes,
-		AppType:                  app.OIDCAppType(app.OIDCAppType_value[(d.Get(appTypeVar).(string))]),
-		AuthMethodType:           app.OIDCAuthMethodType(app.OIDCAuthMethodType_value[(d.Get(authMethodTypeVar).(string))]),
-		PostLogoutRedirectUris:   interfaceToStringSlice(d.Get(postLogoutRedirectURIsVar)),
-		DevMode:                  d.Get(devModeVar).(bool),
-		AccessTokenType:          app.OIDCTokenType(app.OIDCTokenType_value[(d.Get(accessTokenTypeVar).(string))]),
-		AccessTokenRoleAssertion: d.Get(accessTokenRoleAssertionVar).(bool),
-		IdTokenRoleAssertion:     d.Get(idTokenRoleAssertionVar).(bool),
-		IdTokenUserinfoAssertion: d.Get(idTokenUserinfoAssertionVar).(bool),
-		ClockSkew:                durationpb.New(dur),
-		AdditionalOrigins:        interfaceToStringSlice(d.Get(additionalOriginsVar)),
-		Version:                  app.OIDCVersion(app.OIDCVersion_value[d.Get(versionVar).(string)]),
-		SkipNativeAppSuccessPage: d.Get(skipNativeAppSuccessPageVar).(bool),
-		BackChannelLogoutUri:     d.Get(BackChannelLogoutURIVar).(string),
-		LoginVersion:             getLoginVersion(d),
+	resp, err := client.CreateApplication(ctx, &apppb.CreateApplicationRequest{
+		ProjectId: d.Get(ProjectIDVar).(string),
+		Name:      d.Get(NameVar).(string),
+		ApplicationType: &apppb.CreateApplicationRequest_OidcConfiguration{
+			OidcConfiguration: &apppb.CreateOIDCApplicationRequest{
+				RedirectUris:             interfaceToStringSlice(d.Get(redirectURIsVar)),
+				ResponseTypes:            respTypes,
+				GrantTypes:               grantTypes,
+				ApplicationType:          apppb.OIDCApplicationType(apppb.OIDCApplicationType_value[(d.Get(appTypeVar).(string))]),
+				AuthMethodType:           apppb.OIDCAuthMethodType(apppb.OIDCAuthMethodType_value[(d.Get(authMethodTypeVar).(string))]),
+				PostLogoutRedirectUris:   interfaceToStringSlice(d.Get(postLogoutRedirectURIsVar)),
+				Version:                  apppb.OIDCVersion(apppb.OIDCVersion_value[d.Get(versionVar).(string)]),
+				DevelopmentMode:          d.Get(devModeVar).(bool),
+				AccessTokenType:          apppb.OIDCTokenType(apppb.OIDCTokenType_value[(d.Get(accessTokenTypeVar).(string))]),
+				AccessTokenRoleAssertion: d.Get(accessTokenRoleAssertionVar).(bool),
+				IdTokenRoleAssertion:     d.Get(idTokenRoleAssertionVar).(bool),
+				IdTokenUserinfoAssertion: d.Get(idTokenUserinfoAssertionVar).(bool),
+				ClockSkew:                durationpb.New(dur),
+				AdditionalOrigins:        interfaceToStringSlice(d.Get(additionalOriginsVar)),
+				SkipNativeAppSuccessPage: d.Get(skipNativeAppSuccessPageVar).(bool),
+				BackChannelLogoutUri:     d.Get(BackChannelLogoutURIVar).(string),
+				LoginVersion:             getLoginVersion(d),
+			},
+		},
 	})
 	if err != nil {
 		return diag.Errorf("failed to create applicationOIDC: %v", err)
 	}
 
+	oidcConfig := resp.GetOidcConfiguration()
 	set := map[string]interface{}{
-		ClientIDVar:     resp.GetClientId(),
-		ClientSecretVar: resp.GetClientSecret(),
+		ClientIDVar:     oidcConfig.GetClientId(),
+		ClientSecretVar: oidcConfig.GetClientSecret(),
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
@@ -184,7 +202,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	d.SetId(resp.GetAppId())
+	d.SetId(resp.GetApplicationId())
 	return read(ctx, d, m)
 }
 
@@ -196,12 +214,12 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get client")
 	}
 
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetAppV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetAppByID(helper.CtxWithOrgID(ctx, d), &management.GetAppByIDRequest{ProjectId: d.Get(ProjectIDVar).(string), AppId: helper.GetID(d, AppIDVar)})
+	resp, err := client.GetApplication(ctx, &apppb.GetApplicationRequest{ApplicationId: helper.GetID(d, AppIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -210,8 +228,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get application oidc: %v", err)
 	}
 
-	oidcApp := resp.GetApp()
-	oidc := oidcApp.GetOidcConfig()
+	app := resp.GetApplication()
+	oidc := app.GetOidcConfiguration()
 	grantTypes := make([]string, 0)
 	for _, grantType := range oidc.GetGrantTypes() {
 		grantTypes = append(grantTypes, grantType.String())
@@ -236,18 +254,16 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	loginVersion := []interface{}{}
 	if oidc.GetLoginVersion() != nil {
 		switch oidc.GetLoginVersion().GetVersion().(type) {
-		case *app.LoginVersion_LoginV1:
+		case *apppb.LoginVersion_LoginV1:
 			loginVersion = append(loginVersion, map[string]interface{}{
 				LoginV1Var: true,
 			})
-		case *app.LoginVersion_LoginV2:
+		case *apppb.LoginVersion_LoginV2:
 			v2 := oidc.GetLoginVersion().GetLoginV2()
 			v2Map := map[string]interface{}{}
-
 			if baseUri := v2.GetBaseUri(); baseUri != "" {
 				v2Map[BaseURIVar] = baseUri
 			}
-
 			loginVersion = append(loginVersion, map[string]interface{}{
 				LoginV2Var: []interface{}{v2Map},
 			})
@@ -255,16 +271,15 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	set := map[string]interface{}{
-		helper.OrgIDVar:             oidcApp.GetDetails().GetResourceOwner(),
-		NameVar:                     oidcApp.GetName(),
+		NameVar:                     app.GetName(),
 		redirectURIsVar:             oidc.GetRedirectUris(),
 		responseTypesVar:            responseTypes,
 		grantTypesVar:               grantTypes,
-		appTypeVar:                  oidc.GetAppType().String(),
+		appTypeVar:                  oidc.GetApplicationType().String(),
 		authMethodTypeVar:           oidc.GetAuthMethodType().String(),
 		postLogoutRedirectURIsVar:   oidc.GetPostLogoutRedirectUris(),
 		versionVar:                  oidc.GetVersion().String(),
-		devModeVar:                  oidc.GetDevMode(),
+		devModeVar:                  oidc.GetDevelopmentMode(),
 		accessTokenTypeVar:          oidc.GetAccessTokenType().String(),
 		accessTokenRoleAssertionVar: oidc.GetAccessTokenRoleAssertion(),
 		idTokenRoleAssertionVar:     oidc.GetIdTokenRoleAssertion(),
@@ -273,12 +288,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		additionalOriginsVar:        oidc.GetAdditionalOrigins(),
 		ClientIDVar:                 oidc.GetClientId(),
 		skipNativeAppSuccessPageVar: oidc.GetSkipNativeAppSuccessPage(),
-		NoneCompliantVar:            oidc.GetNoneCompliant(),
+		NoneCompliantVar:            oidc.GetNonCompliant(),
 		ComplianceProblemsVar:       complianceProblems,
 		BackChannelLogoutURIVar:     oidc.GetBackChannelLogoutUri(),
 	}
 
-	// Only set login_version if it has content
 	if len(loginVersion) > 0 {
 		set[LoginVersionVar] = loginVersion
 	}
@@ -288,7 +302,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			return diag.Errorf("failed to set %s of applicationOIDC: %v", k, err)
 		}
 	}
-	d.SetId(oidcApp.GetId())
+	d.SetId(app.GetApplicationId())
 	return nil
 }
 
@@ -301,7 +315,7 @@ func interfaceToStringSlice(in interface{}) []string {
 	return ret
 }
 
-func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
+func getLoginVersion(d *schema.ResourceData) *apppb.LoginVersion {
 	v, ok := d.GetOk(LoginVersionVar)
 	if !ok {
 		return nil
@@ -319,9 +333,9 @@ func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
 	item := list[0].(map[string]interface{})
 
 	if loginV1, ok := item[LoginV1Var]; ok && loginV1.(bool) {
-		return &app.LoginVersion{
-			Version: &app.LoginVersion_LoginV1{
-				LoginV1: &app.LoginV1{},
+		return &apppb.LoginVersion{
+			Version: &apppb.LoginVersion_LoginV1{
+				LoginV1: &apppb.LoginV1{},
 			},
 		}
 	}
@@ -329,7 +343,6 @@ func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
 	if v2, ok := item[LoginV2Var]; ok && v2 != nil {
 		v2List := v2.([]interface{})
 		if len(v2List) > 0 {
-			// Add nil check HERE before type assertion
 			if v2List[0] == nil {
 				return nil
 			}
@@ -339,9 +352,9 @@ func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
 				uriStr := baseURI.(string)
 				uri = &uriStr
 			}
-			return &app.LoginVersion{
-				Version: &app.LoginVersion_LoginV2{
-					LoginV2: &app.LoginV2{
+			return &apppb.LoginVersion{
+				Version: &apppb.LoginVersion_LoginV2{
+					LoginV2: &apppb.LoginV2{
 						BaseUri: uri,
 					},
 				},
@@ -355,39 +368,50 @@ func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started list")
 	name := d.Get(NameVar).(string)
-	nameMethod := d.Get(nameMethodVar).(string)
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	client, err := helper.GetManagementClient(ctx, clientinfo)
+	client, err := helper.GetAppV2Client(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	req := &management.ListAppsRequest{
-		ProjectId: d.Get(ProjectIDVar).(string),
-	}
-	if name != "" {
-		req.Queries = append(req.Queries,
-			&app.AppQuery{
-				Query: &app.AppQuery_NameQuery{
-					NameQuery: &app.AppNameQuery{
-						Name:   name,
-						Method: object.TextQueryMethod(object.TextQueryMethod_value[nameMethod]),
-					},
+	projectID := d.Get(ProjectIDVar).(string)
+
+	filters := make([]*apppb.ApplicationSearchFilter, 0)
+
+	if projectID != "" {
+		filters = append(filters, &apppb.ApplicationSearchFilter{
+			Filter: &apppb.ApplicationSearchFilter_ProjectIdFilter{
+				ProjectIdFilter: &apppb.ProjectIDFilter{
+					ProjectId: projectID,
 				},
-			})
+			},
+		})
 	}
-	resp, err := client.ListApps(helper.CtxWithOrgID(ctx, d), req)
+
+	if name != "" {
+		filters = append(filters, &apppb.ApplicationSearchFilter{
+			Filter: &apppb.ApplicationSearchFilter_NameFilter{
+				NameFilter: &apppb.ApplicationNameFilter{
+					Name: name,
+				},
+			},
+		})
+	}
+
+	resp, err := client.ListApplications(ctx, &apppb.ListApplicationsRequest{
+		Filters: filters,
+	})
 	if err != nil {
 		return diag.Errorf("error while getting app by name %s: %v", name, err)
 	}
-	ids := make([]string, len(resp.Result))
-	for i, res := range resp.Result {
-		if res.GetOidcConfig() == nil {
+	ids := make([]string, 0)
+	for _, res := range resp.GetApplications() {
+		if res.GetOidcConfiguration() == nil {
 			continue
 		}
-		ids[i] = res.Id
+		ids = append(ids, res.GetApplicationId())
 	}
 	d.SetId("-")
 	return diag.FromErr(d.Set(appIDsVar, ids))
