@@ -44,7 +44,7 @@ resource "zitadel_application_oidc" "default" {
 - `name` (String) Name of the application
 - `project_id` (String) ID of the project
 - `redirect_uris` (List of String) RedirectURIs
-- `response_types` (List of String) Response type, supported values: OIDC_RESPONSE_TYPE_CODE, OIDC_RESPONSE_TYPE_ID_TOKEN, OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN
+- `response_types` (List of String) Response type, supported values: OIDC_RESPONSE_TYPE_UNSPECIFIED, OIDC_RESPONSE_TYPE_CODE, OIDC_RESPONSE_TYPE_ID_TOKEN, OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN
 
 ### Optional
 

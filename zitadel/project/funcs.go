@@ -8,7 +8,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	filter "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/filter/v2"
-
 	projectpb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/project/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -57,12 +56,12 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	name := d.Get(NameVar).(string)
 
 	_, err = client.UpdateProject(ctx, &projectpb.UpdateProjectRequest{
-		ProjectId:                d.Id(),
-		Name:                     &name,
-		ProjectRoleAssertion:     &projectRoleAssertion,
-		AuthorizationRequired:    &authRequired,
-		ProjectAccessRequired:    &projectAccessRequired,
-		PrivateLabelingSetting:   &plSetting,
+		ProjectId:              d.Id(),
+		Name:                   &name,
+		ProjectRoleAssertion:   &projectRoleAssertion,
+		AuthorizationRequired:  &authRequired,
+		ProjectAccessRequired:  &projectAccessRequired,
+		PrivateLabelingSetting: &plSetting,
 	})
 	if err != nil {
 		return diag.Errorf("failed to update project: %v", err)
