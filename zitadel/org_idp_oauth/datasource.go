@@ -16,7 +16,6 @@ func GetDatasource() *schema.Resource {
 			helper.OrgIDVar:                    helper.OrgIDDatasourceField,
 			idp_utils.NameVar:                  idp_utils.NameDataSourceField,
 			idp_utils.ClientIDVar:              idp_utils.ClientIDDataSourceField,
-			idp_utils.ClientSecretVar:          idp_utils.ClientSecretDataSourceField,
 			idp_oauth.AuthorizationEndpointVar: idp_oauth.AuthorizationEndpointDatasourceField,
 			idp_oauth.TokenEndpointVar:         idp_oauth.TokenEndpointDatasourceField,
 			idp_oauth.UserEndpointVar:          idp_oauth.UserEndpointDatasourceField,
