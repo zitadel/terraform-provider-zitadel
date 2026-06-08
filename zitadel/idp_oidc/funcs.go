@@ -23,7 +23,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	resp, err := client.AddGenericOIDCProvider(ctx, &admin.AddGenericOIDCProviderRequest{
 		Name:             idp_utils.StringValue(d, idp_utils.NameVar),
 		ClientId:         idp_utils.StringValue(d, idp_utils.ClientIDVar),
-		ClientSecret:     idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		ClientSecret:     idp_utils.WriteOnlyStringValue(d, idp_utils.ClientSecretVar),
 		Scopes:           idp_utils.ScopesValue(d),
 		ProviderOptions:  idp_utils.ProviderOptionsValue(d),
 		Issuer:           idp_utils.StringValue(d, IssuerVar),
@@ -51,7 +51,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Name:             idp_utils.StringValue(d, idp_utils.NameVar),
 		Issuer:           idp_utils.StringValue(d, IssuerVar),
 		ClientId:         idp_utils.StringValue(d, idp_utils.ClientIDVar),
-		ClientSecret:     idp_utils.StringValue(d, idp_utils.ClientSecretVar),
+		ClientSecret:     idp_utils.WriteOnlyStringValue(d, idp_utils.ClientSecretVar),
 		Scopes:           idp_utils.ScopesValue(d),
 		ProviderOptions:  idp_utils.ProviderOptionsValue(d),
 		IsIdTokenMapping: idp_utils.BoolValue(d, IsIdTokenMappingVar),
@@ -87,7 +87,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	set := map[string]interface{}{
 		idp_utils.NameVar:              idp.GetName(),
 		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
-		idp_utils.ClientSecretVar:      idp_utils.StringValue(d, idp_utils.ClientSecretVar),
 		idp_utils.ScopesVar:            specificCfg.GetScopes(),
 		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
 		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),

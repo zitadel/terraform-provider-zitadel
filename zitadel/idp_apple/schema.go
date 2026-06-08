@@ -3,9 +3,10 @@ package idp_apple
 import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 const (
-	TeamIDVar     = "team_id"
-	KeyIDVar      = "key_id"
-	PrivateKeyVar = "private_key"
+	TeamIDVar         = "team_id"
+	KeyIDVar          = "key_id"
+	PrivateKeyVar     = "private_key"
+	PrivateKeyHashVar = "private_key_hash"
 )
 
 var (
@@ -32,13 +33,14 @@ var (
 	PrivateKeyResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Required:    true,
-		Description: "Apple Private Key from your Apple Developer Account",
+		Description: "Apple Private Key from your Apple Developer Account. This value is write-only and is never stored in Terraform state; it cannot be read back or retrieved from a datasource.",
 		Sensitive:   true,
+		WriteOnly:   true,
 	}
-	PrivateKeyDataSourceField = &schema.Schema{
+	PrivateKeyHashResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Computed:    true,
-		Description: "Apple Private Key from your Apple Developer Account",
 		Sensitive:   true,
+		Description: "A non-reversible hash of the write-only private_key, used to detect when it changes. It does not contain the key itself.",
 	}
 )

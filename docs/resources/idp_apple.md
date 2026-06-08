@@ -38,7 +38,7 @@ resource "zitadel_idp_apple" "default" {
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account
 - `is_linking_allowed` (Boolean) enable if users should be able to link an existing ZITADEL user with an external account
 - `key_id` (String) Apple Key ID from your Apple Developer Account
-- `private_key` (String, Sensitive) Apple Private Key from your Apple Developer Account
+- `private_key` (String, Sensitive) Apple Private Key from your Apple Developer Account. This value is write-only and is never stored in Terraform state; it cannot be read back or retrieved from a datasource.
 - `team_id` (String) Apple Team ID from your Apple Developer Account
 
 ### Optional
@@ -50,6 +50,7 @@ resource "zitadel_idp_apple" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `private_key_hash` (String, Sensitive) A non-reversible hash of the write-only private_key, used to detect when it changes. It does not contain the key itself.
 
 ## Import
 

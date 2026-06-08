@@ -25,7 +25,6 @@ func GetDatasource() *schema.Resource {
 			idp_ldap.StartTLSVar:          idp_ldap.StartTLSDataSourceField,
 			idp_ldap.BaseDNVar:            idp_ldap.BaseDNDataSourceField,
 			idp_ldap.BindDNVar:            idp_ldap.BindDNDataSourceField,
-			idp_ldap.BindPasswordVar:      idp_ldap.BindPasswordDataSourceField,
 			idp_ldap.UserBaseVar:          idp_ldap.UserBaseDataSourceField,
 			idp_ldap.UserObjectClassesVar: idp_ldap.UserObjectClassesDataSourceField,
 			idp_ldap.UserFiltersVar:       idp_ldap.UserFiltersDataSourceField,

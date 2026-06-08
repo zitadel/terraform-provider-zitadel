@@ -12,6 +12,7 @@ const (
 	BaseDNVar            = "base_dn"
 	BindDNVar            = "bind_dn"
 	BindPasswordVar      = "bind_password"
+	BindPasswordHashVar  = "bind_password_hash"
 	UserBaseVar          = "user_base"
 	UserObjectClassesVar = "user_object_classes"
 	UserFiltersVar       = "user_filters"
@@ -83,14 +84,15 @@ var (
 	BindPasswordResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Required:    true,
-		Description: "Bind password for LDAP connections",
+		Description: "Bind password for LDAP connections. This value is write-only and is never stored in Terraform state; it cannot be read back or retrieved from a datasource.",
 		Sensitive:   true,
+		WriteOnly:   true,
 	}
-	BindPasswordDataSourceField = &schema.Schema{
+	BindPasswordHashResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Computed:    true,
-		Description: "Bind password for LDAP connections",
 		Sensitive:   true,
+		Description: "A non-reversible hash of the write-only bind_password, used to detect when the password changes. It does not contain the password itself.",
 	}
 	UserBaseResourceField = &schema.Schema{
 		Type:        schema.TypeString,

@@ -110,20 +110,18 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		humanUser.Phone = phoneReq
 	}
 
-	if password, ok := d.GetOk(InitialPasswordVar); ok {
-		pwd := password.(string)
+	if password := helper.WriteOnlyStringValue(d, InitialPasswordVar); password != "" {
 		changeReq := !d.Get(initialSkipPasswordChange).(bool)
 		humanUser.PasswordType = &userv2.CreateUserRequest_Human_Password{
 			Password: &userv2.Password{
-				Password:       pwd,
+				Password:       password,
 				ChangeRequired: changeReq,
 			},
 		}
-	} else if hashedPassword, ok := d.GetOk(initialHashedPasswordVar); ok {
-		hash := hashedPassword.(string)
+	} else if hashedPassword := helper.WriteOnlyStringValue(d, InitialHashedPasswordVar); hashedPassword != "" {
 		humanUser.PasswordType = &userv2.CreateUserRequest_Human_HashedPassword{
 			HashedPassword: &userv2.HashedPassword{
-				Hash: hash,
+				Hash: hashedPassword,
 			},
 		}
 	}
@@ -142,8 +140,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		humanUser.IdpLinks = idpLinks
 	}
 
-	if v, ok := d.GetOk(totpSecretVar); ok && v.(string) != "" {
-		secret := v.(string)
+	if secret := helper.WriteOnlyStringValue(d, TotpSecretVar); secret != "" {
 		humanUser.TotpSecret = &secret
 	}
 

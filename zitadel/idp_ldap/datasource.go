@@ -22,7 +22,6 @@ func GetDatasource() *schema.Resource {
 			StartTLSVar:          StartTLSDataSourceField,
 			BaseDNVar:            BaseDNDataSourceField,
 			BindDNVar:            BindDNDataSourceField,
-			BindPasswordVar:      BindPasswordDataSourceField,
 			UserBaseVar:          UserBaseDataSourceField,
 			UserObjectClassesVar: UserObjectClassesDataSourceField,
 			UserFiltersVar:       UserFiltersDataSourceField,

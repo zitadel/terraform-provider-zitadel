@@ -37,7 +37,7 @@ resource "zitadel_email_provider_smtp" "default" {
 ### Optional
 
 - `description` (String) Description of the email provider.
-- `password` (String, Sensitive) Password used to communicate with your SMTP server.
+- `password` (String, Sensitive) Password used to communicate with your SMTP server. This value is write-only and is never stored in Terraform state; it cannot be read back.
 - `reply_to_address` (String) Address to reply to.
 - `set_active` (Boolean) Set the email provider as active after creating/updating.
 - `tls` (Boolean) TLS used to communicate with your SMTP server.
@@ -46,6 +46,7 @@ resource "zitadel_email_provider_smtp" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `password_hash` (String, Sensitive) A non-reversible hash of the write-only password, used to detect when it changes. It does not contain the secret itself.
 
 ## Import
 

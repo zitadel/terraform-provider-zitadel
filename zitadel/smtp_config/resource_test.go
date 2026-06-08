@@ -40,8 +40,11 @@ func TestAccSMTPConfig(t *testing.T) {
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, smtp_config.PasswordVar),
 		),
+		// The password is write-only: it is never persisted to state, so it
+		// cannot be sourced from state for the import ID, nor verified after
+		// import. Its companion hash attribute is likewise absent after import.
+		smtp_config.PasswordVar, "password_hash",
 	)
 }
 

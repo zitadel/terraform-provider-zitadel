@@ -1,6 +1,8 @@
 package idp_ldap
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -23,6 +25,7 @@ func GetResource() *schema.Resource {
 			BaseDNVar:            BaseDNResourceField,
 			BindDNVar:            BindDNResourceField,
 			BindPasswordVar:      BindPasswordResourceField,
+			BindPasswordHashVar:  BindPasswordHashResourceField,
 			UserBaseVar:          UserBaseResourceField,
 			UserObjectClassesVar: UserObjectClassesResourceField,
 			UserFiltersVar:       UserFiltersResourceField,
@@ -47,6 +50,9 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: idp_utils.Delete,
-		Importer:      helper.ImportWithIDAndOptionalSecret(idp_utils.IdpIDVar, BindPasswordVar),
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			return helper.WriteOnlyHashDiff(d, BindPasswordVar, BindPasswordHashVar)
+		},
+		Importer: helper.ImportWithIDAndOptionalSecret(idp_utils.IdpIDVar, BindPasswordVar),
 	}
 }

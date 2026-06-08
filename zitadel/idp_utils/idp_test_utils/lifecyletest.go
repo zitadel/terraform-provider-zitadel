@@ -19,12 +19,16 @@ func RunInstanceIDPLifecyleTest(t *testing.T, resourceName, secretAttribute stri
 	resourceExample = strings.Replace(resourceExample, nameProperty, frame.UniqueResourcesID, 1)
 	exampleProperty := test_utils.AttributeValue(t, idp_utils.IsCreationAllowedVar, exampleAttributes).True()
 	exampleSecret := ""
+	var importStateVerifyIgnore []string
 	importParts := []resource.ImportStateIdFunc{
 		test_utils.ImportResourceId(frame.BaseTestFrame),
 	}
 	if secretAttribute != "" {
 		exampleSecret = test_utils.AttributeValue(t, secretAttribute, exampleAttributes).AsString()
-		importParts = append(importParts, test_utils.ImportStateAttribute(frame.BaseTestFrame, secretAttribute))
+		// The secret is write-only: it is never persisted to state, so it cannot
+		// be sourced from state for the import ID, nor verified after import. Its
+		// companion hash attribute is likewise absent immediately after import.
+		importStateVerifyIgnore = []string{secretAttribute, secretAttribute + "_hash"}
 	}
 	test_utils.RunLifecyleTest(
 		t,
@@ -38,5 +42,6 @@ func RunInstanceIDPLifecyleTest(t *testing.T, resourceName, secretAttribute stri
 		helper.ZitadelGeneratedIdOnlyRegex,
 		CheckDestroy(*frame),
 		test_utils.ChainImportStateIdFuncs(importParts...),
+		importStateVerifyIgnore...,
 	)
 }

@@ -31,8 +31,11 @@ func TestAccSMSProviderTwilio(t *testing.T) {
 		test_utils.CheckNothing,
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, sms_provider_twilio.TokenVar),
 		),
+		// The token is write-only: it is never persisted to state, so it cannot
+		// be sourced from state for the import ID, nor verified after import. Its
+		// companion hash attribute is likewise absent after import.
+		sms_provider_twilio.TokenVar, "token_hash",
 	)
 }
 

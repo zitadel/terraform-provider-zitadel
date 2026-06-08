@@ -29,7 +29,7 @@ resource "zitadel_sms_provider_twilio" "default" {
 
 - `sender_number` (String) Sender number which is used to send the SMS.
 - `sid` (String) SID used to communicate with Twilio.
-- `token` (String, Sensitive) Token used to communicate with Twilio.
+- `token` (String, Sensitive) Token used to communicate with Twilio. This value is write-only and is never stored in Terraform state; it cannot be read back.
 
 ### Optional
 
@@ -40,6 +40,7 @@ resource "zitadel_sms_provider_twilio" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `token_hash` (String, Sensitive) A non-reversible hash of the write-only token, used to detect when it changes. It does not contain the secret itself.
 
 ## Import
 

@@ -24,13 +24,16 @@ func TestAccEmailSMTPProvider(t *testing.T) {
 	exampleProperty := test_utils.AttributeValue(t, email_provider_smtp.SenderNameVar, exampleAttributes).AsString()
 	updatedProperty := "updatedProperty"
 
+	exampleSecret := test_utils.AttributeValue(t, email_provider_smtp.PasswordVar, exampleAttributes).AsString()
+	updatedSecret := "updatedSecret"
+
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		nil,
-		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
 		exampleProperty, updatedProperty,
-		"", "", "",
+		email_provider_smtp.PasswordVar, exampleSecret, updatedSecret,
 		false,
 		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,
@@ -38,7 +41,10 @@ func TestAccEmailSMTPProvider(t *testing.T) {
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 		),
-		"password", "set_active",
+		// The password is write-only: it is never persisted to state, so it
+		// cannot be sourced from state for the import ID, nor verified after
+		// import. Its companion hash attribute is likewise absent after import.
+		email_provider_smtp.PasswordVar, "password_hash", "set_active",
 	)
 }
 

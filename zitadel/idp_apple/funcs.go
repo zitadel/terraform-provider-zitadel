@@ -25,7 +25,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
 		TeamId:          idp_utils.StringValue(d, TeamIDVar),
 		KeyId:           idp_utils.StringValue(d, KeyIDVar),
-		PrivateKey:      []byte(idp_utils.StringValue(d, PrivateKeyVar)),
+		PrivateKey:      []byte(helper.WriteOnlyStringValue(d, PrivateKeyVar)),
 		Scopes:          idp_utils.ScopesValue(d),
 		ProviderOptions: idp_utils.ProviderOptionsValue(d),
 	})
@@ -51,7 +51,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
 		TeamId:          idp_utils.StringValue(d, TeamIDVar),
 		KeyId:           idp_utils.StringValue(d, KeyIDVar),
-		PrivateKey:      []byte(idp_utils.StringValue(d, PrivateKeyVar)),
+		PrivateKey:      []byte(helper.WriteOnlyStringValue(d, PrivateKeyVar)),
 		Scopes:          idp_utils.ScopesValue(d),
 		ProviderOptions: idp_utils.ProviderOptionsValue(d),
 	})
@@ -87,7 +87,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		idp_utils.ClientIDVar:          specificCfg.GetClientId(),
 		TeamIDVar:                      specificCfg.GetTeamId(),
 		KeyIDVar:                       specificCfg.GetKeyId(),
-		PrivateKeyVar:                  idp_utils.StringValue(d, PrivateKeyVar),
 		idp_utils.ScopesVar:            specificCfg.GetScopes(),
 		idp_utils.IsLinkingAllowedVar:  generalCfg.GetIsLinkingAllowed(),
 		idp_utils.IsCreationAllowedVar: generalCfg.GetIsCreationAllowed(),

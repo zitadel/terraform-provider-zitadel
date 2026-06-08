@@ -31,6 +31,19 @@ func StringValue(d *schema.ResourceData, attributeVar string) string {
 	return d.Get(attributeVar).(string)
 }
 
+// WriteOnlyStringValue reads a write-only attribute from the raw config. See
+// helper.WriteOnlyStringValue.
+func WriteOnlyStringValue(d *schema.ResourceData, attributeVar string) string {
+	return helper.WriteOnlyStringValue(d, attributeVar)
+}
+
+// ClientSecretHashDiff keeps the computed client_secret_hash attribute in sync
+// with the write-only client_secret, so that rotating the secret is detected as
+// a normal diff without the practitioner having to manage a version field.
+func ClientSecretHashDiff(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+	return helper.WriteOnlyHashDiff(d, ClientSecretVar, ClientSecretHashVar)
+}
+
 func BoolValue(d *schema.ResourceData, attributeVar string) bool {
 	return d.Get(attributeVar).(bool)
 }

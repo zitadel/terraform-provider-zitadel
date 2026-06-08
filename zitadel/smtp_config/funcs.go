@@ -52,7 +52,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Host:           d.Get(hostVar).(string),
 		User:           d.Get(userVar).(string),
 		Tls:            d.Get(tlsVar).(bool),
-		Password:       d.Get(PasswordVar).(string),
+		Password:       helper.WriteOnlyStringValue(d, PasswordVar),
 		ReplyToAddress: d.Get(replyToAddressVar).(string),
 		Description:    d.Get(DescriptionVar).(string),
 	}
@@ -85,7 +85,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar, replyToAddressVar, PasswordVar, DescriptionVar) {
+	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar, replyToAddressVar, "password_hash", DescriptionVar) {
 		_, err = client.UpdateSMTPConfig(ctx, &admin.UpdateSMTPConfigRequest{
 			Id:             d.Id(),
 			SenderAddress:  d.Get(SenderAddressVar).(string),
@@ -94,7 +94,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			Tls:            d.Get(tlsVar).(bool),
 			User:           d.Get(userVar).(string),
 			ReplyToAddress: d.Get(replyToAddressVar).(string),
-			Password:       d.Get(PasswordVar).(string),
+			Password:       helper.WriteOnlyStringValue(d, PasswordVar),
 			Description:    d.Get(DescriptionVar).(string),
 		})
 		if err != nil {
@@ -141,7 +141,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		tlsVar:            resp.GetSmtpConfig().GetTls(),
 		hostVar:           resp.GetSmtpConfig().GetHost(),
 		userVar:           resp.GetSmtpConfig().GetUser(),
-		PasswordVar:       d.Get(PasswordVar).(string),
 		replyToAddressVar: resp.GetSmtpConfig().GetReplyToAddress(),
 		DescriptionVar:    resp.GetSmtpConfig().GetDescription(),
 		SetActiveVar:      d.Get(SetActiveVar).(bool),
