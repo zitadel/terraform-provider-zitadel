@@ -40,7 +40,7 @@ resource "zitadel_sms_provider_twilio" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `token_hash` (String) A non-reversible hash of the write-only token, used to detect when it changes. It does not contain the secret itself.
+- `token_hash` (String, Sensitive) A non-reversible hash of the write-only token, used to detect when it changes. It does not contain the secret itself.
 
 ## Import
 

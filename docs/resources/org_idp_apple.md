@@ -52,7 +52,7 @@ resource "zitadel_org_idp_apple" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `private_key_hash` (String) A non-reversible hash of the write-only private_key, used to detect when it changes. It does not contain the key itself.
+- `private_key_hash` (String, Sensitive) A non-reversible hash of the write-only private_key, used to detect when it changes. It does not contain the key itself.
 
 ## Import
 

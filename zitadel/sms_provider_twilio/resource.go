@@ -27,6 +27,7 @@ func GetResource() *schema.Resource {
 			"token_hash": {
 				Type:        schema.TypeString,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "A non-reversible hash of the write-only token, used to detect when it changes. It does not contain the secret itself.",
 			},
 			SenderNumberVar: {

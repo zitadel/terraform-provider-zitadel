@@ -91,6 +91,7 @@ var (
 	BindPasswordHashResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Computed:    true,
+		Sensitive:   true,
 		Description: "A non-reversible hash of the write-only bind_password, used to detect when the password changes. It does not contain the password itself.",
 	}
 	UserBaseResourceField = &schema.Schema{

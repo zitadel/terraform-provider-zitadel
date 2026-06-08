@@ -48,6 +48,7 @@ func GetResource() *schema.Resource {
 			"password_hash": {
 				Type:        schema.TypeString,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "A non-reversible hash of the write-only password, used to detect when it changes. It does not contain the secret itself.",
 			},
 			replyToAddressVar: {

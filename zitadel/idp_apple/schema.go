@@ -40,6 +40,7 @@ var (
 	PrivateKeyHashResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Computed:    true,
+		Sensitive:   true,
 		Description: "A non-reversible hash of the write-only private_key, used to detect when it changes. It does not contain the key itself.",
 	}
 )

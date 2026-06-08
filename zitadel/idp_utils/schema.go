@@ -59,6 +59,7 @@ var (
 	ClientSecretHashResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Computed:    true,
+		Sensitive:   true,
 		Description: "A non-reversible hash of the write-only client_secret, used to detect when the secret changes. It does not contain the secret itself.",
 	}
 	ScopesResourceField = &schema.Schema{
