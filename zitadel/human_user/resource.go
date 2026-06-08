@@ -116,7 +116,7 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				WriteOnly:   true,
-				Description: "Initially set password for the user, not changeable after creation",
+				Description: "Initially set password for the user, not changeable after creation. This value is write-only and is never stored in Terraform state.",
 				Sensitive:   true,
 				// We ignore if the value changes after creation or import
 				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
@@ -125,7 +125,7 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				WriteOnly:   true,
-				Description: "Initial hashed password for the user, not changeable after creation. Being able to pass an initial hashed password is useful in migration scenarios.",
+				Description: "Initial hashed password for the user, not changeable after creation. Being able to pass an initial hashed password is useful in migration scenarios. This value is write-only and is never stored in Terraform state.",
 				// We ignore if the value changes after creation or import
 				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
 				Sensitive:        true,
@@ -169,7 +169,7 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				WriteOnly:   true,
 				Sensitive:   true,
-				Description: "TOTP secret for two-factor authentication. Only used during creation. Useful for migration scenarios.",
+				Description: "TOTP secret for two-factor authentication. Only used during creation. Useful for migration scenarios. This value is write-only and is never stored in Terraform state.",
 				// We ignore if the value changes after creation or import
 				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
 			},

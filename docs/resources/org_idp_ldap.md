@@ -42,7 +42,7 @@ resource "zitadel_org_idp_ldap" "default" {
 
 - `base_dn` (String) Base DN for LDAP connections
 - `bind_dn` (String) Bind DN for LDAP connections
-- `bind_password` (String, Sensitive) Bind password for LDAP connections
+- `bind_password` (String, Sensitive) Bind password for LDAP connections. This value is write-only and is never stored in Terraform state; it cannot be read back or retrieved from a datasource.
 - `is_auto_creation` (Boolean) enable if a new account in ZITADEL should be created automatically on login with an external account
 - `is_auto_update` (Boolean) enable if a the ZITADEL account fields should be updated automatically on each login
 - `is_creation_allowed` (Boolean) enable if users should be able to create a new account in ZITADEL when using an external account

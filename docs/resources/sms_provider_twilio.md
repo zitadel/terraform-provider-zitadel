@@ -29,7 +29,7 @@ resource "zitadel_sms_provider_twilio" "default" {
 
 - `sender_number` (String) Sender number which is used to send the SMS.
 - `sid` (String) SID used to communicate with Twilio.
-- `token` (String, Sensitive) Token used to communicate with Twilio.
+- `token` (String, Sensitive) Token used to communicate with Twilio. This value is write-only and is never stored in Terraform state; it cannot be read back.
 
 ### Optional
 

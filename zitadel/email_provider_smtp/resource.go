@@ -40,7 +40,7 @@ func GetResource() *schema.Resource {
 			PasswordVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Password used to communicate with your SMTP server.",
+				Description: "Password used to communicate with your SMTP server. This value is write-only and is never stored in Terraform state; it cannot be read back.",
 				Sensitive:   true,
 				WriteOnly:   true,
 			},

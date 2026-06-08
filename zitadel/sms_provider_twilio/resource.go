@@ -20,7 +20,7 @@ func GetResource() *schema.Resource {
 			TokenVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Token used to communicate with Twilio.",
+				Description: "Token used to communicate with Twilio. This value is write-only and is never stored in Terraform state; it cannot be read back.",
 				Sensitive:   true,
 				WriteOnly:   true,
 			},

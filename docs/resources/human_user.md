@@ -45,8 +45,8 @@ resource "zitadel_human_user" "default" {
 - `display_name` (String) Display name of the user
 - `gender` (String) Gender of the user, supported values: GENDER_UNSPECIFIED, GENDER_FEMALE, GENDER_MALE, GENDER_DIVERSE
 - `idp_links` (Block List) A list of identity provider links to add to the user during creation. Useful for migration scenarios. (see [below for nested schema](#nestedblock--idp_links))
-- `initial_hashed_password` (String, Sensitive) Initial hashed password for the user, not changeable after creation. Being able to pass an initial hashed password is useful in migration scenarios.
-- `initial_password` (String, Sensitive) Initially set password for the user, not changeable after creation
+- `initial_hashed_password` (String, Sensitive) Initial hashed password for the user, not changeable after creation. Being able to pass an initial hashed password is useful in migration scenarios. This value is write-only and is never stored in Terraform state.
+- `initial_password` (String, Sensitive) Initially set password for the user, not changeable after creation. This value is write-only and is never stored in Terraform state.
 - `initial_skip_password_change` (Boolean) Whether the user has to change the password on first login.
 - `is_email_verified` (Boolean) Is the email verified of the user, can only be true if password of the user is set
 - `is_phone_verified` (Boolean) Is the phone verified of the user
@@ -55,7 +55,7 @@ resource "zitadel_human_user" "default" {
 - `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `phone` (String) Phone of the user
 - `preferred_language` (String) Preferred language of the user
-- `totp_secret` (String, Sensitive) TOTP secret for two-factor authentication. Only used during creation. Useful for migration scenarios.
+- `totp_secret` (String, Sensitive) TOTP secret for two-factor authentication. Only used during creation. Useful for migration scenarios. This value is write-only and is never stored in Terraform state.
 - `user_id` (String) The ID of this resource. Optionally set a custom unique ID. If omitted, ZITADEL will generate one.
 
 ### Read-Only

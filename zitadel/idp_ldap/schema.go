@@ -84,7 +84,7 @@ var (
 	BindPasswordResourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Required:    true,
-		Description: "Bind password for LDAP connections",
+		Description: "Bind password for LDAP connections. This value is write-only and is never stored in Terraform state; it cannot be read back or retrieved from a datasource.",
 		Sensitive:   true,
 		WriteOnly:   true,
 	}
