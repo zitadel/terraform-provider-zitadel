@@ -30,7 +30,6 @@ data "zitadel_idp_ldap" "default" {
 - `avatar_url_attribute` (String) User attribute for the avatar url
 - `base_dn` (String) Base DN for LDAP connections
 - `bind_dn` (String) Bind DN for LDAP connections
-- `bind_password` (String, Sensitive) Bind password for LDAP connections
 - `display_name_attribute` (String) User attribute for the display name
 - `email_attribute` (String) User attribute for the email
 - `email_verified_attribute` (String) User attribute for the email verified state

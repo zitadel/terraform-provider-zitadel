@@ -44,6 +44,7 @@ resource "zitadel_smtp_config" "default" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `password_hash` (String) A non-reversible hash of the write-only password, used to detect when it changes. It does not contain the secret itself.
 
 ## Import
 

@@ -14,6 +14,7 @@ func GetResource() *schema.Resource {
 			idp_utils.NameVar:              idp_utils.NameResourceField,
 			idp_utils.ClientIDVar:          idp_utils.ClientIDResourceField,
 			idp_utils.ClientSecretVar:      idp_utils.ClientSecretResourceField,
+			idp_utils.ClientSecretHashVar:  idp_utils.ClientSecretHashResourceField,
 			AuthorizationEndpointVar:       AuthorizationEndpointResourceField,
 			TokenEndpointVar:               TokenEndpointResourceField,
 			UserEndpointVar:                UserEndpointResourceField,
@@ -30,6 +31,7 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: idp_utils.Delete,
+		CustomizeDiff: idp_utils.ClientSecretHashDiff,
 		Importer:      helper.ImportWithIDAndOptionalSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
 	}
 }

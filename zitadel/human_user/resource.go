@@ -115,14 +115,16 @@ func GetResource() *schema.Resource {
 			InitialPasswordVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
+				WriteOnly:   true,
 				Description: "Initially set password for the user, not changeable after creation",
 				Sensitive:   true,
 				// We ignore if the value changes after creation or import
 				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
 			},
-			initialHashedPasswordVar: {
+			InitialHashedPasswordVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
+				WriteOnly:   true,
 				Description: "Initial hashed password for the user, not changeable after creation. Being able to pass an initial hashed password is useful in migration scenarios.",
 				// We ignore if the value changes after creation or import
 				DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool { return d.Id() != "" },
@@ -162,10 +164,10 @@ func GetResource() *schema.Resource {
 					},
 				},
 			},
-			totpSecretVar: {
+			TotpSecretVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    true,
+				WriteOnly:   true,
 				Sensitive:   true,
 				Description: "TOTP secret for two-factor authentication. Only used during creation. Useful for migration scenarios.",
 				// We ignore if the value changes after creation or import

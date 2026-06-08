@@ -1,6 +1,8 @@
 package org_idp_ldap
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -26,6 +28,7 @@ func GetResource() *schema.Resource {
 			idp_ldap.BaseDNVar:            idp_ldap.BaseDNResourceField,
 			idp_ldap.BindDNVar:            idp_ldap.BindDNResourceField,
 			idp_ldap.BindPasswordVar:      idp_ldap.BindPasswordResourceField,
+			idp_ldap.BindPasswordHashVar:  idp_ldap.BindPasswordHashResourceField,
 			idp_ldap.UserBaseVar:          idp_ldap.UserBaseResourceField,
 			idp_ldap.UserObjectClassesVar: idp_ldap.UserObjectClassesResourceField,
 			idp_ldap.UserFiltersVar:       idp_ldap.UserFiltersResourceField,
@@ -50,6 +53,9 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: org_idp_utils.Delete,
-		Importer:      helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_ldap.BindPasswordVar),
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			return helper.WriteOnlyHashDiff(d, idp_ldap.BindPasswordVar, idp_ldap.BindPasswordHashVar)
+		},
+		Importer: helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_ldap.BindPasswordVar),
 	}
 }

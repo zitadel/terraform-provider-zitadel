@@ -68,12 +68,12 @@ func legacyCreateHumanUser(ctx context.Context, d *schema.ResourceData, clientin
 		req.Phone = phoneReq
 	}
 
-	if password, ok := d.GetOk(InitialPasswordVar); ok {
-		req.Password = password.(string)
+	if password := helper.WriteOnlyStringValue(d, InitialPasswordVar); password != "" {
+		req.Password = password
 		req.PasswordChangeRequired = !d.Get(initialSkipPasswordChange).(bool)
-	} else if hashedPassword, ok := d.GetOk(initialHashedPasswordVar); ok {
+	} else if hashedPassword := helper.WriteOnlyStringValue(d, InitialHashedPasswordVar); hashedPassword != "" {
 		req.HashedPassword = &management.ImportHumanUserRequest_HashedPassword{
-			Value: hashedPassword.(string),
+			Value: hashedPassword,
 		}
 	}
 

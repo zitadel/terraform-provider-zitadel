@@ -17,6 +17,7 @@ func GetResource() *schema.Resource {
 			idp_utils.NameVar:              idp_utils.NameResourceField,
 			idp_utils.ClientIDVar:          idp_utils.ClientIDResourceField,
 			idp_utils.ClientSecretVar:      idp_utils.ClientSecretResourceField,
+			idp_utils.ClientSecretHashVar:  idp_utils.ClientSecretHashResourceField,
 			idp_utils.ScopesVar:            idp_utils.ScopesResourceField,
 			idp_utils.IsLinkingAllowedVar:  idp_utils.IsLinkingAllowedResourceField,
 			idp_utils.IsCreationAllowedVar: idp_utils.IsCreationAllowedResourceField,
@@ -31,6 +32,7 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: org_idp_utils.Delete,
+		CustomizeDiff: idp_utils.ClientSecretHashDiff,
 		Importer:      helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_utils.ClientSecretVar),
 	}
 }

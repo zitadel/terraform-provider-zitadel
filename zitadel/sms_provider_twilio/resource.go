@@ -1,6 +1,8 @@
 package sms_provider_twilio
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -20,6 +22,12 @@ func GetResource() *schema.Resource {
 				Required:    true,
 				Description: "Token used to communicate with Twilio.",
 				Sensitive:   true,
+				WriteOnly:   true,
+			},
+			"token_hash": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "A non-reversible hash of the write-only token, used to detect when it changes. It does not contain the secret itself.",
 			},
 			SenderNumberVar: {
 				Type:        schema.TypeString,
@@ -46,6 +54,9 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithIDAndOptionalSecret(providerIDVar, TokenVar),
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			return helper.WriteOnlyHashDiff(d, TokenVar, "token_hash")
+		},
+		Importer: helper.ImportWithIDAndOptionalSecret(providerIDVar, TokenVar),
 	}
 }

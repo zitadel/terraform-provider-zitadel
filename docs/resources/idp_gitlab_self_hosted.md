@@ -47,6 +47,7 @@ resource "zitadel_idp_gitlab_self_hosted" "default" {
 
 ### Read-Only
 
+- `client_secret_hash` (String) A non-reversible hash of the write-only client_secret, used to detect when the secret changes. It does not contain the secret itself.
 - `id` (String) The ID of this resource.
 
 ## Import

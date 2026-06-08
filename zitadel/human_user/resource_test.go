@@ -35,8 +35,13 @@ func TestAccHumanUser(t *testing.T) {
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 			test_utils.ImportOrgId(frame),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, human_user.InitialPasswordVar),
 		),
+		// These secrets are write-only: they are never persisted to state, so
+		// they cannot be sourced from state for the import ID, nor verified
+		// after import.
+		human_user.InitialPasswordVar,
+		human_user.InitialHashedPasswordVar,
+		human_user.TotpSecretVar,
 	)
 }
 

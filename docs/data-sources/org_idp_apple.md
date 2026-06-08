@@ -39,6 +39,5 @@ data "zitadel_org_idp_apple" "default" {
 - `is_linking_allowed` (Boolean) enabled if users are able to link an existing ZITADEL user with an external account
 - `key_id` (String) Apple Key ID from your Apple Developer Account
 - `name` (String) Name of the IDP
-- `private_key` (String, Sensitive) Apple Private Key from your Apple Developer Account
 - `scopes` (Set of String) the scopes requested by ZITADEL during the request on the identity provider
 - `team_id` (String) Apple Team ID from your Apple Developer Account

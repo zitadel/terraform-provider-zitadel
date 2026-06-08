@@ -76,6 +76,7 @@ resource "zitadel_org_idp_ldap" "default" {
 
 ### Read-Only
 
+- `bind_password_hash` (String) A non-reversible hash of the write-only bind_password, used to detect when the password changes. It does not contain the password itself.
 - `id` (String) The ID of this resource.
 
 ## Import

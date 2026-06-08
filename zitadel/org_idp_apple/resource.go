@@ -1,6 +1,8 @@
 package org_idp_apple
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -19,6 +21,7 @@ func GetResource() *schema.Resource {
 			idp_apple.TeamIDVar:            idp_apple.TeamIDResourceField,
 			idp_apple.KeyIDVar:             idp_apple.KeyIDResourceField,
 			idp_apple.PrivateKeyVar:        idp_apple.PrivateKeyResourceField,
+			idp_apple.PrivateKeyHashVar:    idp_apple.PrivateKeyHashResourceField,
 			idp_utils.ScopesVar:            idp_utils.ScopesResourceField,
 			idp_utils.IsLinkingAllowedVar:  idp_utils.IsLinkingAllowedResourceField,
 			idp_utils.IsCreationAllowedVar: idp_utils.IsCreationAllowedResourceField,
@@ -30,6 +33,9 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		CreateContext: create,
 		DeleteContext: org_idp_utils.Delete,
-		Importer:      helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_apple.PrivateKeyVar),
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			return helper.WriteOnlyHashDiff(d, idp_apple.PrivateKeyVar, idp_apple.PrivateKeyHashVar)
+		},
+		Importer: helper.ImportWithIDAndOptionalOrgAndSecret(idp_utils.IdpIDVar, idp_apple.PrivateKeyVar),
 	}
 }

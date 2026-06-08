@@ -38,7 +38,10 @@ func TestAccEmailSMTPProvider(t *testing.T) {
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 		),
-		"password", "set_active",
+		// The password is write-only: it is never persisted to state, so it
+		// cannot be sourced from state for the import ID, nor verified after
+		// import. Its companion hash attribute is likewise absent after import.
+		email_provider_smtp.PasswordVar, "password_hash", "set_active",
 	)
 }
 

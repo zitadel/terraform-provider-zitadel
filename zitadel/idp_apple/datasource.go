@@ -15,7 +15,6 @@ func GetDatasource() *schema.Resource {
 			idp_utils.ClientIDVar:          idp_utils.ClientIDDataSourceField,
 			TeamIDVar:                      TeamIDDataSourceField,
 			KeyIDVar:                       KeyIDDataSourceField,
-			PrivateKeyVar:                  PrivateKeyDataSourceField,
 			idp_utils.ScopesVar:            idp_utils.ScopesDataSourceField,
 			idp_utils.IsLinkingAllowedVar:  idp_utils.IsLinkingAllowedDataSourceField,
 			idp_utils.IsCreationAllowedVar: idp_utils.IsCreationAllowedDataSourceField,

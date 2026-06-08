@@ -50,7 +50,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Host:           d.Get(hostVar).(string),
 		User:           d.Get(userVar).(string),
 		Tls:            d.Get(tlsVar).(bool),
-		Password:       d.Get(PasswordVar).(string),
+		Password:       helper.WriteOnlyStringValue(d, PasswordVar),
 		ReplyToAddress: d.Get(replyToAddressVar).(string),
 		Description:    d.Get(DescriptionVar).(string),
 	})
@@ -89,7 +89,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			Tls:            d.Get(tlsVar).(bool),
 			User:           d.Get(userVar).(string),
 			ReplyToAddress: d.Get(replyToAddressVar).(string),
-			Password:       d.Get(PasswordVar).(string),
+			Password:       helper.WriteOnlyStringValue(d, PasswordVar),
 			Description:    d.Get(DescriptionVar).(string),
 		})
 		if err != nil {
@@ -140,7 +140,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		tlsVar:            resp.GetConfig().GetSmtp().GetTls(),
 		hostVar:           resp.GetConfig().GetSmtp().GetHost(),
 		userVar:           resp.GetConfig().GetSmtp().GetUser(),
-		PasswordVar:       d.Get(PasswordVar).(string),
 		replyToAddressVar: resp.GetConfig().GetSmtp().GetReplyToAddress(),
 		DescriptionVar:    resp.GetConfig().GetDescription(),
 		setActiveVar:      d.Get(setActiveVar).(bool),
