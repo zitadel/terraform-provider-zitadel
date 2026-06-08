@@ -24,13 +24,16 @@ func TestAccEmailSMTPProvider(t *testing.T) {
 	exampleProperty := test_utils.AttributeValue(t, email_provider_smtp.SenderNameVar, exampleAttributes).AsString()
 	updatedProperty := "updatedProperty"
 
+	exampleSecret := test_utils.AttributeValue(t, email_provider_smtp.PasswordVar, exampleAttributes).AsString()
+	updatedSecret := "updatedSecret"
+
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		nil,
-		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
+		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
 		exampleProperty, updatedProperty,
-		"", "", "",
+		email_provider_smtp.PasswordVar, exampleSecret, updatedSecret,
 		false,
 		checkRemoteProperty(frame),
 		helper.ZitadelGeneratedIdOnlyRegex,

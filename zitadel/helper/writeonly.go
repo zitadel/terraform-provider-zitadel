@@ -42,7 +42,11 @@ func WriteOnlyHashDiff(d *schema.ResourceDiff, secretVar, hashVar string) error 
 	}
 	v := raw.GetAttr(secretVar)
 	if v.IsNull() {
-		return nil
+		// The secret is absent from config. For an Optional write-only secret
+		// this means it was removed, so clear the hash to produce a diff and let
+		// the update remove the secret, rather than leaving a stale hash that
+		// would advertise a secret no longer configured.
+		return d.SetNew(hashVar, "")
 	}
 	if !v.IsKnown() {
 		// The secret is not yet known (e.g. it references another resource).
