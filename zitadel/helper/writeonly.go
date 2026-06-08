@@ -31,8 +31,14 @@ func WriteOnlyStringValue(d *schema.ResourceData, attributeVar string) string {
 // is one-way and never contains the secret.
 func WriteOnlyHashDiff(d *schema.ResourceDiff, secretVar, hashVar string) error {
 	raw := d.GetRawConfig()
-	if raw.IsNull() || !raw.IsKnown() {
+	if raw.IsNull() {
 		return nil
+	}
+	if !raw.IsKnown() {
+		// The whole config is not yet known (e.g. it derives from another
+		// resource). Mark the hash as computed so an update is planned once the
+		// secret becomes known.
+		return d.SetNewComputed(hashVar)
 	}
 	v := raw.GetAttr(secretVar)
 	if v.IsNull() {
@@ -43,6 +49,21 @@ func WriteOnlyHashDiff(d *schema.ResourceDiff, secretVar, hashVar string) error 
 		// Mark the hash as computed so a change is planned once it is known.
 		return d.SetNewComputed(hashVar)
 	}
-	sum := sha256.Sum256([]byte(v.AsString()))
-	return d.SetNew(hashVar, hex.EncodeToString(sum[:]))
+	return d.SetNew(hashVar, hashSecret(v.AsString()))
+}
+
+// hashRounds stretches the secret hash to slow down offline brute-forcing of a
+// low-entropy secret (e.g. a weak SMTP or LDAP password) recovered from state.
+// The hash stays deterministic and unsalted on purpose: an unchanged secret
+// must produce an unchanged hash so that rotation can be detected.
+const hashRounds = 100000
+
+// hashSecret returns a stretched, non-reversible hash of the secret. The value
+// is only used to detect changes; it never needs to be reversed.
+func hashSecret(secret string) string {
+	sum := sha256.Sum256([]byte(secret))
+	for i := 1; i < hashRounds; i++ {
+		sum = sha256.Sum256(sum[:])
+	}
+	return hex.EncodeToString(sum[:])
 }

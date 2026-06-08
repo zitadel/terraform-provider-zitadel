@@ -80,7 +80,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar, replyToAddressVar, PasswordVar, DescriptionVar) {
+	if d.HasChanges(SenderAddressVar, SenderNameVar, tlsVar, hostVar, userVar, replyToAddressVar, "password_hash", DescriptionVar) {
 		_, err = client.UpdateEmailProviderSMTP(ctx, &admin.UpdateEmailProviderSMTPRequest{
 			Id:             d.Id(),
 			SenderAddress:  d.Get(SenderAddressVar).(string),
