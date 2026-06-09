@@ -66,8 +66,16 @@ func ListDatasources() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			NameVar: {
-				Type:        schema.TypeString,
-				Required:    true,
+				Type:     schema.TypeString,
+				Required: true,
+				// Required alone permits "", which list() treats as "no name
+				// filter" and would return all projects. Reject "" at plan time.
+				ValidateDiagFunc: func(value interface{}, _ cty.Path) diag.Diagnostics {
+					if s, _ := value.(string); s == "" {
+						return diag.Errorf("%s must not be empty", NameVar)
+					}
+					return nil
+				},
 				Description: "Name of the project",
 			},
 			nameMethodVar: {

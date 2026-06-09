@@ -74,9 +74,13 @@ func ListDatasources() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDDatasourceField,
 			ProjectIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "ID of the project to list applications from.",
+				Type:     schema.TypeString,
+				Required: true,
+				// Required alone permits "", which list() would treat as
+				// "no project filter" and return applications across all
+				// projects. Reject the empty string at plan time.
+				ValidateDiagFunc: nonEmptyString(ProjectIDVar),
+				Description:      "ID of the project to list applications from.",
 			},
 			NameVar: {
 				Type:        schema.TypeString,
