@@ -90,7 +90,7 @@ Optional:
 - `dev_mode` (Boolean) Development mode (relaxes redirect-URI validation).
 - `id_token_role_assertion` (Boolean)
 - `id_token_userinfo_assertion` (Boolean)
-- `login_version` (Block List, Max: 1) Login UI version to use for this application. (see [below for nested schema](#nestedblock--oidc--login_version))
+- `login_version` (Block List, Max: 1) Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set. (see [below for nested schema](#nestedblock--oidc--login_version))
 - `post_logout_redirect_uris` (List of String) Post-logout redirect URIs.
 - `redirect_uris` (List of String) Allowed redirect URIs.
 - `skip_native_app_success_page` (Boolean)
@@ -108,15 +108,15 @@ Read-Only:
 
 Optional:
 
-- `login_v1` (Boolean)
-- `login_v2` (Block List, Max: 1) (see [below for nested schema](#nestedblock--oidc--login_version--login_v2))
+- `login_v1` (Boolean) Use the legacy Login UI (V1).
+- `login_v2` (Block List, Max: 1) Use the Login UI V2. (see [below for nested schema](#nestedblock--oidc--login_version--login_v2))
 
 <a id="nestedblock--oidc--login_version--login_v2"></a>
 ### Nested Schema for `oidc.login_version.login_v2`
 
 Optional:
 
-- `base_uri` (String)
+- `base_uri` (String) Optional base URI of a custom Login UI V2. If unset, the instance default is used.
 
 
 
@@ -135,7 +135,7 @@ Read-Only:
 
 Optional:
 
-- `login_version` (Block List, Max: 1) (see [below for nested schema](#nestedblock--saml--login_version))
+- `login_version` (Block List, Max: 1) Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set. (see [below for nested schema](#nestedblock--saml--login_version))
 - `metadata_url` (String) URL from which SAML metadata can be fetched. Mutually exclusive with `metadata_xml`.
 - `metadata_xml` (String) SAML metadata as raw XML. Mutually exclusive with `metadata_url`.
 
@@ -144,15 +144,15 @@ Optional:
 
 Optional:
 
-- `login_v1` (Boolean)
-- `login_v2` (Block List, Max: 1) (see [below for nested schema](#nestedblock--saml--login_version--login_v2))
+- `login_v1` (Boolean) Use the legacy Login UI (V1).
+- `login_v2` (Block List, Max: 1) Use the Login UI V2. (see [below for nested schema](#nestedblock--saml--login_version--login_v2))
 
 <a id="nestedblock--saml--login_version--login_v2"></a>
 ### Nested Schema for `saml.login_version.login_v2`
 
 Optional:
 
-- `base_uri` (String)
+- `base_uri` (String) Optional base URI of a custom Login UI V2. If unset, the instance default is used.
 
 ## Import
 

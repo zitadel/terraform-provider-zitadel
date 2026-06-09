@@ -107,16 +107,38 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
+	// Clear non-matching config blocks before populating the active one.
+	// Without this an import (or a stale state from before an out-of-band app
+	// type change) could leave two blocks populated and violate the
+	// ExactlyOneOf constraint, surfacing as "inconsistent result" errors.
 	switch {
 	case app.GetOidcConfiguration() != nil:
+		if err := d.Set(samlBlockVar, nil); err != nil {
+			return diag.FromErr(err)
+		}
+		if err := d.Set(apiBlockVar, nil); err != nil {
+			return diag.FromErr(err)
+		}
 		if err := d.Set(oidcBlockVar, []interface{}{flattenOIDC(d, app.GetOidcConfiguration())}); err != nil {
 			return diag.FromErr(err)
 		}
 	case app.GetSamlConfiguration() != nil:
+		if err := d.Set(oidcBlockVar, nil); err != nil {
+			return diag.FromErr(err)
+		}
+		if err := d.Set(apiBlockVar, nil); err != nil {
+			return diag.FromErr(err)
+		}
 		if err := d.Set(samlBlockVar, []interface{}{flattenSAML(d, app.GetSamlConfiguration())}); err != nil {
 			return diag.FromErr(err)
 		}
 	case app.GetApiConfiguration() != nil:
+		if err := d.Set(oidcBlockVar, nil); err != nil {
+			return diag.FromErr(err)
+		}
+		if err := d.Set(samlBlockVar, nil); err != nil {
+			return diag.FromErr(err)
+		}
 		if err := d.Set(apiBlockVar, []interface{}{flattenAPI(d, app.GetApiConfiguration())}); err != nil {
 			return diag.FromErr(err)
 		}

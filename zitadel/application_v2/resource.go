@@ -160,10 +160,11 @@ func oidcConfigSchema() *schema.Resource {
 				Optional: true,
 			},
 			clockSkewVar: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "0s",
-				Description: "Allowed clock skew (Go duration string, e.g. `5s`).",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          "0s",
+				Description:      "Allowed clock skew (Go duration string, e.g. `5s`).",
+				DiffSuppressFunc: helper.DurationDiffSuppress,
 			},
 			additionalOriginsVar: {
 				Type:        schema.TypeList,
@@ -179,33 +180,7 @@ func oidcConfigSchema() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			loginVersionVar: {
-				Type:        schema.TypeList,
-				MaxItems:    1,
-				Optional:    true,
-				Description: "Login UI version to use for this application.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						loginV1Var: {
-							Type:     schema.TypeBool,
-							Optional: true,
-						},
-						loginV2Var: {
-							Type:     schema.TypeList,
-							MaxItems: 1,
-							Optional: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									baseURIVar: {
-										Type:     schema.TypeString,
-										Optional: true,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
+			loginVersionVar: loginVersionSchema(oidcBlockVar),
 
 			clientIDVar: {
 				Type:        schema.TypeString,
@@ -251,32 +226,7 @@ func samlConfigSchema() *schema.Resource {
 				ExactlyOneOf: []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
 				Description:  "URL from which SAML metadata can be fetched. Mutually exclusive with `metadata_xml`.",
 			},
-			loginVersionVar: {
-				Type:     schema.TypeList,
-				MaxItems: 1,
-				Optional: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						loginV1Var: {
-							Type:     schema.TypeBool,
-							Optional: true,
-						},
-						loginV2Var: {
-							Type:     schema.TypeList,
-							MaxItems: 1,
-							Optional: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									baseURIVar: {
-										Type:     schema.TypeString,
-										Optional: true,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
+			loginVersionVar: loginVersionSchema(samlBlockVar),
 		},
 	}
 }
@@ -301,6 +251,47 @@ func apiConfigSchema() *schema.Resource {
 				Type:      schema.TypeString,
 				Computed:  true,
 				Sensitive: true,
+			},
+		},
+	}
+}
+
+// loginVersionSchema returns the shared login_version sub-block. The
+// parentBlock argument is the top-level resource attribute that contains
+// this login_version (e.g. "oidc" or "saml"); it's used to build absolute
+// ConflictsWith paths so that login_v1 and login_v2 cannot both be set.
+func loginVersionSchema(parentBlock string) *schema.Schema {
+	v1Path := parentBlock + ".0." + loginVersionVar + ".0." + loginV1Var
+	v2Path := parentBlock + ".0." + loginVersionVar + ".0." + loginV2Var
+	return &schema.Schema{
+		Type:        schema.TypeList,
+		MaxItems:    1,
+		Optional:    true,
+		Description: "Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set.",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				loginV1Var: {
+					Type:          schema.TypeBool,
+					Optional:      true,
+					Description:   "Use the legacy Login UI (V1).",
+					ConflictsWith: []string{v2Path},
+				},
+				loginV2Var: {
+					Type:          schema.TypeList,
+					MaxItems:      1,
+					Optional:      true,
+					Description:   "Use the Login UI V2.",
+					ConflictsWith: []string{v1Path},
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							baseURIVar: {
+								Type:        schema.TypeString,
+								Optional:    true,
+								Description: "Optional base URI of a custom Login UI V2. If unset, the instance default is used.",
+							},
+						},
+					},
+				},
 			},
 		},
 	}

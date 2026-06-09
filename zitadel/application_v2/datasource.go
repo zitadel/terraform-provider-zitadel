@@ -125,6 +125,7 @@ func cloneFieldAsComputed(s *schema.Schema) *schema.Schema {
 	dup.RequiredWith = nil
 	dup.MaxItems = 0
 	dup.MinItems = 0
+	dup.DiffSuppressFunc = nil
 	dup.Computed = true
 
 	switch elem := dup.Elem.(type) {

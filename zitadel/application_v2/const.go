@@ -1,12 +1,11 @@
 package application_v2
 
 const (
-	AppIDVar      = "app_id"
-	appIDsVar     = "app_ids"
-	ProjectIDVar  = "project_id"
-	NameVar       = "name"
-	nameMethodVar = "name_method"
-	stateVar      = "state"
+	AppIDVar     = "app_id"
+	appIDsVar    = "app_ids"
+	ProjectIDVar = "project_id"
+	NameVar      = "name"
+	stateVar     = "state"
 
 	// Top-level config block selectors (ExactlyOneOf).
 	oidcBlockVar = "oidc"
