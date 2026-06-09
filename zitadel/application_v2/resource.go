@@ -38,15 +38,17 @@ func GetResource() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDResourceField,
 			ProjectIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "ID of the project this application belongs to.",
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: nonEmptyString(ProjectIDVar),
+				Description:      "ID of the project this application belongs to.",
 			},
 			NameVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the application.",
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: nonEmptyString(NameVar),
+				Description:      "Name of the application.",
 			},
 			stateVar: {
 				Type:        schema.TypeString,

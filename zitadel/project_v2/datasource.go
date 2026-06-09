@@ -18,13 +18,8 @@ func GetDatasource() *schema.Resource {
 				Required: true,
 				// Required permits "", which would make the v2 GetProject
 				// call fail at apply with InvalidArgument. Reject it at plan.
-				ValidateDiagFunc: func(value interface{}, _ cty.Path) diag.Diagnostics {
-					if s, _ := value.(string); s == "" {
-						return diag.Errorf("%s must not be empty", ProjectIDVar)
-					}
-					return nil
-				},
-				Description: "The ID of this resource.",
+				ValidateDiagFunc: nonEmptyString(ProjectIDVar),
+				Description:      "The ID of this resource.",
 			},
 			NameVar: {
 				Type:        schema.TypeString,
@@ -78,13 +73,8 @@ func ListDatasources() *schema.Resource {
 				Required: true,
 				// Required alone permits "", which list() treats as "no name
 				// filter" and would return all projects. Reject "" at plan time.
-				ValidateDiagFunc: func(value interface{}, _ cty.Path) diag.Diagnostics {
-					if s, _ := value.(string); s == "" {
-						return diag.Errorf("%s must not be empty", NameVar)
-					}
-					return nil
-				},
-				Description: "Name of the project",
+				ValidateDiagFunc: nonEmptyString(NameVar),
+				Description:      "Name of the project",
 			},
 			nameMethodVar: {
 				Type:        schema.TypeString,

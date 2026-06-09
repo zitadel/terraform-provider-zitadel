@@ -19,15 +19,17 @@ func GetResource() *schema.Resource {
 			// request body rather than as context metadata. An empty value
 			// produces an invalid request that fails at apply time.
 			helper.OrgIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "ID of the organization the project belongs to. Required because the v2 CreateProject API takes the organization as an explicit request field.",
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: nonEmptyString(helper.OrgIDVar),
+				Description:      "ID of the organization the project belongs to. Required because the v2 CreateProject API takes the organization as an explicit request field.",
 			},
 			NameVar: {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the project",
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: nonEmptyString(NameVar),
+				Description:      "Name of the project",
 			},
 			stateVar: {
 				Type:        schema.TypeString,
@@ -68,5 +70,17 @@ func GetResource() *schema.Resource {
 		UpdateContext: update,
 		ReadContext:   read,
 		Importer:      helper.ImportWithIDAndOptionalOrg(ProjectIDVar),
+	}
+}
+
+// nonEmptyString returns a ValidateDiagFunc that rejects empty strings, so a
+// Required attribute set to "" fails at plan time instead of producing an
+// invalid request at apply.
+func nonEmptyString(attr string) schema.SchemaValidateDiagFunc {
+	return func(value interface{}, _ cty.Path) diag.Diagnostics {
+		if s, _ := value.(string); s == "" {
+			return diag.Errorf("%s must not be empty", attr)
+		}
+		return nil
 	}
 }
