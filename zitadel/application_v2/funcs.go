@@ -113,7 +113,17 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get application: %v", err)
 	}
 
+	// Defensive guard against the server returning a successful response
+	// with an empty Application payload (instead of a proper NotFound).
+	// Without this, the d.SetId at the end of read() would clear the
+	// resource ID and Terraform would surface a confusing
+	// "Root object was present, but now absent" consistency error.
 	app := resp.GetApplication()
+	if app == nil || app.GetApplicationId() == "" {
+		d.SetId("")
+		return nil
+	}
+
 	if err := d.Set(NameVar, app.GetName()); err != nil {
 		return diag.FromErr(err)
 	}

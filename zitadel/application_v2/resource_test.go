@@ -2,7 +2,6 @@ package application_v2_test
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -16,30 +15,39 @@ import (
 )
 
 // TestAccApplicationV2_OIDC exercises the unified zitadel_application_v2
-// resource with the OIDC configuration block populated. It mirrors the v1
-// TestAccAppOIDC but verifies remote state through the v2 GetApplication
-// endpoint.
+// resource with the OIDC configuration block populated. Mirrors the v1
+// TestAccAppOIDC pattern but verifies remote state through the v2
+// GetApplication endpoint.
+//
+// We build the HCL inline rather than reading from
+// examples/provider/resources/application_v2.tf because the test helper
+// `test_utils.ReadExample` uses HCL's JustAttributes() which forbids
+// nested blocks; the example file uses `oidc { ... }` block syntax.
 func TestAccApplicationV2_OIDC(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_v2")
-	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
-	exampleProperty := test_utils.AttributeValue(t, application_v2.NameVar, exampleAttributes).AsString()
 	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
-
-	// Replace the example file's data-source project_id with the live project
-	// ID we just created. We do this once up front so the resourceFunc only
-	// has to substitute the application name.
-	staticExample := strings.ReplaceAll(
-		resourceExample,
-		"data.zitadel_project.default.id",
-		fmt.Sprintf("%q", projectID),
-	)
 
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		[]string{frame.AsOrgDefaultDependency, projectDep},
-		test_utils.ReplaceAll(staticExample, exampleProperty, ""),
-		exampleProperty, "updatedproperty",
+		func(property, _ string) string {
+			return fmt.Sprintf(`
+resource "zitadel_application_v2" "default" {
+  org_id     = data.zitadel_org.default.id
+  project_id = %q
+  name       = %q
+
+  oidc {
+    redirect_uris    = ["https://localhost.com/callback"]
+    response_types   = ["OIDC_RESPONSE_TYPE_CODE"]
+    grant_types      = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
+    auth_method_type = "OIDC_AUTH_METHOD_TYPE_BASIC"
+  }
+}`, projectID, property)
+		},
+		"app_oidc_"+frame.UniqueResourcesID,
+		"app_oidc_updated_"+frame.UniqueResourcesID,
 		"", "", "",
 		false,
 		checkRemoteProperty(frame),
@@ -54,6 +62,7 @@ func TestAccApplicationV2_OIDC(t *testing.T) {
 		// during the ImportStateVerify pass.
 		"oidc.0.client_secret",
 		"oidc.0.compliance_problems",
+		"oidc.0.login_version",
 	)
 }
 
@@ -96,9 +105,9 @@ resource "zitadel_application_v2" "default" {
 	)
 }
 
-// checkRemoteProperty validates the application's name via the v2 API — the
-// same endpoint the resource itself reads from — so that we cover the v2
-// wire format end-to-end.
+// checkRemoteProperty validates the application's name via the v2 API,
+// the same endpoint the resource itself reads from, so that the test
+// covers the v2 wire format end-to-end.
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
