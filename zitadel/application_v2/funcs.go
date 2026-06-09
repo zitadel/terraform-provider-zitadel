@@ -120,6 +120,16 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err := d.Set(stateVar, app.GetState().String()); err != nil {
 		return diag.FromErr(err)
 	}
+	// Refresh project_id from the server response. This keeps state
+	// accurate after import and corrects any drift if the application
+	// was somehow re-parented out-of-band. The v2 Application proto
+	// does not carry organization_id / resource_owner, so org_id is
+	// preserved from configuration/import rather than refreshed.
+	if pid := app.GetProjectId(); pid != "" {
+		if err := d.Set(ProjectIDVar, pid); err != nil {
+			return diag.FromErr(err)
+		}
+	}
 
 	// Clear non-matching config blocks before populating the active one.
 	// Without this an import (or a stale state from before an out-of-band app
@@ -300,6 +310,7 @@ func buildUpdateOIDC(cfg map[string]interface{}) (*apppb.UpdateOIDCApplicationCo
 	idTokenRoleAssertion := cfg[idTokenRoleAssertionVar].(bool)
 	idTokenUserinfoAssertion := cfg[idTokenUserinfoAssertionVar].(bool)
 	skipNative := cfg[skipNativeAppSuccessPageVar].(bool)
+	devMode := cfg[devModeVar].(bool)
 
 	// Pass BackChannelLogoutUri as a pointer unconditionally, including when
 	// it is an empty string. This lets the practitioner clear a previously
@@ -314,6 +325,7 @@ func buildUpdateOIDC(cfg map[string]interface{}) (*apppb.UpdateOIDCApplicationCo
 		ApplicationType:          &appType,
 		AuthMethodType:           &authType,
 		PostLogoutRedirectUris:   toStringSlice(cfg[postLogoutRedirectURIsVar]),
+		DevelopmentMode:          &devMode,
 		AccessTokenType:          &tokenType,
 		AccessTokenRoleAssertion: &accessTokenRoleAssertion,
 		IdTokenRoleAssertion:     &idTokenRoleAssertion,
