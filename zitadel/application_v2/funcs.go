@@ -245,7 +245,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// Zitadel reject the call with FailedPrecondition "No changes", which
 	// would break a name-only update. This mirrors the d.HasChange gating
 	// the v1 application_oidc resource does across its two update RPCs.
-	if d.HasChange(NameVar) {
+	nameChanged := d.HasChange(NameVar)
+	if nameChanged {
 		req.Name = d.Get(NameVar).(string)
 	}
 
@@ -275,9 +276,11 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	// Nothing we send changed; skip the API call entirely to avoid a
-	// spurious "No changes" error from Zitadel. State already equals the
-	// plan, so there is nothing to refresh.
-	if req.Name == "" && req.ApplicationType == nil {
+	// spurious "No changes" error from Zitadel. We test the change signal
+	// (nameChanged) rather than req.Name == "" so that an intentional
+	// change of name to an empty string is not mistaken for "no change".
+	// State already equals the plan, so there is nothing to refresh.
+	if !nameChanged && req.ApplicationType == nil {
 		return nil
 	}
 
