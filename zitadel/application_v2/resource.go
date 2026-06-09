@@ -2,6 +2,7 @@ package application_v2
 
 import (
 	"sort"
+	"time"
 
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -188,6 +189,13 @@ func oidcConfigSchema() *schema.Resource {
 				Default:          "0s",
 				Description:      "Allowed clock skew (Go duration string, e.g. `5s`).",
 				DiffSuppressFunc: helper.DurationDiffSuppress,
+				ValidateDiagFunc: func(value interface{}, _ cty.Path) diag.Diagnostics {
+					s, _ := value.(string)
+					if _, err := time.ParseDuration(s); err != nil {
+						return diag.Errorf("%s must be a valid Go duration string (e.g. \"5s\"): %v", clockSkewVar, err)
+					}
+					return nil
+				},
 			},
 			additionalOriginsVar: {
 				Type:        schema.TypeList,
