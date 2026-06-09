@@ -34,7 +34,37 @@ func GetDatasource() *schema.Resource {
 		Description: "The ID of the project the application belongs to. Optional on the datasource; the application is looked up by `app_id`.",
 	}
 	ds.Schema[helper.OrgIDVar] = helper.OrgIDDatasourceField
+
+	// client_secret is only ever returned by Zitadel on CreateApplication;
+	// GetApplication does not return it. Exposing it on the datasource
+	// would imply the secret is readable, which it is not. Prune it from
+	// the cloned OIDC and API nested schemas so the datasource surface
+	// only advertises fields that can actually be populated from a Get.
+	pruneClientSecret(ds.Schema, oidcBlockVar)
+	pruneClientSecret(ds.Schema, apiBlockVar)
 	return ds
+}
+
+func pruneClientSecret(s map[string]*schema.Schema, block string) {
+	field, ok := s[block]
+	if !ok {
+		return
+	}
+	res, ok := field.Elem.(*schema.Resource)
+	if !ok {
+		return
+	}
+	// The package has a top-level `delete` CRUD function which shadows
+	// the built-in `delete` identifier, so rebuild the schema map
+	// without the unwanted key instead of calling the builtin.
+	pruned := make(map[string]*schema.Schema, len(res.Schema))
+	for k, v := range res.Schema {
+		if k == clientSecretVar {
+			continue
+		}
+		pruned[k] = v
+	}
+	res.Schema = pruned
 }
 
 // ListDatasources returns app IDs filtered by project_id and (optionally) name.

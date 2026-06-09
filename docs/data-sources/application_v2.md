@@ -47,7 +47,6 @@ Read-Only:
 
 - `auth_method_type` (String)
 - `client_id` (String)
-- `client_secret` (String)
 
 
 <a id="nestedatt--oidc"></a>
@@ -62,7 +61,6 @@ Read-Only:
 - `auth_method_type` (String)
 - `back_channel_logout_uri` (String)
 - `client_id` (String)
-- `client_secret` (String)
 - `clock_skew` (String)
 - `compliance_problems` (List of Object) (see [below for nested schema](#nestedobjatt--oidc--compliance_problems))
 - `dev_mode` (Boolean)
