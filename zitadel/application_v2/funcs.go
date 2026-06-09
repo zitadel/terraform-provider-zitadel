@@ -237,32 +237,62 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	req := &apppb.UpdateApplicationRequest{
 		ApplicationId: d.Id(),
 		ProjectId:     d.Get(ProjectIDVar).(string),
-		Name:          d.Get(NameVar).(string),
+	}
+
+	// Both Name and the config oneof are optional on UpdateApplication
+	// ("If not set, the name will not be changed"). Only include the
+	// parts that actually changed: resending an unchanged config makes
+	// Zitadel reject the call with FailedPrecondition "No changes", which
+	// would break a name-only update. This mirrors the d.HasChange gating
+	// the v1 application_oidc resource does across its two update RPCs.
+	if d.HasChange(NameVar) {
+		req.Name = d.Get(NameVar).(string)
 	}
 
 	switch {
 	case nestedBlock(d, oidcBlockVar) != nil:
-		cfg, derr := buildUpdateOIDC(nestedBlock(d, oidcBlockVar))
-		if derr != nil {
-			return derr
+		if d.HasChange(oidcBlockVar) {
+			cfg, derr := buildUpdateOIDC(nestedBlock(d, oidcBlockVar))
+			if derr != nil {
+				return derr
+			}
+			req.ApplicationType = &apppb.UpdateApplicationRequest_OidcConfiguration{OidcConfiguration: cfg}
 		}
-		req.ApplicationType = &apppb.UpdateApplicationRequest_OidcConfiguration{OidcConfiguration: cfg}
 	case nestedBlock(d, samlBlockVar) != nil:
-		req.ApplicationType = &apppb.UpdateApplicationRequest_SamlConfiguration{
-			SamlConfiguration: buildUpdateSAML(nestedBlock(d, samlBlockVar)),
+		if d.HasChange(samlBlockVar) {
+			req.ApplicationType = &apppb.UpdateApplicationRequest_SamlConfiguration{
+				SamlConfiguration: buildUpdateSAML(nestedBlock(d, samlBlockVar)),
+			}
 		}
 	case nestedBlock(d, apiBlockVar) != nil:
-		req.ApplicationType = &apppb.UpdateApplicationRequest_ApiConfiguration{
-			ApiConfiguration: buildUpdateAPI(nestedBlock(d, apiBlockVar)),
+		if d.HasChange(apiBlockVar) {
+			req.ApplicationType = &apppb.UpdateApplicationRequest_ApiConfiguration{
+				ApiConfiguration: buildUpdateAPI(nestedBlock(d, apiBlockVar)),
+			}
 		}
 	default:
 		return diag.Errorf("exactly one of oidc, saml, api must be set")
 	}
 
+	// Nothing we send changed; skip the API call entirely to avoid a
+	// spurious "No changes" error from Zitadel. State already equals the
+	// plan, so there is nothing to refresh.
+	if req.Name == "" && req.ApplicationType == nil {
+		return nil
+	}
+
 	if _, err := client.UpdateApplication(ctx, req); err != nil {
 		return diag.Errorf("failed to update application: %v", err)
 	}
-	return read(ctx, d, m)
+	// Deliberately do not tail-call read() here. The v2 GetApplication
+	// endpoint can lag immediately after UpdateApplication (read-after-
+	// write), returning the pre-update values and reverting freshly
+	// applied attributes in state, which surfaces as a non-empty plan
+	// after apply. Terraform already holds the applied config values;
+	// leave them in state and let the next refresh reconcile any
+	// server-side computed fields. This matches the v1 application_oidc
+	// update, which also returns without re-reading.
+	return nil
 }
 
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

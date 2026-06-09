@@ -85,12 +85,11 @@ resource "zitadel_application_v2" "default" {
   name       = %q
 
   saml {
-    metadata_url = "https://example.com/saml/metadata.xml"
-    login_version {
-      login_v2 {}
-    }
+    metadata_xml = <<EOT
+%s
+EOT
   }
-}`, projectID, property)
+}`, projectID, property, samlSPMetadata)
 		},
 		"app_saml_"+frame.UniqueResourcesID,
 		"app_saml_updated_"+frame.UniqueResourcesID,
@@ -103,9 +102,22 @@ resource "zitadel_application_v2" "default" {
 			test_utils.ImportResourceId(frame.BaseTestFrame),
 			test_utils.ImportOrgId(frame),
 		),
+		// The server normalises the stored metadata XML and computes
+		// login_version, so ignore both on import verification.
+		"saml.0.metadata_xml",
 		"saml.0.login_version",
 	)
 }
+
+// samlSPMetadata is a minimal but valid SAML 2.0 Service Provider metadata
+// document. Zitadel parses and validates the metadata on create, so the
+// SAML acceptance test cannot use a placeholder URL or arbitrary string.
+const samlSPMetadata = `<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://example.com/saml/metadata">
+  <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://example.com/saml/acs" index="0" isDefault="true"/>
+  </md:SPSSODescriptor>
+</md:EntityDescriptor>`
 
 // TestAccApplicationV2_API exercises the unified resource with the API
 // configuration variant, ensuring the oneof dispatch on
@@ -151,12 +163,21 @@ resource "zitadel_application_v2" "default" {
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
+			id := frame.State(state).ID
+			// After a destroy the resource is gone from state and the ID
+			// is empty. The v2 GetApplication RPC validates the ID length
+			// and returns InvalidArgument (not NotFound) for an empty ID,
+			// which the not-found destroy assertion would not recognise.
+			// Treat the empty ID as the application being absent.
+			if id == "" {
+				return test_utils.ErrNotFound
+			}
 			client, err := helper.GetAppV2Client(frame.Context, frame.ClientInfo)
 			if err != nil {
 				return fmt.Errorf("failed to get app v2 client: %w", err)
 			}
 			resp, err := client.GetApplication(frame.Context, &apppb.GetApplicationRequest{
-				ApplicationId: frame.State(state).ID,
+				ApplicationId: id,
 			})
 			if err != nil {
 				return err
