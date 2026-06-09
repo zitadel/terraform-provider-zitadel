@@ -1,13 +1,27 @@
 package application_v2
 
 import (
+	"sort"
+
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	apppb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/application/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
+
+// enumKeys returns the sorted set of valid string values for a protobuf
+// enum's _value map, for use with validation.StringInSlice.
+func enumKeys(m map[string]int32) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
+}
 
 // GetResource returns the unified zitadel_application_v2 resource.
 //
@@ -91,14 +105,20 @@ func oidcConfigSchema() *schema.Resource {
 				Description: "Allowed redirect URIs. Required: OIDC clients cannot function without at least one redirect URI, and the Zitadel API rejects creation otherwise. Matches the v1 `zitadel_application_oidc` requirement.",
 			},
 			responseTypesVar: {
-				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type:         schema.TypeString,
+					ValidateFunc: validation.StringInSlice(enumKeys(apppb.OIDCResponseType_value), false),
+				},
 				Required:    true,
 				Description: "Response types" + helper.DescriptionEnumValuesList(apppb.OIDCResponseType_name),
 			},
 			grantTypesVar: {
-				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type:         schema.TypeString,
+					ValidateFunc: validation.StringInSlice(enumKeys(apppb.OIDCGrantType_value), false),
+				},
 				Required:    true,
 				Description: "Grant types" + helper.DescriptionEnumValuesList(apppb.OIDCGrantType_name),
 			},
