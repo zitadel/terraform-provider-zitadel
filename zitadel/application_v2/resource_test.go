@@ -8,7 +8,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	apppb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/application/v2"
 
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_v2"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project/project_test_dep"
@@ -55,7 +54,6 @@ resource "zitadel_application_v2" "default" {
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_v2.ProjectIDVar),
 			test_utils.ImportOrgId(frame),
 		),
 		// Computed-only / server-derived fields that won't be present in HCL
@@ -63,6 +61,49 @@ resource "zitadel_application_v2" "default" {
 		"oidc.0.client_secret",
 		"oidc.0.compliance_problems",
 		"oidc.0.login_version",
+	)
+}
+
+// TestAccApplicationV2_SAML exercises the unified resource with the SAML
+// configuration variant, including the metadata_url oneof path and the
+// shared login_version sub-block. This catches regressions in the SAML
+// builder/flattener and the metadata oneof dispatch that the OIDC and
+// API tests do not.
+func TestAccApplicationV2_SAML(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_v2")
+	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
+
+	test_utils.RunLifecyleTest(
+		t,
+		frame.BaseTestFrame,
+		[]string{frame.AsOrgDefaultDependency, projectDep},
+		func(property, _ string) string {
+			return fmt.Sprintf(`
+resource "zitadel_application_v2" "default" {
+  org_id     = data.zitadel_org.default.id
+  project_id = %q
+  name       = %q
+
+  saml {
+    metadata_url = "https://example.com/saml/metadata.xml"
+    login_version {
+      login_v2 {}
+    }
+  }
+}`, projectID, property)
+		},
+		"app_saml_"+frame.UniqueResourcesID,
+		"app_saml_updated_"+frame.UniqueResourcesID,
+		"", "", "",
+		false,
+		checkRemoteProperty(frame),
+		helper.ZitadelGeneratedIdOnlyRegex,
+		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
+		test_utils.ChainImportStateIdFuncs(
+			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportOrgId(frame),
+		),
+		"saml.0.login_version",
 	)
 }
 
@@ -98,7 +139,6 @@ resource "zitadel_application_v2" "default" {
 		test_utils.CheckIsNotFoundFromPropertyCheck(checkRemoteProperty(frame), ""),
 		test_utils.ChainImportStateIdFuncs(
 			test_utils.ImportResourceId(frame.BaseTestFrame),
-			test_utils.ImportStateAttribute(frame.BaseTestFrame, application_v2.ProjectIDVar),
 			test_utils.ImportOrgId(frame),
 		),
 		"api.0.client_secret",

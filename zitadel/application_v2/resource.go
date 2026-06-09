@@ -74,10 +74,10 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		UpdateContext: update,
 		DeleteContext: delete,
-		Importer: helper.ImportWithIDAndOptionalOrg(
-			AppIDVar,
-			helper.NewImportAttribute(ProjectIDVar, helper.ConvertID, false),
-		),
+		// The import ID format is `<app_id[:org_id]>`. project_id is not
+		// required because read() refreshes it from the v2 GetApplication
+		// response, which carries project_id on the Application proto.
+		Importer: helper.ImportWithIDAndOptionalOrg(AppIDVar),
 	}
 }
 
