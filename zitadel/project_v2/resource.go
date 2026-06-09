@@ -35,10 +35,6 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "State of the project",
-				/* Not necessary as long as only active projects are created
-				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return EnumValueValidation(projectStateVar, value, project.ProjectState_value)
-				},*/
 			},
 			roleAssertionVar: {
 				Type:        schema.TypeBool,
