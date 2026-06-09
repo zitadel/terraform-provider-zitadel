@@ -218,17 +218,19 @@ func samlConfigSchema() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			metadataXMLVar: {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Sensitive:    true,
-				ExactlyOneOf: []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
-				Description:  "SAML metadata as raw XML. Mutually exclusive with `metadata_url`. Marked sensitive because SAML metadata documents commonly embed signing/encryption certificates.",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Sensitive:        true,
+				ExactlyOneOf:     []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
+				ValidateDiagFunc: nonEmptyString(metadataXMLVar),
+				Description:      "SAML metadata as raw XML. Mutually exclusive with `metadata_url`. Marked sensitive because SAML metadata documents commonly embed signing/encryption certificates.",
 			},
 			metadataURLVar: {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ExactlyOneOf: []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
-				Description:  "URL from which SAML metadata can be fetched. Mutually exclusive with `metadata_xml`.",
+				Type:             schema.TypeString,
+				Optional:         true,
+				ExactlyOneOf:     []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
+				ValidateDiagFunc: nonEmptyString(metadataURLVar),
+				Description:      "URL from which SAML metadata can be fetched. Mutually exclusive with `metadata_xml`.",
 			},
 			loginVersionVar: loginVersionSchema(samlBlockVar),
 		},
@@ -260,6 +262,21 @@ func apiConfigSchema() *schema.Resource {
 				Description: "Generated client secret (only returned on create).",
 			},
 		},
+	}
+}
+
+// nonEmptyString returns a ValidateDiagFunc that rejects empty strings.
+// Used on the SAML metadata fields where ExactlyOneOf alone is not enough:
+// HCL permits the user to satisfy ExactlyOneOf by setting `metadata_xml =
+// ""`, but an empty string carries no SAML metadata and the builder treats
+// it as "unset", which would either fail the API call or produce a
+// perpetual diff.
+func nonEmptyString(attr string) schema.SchemaValidateDiagFunc {
+	return func(value interface{}, _ cty.Path) diag.Diagnostics {
+		if s, _ := value.(string); s == "" {
+			return diag.Errorf("%s must not be an empty string when set; omit the attribute instead", attr)
+		}
+		return nil
 	}
 }
 
