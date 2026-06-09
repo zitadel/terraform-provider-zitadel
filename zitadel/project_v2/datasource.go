@@ -23,7 +23,7 @@ func GetDatasource() *schema.Resource {
 				Computed:    true,
 				Description: "Name of the project",
 			},
-			helper.OrgIDVar: helper.OrgIDResourceField,
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
 			stateVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -58,7 +58,7 @@ func ListDatasources() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: helper.OrgIDResourceField,
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
 			projectIDsVar: {
 				Type:        schema.TypeList,
 				Computed:    true,
