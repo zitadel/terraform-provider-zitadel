@@ -25,6 +25,9 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope all subsequent API calls to the org_id attribute so middleware
+	// metadata is set consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 
 	_, err = client.DeleteProject(ctx, &projectpb.DeleteProjectRequest{
 		ProjectId: d.Id(),
@@ -47,6 +50,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope all subsequent API calls to the org_id attribute so middleware
+	// metadata is set consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 
 	projectRoleAssertion := d.Get(roleAssertionVar).(bool)
 	authRequired := d.Get(roleCheckVar).(bool)
@@ -82,6 +88,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope all subsequent API calls to the org_id attribute so middleware
+	// metadata is set consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 
 	plSetting := projectpb.PrivateLabelingSetting(projectpb.PrivateLabelingSetting_value[d.Get(privateLabelingSettingVar).(string)])
 
@@ -112,6 +121,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope all subsequent API calls to the org_id attribute so middleware
+	// metadata is set consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 
 	resp, err := client.GetProject(ctx, &projectpb.GetProjectRequest{ProjectId: helper.GetID(d, ProjectIDVar)})
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
@@ -154,6 +166,9 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope all subsequent API calls to the org_id attribute so middleware
+	// metadata is set consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 	req := &projectpb.ListProjectsRequest{
 		Filters: make([]*projectpb.ProjectSearchFilter, 0),
 	}

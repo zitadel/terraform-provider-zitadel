@@ -25,11 +25,11 @@ data "zitadel_application_v2" "default" {
 ### Required
 
 - `app_id` (String) The ID of the application.
-- `project_id` (String) The ID of the project the application belongs to.
 
 ### Optional
 
 - `org_id` (String) ID of the organization
+- `project_id` (String) The ID of the project the application belongs to. Optional on the datasource; the application is looked up by `app_id`.
 
 ### Read-Only
 

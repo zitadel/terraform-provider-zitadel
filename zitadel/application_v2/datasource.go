@@ -24,10 +24,14 @@ func GetDatasource() *schema.Resource {
 		Required:    true,
 		Description: "The ID of the application.",
 	}
+	// project_id is exposed for state-shape parity with the resource but is
+	// not required to look up an application: the v2 GetApplication RPC
+	// keys off application_id alone.
 	ds.Schema[ProjectIDVar] = &schema.Schema{
 		Type:        schema.TypeString,
-		Required:    true,
-		Description: "The ID of the project the application belongs to.",
+		Optional:    true,
+		Computed:    true,
+		Description: "The ID of the project the application belongs to. Optional on the datasource; the application is looked up by `app_id`.",
 	}
 	ds.Schema[helper.OrgIDVar] = helper.OrgIDDatasourceField
 	return ds
@@ -70,6 +74,9 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope the call to the org_id attribute so middleware metadata is set
+	// consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 
 	filters := make([]*apppb.ApplicationSearchFilter, 0, 2)
 	if pid := d.Get(ProjectIDVar).(string); pid != "" {

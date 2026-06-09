@@ -26,6 +26,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope all subsequent API calls to the org_id attribute so middleware
+	// metadata is set consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 
 	req := &apppb.CreateApplicationRequest{
 		ProjectId: d.Get(ProjectIDVar).(string),
@@ -87,6 +90,9 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope all subsequent API calls to the org_id attribute so middleware
+	// metadata is set consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 
 	resp, err := client.GetApplication(ctx, &apppb.GetApplicationRequest{
 		ApplicationId: helper.GetID(d, AppIDVar),
@@ -159,6 +165,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope all subsequent API calls to the org_id attribute so middleware
+	// metadata is set consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 
 	req := &apppb.UpdateApplicationRequest{
 		ApplicationId: d.Id(),
@@ -202,6 +211,9 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// Scope all subsequent API calls to the org_id attribute so middleware
+	// metadata is set consistently with the rest of the provider.
+	ctx = helper.CtxWithOrgID(ctx, d)
 	if _, err := client.DeleteApplication(ctx, &apppb.DeleteApplicationRequest{
 		ApplicationId: d.Id(),
 		ProjectId:     d.Get(ProjectIDVar).(string),
