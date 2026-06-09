@@ -177,14 +177,17 @@ func oidcConfigSchema() *schema.Resource {
 				Optional: true,
 			},
 			backChannelLogoutURIVar: {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Back-channel logout URI used by ZITADEL to notify the application of terminated sessions (OIDC Back-Channel Logout). Computed if not set, so the server-side default flows back into state.",
 			},
 			loginVersionVar: loginVersionSchema(oidcBlockVar),
 
 			clientIDVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "Generated client ID.",
 			},
 			clientSecretVar: {
@@ -217,8 +220,9 @@ func samlConfigSchema() *schema.Resource {
 			metadataXMLVar: {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Sensitive:    true,
 				ExactlyOneOf: []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
-				Description:  "SAML metadata as raw XML. Mutually exclusive with `metadata_url`.",
+				Description:  "SAML metadata as raw XML. Mutually exclusive with `metadata_url`. Marked sensitive because SAML metadata documents commonly embed signing/encryption certificates.",
 			},
 			metadataURLVar: {
 				Type:         schema.TypeString,
@@ -244,13 +248,16 @@ func apiConfigSchema() *schema.Resource {
 				Default: apppb.APIAuthMethodType_name[0],
 			},
 			clientIDVar: {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Sensitive:   true,
+				Description: "Generated client ID.",
 			},
 			clientSecretVar: {
-				Type:      schema.TypeString,
-				Computed:  true,
-				Sensitive: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Sensitive:   true,
+				Description: "Generated client secret (only returned on create).",
 			},
 		},
 	}
@@ -267,7 +274,8 @@ func loginVersionSchema(parentBlock string) *schema.Schema {
 		Type:        schema.TypeList,
 		MaxItems:    1,
 		Optional:    true,
-		Description: "Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set.",
+		Computed:    true,
+		Description: "Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set. Computed so that the server-side default flows back into state when the user omits this block.",
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				loginV1Var: {

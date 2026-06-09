@@ -66,8 +66,8 @@ Optional:
 
 Read-Only:
 
-- `client_id` (String)
-- `client_secret` (String, Sensitive)
+- `client_id` (String, Sensitive) Generated client ID.
+- `client_secret` (String, Sensitive) Generated client secret (only returned on create).
 
 
 <a id="nestedblock--oidc"></a>
@@ -85,12 +85,12 @@ Optional:
 - `additional_origins` (List of String) Additional allowed origins.
 - `app_type` (String) Application type, supported values: OIDC_APP_TYPE_WEB, OIDC_APP_TYPE_USER_AGENT, OIDC_APP_TYPE_NATIVE
 - `auth_method_type` (String) Auth method type, supported values: OIDC_AUTH_METHOD_TYPE_BASIC, OIDC_AUTH_METHOD_TYPE_POST, OIDC_AUTH_METHOD_TYPE_NONE, OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT
-- `back_channel_logout_uri` (String)
+- `back_channel_logout_uri` (String) Back-channel logout URI used by ZITADEL to notify the application of terminated sessions (OIDC Back-Channel Logout). Computed if not set, so the server-side default flows back into state.
 - `clock_skew` (String) Allowed clock skew (Go duration string, e.g. `5s`).
 - `dev_mode` (Boolean) Development mode (relaxes redirect-URI validation).
 - `id_token_role_assertion` (Boolean)
 - `id_token_userinfo_assertion` (Boolean)
-- `login_version` (Block List, Max: 1) Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set. (see [below for nested schema](#nestedblock--oidc--login_version))
+- `login_version` (Block List, Max: 1) Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set. Computed so that the server-side default flows back into state when the user omits this block. (see [below for nested schema](#nestedblock--oidc--login_version))
 - `post_logout_redirect_uris` (List of String) Post-logout redirect URIs.
 - `redirect_uris` (List of String) Allowed redirect URIs.
 - `skip_native_app_success_page` (Boolean)
@@ -98,7 +98,7 @@ Optional:
 
 Read-Only:
 
-- `client_id` (String) Generated client ID.
+- `client_id` (String, Sensitive) Generated client ID.
 - `client_secret` (String, Sensitive) Generated client secret (only set on create when the auth method requires one).
 - `compliance_problems` (List of Object) (see [below for nested schema](#nestedatt--oidc--compliance_problems))
 - `none_compliant` (Boolean)
@@ -135,9 +135,9 @@ Read-Only:
 
 Optional:
 
-- `login_version` (Block List, Max: 1) Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set. (see [below for nested schema](#nestedblock--saml--login_version))
+- `login_version` (Block List, Max: 1) Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set. Computed so that the server-side default flows back into state when the user omits this block. (see [below for nested schema](#nestedblock--saml--login_version))
 - `metadata_url` (String) URL from which SAML metadata can be fetched. Mutually exclusive with `metadata_xml`.
-- `metadata_xml` (String) SAML metadata as raw XML. Mutually exclusive with `metadata_url`.
+- `metadata_xml` (String, Sensitive) SAML metadata as raw XML. Mutually exclusive with `metadata_url`. Marked sensitive because SAML metadata documents commonly embed signing/encryption certificates.
 
 <a id="nestedblock--saml--login_version"></a>
 ### Nested Schema for `saml.login_version`

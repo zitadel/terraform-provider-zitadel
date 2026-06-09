@@ -169,6 +169,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// metadata is set consistently with the rest of the provider.
 	ctx = helper.CtxWithOrgID(ctx, d)
 
+	// Reject mid-life application_type changes (e.g. oidc -> saml). The
+	// Zitadel API does not support converting an existing application from
+	// one type to another, so without this check the user would get a
+	// confusing wire-level error at apply time. They need to recreate the
+	// resource instead.
+	if oldType, newType := activeAppType(d); oldType != "" && newType != "" && oldType != newType {
+		return diag.Errorf("changing application_type from %q to %q is not supported by the Zitadel API; remove the resource from configuration and add it back to recreate it with the new type", oldType, newType)
+	}
+
 	req := &apppb.UpdateApplicationRequest{
 		ApplicationId: d.Id(),
 		ProjectId:     d.Get(ProjectIDVar).(string),
@@ -284,7 +293,13 @@ func buildUpdateOIDC(cfg map[string]interface{}) (*apppb.UpdateOIDCApplicationCo
 	idTokenUserinfoAssertion := cfg[idTokenUserinfoAssertionVar].(bool)
 	skipNative := cfg[skipNativeAppSuccessPageVar].(bool)
 
-	req := &apppb.UpdateOIDCApplicationConfigurationRequest{
+	// Pass BackChannelLogoutUri as a pointer unconditionally, including when
+	// it is an empty string. This lets the practitioner clear a previously
+	// set URI by removing the field from configuration; with a nil pointer
+	// the server treats the field as absent and would never reset it.
+	backCh := cfg[backChannelLogoutURIVar].(string)
+
+	return &apppb.UpdateOIDCApplicationConfigurationRequest{
 		RedirectUris:             toStringSlice(cfg[redirectURIsVar]),
 		ResponseTypes:            respTypes,
 		GrantTypes:               grantTypes,
@@ -298,12 +313,9 @@ func buildUpdateOIDC(cfg map[string]interface{}) (*apppb.UpdateOIDCApplicationCo
 		AdditionalOrigins:        toStringSlice(cfg[additionalOriginsVar]),
 		ClockSkew:                durationpb.New(dur),
 		SkipNativeAppSuccessPage: &skipNative,
+		BackChannelLogoutUri:     &backCh,
 		LoginVersion:             buildLoginVersion(cfg[loginVersionVar]),
-	}
-	if backCh := cfg[backChannelLogoutURIVar].(string); backCh != "" {
-		req.BackChannelLogoutUri = &backCh
-	}
-	return req, nil
+	}, nil
 }
 
 func flattenOIDC(d *schema.ResourceData, oidc *apppb.OIDCConfiguration) map[string]interface{} {
@@ -525,6 +537,33 @@ func toStringSlice(in interface{}) []string {
 		out = append(out, v.(string))
 	}
 	return out
+}
+
+// activeAppType inspects the prior and proposed state of the three mutually
+// exclusive config blocks and returns the active application type for each.
+// An empty string means no block was populated on that side. ResourceData's
+// GetChange returns (old, new) pairs even during plan/apply, so this works
+// both for detecting the active type during an update and for the
+// new-resource case (where old is empty).
+func activeAppType(d *schema.ResourceData) (oldType, newType string) {
+	for _, key := range []string{oidcBlockVar, samlBlockVar, apiBlockVar} {
+		oldV, newV := d.GetChange(key)
+		if listHasContent(oldV) {
+			oldType = key
+		}
+		if listHasContent(newV) {
+			newType = key
+		}
+	}
+	return oldType, newType
+}
+
+func listHasContent(v interface{}) bool {
+	list, ok := v.([]interface{})
+	if !ok {
+		return false
+	}
+	return len(list) > 0 && list[0] != nil
 }
 
 func stringOrDefault(v interface{}, def string) string {
