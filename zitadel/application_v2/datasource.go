@@ -155,6 +155,7 @@ func cloneFieldAsComputed(s *schema.Schema) *schema.Schema {
 	dup.Optional = false
 	dup.Default = nil
 	dup.ValidateDiagFunc = nil
+	dup.ValidateFunc = nil
 	dup.ForceNew = false
 	dup.ExactlyOneOf = nil
 	dup.ConflictsWith = nil
