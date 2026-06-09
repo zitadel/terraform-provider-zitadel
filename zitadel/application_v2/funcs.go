@@ -62,17 +62,45 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	d.SetId(resp.GetApplicationId())
 
-	// Persist credentials returned only on create. We surface any d.Set
-	// failure here because client_secret in particular is only ever
-	// returned by the API at create time — silently dropping it would
-	// strand the practitioner with no way to recover the secret short of
+	// A successful CreateApplication leaves the app in ACTIVE state.
+	// Set it explicitly so the Computed `state` attribute is populated
+	// without a tail-call to read().
+	if err := d.Set(stateVar, apppb.ApplicationState_APPLICATION_STATE_ACTIVE.String()); err != nil {
+		return diag.FromErr(err)
+	}
+
+	// Persist everything we can derive from the CreateApplication
+	// response directly into state, without tail-calling read(). The v2
+	// GetApplication endpoint exhibits a short eventual-consistency
+	// window after CreateApplication: an immediate Get can return OK
+	// with an empty Application payload, which the defensive guard in
+	// read() then treats as "deleted" and clears d.Id(). Terraform's
+	// SDK consistency check then fires with "Root object was present,
+	// but now absent". project_v2/funcs.go avoids this by not
+	// tail-calling read, so do the same here. Terraform's refresh on
+	// the next plan picks up server-derived fields once the write has
+	// settled.
+	//
+	// We surface any d.Set failure because client_secret is only ever
+	// returned by the API at create time; silently dropping it would
+	// strand the practitioner with no way to recover it short of
 	// rotating it server-side.
 	if oidc := resp.GetOidcConfiguration(); oidc != nil {
-		if err := writeNested(d, oidcBlockVar, map[string]interface{}{
-			clientIDVar:     oidc.GetClientId(),
-			clientSecretVar: oidc.GetClientSecret(),
-		}); err != nil {
-			return diag.Errorf("failed to persist OIDC client credentials in state: %v", err)
+		fields := map[string]interface{}{
+			clientIDVar:      oidc.GetClientId(),
+			clientSecretVar:  oidc.GetClientSecret(),
+			noneCompliantVar: oidc.GetNonCompliant(),
+		}
+		problems := make([]interface{}, 0, len(oidc.GetComplianceProblems()))
+		for _, p := range oidc.GetComplianceProblems() {
+			problems = append(problems, map[string]interface{}{
+				complianceKeyVar:     p.GetKey(),
+				complianceMessageVar: p.GetLocalizedMessage(),
+			})
+		}
+		fields[complianceProblemsVar] = problems
+		if err := writeNested(d, oidcBlockVar, fields); err != nil {
+			return diag.Errorf("failed to persist OIDC config in state: %v", err)
 		}
 	}
 	if api := resp.GetApiConfiguration(); api != nil {
@@ -84,7 +112,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	return read(ctx, d, m)
+	return nil
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
