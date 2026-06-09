@@ -520,7 +520,14 @@ func flattenOIDC(d *schema.ResourceData, oidc *apppb.OIDCConfiguration) map[stri
 		clientIDVar:                 oidc.GetClientId(),
 		noneCompliantVar:            oidc.GetNonCompliant(),
 		complianceProblemsVar:       problems,
-		loginVersionVar:             flattenLoginVersion(oidc.GetLoginVersion()),
+	}
+
+	// Only set login_version when the server actually returned one. It is
+	// Optional+Computed, so writing an empty/null value can produce a
+	// perpetual diff; omitting it lets Terraform keep the computed value.
+	// Mirrors the v1 application_oidc read behaviour.
+	if lv := flattenLoginVersion(oidc.GetLoginVersion()); len(lv) > 0 {
+		out[loginVersionVar] = lv
 	}
 
 	// Preserve client_secret if previously stored (server doesn't return it on Get).
@@ -561,8 +568,12 @@ func buildUpdateSAML(cfg map[string]interface{}) *apppb.UpdateSAMLApplicationCon
 }
 
 func flattenSAML(d *schema.ResourceData, saml *apppb.SAMLConfiguration) map[string]interface{} {
-	out := map[string]interface{}{
-		loginVersionVar: flattenLoginVersion(saml.GetLoginVersion()),
+	out := map[string]interface{}{}
+
+	// Only set login_version when the server returned one (Optional+Computed;
+	// writing an empty value can cause a perpetual diff).
+	if lv := flattenLoginVersion(saml.GetLoginVersion()); len(lv) > 0 {
+		out[loginVersionVar] = lv
 	}
 
 	// A metadata_url-backed application has its metadata fetched and stored
