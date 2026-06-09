@@ -2,6 +2,8 @@ package application_v2
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -12,6 +14,69 @@ import (
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
+
+// importApplication implements `terraform import` for zitadel_application_v2.
+//
+// Import ID format: <app_id[:org_id[:client_secret]]> (positional; supply an
+// empty org_id segment if you need to pass a secret without an org, e.g.
+// "<app_id>::<secret>").
+//
+// client_secret is accepted because the v2 GetApplication RPC never returns
+// it (it is only emitted once, at create) and the attribute is Computed-only,
+// so it cannot be re-supplied via configuration. Without this, importing or
+// migrating a secret-bearing app would permanently drop the secret from
+// state. Because the secret lives in a per-type nested block, we look up the
+// application to learn its type and seed the secret into the matching
+// oidc/api block; read() then preserves it.
+func importApplication(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	// SplitN with limit 3 keeps any ':' characters inside the secret intact.
+	parts := strings.SplitN(d.Id(), ":", 3)
+
+	appID := parts[0]
+	if appID == "" {
+		return nil, fmt.Errorf("import id must start with the application id, got %q", d.Id())
+	}
+	d.SetId(appID)
+
+	if len(parts) >= 2 && parts[1] != "" {
+		if err := d.Set(helper.OrgIDVar, parts[1]); err != nil {
+			return nil, err
+		}
+	}
+
+	if len(parts) == 3 && parts[2] != "" {
+		secret := parts[2]
+		clientinfo, ok := m.(*helper.ClientInfo)
+		if !ok {
+			return nil, fmt.Errorf("failed to get client")
+		}
+		client, err := helper.GetAppV2Client(ctx, clientinfo)
+		if err != nil {
+			return nil, err
+		}
+		// Determine the application type so the secret lands in the right
+		// nested block; read() will then preserve it.
+		resp, err := client.GetApplication(helper.CtxWithOrgID(ctx, d), &apppb.GetApplicationRequest{ApplicationId: appID})
+		if err != nil {
+			return nil, fmt.Errorf("failed to look up application %q while importing its client_secret: %w", appID, err)
+		}
+		app := resp.GetApplication()
+		switch {
+		case app.GetOidcConfiguration() != nil:
+			if err := d.Set(oidcBlockVar, []interface{}{map[string]interface{}{clientSecretVar: secret}}); err != nil {
+				return nil, err
+			}
+		case app.GetApiConfiguration() != nil:
+			if err := d.Set(apiBlockVar, []interface{}{map[string]interface{}{clientSecretVar: secret}}); err != nil {
+				return nil, err
+			}
+		default:
+			return nil, fmt.Errorf("a client_secret was provided on import, but application %q is neither an OIDC nor an API application (only those have a client secret)", appID)
+		}
+	}
+
+	return []*schema.ResourceData{d}, nil
+}
 
 // create dispatches on which nested config block is set in HCL and fills
 // the matching oneof branch of CreateApplicationRequest.application_type.

@@ -89,10 +89,17 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		UpdateContext: update,
 		DeleteContext: delete,
-		// The import ID format is `<app_id[:org_id]>`. project_id is not
-		// required because read() refreshes it from the v2 GetApplication
-		// response, which carries project_id on the Application proto.
-		Importer: helper.ImportWithIDAndOptionalOrg(AppIDVar),
+		// Import ID format: `<app_id[:org_id[:client_secret]]>`.
+		//
+		// project_id is not part of the ID because read() refreshes it from
+		// the v2 GetApplication response. client_secret is an optional
+		// trailing segment because the API never returns it after create
+		// and it is a Computed-only attribute, so a migrated/re-imported
+		// secret-bearing app would otherwise lose its secret from state
+		// with no way to restore it short of rotating it. This mirrors the
+		// optional client_secret import segment of the v1 application_oidc
+		// and application_api resources.
+		Importer: &schema.ResourceImporter{StateContext: importApplication},
 	}
 }
 
