@@ -151,7 +151,10 @@ func oidcConfigSchema() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 				Description: "OIDC version" + helper.DescriptionEnumValuesList(apppb.OIDCVersion_name),
-				Default:     apppb.OIDCVersion_name[0],
+				ValidateDiagFunc: func(value interface{}, _ cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(versionVar, value, apppb.OIDCVersion_value)
+				},
+				Default: apppb.OIDCVersion_name[0],
 			},
 			devModeVar: {
 				Type:        schema.TypeBool,
