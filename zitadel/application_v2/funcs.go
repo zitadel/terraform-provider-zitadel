@@ -312,10 +312,14 @@ func buildUpdateOIDC(cfg map[string]interface{}) (*apppb.UpdateOIDCApplicationCo
 	skipNative := cfg[skipNativeAppSuccessPageVar].(bool)
 	devMode := cfg[devModeVar].(bool)
 
-	// Pass BackChannelLogoutUri as a pointer unconditionally, including when
-	// it is an empty string. This lets the practitioner clear a previously
-	// set URI by removing the field from configuration; with a nil pointer
-	// the server treats the field as absent and would never reset it.
+	// Pass BackChannelLogoutUri as a pointer unconditionally, including
+	// when it is an empty string. Because back_channel_logout_uri is
+	// Optional+Computed, simply removing the field from HCL leaves the
+	// stored value in state untouched. To actually clear a previously set
+	// URI the practitioner sets the attribute to "" explicitly; that
+	// empty string then needs to reach the server, which only happens if
+	// we always send the pointer (a nil pointer would be treated as "no
+	// change" by the API).
 	backCh := cfg[backChannelLogoutURIVar].(string)
 
 	return &apppb.UpdateOIDCApplicationConfigurationRequest{

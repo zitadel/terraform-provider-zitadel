@@ -87,8 +87,8 @@ func oidcConfigSchema() *schema.Resource {
 			redirectURIsVar: {
 				Type:        schema.TypeList,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Optional:    true,
-				Description: "Allowed redirect URIs.",
+				Required:    true,
+				Description: "Allowed redirect URIs. Required: OIDC clients cannot function without at least one redirect URI, and the Zitadel API rejects creation otherwise. Matches the v1 `zitadel_application_oidc` requirement.",
 			},
 			responseTypesVar: {
 				Type:        schema.TypeList,

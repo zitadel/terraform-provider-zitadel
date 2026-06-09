@@ -76,6 +76,7 @@ Read-Only:
 Required:
 
 - `grant_types` (List of String) Grant types, supported values: OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDC_GRANT_TYPE_IMPLICIT, OIDC_GRANT_TYPE_REFRESH_TOKEN, OIDC_GRANT_TYPE_DEVICE_CODE, OIDC_GRANT_TYPE_TOKEN_EXCHANGE
+- `redirect_uris` (List of String) Allowed redirect URIs. Required: OIDC clients cannot function without at least one redirect URI, and the Zitadel API rejects creation otherwise. Matches the v1 `zitadel_application_oidc` requirement.
 - `response_types` (List of String) Response types, supported values: OIDC_RESPONSE_TYPE_UNSPECIFIED, OIDC_RESPONSE_TYPE_CODE, OIDC_RESPONSE_TYPE_ID_TOKEN, OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN
 
 Optional:
@@ -92,7 +93,6 @@ Optional:
 - `id_token_userinfo_assertion` (Boolean)
 - `login_version` (Block List, Max: 1) Login UI version to use for this application. Exactly one of `login_v1` and `login_v2` may be set. Computed so that the server-side default flows back into state when the user omits this block. (see [below for nested schema](#nestedblock--oidc--login_version))
 - `post_logout_redirect_uris` (List of String) Post-logout redirect URIs.
-- `redirect_uris` (List of String) Allowed redirect URIs.
 - `skip_native_app_success_page` (Boolean)
 - `version` (String) OIDC version, supported values: OIDC_VERSION_1_0
 
