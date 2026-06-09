@@ -13,7 +13,17 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: helper.OrgIDResourceField,
+			// org_id is Required here (unlike most resources where it is
+			// optional) because the v2 CreateProject RPC takes the
+			// organization as an explicit OrganizationId field in the
+			// request body rather than as context metadata. An empty value
+			// produces an invalid request that fails at apply time.
+			helper.OrgIDVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "ID of the organization the project belongs to. Required because the v2 CreateProject API takes the organization as an explicit request field.",
+			},
 			NameVar: {
 				Type:        schema.TypeString,
 				Required:    true,

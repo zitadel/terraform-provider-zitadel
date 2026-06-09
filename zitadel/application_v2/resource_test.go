@@ -65,10 +65,10 @@ resource "zitadel_application_v2" "default" {
 }
 
 // TestAccApplicationV2_SAML exercises the unified resource with the SAML
-// configuration variant, including the metadata_url oneof path and the
-// shared login_version sub-block. This catches regressions in the SAML
-// builder/flattener and the metadata oneof dispatch that the OIDC and
-// API tests do not.
+// configuration variant, using the metadata_xml branch of the SAML
+// metadata oneof. This catches regressions in the SAML builder/flattener
+// and the application-type oneof dispatch that the OIDC and API tests do
+// not.
 func TestAccApplicationV2_SAML(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_v2")
 	projectDep, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)

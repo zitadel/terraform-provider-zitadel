@@ -47,12 +47,21 @@ func TestAccProjectV2(t *testing.T) {
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
+			id := frame.State(state).ID
+			// After a destroy the resource is gone from state and the ID
+			// is empty. The v2 GetProject RPC rejects an empty ID with
+			// InvalidArgument rather than NotFound, which the not-found
+			// destroy assertion would not recognise. Treat an empty ID as
+			// the project being absent.
+			if id == "" {
+				return test_utils.ErrNotFound
+			}
 			client, err := helper.GetProjectV2Client(frame.Context, frame.ClientInfo)
 			if err != nil {
 				return fmt.Errorf("failed to get project v2 client: %w", err)
 			}
 			resp, err := client.GetProject(frame.Context, &projectpb.GetProjectRequest{
-				ProjectId: frame.State(state).ID,
+				ProjectId: id,
 			})
 			if err != nil {
 				return err
