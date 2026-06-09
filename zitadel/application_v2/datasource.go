@@ -20,9 +20,10 @@ func GetDatasource() *schema.Resource {
 		ReadContext: read,
 	}
 	ds.Schema[AppIDVar] = &schema.Schema{
-		Type:        schema.TypeString,
-		Required:    true,
-		Description: "The ID of the application.",
+		Type:             schema.TypeString,
+		Required:         true,
+		ValidateDiagFunc: nonEmptyString(AppIDVar),
+		Description:      "The ID of the application.",
 	}
 	// project_id is exposed for state-shape parity with the resource but is
 	// not required to look up an application: the v2 GetApplication RPC

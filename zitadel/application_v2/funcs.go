@@ -36,6 +36,12 @@ func importApplication(ctx context.Context, d *schema.ResourceData, m interface{
 	if appID == "" {
 		return nil, fmt.Errorf("import id must start with the application id, got %q", d.Id())
 	}
+	// Validate the ID format up front so a typo fails with a clear message
+	// rather than an opaque API error, consistent with the ConvertID check
+	// the v1 importers use.
+	if _, err := helper.ConvertID(appID); err != nil {
+		return nil, fmt.Errorf("invalid application id in import id: %w", err)
+	}
 	d.SetId(appID)
 
 	if len(parts) >= 2 && parts[1] != "" {

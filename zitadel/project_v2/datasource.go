@@ -14,8 +14,16 @@ func GetDatasource() *schema.Resource {
 		Description: "Datasource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
 		Schema: map[string]*schema.Schema{
 			ProjectIDVar: {
-				Type:        schema.TypeString,
-				Required:    true,
+				Type:     schema.TypeString,
+				Required: true,
+				// Required permits "", which would make the v2 GetProject
+				// call fail at apply with InvalidArgument. Reject it at plan.
+				ValidateDiagFunc: func(value interface{}, _ cty.Path) diag.Diagnostics {
+					if s, _ := value.(string); s == "" {
+						return diag.Errorf("%s must not be empty", ProjectIDVar)
+					}
+					return nil
+				},
 				Description: "The ID of this resource.",
 			},
 			NameVar: {
