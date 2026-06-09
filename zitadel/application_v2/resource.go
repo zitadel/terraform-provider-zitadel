@@ -110,6 +110,7 @@ func oidcConfigSchema() *schema.Resource {
 				Type:        schema.TypeList,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Required:    true,
+				MinItems:    1,
 				Description: "Allowed redirect URIs. Required: OIDC clients cannot function without at least one redirect URI, and the Zitadel API rejects creation otherwise. Matches the v1 `zitadel_application_oidc` requirement.",
 			},
 			responseTypesVar: {
@@ -119,6 +120,7 @@ func oidcConfigSchema() *schema.Resource {
 					ValidateFunc: validation.StringInSlice(enumKeys(apppb.OIDCResponseType_value), false),
 				},
 				Required:    true,
+				MinItems:    1,
 				Description: "Response types" + helper.DescriptionEnumValuesList(apppb.OIDCResponseType_name),
 			},
 			grantTypesVar: {
@@ -128,6 +130,7 @@ func oidcConfigSchema() *schema.Resource {
 					ValidateFunc: validation.StringInSlice(enumKeys(apppb.OIDCGrantType_value), false),
 				},
 				Required:    true,
+				MinItems:    1,
 				Description: "Grant types" + helper.DescriptionEnumValuesList(apppb.OIDCGrantType_name),
 			},
 			appTypeVar: {
