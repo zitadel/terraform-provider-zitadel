@@ -495,15 +495,33 @@ func buildUpdateSAML(cfg map[string]interface{}) *apppb.UpdateSAMLApplicationCon
 	return req
 }
 
-func flattenSAML(_ *schema.ResourceData, saml *apppb.SAMLConfiguration) map[string]interface{} {
+func flattenSAML(d *schema.ResourceData, saml *apppb.SAMLConfiguration) map[string]interface{} {
 	out := map[string]interface{}{
 		loginVersionVar: flattenLoginVersion(saml.GetLoginVersion()),
 	}
-	if xml := saml.GetMetadataXml(); len(xml) > 0 {
-		out[metadataXMLVar] = string(xml)
+
+	// A metadata_url-backed application has its metadata fetched and stored
+	// by ZITADEL, so GetApplication returns BOTH metadata_url (the source)
+	// and metadata_xml (the resolved document). Populating both would
+	// violate the metadata_xml/metadata_url ExactlyOneOf constraint and
+	// produce an inconsistent-result error or a perpetual diff. Set only
+	// the field the practitioner configured (tracked via prior state), and
+	// fall back to preferring metadata_url for a fresh import where no
+	// prior state is available.
+	urlConfigured := false
+	if prev := nestedBlock(d, samlBlockVar); prev != nil {
+		if u, ok := prev[metadataURLVar].(string); ok && u != "" {
+			urlConfigured = true
+		}
 	}
-	if url := saml.GetMetadataUrl(); url != "" {
-		out[metadataURLVar] = url
+
+	switch {
+	case urlConfigured:
+		out[metadataURLVar] = saml.GetMetadataUrl()
+	case len(saml.GetMetadataXml()) > 0:
+		out[metadataXMLVar] = string(saml.GetMetadataXml())
+	case saml.GetMetadataUrl() != "":
+		out[metadataURLVar] = saml.GetMetadataUrl()
 	}
 	return out
 }
