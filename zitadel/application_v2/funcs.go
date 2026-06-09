@@ -62,18 +62,26 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	d.SetId(resp.GetApplicationId())
 
-	// Persist credentials returned only on create.
+	// Persist credentials returned only on create. We surface any d.Set
+	// failure here because client_secret in particular is only ever
+	// returned by the API at create time — silently dropping it would
+	// strand the practitioner with no way to recover the secret short of
+	// rotating it server-side.
 	if oidc := resp.GetOidcConfiguration(); oidc != nil {
-		writeNested(d, oidcBlockVar, map[string]interface{}{
+		if err := writeNested(d, oidcBlockVar, map[string]interface{}{
 			clientIDVar:     oidc.GetClientId(),
 			clientSecretVar: oidc.GetClientSecret(),
-		})
+		}); err != nil {
+			return diag.Errorf("failed to persist OIDC client credentials in state: %v", err)
+		}
 	}
 	if api := resp.GetApiConfiguration(); api != nil {
-		writeNested(d, apiBlockVar, map[string]interface{}{
+		if err := writeNested(d, apiBlockVar, map[string]interface{}{
 			clientIDVar:     api.GetClientId(),
 			clientSecretVar: api.GetClientSecret(),
-		})
+		}); err != nil {
+			return diag.Errorf("failed to persist API client credentials in state: %v", err)
+		}
 	}
 
 	return read(ctx, d, m)
@@ -512,8 +520,10 @@ func nestedBlock(d *schema.ResourceData, key string) map[string]interface{} {
 
 // writeNested merges the given fields into the existing nested block (or
 // creates the block if missing). Used to persist server-generated secrets
-// alongside what the user wrote into HCL.
-func writeNested(d *schema.ResourceData, key string, fields map[string]interface{}) {
+// alongside what the user wrote into HCL. The error from d.Set is
+// propagated so callers can surface it instead of silently dropping
+// credentials that the server only returns once.
+func writeNested(d *schema.ResourceData, key string, fields map[string]interface{}) error {
 	cur := nestedBlock(d, key)
 	if cur == nil {
 		cur = map[string]interface{}{}
@@ -521,7 +531,7 @@ func writeNested(d *schema.ResourceData, key string, fields map[string]interface
 	for k, v := range fields {
 		cur[k] = v
 	}
-	_ = d.Set(key, []interface{}{cur})
+	return d.Set(key, []interface{}{cur})
 }
 
 func toStringSlice(in interface{}) []string {
