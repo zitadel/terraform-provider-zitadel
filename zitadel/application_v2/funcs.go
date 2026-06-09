@@ -344,19 +344,19 @@ func buildCreateOIDC(cfg map[string]interface{}) (*apppb.CreateOIDCApplicationRe
 		RedirectUris:             toStringSlice(cfg[redirectURIsVar]),
 		ResponseTypes:            respTypes,
 		GrantTypes:               grantTypes,
-		ApplicationType:          apppb.OIDCApplicationType(apppb.OIDCApplicationType_value[cfg[appTypeVar].(string)]),
-		AuthMethodType:           apppb.OIDCAuthMethodType(apppb.OIDCAuthMethodType_value[cfg[authMethodTypeVar].(string)]),
+		ApplicationType:          apppb.OIDCApplicationType(apppb.OIDCApplicationType_value[cfgString(cfg, appTypeVar)]),
+		AuthMethodType:           apppb.OIDCAuthMethodType(apppb.OIDCAuthMethodType_value[cfgString(cfg, authMethodTypeVar)]),
 		PostLogoutRedirectUris:   toStringSlice(cfg[postLogoutRedirectURIsVar]),
-		Version:                  apppb.OIDCVersion(apppb.OIDCVersion_value[cfg[versionVar].(string)]),
-		DevelopmentMode:          cfg[devModeVar].(bool),
-		AccessTokenType:          apppb.OIDCTokenType(apppb.OIDCTokenType_value[cfg[accessTokenTypeVar].(string)]),
-		AccessTokenRoleAssertion: cfg[accessTokenRoleAssertionVar].(bool),
-		IdTokenRoleAssertion:     cfg[idTokenRoleAssertionVar].(bool),
-		IdTokenUserinfoAssertion: cfg[idTokenUserinfoAssertionVar].(bool),
+		Version:                  apppb.OIDCVersion(apppb.OIDCVersion_value[cfgString(cfg, versionVar)]),
+		DevelopmentMode:          cfgBool(cfg, devModeVar),
+		AccessTokenType:          apppb.OIDCTokenType(apppb.OIDCTokenType_value[cfgString(cfg, accessTokenTypeVar)]),
+		AccessTokenRoleAssertion: cfgBool(cfg, accessTokenRoleAssertionVar),
+		IdTokenRoleAssertion:     cfgBool(cfg, idTokenRoleAssertionVar),
+		IdTokenUserinfoAssertion: cfgBool(cfg, idTokenUserinfoAssertionVar),
 		ClockSkew:                durationpb.New(dur),
 		AdditionalOrigins:        toStringSlice(cfg[additionalOriginsVar]),
-		SkipNativeAppSuccessPage: cfg[skipNativeAppSuccessPageVar].(bool),
-		BackChannelLogoutUri:     cfg[backChannelLogoutURIVar].(string),
+		SkipNativeAppSuccessPage: cfgBool(cfg, skipNativeAppSuccessPageVar),
+		BackChannelLogoutUri:     cfgString(cfg, backChannelLogoutURIVar),
 		LoginVersion:             buildLoginVersion(cfg[loginVersionVar]),
 	}, nil
 }
@@ -374,14 +374,14 @@ func buildUpdateOIDC(cfg map[string]interface{}) (*apppb.UpdateOIDCApplicationCo
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
-	appType := apppb.OIDCApplicationType(apppb.OIDCApplicationType_value[cfg[appTypeVar].(string)])
-	authType := apppb.OIDCAuthMethodType(apppb.OIDCAuthMethodType_value[cfg[authMethodTypeVar].(string)])
-	tokenType := apppb.OIDCTokenType(apppb.OIDCTokenType_value[cfg[accessTokenTypeVar].(string)])
-	accessTokenRoleAssertion := cfg[accessTokenRoleAssertionVar].(bool)
-	idTokenRoleAssertion := cfg[idTokenRoleAssertionVar].(bool)
-	idTokenUserinfoAssertion := cfg[idTokenUserinfoAssertionVar].(bool)
-	skipNative := cfg[skipNativeAppSuccessPageVar].(bool)
-	devMode := cfg[devModeVar].(bool)
+	appType := apppb.OIDCApplicationType(apppb.OIDCApplicationType_value[cfgString(cfg, appTypeVar)])
+	authType := apppb.OIDCAuthMethodType(apppb.OIDCAuthMethodType_value[cfgString(cfg, authMethodTypeVar)])
+	tokenType := apppb.OIDCTokenType(apppb.OIDCTokenType_value[cfgString(cfg, accessTokenTypeVar)])
+	accessTokenRoleAssertion := cfgBool(cfg, accessTokenRoleAssertionVar)
+	idTokenRoleAssertion := cfgBool(cfg, idTokenRoleAssertionVar)
+	idTokenUserinfoAssertion := cfgBool(cfg, idTokenUserinfoAssertionVar)
+	skipNative := cfgBool(cfg, skipNativeAppSuccessPageVar)
+	devMode := cfgBool(cfg, devModeVar)
 
 	// Pass BackChannelLogoutUri as a pointer unconditionally, including
 	// when it is an empty string. Because back_channel_logout_uri is
@@ -391,7 +391,7 @@ func buildUpdateOIDC(cfg map[string]interface{}) (*apppb.UpdateOIDCApplicationCo
 	// empty string then needs to reach the server, which only happens if
 	// we always send the pointer (a nil pointer would be treated as "no
 	// change" by the API).
-	backCh := cfg[backChannelLogoutURIVar].(string)
+	backCh := cfgString(cfg, backChannelLogoutURIVar)
 
 	return &apppb.UpdateOIDCApplicationConfigurationRequest{
 		RedirectUris:             toStringSlice(cfg[redirectURIsVar]),
@@ -514,13 +514,13 @@ func flattenSAML(_ *schema.ResourceData, saml *apppb.SAMLConfiguration) map[stri
 
 func buildCreateAPI(cfg map[string]interface{}) *apppb.CreateAPIApplicationRequest {
 	return &apppb.CreateAPIApplicationRequest{
-		AuthMethodType: apppb.APIAuthMethodType(apppb.APIAuthMethodType_value[cfg[authMethodTypeVar].(string)]),
+		AuthMethodType: apppb.APIAuthMethodType(apppb.APIAuthMethodType_value[cfgString(cfg, authMethodTypeVar)]),
 	}
 }
 
 func buildUpdateAPI(cfg map[string]interface{}) *apppb.UpdateAPIApplicationConfigurationRequest {
 	return &apppb.UpdateAPIApplicationConfigurationRequest{
-		AuthMethodType: apppb.APIAuthMethodType(apppb.APIAuthMethodType_value[cfg[authMethodTypeVar].(string)]),
+		AuthMethodType: apppb.APIAuthMethodType(apppb.APIAuthMethodType_value[cfgString(cfg, authMethodTypeVar)]),
 	}
 }
 
@@ -668,4 +668,22 @@ func stringOrDefault(v interface{}, def string) string {
 		return s
 	}
 	return def
+}
+
+// cfgString and cfgBool read a value from a nested-block map with a safe
+// type assertion. SDKv2 normally populates every block attribute with its
+// zero value, but using ok-checked casts avoids a panic if a key is ever
+// absent (e.g. partial state after import or a future schema change).
+func cfgString(m map[string]interface{}, key string) string {
+	if v, ok := m[key].(string); ok {
+		return v
+	}
+	return ""
+}
+
+func cfgBool(m map[string]interface{}, key string) bool {
+	if v, ok := m[key].(bool); ok {
+		return v
+	}
+	return false
 }
