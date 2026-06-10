@@ -36,10 +36,10 @@ func importApplication(ctx context.Context, d *schema.ResourceData, m interface{
 	if appID == "" {
 		return nil, fmt.Errorf("import id must start with the application id, got %q", d.Id())
 	}
-	// Note: we intentionally do not enforce the helper.ConvertID 18-digit
-	// regex here. ZITADEL IDs are not guaranteed to be exactly 18 digits
-	// (they can be 19), so a strict format check can reject valid ids. An
-	// invalid id simply fails on the subsequent GetApplication call.
+	// We intentionally accept any non-empty id rather than applying the
+	// strict helper.ConvertID format check, and let the server validate it
+	// on the subsequent GetApplication call. This avoids rejecting an id at
+	// import time purely on a format assumption.
 	d.SetId(appID)
 
 	if len(parts) >= 2 && parts[1] != "" {

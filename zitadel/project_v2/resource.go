@@ -65,11 +65,12 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		UpdateContext: update,
 		ReadContext:   read,
-		// Use ConvertNonEmpty rather than the default ConvertID (which
-		// enforces a strict ^\d{18}$). ZITADEL ids are not guaranteed to be
-		// exactly 18 digits (they can be 19), so a strict check could reject
-		// a valid project id on import. This matches the application_v2
-		// importer. Format stays `<project_id[:org_id]>`.
+		// Use ConvertNonEmpty rather than the default ConvertID (which applies
+		// a strict generated-id format check). The id is validated server-side
+		// by the subsequent GetProject call, so accepting any non-empty id at
+		// import time avoids rejecting a valid id on a format assumption. This
+		// matches the application_v2 importer. Format stays
+		// `<project_id[:org_id]>`.
 		Importer: helper.ImportWithAttributes(
 			helper.NewImportAttribute(ProjectIDVar, helper.ConvertNonEmpty, false),
 			helper.ImportOptionalOrgAttribute,
