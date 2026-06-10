@@ -302,21 +302,23 @@ var projectV2ClientLock = &sync.Mutex{}
 var projectV2Client *projectv2.Client
 
 func GetProjectV2Client(ctx context.Context, info *ClientInfo) (*projectv2.Client, error) {
+	// Hold the lock across the whole check-and-init so the read and write of
+	// projectV2Client are both synchronised (no read outside the mutex, so no
+	// data race under concurrent provider operations). A failed init is not
+	// cached, so a later call can retry.
+	projectV2ClientLock.Lock()
+	defer projectV2ClientLock.Unlock()
 	if projectV2Client == nil {
-		projectV2ClientLock.Lock()
-		defer projectV2ClientLock.Unlock()
-		if projectV2Client == nil {
-			client, err := projectv2.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel project v2 client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			projectV2Client = client
+		client, err := projectv2.NewClient(ctx,
+			info.Issuer, info.Domain,
+			[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+			info.Options...,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to start zitadel project v2 client: %w", err)
 		}
+		time.Sleep(time.Second * 2)
+		projectV2Client = client
 	}
 	return projectV2Client, nil
 }
@@ -325,21 +327,23 @@ var appV2ClientLock = &sync.Mutex{}
 var appV2Client *appv2.Client
 
 func GetAppV2Client(ctx context.Context, info *ClientInfo) (*appv2.Client, error) {
+	// Hold the lock across the whole check-and-init so the read and write of
+	// appV2Client are both synchronised (no read outside the mutex, so no
+	// data race under concurrent provider operations). A failed init is not
+	// cached, so a later call can retry.
+	appV2ClientLock.Lock()
+	defer appV2ClientLock.Unlock()
 	if appV2Client == nil {
-		appV2ClientLock.Lock()
-		defer appV2ClientLock.Unlock()
-		if appV2Client == nil {
-			client, err := appv2.NewClient(ctx,
-				info.Issuer, info.Domain,
-				[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-				info.Options...,
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to start zitadel app v2 client: %v", err)
-			}
-			time.Sleep(time.Second * 2)
-			appV2Client = client
+		client, err := appv2.NewClient(ctx,
+			info.Issuer, info.Domain,
+			[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+			info.Options...,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to start zitadel app v2 client: %w", err)
 		}
+		time.Sleep(time.Second * 2)
+		appV2Client = client
 	}
 	return appV2Client, nil
 }
