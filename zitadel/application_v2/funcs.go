@@ -32,6 +32,14 @@ func importApplication(ctx context.Context, d *schema.ResourceData, m interface{
 	// SplitN with limit 3 keeps any ':' characters inside the secret intact.
 	parts := strings.SplitN(d.Id(), ":", 3)
 
+	// The provider's import helpers escape any literal ':' inside a segment
+	// as helper.SemicolonPlaceholder (so it is not mistaken for a delimiter).
+	// Restore them, consistent with importWithAttributes, so an org id or
+	// secret containing ':' round-trips correctly.
+	for i := range parts {
+		parts[i] = strings.ReplaceAll(parts[i], helper.SemicolonPlaceholder, ":")
+	}
+
 	appID := parts[0]
 	if appID == "" {
 		return nil, fmt.Errorf("import id must start with the application id, got %q", d.Id())
