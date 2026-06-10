@@ -264,14 +264,16 @@ func samlConfigSchema() *schema.Resource {
 				Type:             schema.TypeString,
 				Optional:         true,
 				Sensitive:        true,
-				ExactlyOneOf:     []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
+				ConflictsWith:    []string{samlBlockVar + ".0." + metadataURLVar},
+				AtLeastOneOf:     []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
 				ValidateDiagFunc: nonEmptyString(metadataXMLVar),
 				Description:      "SAML metadata as raw XML. Mutually exclusive with `metadata_url`. Marked sensitive because SAML metadata documents commonly embed signing/encryption certificates.",
 			},
 			metadataURLVar: {
 				Type:             schema.TypeString,
 				Optional:         true,
-				ExactlyOneOf:     []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
+				ConflictsWith:    []string{samlBlockVar + ".0." + metadataXMLVar},
+				AtLeastOneOf:     []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
 				ValidateDiagFunc: nonEmptyString(metadataURLVar),
 				Description:      "URL from which SAML metadata can be fetched. Mutually exclusive with `metadata_xml`.",
 			},
@@ -317,7 +319,7 @@ func apiConfigSchema() *schema.Resource {
 func nonEmptyString(attr string) schema.SchemaValidateDiagFunc {
 	return func(value interface{}, _ cty.Path) diag.Diagnostics {
 		if s, _ := value.(string); s == "" {
-			return diag.Errorf("%s must not be an empty string when set; omit the attribute instead", attr)
+			return diag.Errorf("%s must not be an empty string", attr)
 		}
 		return nil
 	}
