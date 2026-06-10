@@ -2,6 +2,7 @@ package application_v2
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
 	"strings"
 	"time"
@@ -29,13 +30,18 @@ import (
 // application to learn its type and seed the secret into the matching
 // oidc/api block; read() then preserves it.
 func importApplication(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-	// SplitN with limit 3 keeps any ':' characters inside the secret intact.
-	parts := strings.SplitN(d.Id(), ":", 3)
-
-	// The provider's import helpers escape any literal ':' inside a segment
-	// as helper.SemicolonPlaceholder (so it is not mistaken for a delimiter).
-	// Restore them, consistent with importWithAttributes, so an org id or
-	// secret containing ':' round-trips correctly.
+	// Parse the import id the same way the provider's importWithAttributes
+	// helper does: a ':'-separated, csv-quoted string. Using csv (with
+	// LazyQuotes) handles segments the test/import helpers wrap in quotes,
+	// and the SemicolonPlaceholder restore handles a literal ':' inside a
+	// segment (e.g. an org id or client secret).
+	reader := csv.NewReader(strings.NewReader(d.Id()))
+	reader.Comma = ':'
+	reader.LazyQuotes = true
+	parts, err := reader.Read()
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse import id %q: %w", d.Id(), err)
+	}
 	for i := range parts {
 		parts[i] = strings.ReplaceAll(parts[i], helper.SemicolonPlaceholder, ":")
 	}
