@@ -584,24 +584,33 @@ func flattenSAML(d *schema.ResourceData, saml *apppb.SAMLConfiguration) map[stri
 	// by ZITADEL, so GetApplication returns BOTH metadata_url (the source)
 	// and metadata_xml (the resolved document). Populating both would
 	// violate the metadata_xml/metadata_url ExactlyOneOf constraint and
-	// produce an inconsistent-result error or a perpetual diff. Set only
-	// the field the practitioner configured (tracked via prior state), and
-	// fall back to preferring metadata_url for a fresh import where no
-	// prior state is available.
-	urlConfigured := false
+	// produce an inconsistent-result error or a perpetual diff. Populate
+	// only one field:
+	//   - if prior state shows which one the practitioner configured, keep
+	//     that one (so an xml-configured app is not flipped to the url, or
+	//     vice versa);
+	//   - on a fresh import with no prior state, prefer metadata_url when
+	//     present (it is the smaller source of truth and avoids storing the
+	//     large resolved XML), falling back to metadata_xml otherwise.
+	xmlConfigured, urlConfigured := false, false
 	if prev := nestedBlock(d, samlBlockVar); prev != nil {
 		if u, ok := prev[metadataURLVar].(string); ok && u != "" {
 			urlConfigured = true
+		}
+		if x, ok := prev[metadataXMLVar].(string); ok && x != "" {
+			xmlConfigured = true
 		}
 	}
 
 	switch {
 	case urlConfigured:
 		out[metadataURLVar] = saml.GetMetadataUrl()
-	case len(saml.GetMetadataXml()) > 0:
+	case xmlConfigured:
 		out[metadataXMLVar] = string(saml.GetMetadataXml())
 	case saml.GetMetadataUrl() != "":
 		out[metadataURLVar] = saml.GetMetadataUrl()
+	case len(saml.GetMetadataXml()) > 0:
+		out[metadataXMLVar] = string(saml.GetMetadataXml())
 	}
 	return out
 }
