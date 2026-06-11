@@ -15,7 +15,11 @@ import (
 // invalid request at apply.
 func NonEmptyString(attr string) schema.SchemaValidateDiagFunc {
 	return func(value interface{}, _ cty.Path) diag.Diagnostics {
-		if s, _ := value.(string); s == "" {
+		s, ok := value.(string)
+		if !ok {
+			return diag.Errorf("%s must be a string, got %T", attr, value)
+		}
+		if s == "" {
 			return diag.Errorf("%s must not be an empty string", attr)
 		}
 		return nil
