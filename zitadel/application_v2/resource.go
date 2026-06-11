@@ -91,6 +91,10 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		UpdateContext: update,
 		DeleteContext: delete,
+		// The Zitadel API cannot convert an application from one type to
+		// another, so switching the active oidc/saml/api block forces a
+		// replacement, surfaced at plan time rather than failing at apply.
+		CustomizeDiff: forceNewOnAppTypeChange,
 		// Import ID format: `<app_id[:org_id[:client_secret]]>`.
 		//
 		// project_id is not part of the ID because read() refreshes it from

@@ -314,14 +314,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// metadata is set consistently with the rest of the provider.
 	ctx = helper.CtxWithOrgID(ctx, d)
 
-	// Reject mid-life application_type changes (e.g. oidc -> saml). The
-	// Zitadel API does not support converting an existing application from
-	// one type to another, so without this check the user would get a
-	// confusing wire-level error at apply time. They need to recreate the
-	// resource instead.
-	if oldType, newType := activeAppType(d); oldType != "" && newType != "" && oldType != newType {
-		return diag.Errorf("changing the application type from the %q block to the %q block is not supported by the Zitadel API; remove the resource from configuration and add it back to recreate it with the new type", oldType, newType)
-	}
+	// A change of application type (oidc/saml/api) is handled at plan time by
+	// forceNewOnAppTypeChange, which forces a replacement, so update() is only
+	// reached when the type is unchanged.
 
 	req := &apppb.UpdateApplicationRequest{
 		ApplicationId: d.Id(),
@@ -366,9 +361,9 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	// Nothing we send changed; skip the API call entirely to avoid a
 	// spurious "No changes" error from Zitadel. We test the change signal
-	// (nameChanged) rather than req.Name == "" so that an intentional
-	// change of name to an empty string is not mistaken for "no change".
-	// State already equals the plan, so there is nothing to refresh.
+	// (nameChanged) rather than req.Name to decide this, independent of the
+	// name's value. State already equals the plan, so there is nothing to
+	// refresh.
 	if !nameChanged && req.ApplicationType == nil {
 		return nil
 	}
@@ -769,8 +764,14 @@ func toStringSlice(in interface{}) []string {
 // GetChange returns (old, new) pairs even during plan/apply, so this works
 // both for detecting the active type during an update and for the
 // new-resource case (where old is empty).
-func activeAppType(d *schema.ResourceData) (oldType, newType string) {
-	for _, key := range []string{oidcBlockVar, samlBlockVar, apiBlockVar} {
+// forceNewOnAppTypeChange marks the resource for replacement when the active
+// configuration block (oidc/saml/api) changes. The Zitadel API cannot convert
+// an existing application from one type to another, so the change is surfaced
+// as a plan-time replacement rather than an apply-time failure.
+func forceNewOnAppTypeChange(_ context.Context, d *schema.ResourceDiff, _ interface{}) error {
+	blocks := []string{oidcBlockVar, samlBlockVar, apiBlockVar}
+	var oldType, newType string
+	for _, key := range blocks {
 		oldV, newV := d.GetChange(key)
 		if listHasContent(oldV) {
 			oldType = key
@@ -779,7 +780,14 @@ func activeAppType(d *schema.ResourceData) (oldType, newType string) {
 			newType = key
 		}
 	}
-	return oldType, newType
+	if oldType != "" && newType != "" && oldType != newType {
+		for _, key := range blocks {
+			if err := d.ForceNew(key); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func listHasContent(v interface{}) bool {
