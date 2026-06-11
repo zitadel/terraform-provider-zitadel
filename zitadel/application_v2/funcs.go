@@ -46,6 +46,12 @@ func importApplication(ctx context.Context, d *schema.ResourceData, m interface{
 		parts[i] = strings.ReplaceAll(parts[i], helper.SemicolonPlaceholder, ":")
 	}
 
+	// Reject extra segments so a typo fails loudly instead of silently
+	// importing with an unintended org or secret.
+	if len(parts) > 3 {
+		return nil, fmt.Errorf("invalid import id %q: expected at most 3 segments <app_id[:org_id[:client_secret]]>, got %d", d.Id(), len(parts))
+	}
+
 	appID := parts[0]
 	if appID == "" {
 		return nil, fmt.Errorf("import id must start with the application id, got %q", d.Id())
