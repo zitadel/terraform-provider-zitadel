@@ -99,11 +99,14 @@ func TestAccProjectsV2Datasource_Name_Mismatch(t *testing.T) {
 func checkRemoteDatasourceProperty(frame *test_utils.OrgTestFrame, id string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			client, err := helper.GetProjectV2Client(frame.Context, frame.ClientInfo)
+			// Scope with the org id so the verification call uses the same
+			// request context as the datasource/resource code (helper.CtxWithOrgID).
+			ctx := helper.CtxSetOrgID(frame.Context, frame.OrgID)
+			client, err := helper.GetProjectV2Client(ctx, frame.ClientInfo)
 			if err != nil {
 				return fmt.Errorf("failed to get project v2 client: %w", err)
 			}
-			resp, err := client.GetProject(frame.Context, &projectpb.GetProjectRequest{ProjectId: id})
+			resp, err := client.GetProject(ctx, &projectpb.GetProjectRequest{ProjectId: id})
 			if err != nil {
 				return err
 			}

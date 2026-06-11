@@ -56,11 +56,16 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.T
 			if id == "" {
 				return test_utils.ErrNotFound
 			}
-			client, err := helper.GetProjectV2Client(frame.Context, frame.ClientInfo)
+			// Scope the verification call with the org id, exactly as the
+			// resource's CRUD functions do via helper.CtxWithOrgID, so the
+			// check exercises the same request context and does not depend
+			// on server-side org defaults.
+			ctx := helper.CtxSetOrgID(frame.Context, frame.OrgID)
+			client, err := helper.GetProjectV2Client(ctx, frame.ClientInfo)
 			if err != nil {
 				return fmt.Errorf("failed to get project v2 client: %w", err)
 			}
-			resp, err := client.GetProject(frame.Context, &projectpb.GetProjectRequest{
+			resp, err := client.GetProject(ctx, &projectpb.GetProjectRequest{
 				ProjectId: id,
 			})
 			if err != nil {
