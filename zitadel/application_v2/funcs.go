@@ -758,12 +758,6 @@ func toStringSlice(in interface{}) []string {
 	return out
 }
 
-// activeAppType inspects the prior and proposed state of the three mutually
-// exclusive config blocks and returns the active application type for each.
-// An empty string means no block was populated on that side. ResourceData's
-// GetChange returns (old, new) pairs even during plan/apply, so this works
-// both for detecting the active type during an update and for the
-// new-resource case (where old is empty).
 // forceNewOnAppTypeChange marks the resource for replacement when the active
 // configuration block (oidc/saml/api) changes. The Zitadel API cannot convert
 // an existing application from one type to another, so the change is surfaced
