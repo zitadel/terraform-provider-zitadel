@@ -100,8 +100,8 @@ Read-Only:
 
 - `client_id` (String, Sensitive) Generated client ID.
 - `client_secret` (String, Sensitive) Generated client secret (only set on create when the auth method requires one).
-- `compliance_problems` (List of Object) (see [below for nested schema](#nestedatt--oidc--compliance_problems))
-- `none_compliant` (Boolean)
+- `compliance_problems` (List of Object) List of OIDC specification compliance problems detected by ZITADEL for this configuration. Empty when the configuration is compliant. (see [below for nested schema](#nestedatt--oidc--compliance_problems))
+- `none_compliant` (Boolean) Whether the OIDC configuration violates the OIDC specification, as determined by ZITADEL. See `compliance_problems` for the individual findings.
 
 <a id="nestedblock--oidc--login_version"></a>
 ### Nested Schema for `oidc.login_version`

@@ -31,10 +31,10 @@ data "zitadel_project_v2" "default" {
 
 ### Read-Only
 
-- `has_project_check` (Boolean) ZITADEL checks if the org of the user has permission to this project
+- `has_project_check` (Boolean) Whether ZITADEL checks that the user's organization is granted access to this project before issuing a token.
 - `id` (String) The ID of this resource.
 - `name` (String) Name of the project
 - `private_labeling_setting` (String) Defines from where the private labeling should be triggered
-- `project_role_assertion` (Boolean) describes if roles of user should be added in token
-- `project_role_check` (Boolean) ZITADEL checks if the user has at least one on this project
+- `project_role_assertion` (Boolean) Whether the roles assigned to a user are asserted (added) in the access and ID tokens issued for this project.
+- `project_role_check` (Boolean) Whether ZITADEL checks that the authenticating user has at least one role granted on this project before issuing a token.
 - `state` (String) State of the project

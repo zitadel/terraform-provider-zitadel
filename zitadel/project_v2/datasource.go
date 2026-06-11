@@ -18,7 +18,7 @@ func GetDatasource() *schema.Resource {
 				Required: true,
 				// Required permits "", which would make the v2 GetProject
 				// call fail at apply with InvalidArgument. Reject it at plan.
-				ValidateDiagFunc: nonEmptyString(ProjectIDVar),
+				ValidateDiagFunc: helper.NonEmptyString(ProjectIDVar),
 				Description:      "The ID of this resource.",
 			},
 			NameVar: {
@@ -35,17 +35,17 @@ func GetDatasource() *schema.Resource {
 			roleAssertionVar: {
 				Type:        schema.TypeBool,
 				Computed:    true,
-				Description: "describes if roles of user should be added in token",
+				Description: "Whether the roles assigned to a user are asserted (added) in the access and ID tokens issued for this project.",
 			},
 			roleCheckVar: {
 				Type:        schema.TypeBool,
 				Computed:    true,
-				Description: "ZITADEL checks if the user has at least one on this project",
+				Description: "Whether ZITADEL checks that the authenticating user has at least one role granted on this project before issuing a token.",
 			},
 			hasProjectCheckVar: {
 				Type:        schema.TypeBool,
 				Computed:    true,
-				Description: "ZITADEL checks if the org of the user has permission to this project",
+				Description: "Whether ZITADEL checks that the user's organization is granted access to this project before issuing a token.",
 			},
 			privateLabelingSettingVar: {
 				Type:        schema.TypeString,
@@ -73,7 +73,7 @@ func ListDatasources() *schema.Resource {
 				Required: true,
 				// Required alone permits "", which list() treats as "no name
 				// filter" and would return all projects. Reject "" at plan time.
-				ValidateDiagFunc: nonEmptyString(NameVar),
+				ValidateDiagFunc: helper.NonEmptyString(NameVar),
 				Description:      "Name of the project",
 			},
 			nameMethodVar: {

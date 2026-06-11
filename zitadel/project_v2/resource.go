@@ -22,13 +22,13 @@ func GetResource() *schema.Resource {
 				Type:             schema.TypeString,
 				Required:         true,
 				ForceNew:         true,
-				ValidateDiagFunc: nonEmptyString(helper.OrgIDVar),
+				ValidateDiagFunc: helper.NonEmptyString(helper.OrgIDVar),
 				Description:      "ID of the organization the project belongs to. Required because the v2 CreateProject API takes the organization as an explicit request field.",
 			},
 			NameVar: {
 				Type:             schema.TypeString,
 				Required:         true,
-				ValidateDiagFunc: nonEmptyString(NameVar),
+				ValidateDiagFunc: helper.NonEmptyString(NameVar),
 				Description:      "Name of the project",
 			},
 			stateVar: {
@@ -39,17 +39,17 @@ func GetResource() *schema.Resource {
 			roleAssertionVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "describes if roles of user should be added in token",
+				Description: "Whether the roles assigned to a user are asserted (added) in the access and ID tokens issued for this project.",
 			},
 			roleCheckVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "ZITADEL checks if the user has at least one on this project",
+				Description: "Whether ZITADEL checks that the authenticating user has at least one role granted on this project before issuing a token.",
 			},
 			hasProjectCheckVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "ZITADEL checks if the org of the user has permission to this project",
+				Description: "Whether ZITADEL checks that the user's organization is granted access to this project before issuing a token.",
 			},
 			privateLabelingSettingVar: {
 				Type:        schema.TypeString,
@@ -75,17 +75,5 @@ func GetResource() *schema.Resource {
 			helper.NewImportAttribute(ProjectIDVar, helper.ConvertNonEmpty, false),
 			helper.ImportOptionalOrgAttribute,
 		),
-	}
-}
-
-// nonEmptyString returns a ValidateDiagFunc that rejects empty strings, so a
-// Required attribute set to "" fails at plan time instead of producing an
-// invalid request at apply.
-func nonEmptyString(attr string) schema.SchemaValidateDiagFunc {
-	return func(value interface{}, _ cty.Path) diag.Diagnostics {
-		if s, _ := value.(string); s == "" {
-			return diag.Errorf("%s must not be empty", attr)
-		}
-		return nil
 	}
 }

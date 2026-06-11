@@ -22,7 +22,7 @@ func GetDatasource() *schema.Resource {
 	ds.Schema[AppIDVar] = &schema.Schema{
 		Type:             schema.TypeString,
 		Required:         true,
-		ValidateDiagFunc: nonEmptyString(AppIDVar),
+		ValidateDiagFunc: helper.NonEmptyString(AppIDVar),
 		Description:      "The ID of the application.",
 	}
 	// project_id is exposed for state-shape parity with the resource but is
@@ -80,7 +80,7 @@ func ListDatasources() *schema.Resource {
 				// Required alone permits "", which list() would treat as
 				// "no project filter" and return applications across all
 				// projects. Reject the empty string at plan time.
-				ValidateDiagFunc: nonEmptyString(ProjectIDVar),
+				ValidateDiagFunc: helper.NonEmptyString(ProjectIDVar),
 				Description:      "ID of the project to list applications from.",
 			},
 			NameVar: {

@@ -41,13 +41,13 @@ func GetResource() *schema.Resource {
 				Type:             schema.TypeString,
 				Required:         true,
 				ForceNew:         true,
-				ValidateDiagFunc: nonEmptyString(ProjectIDVar),
+				ValidateDiagFunc: helper.NonEmptyString(ProjectIDVar),
 				Description:      "ID of the project this application belongs to.",
 			},
 			NameVar: {
 				Type:             schema.TypeString,
 				Required:         true,
-				ValidateDiagFunc: nonEmptyString(NameVar),
+				ValidateDiagFunc: helper.NonEmptyString(NameVar),
 				Description:      "Name of the application.",
 			},
 			stateVar: {
@@ -244,16 +244,18 @@ func oidcConfigSchema() *schema.Resource {
 				Description: "Generated client secret (only set on create when the auth method requires one).",
 			},
 			noneCompliantVar: {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "Whether the OIDC configuration violates the OIDC specification, as determined by ZITADEL. See `compliance_problems` for the individual findings.",
 			},
 			complianceProblemsVar: {
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "List of OIDC specification compliance problems detected by ZITADEL for this configuration. Empty when the configuration is compliant.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						complianceKeyVar:     {Type: schema.TypeString, Computed: true},
-						complianceMessageVar: {Type: schema.TypeString, Computed: true},
+						complianceKeyVar:     {Type: schema.TypeString, Computed: true, Description: "Stable i18n key identifying the compliance problem."},
+						complianceMessageVar: {Type: schema.TypeString, Computed: true, Description: "Human-readable description of the compliance problem."},
 					},
 				},
 			},
@@ -270,7 +272,7 @@ func samlConfigSchema() *schema.Resource {
 				Sensitive:        true,
 				ConflictsWith:    []string{samlBlockVar + ".0." + metadataURLVar},
 				AtLeastOneOf:     []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
-				ValidateDiagFunc: nonEmptyString(metadataXMLVar),
+				ValidateDiagFunc: helper.NonEmptyString(metadataXMLVar),
 				Description:      "SAML metadata as raw XML. Mutually exclusive with `metadata_url`. Marked sensitive because SAML metadata documents commonly embed signing/encryption certificates.",
 			},
 			metadataURLVar: {
@@ -278,7 +280,7 @@ func samlConfigSchema() *schema.Resource {
 				Optional:         true,
 				ConflictsWith:    []string{samlBlockVar + ".0." + metadataXMLVar},
 				AtLeastOneOf:     []string{samlBlockVar + ".0." + metadataXMLVar, samlBlockVar + ".0." + metadataURLVar},
-				ValidateDiagFunc: nonEmptyString(metadataURLVar),
+				ValidateDiagFunc: helper.NonEmptyString(metadataURLVar),
 				Description:      "URL from which SAML metadata can be fetched. Mutually exclusive with `metadata_xml`.",
 			},
 			loginVersionVar: loginVersionSchema(samlBlockVar),
@@ -311,21 +313,6 @@ func apiConfigSchema() *schema.Resource {
 				Description: "Generated client secret (only returned on create).",
 			},
 		},
-	}
-}
-
-// nonEmptyString returns a ValidateDiagFunc that rejects empty strings.
-// Used on the SAML metadata fields where ExactlyOneOf alone is not enough:
-// HCL permits the user to satisfy ExactlyOneOf by setting `metadata_xml =
-// ""`, but an empty string carries no SAML metadata and the builder treats
-// it as "unset", which would either fail the API call or produce a
-// perpetual diff.
-func nonEmptyString(attr string) schema.SchemaValidateDiagFunc {
-	return func(value interface{}, _ cty.Path) diag.Diagnostics {
-		if s, _ := value.(string); s == "" {
-			return diag.Errorf("%s must not be an empty string", attr)
-		}
-		return nil
 	}
 }
 
