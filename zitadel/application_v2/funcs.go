@@ -320,7 +320,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// confusing wire-level error at apply time. They need to recreate the
 	// resource instead.
 	if oldType, newType := activeAppType(d); oldType != "" && newType != "" && oldType != newType {
-		return diag.Errorf("changing application_type from %q to %q is not supported by the Zitadel API; remove the resource from configuration and add it back to recreate it with the new type", oldType, newType)
+		return diag.Errorf("changing the application type from the %q block to the %q block is not supported by the Zitadel API; remove the resource from configuration and add it back to recreate it with the new type", oldType, newType)
 	}
 
 	req := &apppb.UpdateApplicationRequest{
