@@ -60,7 +60,9 @@ func TestAccApplicationV2Datasource_ID(t *testing.T) {
 		frame.BaseTestFrame,
 		config,
 		[]string{frame.AsOrgDefaultDependency, projectDep},
-		nil,
+		// Wait out the v2 read-after-write window so the datasource read does
+		// not flake right after the application is created.
+		checkRemoteDatasourceProperty(frame, appID)(appName),
 		map[string]string{
 			"app_id":     appID,
 			"project_id": projectID,
