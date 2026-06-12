@@ -65,7 +65,7 @@ func ListDatasources() *schema.Resource {
 			projectIDsVar: {
 				Type:        schema.TypeList,
 				Computed:    true,
-				Description: "A set of all project IDs.",
+				Description: "IDs of the projects matching the name filter.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			NameVar: {

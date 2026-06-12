@@ -22,14 +22,20 @@ only exist on ZITADEL 4.x.
 
 ## Migrate in place, without recreating anything
 
-The v1 and v2 resources are different resource *types*, so you cannot switch
-them with a `moved` block, and simply changing the resource type in your
-configuration makes Terraform **destroy and recreate** the object (deleting the
-project or application in ZITADEL and assigning a new ID).
+The v1 and v2 resources are different resource *types*. A `moved` block can
+relocate state between addresses, but it copies the old state verbatim and
+cannot reshape it to the v2 schema — it would not move attributes into the new
+nested blocks (`oidc`/`saml`/`api`) and would drop the practitioner-supplied
+`client_secret`, which the v2 API never returns again. Simply changing the
+resource type in your configuration is worse still: Terraform **destroys and
+recreates** the object, deleting the project or application in ZITADEL and
+assigning a new ID.
 
-Migrate with `terraform state rm` followed by `terraform import` instead. The
-underlying ZITADEL object IDs are identical across the v1 and v2 APIs, so the
-object is never recreated — only the Terraform state record is replaced.
+Migrate with `terraform state rm` followed by `terraform import` instead: this
+lets the v2 resource read the object back through the v2 API and populate the
+new schema correctly. The underlying ZITADEL object IDs are identical across
+the v1 and v2 APIs, so the object is never recreated — only the Terraform state
+record is replaced.
 
 ### Projects
 

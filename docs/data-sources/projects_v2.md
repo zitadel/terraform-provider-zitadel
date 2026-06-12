@@ -45,4 +45,4 @@ output "project_v2_names" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `project_ids` (List of String) A set of all project IDs.
+- `project_ids` (List of String) IDs of the projects matching the name filter.

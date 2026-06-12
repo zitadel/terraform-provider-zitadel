@@ -608,12 +608,14 @@ func flattenSAML(d *schema.ResourceData, saml *apppb.SAMLConfiguration) map[stri
 	//     present (it is the smaller source of truth and avoids storing the
 	//     large resolved XML), falling back to metadata_xml otherwise.
 	xmlConfigured, urlConfigured := false, false
+	var prevXML string
 	if prev := nestedBlock(d, samlBlockVar); prev != nil {
 		if u, ok := prev[metadataURLVar].(string); ok && u != "" {
 			urlConfigured = true
 		}
 		if x, ok := prev[metadataXMLVar].(string); ok && x != "" {
 			xmlConfigured = true
+			prevXML = x
 		}
 	}
 
@@ -621,7 +623,12 @@ func flattenSAML(d *schema.ResourceData, saml *apppb.SAMLConfiguration) map[stri
 	case urlConfigured:
 		out[metadataURLVar] = saml.GetMetadataUrl()
 	case xmlConfigured:
-		out[metadataXMLVar] = string(saml.GetMetadataXml())
+		// Preserve the practitioner-supplied XML rather than the server's
+		// copy. The v2 API canonicalises SAML metadata, so writing the
+		// returned XML back into state would never match the configured
+		// value and would yield a perpetual diff. This mirrors how
+		// client_secret is preserved from prior state for OIDC/API apps.
+		out[metadataXMLVar] = prevXML
 	case saml.GetMetadataUrl() != "":
 		out[metadataURLVar] = saml.GetMetadataUrl()
 	case len(saml.GetMetadataXml()) > 0:
