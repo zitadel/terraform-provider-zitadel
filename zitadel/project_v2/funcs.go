@@ -201,6 +201,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			})
 	}
 
+	resp, err := client.ListProjects(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to list projects (name=%q): %v", name, err)
 	}
