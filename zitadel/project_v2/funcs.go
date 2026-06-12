@@ -201,9 +201,8 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			})
 	}
 
-	resp, err := client.ListProjects(ctx, req)
 	if err != nil {
-		return diag.Errorf("error while getting project by name %s: %v", name, err)
+		return diag.Errorf("failed to list projects (name=%q): %v", name, err)
 	}
 	ids := make([]string, len(resp.GetProjects()))
 	for i, res := range resp.GetProjects() {
