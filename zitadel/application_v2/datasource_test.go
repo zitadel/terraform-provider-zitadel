@@ -22,11 +22,15 @@ import (
 // the indirection through the v1 management client.
 func createOIDCAppForDatasource(t *testing.T, frame *test_utils.OrgTestFrame, projectID, name string) string {
 	t.Helper()
-	client, err := helper.GetAppV2Client(frame.Context, frame.ClientInfo)
+	// Scope with the org id, as the provider's v2 CRUD paths do via
+	// helper.CtxWithOrgID, so the test does not rely on the server default
+	// org scope.
+	ctx := helper.CtxSetOrgID(frame.Context, frame.OrgID)
+	client, err := helper.GetAppV2Client(ctx, frame.ClientInfo)
 	if err != nil {
 		t.Fatalf("failed to get app v2 client: %v", err)
 	}
-	resp, err := client.CreateApplication(frame.Context, &apppb.CreateApplicationRequest{
+	resp, err := client.CreateApplication(ctx, &apppb.CreateApplicationRequest{
 		ProjectId: projectID,
 		Name:      name,
 		ApplicationType: &apppb.CreateApplicationRequest_OidcConfiguration{
@@ -135,11 +139,14 @@ func TestAccApplicationsV2Datasource_Name_Mismatch(t *testing.T) {
 func checkRemoteDatasourceProperty(frame *test_utils.OrgTestFrame, id string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
-			client, err := helper.GetAppV2Client(frame.Context, frame.ClientInfo)
+			// Scope with the org id so the verification call uses the same
+			// request context as the datasource/resource code (helper.CtxWithOrgID).
+			ctx := helper.CtxSetOrgID(frame.Context, frame.OrgID)
+			client, err := helper.GetAppV2Client(ctx, frame.ClientInfo)
 			if err != nil {
 				return fmt.Errorf("failed to get app v2 client: %w", err)
 			}
-			resp, err := client.GetApplication(frame.Context, &apppb.GetApplicationRequest{ApplicationId: id})
+			resp, err := client.GetApplication(ctx, &apppb.GetApplicationRequest{ApplicationId: id})
 			if err != nil {
 				return err
 			}
