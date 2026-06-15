@@ -4,10 +4,27 @@ import (
 	"context"
 	"strings"
 
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
+
+// NonEmptyString returns a ValidateDiagFunc that rejects an empty string, so a
+// Required attribute set to "" fails at plan time instead of producing an
+// invalid request at apply.
+func NonEmptyString(attr string) schema.SchemaValidateDiagFunc {
+	return func(value interface{}, _ cty.Path) diag.Diagnostics {
+		s, ok := value.(string)
+		if !ok {
+			return diag.Errorf("%s must be a string, got %T", attr, value)
+		}
+		if s == "" {
+			return diag.Errorf("%s must not be an empty string", attr)
+		}
+		return nil
+	}
+}
 
 type Stringified struct {
 	Str string

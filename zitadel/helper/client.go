@@ -6,17 +6,20 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/action/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
+	appv2 "github.com/zitadel/zitadel-go/v3/pkg/client/application/v2"
 	featurev2 "github.com/zitadel/zitadel-go/v3/pkg/client/feature/v2"
 	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/instance/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
 	orgV2 "github.com/zitadel/zitadel-go/v3/pkg/client/org/v2"
+	projectv2 "github.com/zitadel/zitadel-go/v3/pkg/client/project/v2"
 	settingsv2 "github.com/zitadel/zitadel-go/v3/pkg/client/settings/v2"
 	userv2 "github.com/zitadel/zitadel-go/v3/pkg/client/user/v2"
 	webkeys "github.com/zitadel/zitadel-go/v3/pkg/client/webkey/v2"
@@ -294,6 +297,64 @@ func GetWebKeyClient(ctx context.Context, info *ClientInfo) (*webkeys.Client, er
 		}
 	}
 	return webkeyClient, nil
+}
+
+var projectV2ClientLock sync.Mutex
+var projectV2Client atomic.Pointer[projectv2.Client]
+
+func GetProjectV2Client(ctx context.Context, info *ClientInfo) (*projectv2.Client, error) {
+	// Lock-free fast path once the client is initialised: the atomic load
+	// synchronises with the atomic store below, so there is no data race and
+	// initialised reads never contend on the mutex. The mutex only guards
+	// initialisation, and a failed init is not cached so a later call retries.
+	if client := projectV2Client.Load(); client != nil {
+		return client, nil
+	}
+	projectV2ClientLock.Lock()
+	defer projectV2ClientLock.Unlock()
+	if client := projectV2Client.Load(); client != nil {
+		return client, nil
+	}
+	client, err := projectv2.NewClient(ctx,
+		info.Issuer, info.Domain,
+		[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+		info.Options...,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to start zitadel project v2 client: %w", err)
+	}
+	time.Sleep(time.Second * 2)
+	projectV2Client.Store(client)
+	return client, nil
+}
+
+var appV2ClientLock sync.Mutex
+var appV2Client atomic.Pointer[appv2.Client]
+
+func GetAppV2Client(ctx context.Context, info *ClientInfo) (*appv2.Client, error) {
+	// Lock-free fast path once the client is initialised: the atomic load
+	// synchronises with the atomic store below, so there is no data race and
+	// initialised reads never contend on the mutex. The mutex only guards
+	// initialisation, and a failed init is not cached so a later call retries.
+	if client := appV2Client.Load(); client != nil {
+		return client, nil
+	}
+	appV2ClientLock.Lock()
+	defer appV2ClientLock.Unlock()
+	if client := appV2Client.Load(); client != nil {
+		return client, nil
+	}
+	client, err := appv2.NewClient(ctx,
+		info.Issuer, info.Domain,
+		[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
+		info.Options...,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to start zitadel app v2 client: %w", err)
+	}
+	time.Sleep(time.Second * 2)
+	appV2Client.Store(client)
+	return client, nil
 }
 
 var mgmtClientLock = &sync.Mutex{}

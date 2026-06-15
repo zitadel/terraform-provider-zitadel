@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_key"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_saml"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_v2"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_init_message_text"
@@ -109,6 +110,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_grant_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_member"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_role"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/project_v2"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/sms_provider_http"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/sms_provider_twilio"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/smtp_config"
@@ -393,6 +395,8 @@ func Provider() *schema.Provider {
 			"zitadel_user_metadatas":             user_metadata.ListDatasources(),
 			"zitadel_project":                    project.GetDatasource(),
 			"zitadel_projects":                   project.ListDatasources(),
+			"zitadel_project_v2":                 project_v2.GetDatasource(),
+			"zitadel_projects_v2":                project_v2.ListDatasources(),
 			"zitadel_project_role":               project_role.GetDatasource(),
 			"zitadel_project_roles":              project_role.ListDatasources(),
 			"zitadel_action":                     action.GetDatasource(),
@@ -405,6 +409,8 @@ func Provider() *schema.Provider {
 			"zitadel_webkey":                     webkey.GetDatasource(),
 			"zitadel_application_oidc":           application_oidc.GetDatasource(),
 			"zitadel_application_oidcs":          application_oidc.ListDatasources(),
+			"zitadel_application_v2":             application_v2.GetDatasource(),
+			"zitadel_applications_v2":            application_v2.ListDatasources(),
 			"zitadel_application_api":            application_api.GetDatasource(),
 			"zitadel_application_apis":           application_api.ListDatasources(),
 			"zitadel_application_saml":           application_saml.GetDatasource(),
@@ -591,6 +597,7 @@ func Provider() *schema.Provider {
 			"zitadel_human_user":                         human_user.GetResource(),
 			"zitadel_machine_user":                       machine_user.GetResource(),
 			"zitadel_project":                            project.GetResource(),
+			"zitadel_project_v2":                         project_v2.GetResource(),
 			"zitadel_project_role":                       project_role.GetResource(),
 			"zitadel_domain":                             domain.GetResource(),
 			"zitadel_action":                             action.GetResource(),
@@ -603,6 +610,7 @@ func Provider() *schema.Provider {
 			"zitadel_action_execution_function":          action_execution_function.GetResource(),
 			"zitadel_action_execution_event":             action_execution_event.GetResource(),
 			"zitadel_application_oidc":                   application_oidc.GetResource(),
+			"zitadel_application_v2":                     application_v2.GetResource(),
 			"zitadel_application_api":                    application_api.GetResource(),
 			"zitadel_application_saml":                   application_saml.GetResource(),
 			"zitadel_application_key":                    application_key.GetResource(),

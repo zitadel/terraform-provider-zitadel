@@ -1,0 +1,91 @@
+package project_v2
+
+import (
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
+
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+)
+
+func GetDatasource() *schema.Resource {
+	return &schema.Resource{
+		Description: "Datasource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
+		Schema: map[string]*schema.Schema{
+			ProjectIDVar: {
+				Type:     schema.TypeString,
+				Required: true,
+				// Required permits "", which would make the v2 GetProject
+				// call fail at apply with InvalidArgument. Reject it at plan.
+				ValidateDiagFunc: helper.NonEmptyString(ProjectIDVar),
+				Description:      "The ID of this resource.",
+			},
+			NameVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Name of the project",
+			},
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
+			stateVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "State of the project",
+			},
+			roleAssertionVar: {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "Whether the roles assigned to a user are asserted (added) in the access and ID tokens issued for this project.",
+			},
+			roleCheckVar: {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "Whether ZITADEL checks that the authenticating user has at least one role granted on this project before issuing a token.",
+			},
+			hasProjectCheckVar: {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "Whether ZITADEL checks that the user's organization is granted access to this project before issuing a token.",
+			},
+			privateLabelingSettingVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Defines from where the private labeling should be triggered",
+			},
+		},
+		ReadContext: read,
+	}
+}
+
+func ListDatasources() *schema.Resource {
+	return &schema.Resource{
+		Description: "Datasource representing the project, which can then be granted to different organizations or users directly, containing different applications.",
+		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
+			projectIDsVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "IDs of the projects matching the name filter.",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
+			NameVar: {
+				Type:     schema.TypeString,
+				Required: true,
+				// Required alone permits "", which list() treats as "no name
+				// filter" and would return all projects. Reject "" at plan time.
+				ValidateDiagFunc: helper.NonEmptyString(NameVar),
+				Description:      "Name of the project",
+			},
+			nameMethodVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Method for querying projects by name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+					return helper.EnumValueValidation(nameMethodVar, value, object.TextQueryMethod_value)
+				},
+				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+			},
+		},
+		ReadContext: list,
+	}
+}
