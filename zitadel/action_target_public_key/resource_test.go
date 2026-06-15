@@ -310,6 +310,15 @@ EOT
 					test_utils.CheckAMinute(checkRemoteProperty(frame, true)),
 				),
 			},
+			// Explicitly verify that, after the out-of-band activation has been
+			// reconciled into state, a follow-up plan against the same `active`-less
+			// config is a no-op. PlanOnly fails the test if the plan is non-empty,
+			// which would catch any regression to "removing `active` from config
+			// silently deactivates the key".
+			{
+				Config:   configNoActive,
+				PlanOnly: true,
+			},
 			// Adding `active = true` to config when the server already matches must be a
 			// no-op (idempotent activate; FailedPrecondition is swallowed).
 			{

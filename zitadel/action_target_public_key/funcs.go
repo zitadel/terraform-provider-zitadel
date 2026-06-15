@@ -14,6 +14,23 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
+// configBool reports the practitioner-supplied value of a bool attribute from the
+// raw configuration, returning false when the attribute is absent or unknown.
+// Unlike d.Get / d.GetOkExists it does NOT fall back to state, which makes it
+// the right primitive for distinguishing "the user wrote `active = false`" from
+// "the user did not write `active` at all" on Optional+Computed attributes.
+func configBool(d *schema.ResourceData, attr string) bool {
+	raw := d.GetRawConfig()
+	if raw.IsNull() || !raw.IsKnown() {
+		return false
+	}
+	v := raw.GetAttr(attr)
+	if v.IsNull() || !v.IsKnown() {
+		return false
+	}
+	return v.True()
+}
+
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started delete")
 
@@ -91,8 +108,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// d.SetId above ensures the key is tracked in state even if activation fails;
 	// the next apply will retry via the Update path rather than orphan or duplicate it.
 	// FailedPrecondition (key already active) is treated as idempotent success.
-	v, hasActive := d.GetOkExists(activeVar)
-	wantActive := hasActive && v.(bool)
+	//
+	// Use the raw config rather than d.Get/d.GetOkExists so we can distinguish
+	// "absent from config" from "present and false" — d.Get-based readers blend
+	// state and config, which is ambiguous for Optional+Computed attributes.
+	wantActive := configBool(d, activeVar)
 
 	// Persist active=false to state BEFORE attempting activation so that, if Activate
 	// returns a non-precondition error, the partial state we leave behind matches the
@@ -125,14 +145,20 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return nil
 	}
 
-	// Only act when the user has an explicit active value in config. If the field has
-	// been removed (Optional+Computed transitioning to unset) we preserve the current
-	// remote state rather than implicitly deactivating a key the user no longer manages.
-	v, hasActive := d.GetOkExists(activeVar)
-	if !hasActive {
+	// Only act when the user has an explicit active value in *config*. If the field
+	// has been removed we preserve the current remote state rather than implicitly
+	// deactivating a key the user no longer manages. We inspect the raw config (not
+	// d.Get/d.GetOkExists, which blend state and config) so this stays correct even
+	// when state has a value populated by Create or Read.
+	rawConfig := d.GetRawConfig()
+	if rawConfig.IsNull() || !rawConfig.IsKnown() {
 		return nil
 	}
-	wantActive := v.(bool)
+	configActive := rawConfig.GetAttr(activeVar)
+	if configActive.IsNull() || !configActive.IsKnown() {
+		return nil
+	}
+	wantActive := configActive.True()
 
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
