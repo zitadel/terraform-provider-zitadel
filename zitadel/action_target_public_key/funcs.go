@@ -85,6 +85,57 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to set key_id: %v", err)
 	}
 
+	// Only call ActivatePublicKey when the user explicitly opted in via active=true.
+	// An unset active leaves the key in ZITADEL's default (inactive) state to preserve
+	// pre-existing behavior for configs that don't set the field.
+	if v, ok := d.GetOkExists(activeVar); ok && v.(bool) {
+		if _, err := client.ActivatePublicKey(ctx, &actionv2.ActivatePublicKeyRequest{
+			TargetId: req.TargetId,
+			KeyId:    resp.GetKeyId(),
+		}); err != nil {
+			return diag.Errorf("failed to activate public key: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started update")
+
+	if !d.HasChange(activeVar) {
+		return nil
+	}
+
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := helper.GetActionClient(ctx, clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	targetID := d.Get(targetIDVar).(string)
+	keyID := d.Id()
+
+	if d.Get(activeVar).(bool) {
+		if _, err := client.ActivatePublicKey(ctx, &actionv2.ActivatePublicKeyRequest{
+			TargetId: targetID,
+			KeyId:    keyID,
+		}); err != nil {
+			return diag.Errorf("failed to activate public key: %v", err)
+		}
+		return nil
+	}
+
+	if _, err := client.DeactivatePublicKey(ctx, &actionv2.DeactivatePublicKeyRequest{
+		TargetId: targetID,
+		KeyId:    keyID,
+	}); err != nil && helper.IgnorePreconditionError(err) != nil {
+		return diag.Errorf("failed to deactivate public key: %v", err)
+	}
 	return nil
 }
 

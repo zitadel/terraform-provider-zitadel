@@ -17,7 +17,17 @@ import (
 func TestAccActionTargetPublicKey(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_public_key")
 
-	resourceConfig := fmt.Sprintf(`
+	const publicKey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Z3VS5JJcds3xfn/ygWe
+FsXpOJFdGMqhBJCnISAAnNPBKSFwETb4FIxgpJMtzBCIR2YEKXE6OryMpO6E8yoI
+6sFawwLY1ViELOE7FD7sJVMUQF1WLiMjb7n1feGfToGarnWjKrx8IXjlgVnJ5kQ0
+GNOwjKBOmgJiJEhBuTflS0ppODBdKP2oq6iAdf5bMmkv0wMKJnxBKPQsXLcCn2u4
+ym9AXkcdH2QviCBWMpGrjVoGLFGqf5E4MiwMuNl7rHIExmBm2mlnmuIPhILRs/jS
+tKKLrdazqFCxD2fWXt9a2yzXoE6Hv0sWBnJSRASez2dn6ki3GFbLHeR2dMhT8wbf
+cQIDAQAB
+-----END PUBLIC KEY-----`
+
+	configWithoutActive := fmt.Sprintf(`
 %s
 resource "zitadel_action_target" "default" {
   name               = "%s"
@@ -31,27 +41,78 @@ resource "zitadel_action_target" "default" {
 resource "zitadel_action_target_public_key" "default" {
   target_id  = zitadel_action_target.default.id
   public_key = <<-EOT
------BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Z3VS5JJcds3xfn/ygWe
-FsXpOJFdGMqhBJCnISAAnNPBKSFwETb4FIxgpJMtzBCIR2YEKXE6OryMpO6E8yoI
-6sFawwLY1ViELOE7FD7sJVMUQF1WLiMjb7n1feGfToGarnWjKrx8IXjlgVnJ5kQ0
-GNOwjKBOmgJiJEhBuTflS0ppODBdKP2oq6iAdf5bMmkv0wMKJnxBKPQsXLcCn2u4
-ym9AXkcdH2QviCBWMpGrjVoGLFGqf5E4MiwMuNl7rHIExmBm2mlnmuIPhILRs/jS
-tKKLrdazqFCxD2fWXt9a2yzXoE6Hv0sWBnJSRASez2dn6ki3GFbLHeR2dMhT8wbf
-cQIDAQAB
------END PUBLIC KEY-----
+%s
 EOT
 }
-`, frame.ProviderSnippet, frame.UniqueResourcesID)
+`, frame.ProviderSnippet, frame.UniqueResourcesID, publicKey)
+
+	configActive := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JWE"
+}
+
+resource "zitadel_action_target_public_key" "default" {
+  target_id  = zitadel_action_target.default.id
+  active     = true
+  public_key = <<-EOT
+%s
+EOT
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID, publicKey)
+
+	configInactive := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JWE"
+}
+
+resource "zitadel_action_target_public_key" "default" {
+  target_id  = zitadel_action_target.default.id
+  active     = false
+  public_key = <<-EOT
+%s
+EOT
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID, publicKey)
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
 		Steps: []resource.TestStep{
+			// Pre-existing behavior: no `active` in config -> key is created and remains inactive.
+			// We assert via the remote check; SDKv2 may leave an unset Optional+Computed bool
+			// absent from the local state until a future refresh writes it.
 			{
-				Config: resourceConfig,
+				Config: configWithoutActive,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet(frame.TerraformName, "key_id"),
-					test_utils.CheckAMinute(checkRemoteProperty(frame)),
+					test_utils.CheckAMinute(checkRemoteProperty(frame, false)),
+				),
+			},
+			// Toggle to active=true via update (no recreate).
+			{
+				Config: configActive,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "active", "true"),
+					test_utils.CheckAMinute(checkRemoteProperty(frame, true)),
+				),
+			},
+			// Toggle back to active=false via update.
+			{
+				Config: configInactive,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "active", "false"),
+					test_utils.CheckAMinute(checkRemoteProperty(frame, false)),
 				),
 			},
 			{
@@ -68,7 +129,7 @@ EOT
 	})
 }
 
-func checkRemoteProperty(frame *test_utils.InstanceTestFrame) resource.TestCheckFunc {
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame, wantActive bool) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		rs, ok := state.RootModule().Resources[frame.TerraformName]
 		if !ok {
@@ -102,6 +163,10 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame) resource.TestCheck
 		keys := resp.GetPublicKeys()
 		if len(keys) == 0 {
 			return fmt.Errorf("public key %s not found on target %s", keyID, targetID)
+		}
+
+		if got := keys[0].GetActive(); got != wantActive {
+			return fmt.Errorf("public key %s on target %s: want active=%v, got active=%v", keyID, targetID, wantActive, got)
 		}
 
 		return nil
