@@ -114,9 +114,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// the next apply will retry via the Update path rather than orphan or duplicate it.
 	// FailedPrecondition (key already active) is treated as idempotent success.
 	//
-	// Use the raw config rather than d.Get/d.GetOkExists so we can distinguish
-	// "absent from config" from "present and false" — d.Get-based readers blend
-	// state and config, which is ambiguous for Optional+Computed attributes.
+	// Inspect the raw config (not d.Get/d.GetOkExists, which blend state and
+	// config) so this stays correct on Optional+Computed attributes where state
+	// may already carry a value populated by Create or Read. configBool returns
+	// true only for an explicit `active = true` in config; anything else
+	// (absent, false, null, unknown) is treated as "do not activate on create".
 	wantActive := configBool(d, activeVar)
 
 	// Persist active=false to state BEFORE attempting activation so that, if Activate
