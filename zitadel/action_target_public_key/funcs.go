@@ -97,7 +97,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	return nil
+	// AddPublicKey only returns the key ID, so call read() to populate the remaining
+	// computed attributes (active, fingerprint, creation_date) from the server.
+	return read(ctx, d, m)
 }
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -127,7 +129,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}); err != nil {
 			return diag.Errorf("failed to activate public key: %v", err)
 		}
-		return nil
+		return read(ctx, d, m)
 	}
 
 	if _, err := client.DeactivatePublicKey(ctx, &actionv2.DeactivatePublicKeyRequest{
@@ -136,7 +138,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}); err != nil && helper.IgnorePreconditionError(err) != nil {
 		return diag.Errorf("failed to deactivate public key: %v", err)
 	}
-	return nil
+	return read(ctx, d, m)
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

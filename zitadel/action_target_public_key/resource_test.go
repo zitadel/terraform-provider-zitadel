@@ -129,6 +129,57 @@ EOT
 	})
 }
 
+// TestAccActionTargetPublicKeyCreateActive verifies that a resource created with
+// active=true is activated on the server during Create (not just after a subsequent
+// Update), so the key is usable for payload encryption immediately after apply.
+func TestAccActionTargetPublicKeyCreateActive(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_public_key")
+
+	const publicKey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Z3VS5JJcds3xfn/ygWe
+FsXpOJFdGMqhBJCnISAAnNPBKSFwETb4FIxgpJMtzBCIR2YEKXE6OryMpO6E8yoI
+6sFawwLY1ViELOE7FD7sJVMUQF1WLiMjb7n1feGfToGarnWjKrx8IXjlgVnJ5kQ0
+GNOwjKBOmgJiJEhBuTflS0ppODBdKP2oq6iAdf5bMmkv0wMKJnxBKPQsXLcCn2u4
+ym9AXkcdH2QviCBWMpGrjVoGLFGqf5E4MiwMuNl7rHIExmBm2mlnmuIPhILRs/jS
+tKKLrdazqFCxD2fWXt9a2yzXoE6Hv0sWBnJSRASez2dn6ki3GFbLHeR2dMhT8wbf
+cQIDAQAB
+-----END PUBLIC KEY-----`
+
+	configActiveOnCreate := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JWE"
+}
+
+resource "zitadel_action_target_public_key" "default" {
+  target_id  = zitadel_action_target.default.id
+  active     = true
+  public_key = <<-EOT
+%s
+EOT
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID, publicKey)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: configActiveOnCreate,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet(frame.TerraformName, "key_id"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "active", "true"),
+					test_utils.CheckAMinute(checkRemoteProperty(frame, true)),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame, wantActive bool) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		rs, ok := state.RootModule().Resources[frame.TerraformName]
