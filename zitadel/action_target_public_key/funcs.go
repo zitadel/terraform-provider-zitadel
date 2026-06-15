@@ -91,23 +91,28 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// d.SetId above ensures the key is tracked in state even if activation fails;
 	// the next apply will retry via the Update path rather than orphan or duplicate it.
 	// FailedPrecondition (key already active) is treated as idempotent success.
-	active := false
-	if v, ok := d.GetOkExists(activeVar); ok && v.(bool) {
+	v, hasActive := d.GetOkExists(activeVar)
+	wantActive := hasActive && v.(bool)
+
+	// Persist active=false to state BEFORE attempting activation so that, if Activate
+	// returns a non-precondition error, the partial state we leave behind matches the
+	// server (key exists, inactive) and the next plan correctly shows false -> true.
+	// This is important when users run with -refresh=false, which would otherwise skip
+	// the read() that reconciles state.
+	if err := d.Set(activeVar, false); err != nil {
+		return diag.Errorf("failed to set active: %v", err)
+	}
+
+	if wantActive {
 		if _, err := client.ActivatePublicKey(ctx, &actionv2.ActivatePublicKeyRequest{
 			TargetId: req.TargetId,
 			KeyId:    resp.GetKeyId(),
 		}); err != nil && helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to activate public key: %v", err)
 		}
-		active = true
-	}
-
-	// AddPublicKey only returns the key ID; populate `active` from what we just did so
-	// state reflects the post-apply server state. ZITADEL's list API is eventually
-	// consistent immediately after creation, so we rely on the next refresh (which the
-	// SDK runs before the following plan) to fill `fingerprint` and `creation_date`.
-	if err := d.Set(activeVar, active); err != nil {
-		return diag.Errorf("failed to set active: %v", err)
+		if err := d.Set(activeVar, true); err != nil {
+			return diag.Errorf("failed to set active: %v", err)
+		}
 	}
 
 	return nil
