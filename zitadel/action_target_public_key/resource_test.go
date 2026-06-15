@@ -14,10 +14,10 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
-func TestAccActionTargetPublicKey(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_public_key")
-
-	const publicKey = `-----BEGIN PUBLIC KEY-----
+// testPublicKey is a static RSA public key used by all acceptance tests in this
+// package. ZITADEL never sees the matching private key; the PEM only has to be
+// a syntactically valid public key, so a single fixed value is reused.
+const testPublicKey = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Z3VS5JJcds3xfn/ygWe
 FsXpOJFdGMqhBJCnISAAnNPBKSFwETb4FIxgpJMtzBCIR2YEKXE6OryMpO6E8yoI
 6sFawwLY1ViELOE7FD7sJVMUQF1WLiMjb7n1feGfToGarnWjKrx8IXjlgVnJ5kQ0
@@ -26,6 +26,9 @@ ym9AXkcdH2QviCBWMpGrjVoGLFGqf5E4MiwMuNl7rHIExmBm2mlnmuIPhILRs/jS
 tKKLrdazqFCxD2fWXt9a2yzXoE6Hv0sWBnJSRASez2dn6ki3GFbLHeR2dMhT8wbf
 cQIDAQAB
 -----END PUBLIC KEY-----`
+
+func TestAccActionTargetPublicKey(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_public_key")
 
 	configWithoutActive := fmt.Sprintf(`
 %s
@@ -44,7 +47,7 @@ resource "zitadel_action_target_public_key" "default" {
 %s
 EOT
 }
-`, frame.ProviderSnippet, frame.UniqueResourcesID, publicKey)
+`, frame.ProviderSnippet, frame.UniqueResourcesID, testPublicKey)
 
 	configActive := fmt.Sprintf(`
 %s
@@ -64,7 +67,7 @@ resource "zitadel_action_target_public_key" "default" {
 %s
 EOT
 }
-`, frame.ProviderSnippet, frame.UniqueResourcesID, publicKey)
+`, frame.ProviderSnippet, frame.UniqueResourcesID, testPublicKey)
 
 	configInactive := fmt.Sprintf(`
 %s
@@ -84,7 +87,7 @@ resource "zitadel_action_target_public_key" "default" {
 %s
 EOT
 }
-`, frame.ProviderSnippet, frame.UniqueResourcesID, publicKey)
+`, frame.ProviderSnippet, frame.UniqueResourcesID, testPublicKey)
 
 	// Capture the key ID after the initial create so subsequent toggle steps can
 	// assert it stays stable — proves activation toggling is an in-place update,
@@ -160,16 +163,6 @@ EOT
 func TestAccActionTargetPublicKeyCreateActive(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_public_key")
 
-	const publicKey = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Z3VS5JJcds3xfn/ygWe
-FsXpOJFdGMqhBJCnISAAnNPBKSFwETb4FIxgpJMtzBCIR2YEKXE6OryMpO6E8yoI
-6sFawwLY1ViELOE7FD7sJVMUQF1WLiMjb7n1feGfToGarnWjKrx8IXjlgVnJ5kQ0
-GNOwjKBOmgJiJEhBuTflS0ppODBdKP2oq6iAdf5bMmkv0wMKJnxBKPQsXLcCn2u4
-ym9AXkcdH2QviCBWMpGrjVoGLFGqf5E4MiwMuNl7rHIExmBm2mlnmuIPhILRs/jS
-tKKLrdazqFCxD2fWXt9a2yzXoE6Hv0sWBnJSRASez2dn6ki3GFbLHeR2dMhT8wbf
-cQIDAQAB
------END PUBLIC KEY-----`
-
 	configActiveOnCreate := fmt.Sprintf(`
 %s
 resource "zitadel_action_target" "default" {
@@ -188,7 +181,7 @@ resource "zitadel_action_target_public_key" "default" {
 %s
 EOT
 }
-`, frame.ProviderSnippet, frame.UniqueResourcesID, publicKey)
+`, frame.ProviderSnippet, frame.UniqueResourcesID, testPublicKey)
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
@@ -216,16 +209,6 @@ EOT
 func TestAccActionTargetPublicKeyNoAccidentalToggle(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_public_key")
 
-	const publicKey = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Z3VS5JJcds3xfn/ygWe
-FsXpOJFdGMqhBJCnISAAnNPBKSFwETb4FIxgpJMtzBCIR2YEKXE6OryMpO6E8yoI
-6sFawwLY1ViELOE7FD7sJVMUQF1WLiMjb7n1feGfToGarnWjKrx8IXjlgVnJ5kQ0
-GNOwjKBOmgJiJEhBuTflS0ppODBdKP2oq6iAdf5bMmkv0wMKJnxBKPQsXLcCn2u4
-ym9AXkcdH2QviCBWMpGrjVoGLFGqf5E4MiwMuNl7rHIExmBm2mlnmuIPhILRs/jS
-tKKLrdazqFCxD2fWXt9a2yzXoE6Hv0sWBnJSRASez2dn6ki3GFbLHeR2dMhT8wbf
-cQIDAQAB
------END PUBLIC KEY-----`
-
 	target := fmt.Sprintf(`
 %s
 resource "zitadel_action_target" "default" {
@@ -245,7 +228,7 @@ resource "zitadel_action_target_public_key" "default" {
 %s
 EOT
 }
-`, publicKey)
+`, testPublicKey)
 
 	configActiveTrue := target + fmt.Sprintf(`
 resource "zitadel_action_target_public_key" "default" {
@@ -255,7 +238,7 @@ resource "zitadel_action_target_public_key" "default" {
 %s
 EOT
 }
-`, publicKey)
+`, testPublicKey)
 
 	var captured struct {
 		targetID, keyID string
