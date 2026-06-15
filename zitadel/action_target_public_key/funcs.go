@@ -14,11 +14,16 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
-// configBool reports the practitioner-supplied value of a bool attribute from the
-// raw configuration, returning false when the attribute is absent or unknown.
-// Unlike d.Get / d.GetOkExists it does NOT fall back to state, which makes it
-// the right primitive for distinguishing "the user wrote `active = false`" from
-// "the user did not write `active` at all" on Optional+Computed attributes.
+// configBool reports whether a bool attribute is set to `true` in the raw,
+// practitioner-supplied configuration. It returns false for every other case —
+// the attribute is absent, set to `false`, null, or not yet known. The intended
+// use is as an opt-in gate ("did the user explicitly request this?"); callers
+// that need to distinguish "absent" from "explicit false" should inspect
+// d.GetRawConfig() directly.
+//
+// Unlike d.Get / d.GetOkExists this does NOT fall back to state, so it stays
+// correct on Optional+Computed attributes where state may carry a value that
+// was never in config (e.g. populated by Create or refreshed by Read).
 func configBool(d *schema.ResourceData, attr string) bool {
 	raw := d.GetRawConfig()
 	if raw.IsNull() || !raw.IsKnown() {
