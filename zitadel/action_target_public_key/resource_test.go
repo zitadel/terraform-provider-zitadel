@@ -179,6 +179,132 @@ EOT
 	})
 }
 
+// TestAccActionTargetPublicKeyNoAccidentalToggle proves the upgrade is non-breaking:
+//
+//   - A key activated out-of-band (e.g. via the API by a user who upgraded from a
+//     provider release that did not manage activation) must NOT be silently
+//     deactivated when terraform applies a config that omits the `active` field.
+//   - Removing `active` from config must NOT change the remote activation state.
+//   - Adding `active = true` to config when the server is already active must be a
+//     plan/apply no-op (FailedPrecondition idempotency).
+func TestAccActionTargetPublicKeyNoAccidentalToggle(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_public_key")
+
+	const publicKey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Z3VS5JJcds3xfn/ygWe
+FsXpOJFdGMqhBJCnISAAnNPBKSFwETb4FIxgpJMtzBCIR2YEKXE6OryMpO6E8yoI
+6sFawwLY1ViELOE7FD7sJVMUQF1WLiMjb7n1feGfToGarnWjKrx8IXjlgVnJ5kQ0
+GNOwjKBOmgJiJEhBuTflS0ppODBdKP2oq6iAdf5bMmkv0wMKJnxBKPQsXLcCn2u4
+ym9AXkcdH2QviCBWMpGrjVoGLFGqf5E4MiwMuNl7rHIExmBm2mlnmuIPhILRs/jS
+tKKLrdazqFCxD2fWXt9a2yzXoE6Hv0sWBnJSRASez2dn6ki3GFbLHeR2dMhT8wbf
+cQIDAQAB
+-----END PUBLIC KEY-----`
+
+	target := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JWE"
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
+
+	configNoActive := target + fmt.Sprintf(`
+resource "zitadel_action_target_public_key" "default" {
+  target_id  = zitadel_action_target.default.id
+  public_key = <<-EOT
+%s
+EOT
+}
+`, publicKey)
+
+	configActiveTrue := target + fmt.Sprintf(`
+resource "zitadel_action_target_public_key" "default" {
+  target_id  = zitadel_action_target.default.id
+  active     = true
+  public_key = <<-EOT
+%s
+EOT
+}
+`, publicKey)
+
+	var captured struct {
+		targetID, keyID string
+	}
+	captureIDs := func(state *terraform.State) error {
+		rs, ok := state.RootModule().Resources[frame.TerraformName]
+		if !ok {
+			return fmt.Errorf("not found: %s", frame.TerraformName)
+		}
+		captured.targetID = rs.Primary.Attributes["target_id"]
+		captured.keyID = rs.Primary.ID
+		return nil
+	}
+	activateExternally := func() {
+		if captured.targetID == "" || captured.keyID == "" {
+			t.Fatal("captureIDs did not run before activateExternally")
+		}
+		client, err := helper.GetActionClient(context.Background(), frame.ClientInfo)
+		if err != nil {
+			t.Fatalf("failed to get client: %v", err)
+		}
+		if _, err := client.ActivatePublicKey(context.Background(), &actionv2.ActivatePublicKeyRequest{
+			TargetId: captured.targetID,
+			KeyId:    captured.keyID,
+		}); err != nil && helper.IgnorePreconditionError(err) != nil {
+			t.Fatalf("external activation failed: %v", err)
+		}
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			// Baseline: create without `active` -> key inactive on server (mirrors the
+			// behaviour every existing user has been getting from prior provider releases).
+			{
+				Config: configNoActive,
+				Check: resource.ComposeTestCheckFunc(
+					captureIDs,
+					resource.TestCheckResourceAttr(frame.TerraformName, "active", "false"),
+					test_utils.CheckAMinute(checkRemoteProperty(frame, false)),
+				),
+			},
+			// User (or another tool) activates the key out-of-band via the ZITADEL API.
+			// Apply the SAME config: the provider must refresh state, see active=true,
+			// and produce no plan diff / no deactivation. This is the critical upgrade
+			// safety property.
+			{
+				PreConfig: activateExternally,
+				Config:    configNoActive,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "active", "true"),
+					test_utils.CheckAMinute(checkRemoteProperty(frame, true)),
+				),
+			},
+			// Adding `active = true` to config when the server already matches must be a
+			// no-op (idempotent activate; FailedPrecondition is swallowed).
+			{
+				Config: configActiveTrue,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "active", "true"),
+					test_utils.CheckAMinute(checkRemoteProperty(frame, true)),
+				),
+			},
+			// Removing `active` from config again must NOT deactivate the key. The
+			// remote state stays active even though the field is gone from config.
+			{
+				Config: configNoActive,
+				Check: resource.ComposeTestCheckFunc(
+					test_utils.CheckAMinute(checkRemoteProperty(frame, true)),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame, wantActive bool) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		rs, ok := state.RootModule().Resources[frame.TerraformName]
