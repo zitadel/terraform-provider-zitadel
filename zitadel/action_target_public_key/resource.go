@@ -35,8 +35,9 @@ func GetResource() *schema.Resource {
 			},
 			activeVar: {
 				Type:        schema.TypeBool,
+				Optional:    true,
 				Computed:    true,
-				Description: "Whether the public key is active and used for payload encryption.",
+				Description: "Whether the public key is active and used for payload encryption. If unset, the key is created in ZITADEL's default (inactive) state and the provider does not modify its activation state. Set to true to activate the key after creation, or to toggle activation on an existing key.",
 			},
 			fingerprintVar: {
 				Type:        schema.TypeString,
@@ -51,6 +52,7 @@ func GetResource() *schema.Resource {
 		},
 		CreateContext: create,
 		ReadContext:   read,
+		UpdateContext: update,
 		DeleteContext: delete,
 		Importer: helper.ImportWithID(
 			keyIDVar,

@@ -14,6 +14,28 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
+// configBool reports whether a bool attribute is set to `true` in the raw,
+// practitioner-supplied configuration. It returns false for every other case —
+// the attribute is absent, set to `false`, null, or not yet known. The intended
+// use is as an opt-in gate ("did the user explicitly request this?"); callers
+// that need to distinguish "absent" from "explicit false" should inspect
+// d.GetRawConfig() directly.
+//
+// Unlike d.Get / d.GetOkExists this does NOT fall back to state, so it stays
+// correct on Optional+Computed attributes where state may carry a value that
+// was never in config (e.g. populated by Create or refreshed by Read).
+func configBool(d *schema.ResourceData, attr string) bool {
+	raw := d.GetRawConfig()
+	if raw.IsNull() || !raw.IsKnown() {
+		return false
+	}
+	v := raw.GetAttr(attr)
+	if v.IsNull() || !v.IsKnown() {
+		return false
+	}
+	return v.True()
+}
+
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started delete")
 
@@ -85,6 +107,98 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to set key_id: %v", err)
 	}
 
+	// Only call ActivatePublicKey when the user explicitly opted in via active=true.
+	// An unset active leaves the key in ZITADEL's default (inactive) state to preserve
+	// pre-existing behavior for configs that don't set the field.
+	// d.SetId above ensures the key is tracked in state even if activation fails;
+	// the next apply will retry via the Update path rather than orphan or duplicate it.
+	// FailedPrecondition (key already active) is treated as idempotent success.
+	//
+	// Inspect the raw config (not d.Get/d.GetOkExists, which blend state and
+	// config) so this stays correct on Optional+Computed attributes where state
+	// may already carry a value populated by Create or Read. configBool returns
+	// true only for an explicit `active = true` in config; anything else
+	// (absent, false, null, unknown) is treated as "do not activate on create".
+	wantActive := configBool(d, activeVar)
+
+	// Persist active=false to state BEFORE attempting activation so that, if Activate
+	// returns a non-precondition error, the partial state we leave behind matches the
+	// server (key exists, inactive) and the next plan correctly shows false -> true.
+	// This is important when users run with -refresh=false, which would otherwise skip
+	// the read() that reconciles state.
+	if err := d.Set(activeVar, false); err != nil {
+		return diag.Errorf("failed to set active: %v", err)
+	}
+
+	if wantActive {
+		if _, err := client.ActivatePublicKey(ctx, &actionv2.ActivatePublicKeyRequest{
+			TargetId: req.TargetId,
+			KeyId:    resp.GetKeyId(),
+		}); err != nil && helper.IgnorePreconditionError(err) != nil {
+			return diag.Errorf("failed to activate public key: %v", err)
+		}
+		if err := d.Set(activeVar, true); err != nil {
+			return diag.Errorf("failed to set active: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started update")
+
+	if !d.HasChange(activeVar) {
+		return nil
+	}
+
+	// Only act when the user has an explicit active value in *config*. If the field
+	// has been removed we preserve the current remote state rather than implicitly
+	// deactivating a key the user no longer manages. We inspect the raw config (not
+	// d.Get/d.GetOkExists, which blend state and config) so this stays correct even
+	// when state has a value populated by Create or Read.
+	rawConfig := d.GetRawConfig()
+	if rawConfig.IsNull() || !rawConfig.IsKnown() {
+		return nil
+	}
+	configActive := rawConfig.GetAttr(activeVar)
+	if configActive.IsNull() || !configActive.IsKnown() {
+		return nil
+	}
+	wantActive := configActive.True()
+
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+
+	client, err := helper.GetActionClient(ctx, clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	targetID := d.Get(targetIDVar).(string)
+	keyID := d.Id()
+
+	if wantActive {
+		if _, err := client.ActivatePublicKey(ctx, &actionv2.ActivatePublicKeyRequest{
+			TargetId: targetID,
+			KeyId:    keyID,
+		}); err != nil && helper.IgnorePreconditionError(err) != nil {
+			return diag.Errorf("failed to activate public key: %v", err)
+		}
+	} else {
+		if _, err := client.DeactivatePublicKey(ctx, &actionv2.DeactivatePublicKeyRequest{
+			TargetId: targetID,
+			KeyId:    keyID,
+		}); err != nil && helper.IgnorePreconditionError(err) != nil {
+			return diag.Errorf("failed to deactivate public key: %v", err)
+		}
+	}
+
+	if err := d.Set(activeVar, wantActive); err != nil {
+		return diag.Errorf("failed to set active: %v", err)
+	}
 	return nil
 }
 
