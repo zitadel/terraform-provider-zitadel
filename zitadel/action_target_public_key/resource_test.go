@@ -90,12 +90,11 @@ EOT
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
 		Steps: []resource.TestStep{
 			// Pre-existing behavior: no `active` in config -> key is created and remains inactive.
-			// We assert via the remote check; SDKv2 may leave an unset Optional+Computed bool
-			// absent from the local state until a future refresh writes it.
 			{
 				Config: configWithoutActive,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet(frame.TerraformName, "key_id"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "active", "false"),
 					test_utils.CheckAMinute(checkRemoteProperty(frame, false)),
 				),
 			},
