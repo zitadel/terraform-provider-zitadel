@@ -86,6 +86,29 @@ EOT
 }
 `, frame.ProviderSnippet, frame.UniqueResourcesID, publicKey)
 
+	// Capture the key ID after the initial create so subsequent toggle steps can
+	// assert it stays stable — proves activation toggling is an in-place update,
+	// not a recreate that would break rotation flows.
+	var initialKeyID string
+	captureKeyID := func(state *terraform.State) error {
+		rs, ok := state.RootModule().Resources[frame.TerraformName]
+		if !ok {
+			return fmt.Errorf("not found: %s", frame.TerraformName)
+		}
+		initialKeyID = rs.Primary.ID
+		return nil
+	}
+	assertKeyIDStable := func(state *terraform.State) error {
+		rs, ok := state.RootModule().Resources[frame.TerraformName]
+		if !ok {
+			return fmt.Errorf("not found: %s", frame.TerraformName)
+		}
+		if rs.Primary.ID != initialKeyID {
+			return fmt.Errorf("key_id changed across toggle: want %q, got %q", initialKeyID, rs.Primary.ID)
+		}
+		return nil
+	}
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
 		Steps: []resource.TestStep{
@@ -95,6 +118,7 @@ EOT
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet(frame.TerraformName, "key_id"),
 					resource.TestCheckResourceAttr(frame.TerraformName, "active", "false"),
+					captureKeyID,
 					test_utils.CheckAMinute(checkRemoteProperty(frame, false)),
 				),
 			},
@@ -103,6 +127,7 @@ EOT
 				Config: configActive,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "active", "true"),
+					assertKeyIDStable,
 					test_utils.CheckAMinute(checkRemoteProperty(frame, true)),
 				),
 			},
@@ -111,6 +136,7 @@ EOT
 				Config: configInactive,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "active", "false"),
+					assertKeyIDStable,
 					test_utils.CheckAMinute(checkRemoteProperty(frame, false)),
 				),
 			},
