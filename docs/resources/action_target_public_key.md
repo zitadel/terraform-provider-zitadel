@@ -28,11 +28,11 @@ resource "zitadel_action_target_public_key" "default" {
 
 ### Optional
 
+- `active` (Boolean) Whether the public key is active and used for payload encryption. If unset, the key is created in the state ZITADEL returns (inactive) and is not modified by this provider. Set to true to activate the key after creation, or to toggle activation on an existing key.
 - `expiration_date` (String) The expiration date of the public key in RFC3339 format.
 
 ### Read-Only
 
-- `active` (Boolean) Whether the public key is active and used for payload encryption.
 - `creation_date` (String) The date the public key was added.
 - `fingerprint` (String) The fingerprint of the public key.
 - `id` (String) The ID of this resource.
