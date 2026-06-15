@@ -88,18 +88,29 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// Only call ActivatePublicKey when the user explicitly opted in via active=true.
 	// An unset active leaves the key in ZITADEL's default (inactive) state to preserve
 	// pre-existing behavior for configs that don't set the field.
+	// d.SetId above ensures the key is tracked in state even if activation fails;
+	// the next apply will retry via the Update path rather than orphan or duplicate it.
+	// FailedPrecondition (key already active) is treated as idempotent success.
+	active := false
 	if v, ok := d.GetOkExists(activeVar); ok && v.(bool) {
 		if _, err := client.ActivatePublicKey(ctx, &actionv2.ActivatePublicKeyRequest{
 			TargetId: req.TargetId,
 			KeyId:    resp.GetKeyId(),
-		}); err != nil {
+		}); err != nil && helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to activate public key: %v", err)
 		}
+		active = true
 	}
 
-	// AddPublicKey only returns the key ID, so call read() to populate the remaining
-	// computed attributes (active, fingerprint, creation_date) from the server.
-	return read(ctx, d, m)
+	// AddPublicKey only returns the key ID; populate `active` from what we just did so
+	// state reflects the post-apply server state. ZITADEL's list API is eventually
+	// consistent immediately after creation, so we rely on the next refresh (which the
+	// SDK runs before the following plan) to fill `fingerprint` and `creation_date`.
+	if err := d.Set(activeVar, active); err != nil {
+		return diag.Errorf("failed to set active: %v", err)
+	}
+
+	return nil
 }
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -108,6 +119,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !d.HasChange(activeVar) {
 		return nil
 	}
+
+	// Only act when the user has an explicit active value in config. If the field has
+	// been removed (Optional+Computed transitioning to unset) we preserve the current
+	// remote state rather than implicitly deactivating a key the user no longer manages.
+	v, hasActive := d.GetOkExists(activeVar)
+	if !hasActive {
+		return nil
+	}
+	wantActive := v.(bool)
 
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
@@ -122,23 +142,26 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	targetID := d.Get(targetIDVar).(string)
 	keyID := d.Id()
 
-	if d.Get(activeVar).(bool) {
+	if wantActive {
 		if _, err := client.ActivatePublicKey(ctx, &actionv2.ActivatePublicKeyRequest{
 			TargetId: targetID,
 			KeyId:    keyID,
-		}); err != nil {
+		}); err != nil && helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to activate public key: %v", err)
 		}
-		return read(ctx, d, m)
+	} else {
+		if _, err := client.DeactivatePublicKey(ctx, &actionv2.DeactivatePublicKeyRequest{
+			TargetId: targetID,
+			KeyId:    keyID,
+		}); err != nil && helper.IgnorePreconditionError(err) != nil {
+			return diag.Errorf("failed to deactivate public key: %v", err)
+		}
 	}
 
-	if _, err := client.DeactivatePublicKey(ctx, &actionv2.DeactivatePublicKeyRequest{
-		TargetId: targetID,
-		KeyId:    keyID,
-	}); err != nil && helper.IgnorePreconditionError(err) != nil {
-		return diag.Errorf("failed to deactivate public key: %v", err)
+	if err := d.Set(activeVar, wantActive); err != nil {
+		return diag.Errorf("failed to set active: %v", err)
 	}
-	return read(ctx, d, m)
+	return nil
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
