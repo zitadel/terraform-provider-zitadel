@@ -19,17 +19,18 @@ var SMSOTPUnsupportedTextAttrs = []string{"title", "pre_header", "subject", "gre
 const smsOTPUnsupportedDeprecation = "Not supported by the SMS OTP message: the ZITADEL API only stores `text` for this message type, so this attribute has no effect. It will be removed in a future major version."
 
 // DeprecateSMSOTPTextAttrs marks the unsupported MessageCustomText attributes as
-// deprecated in place, keeping them optional so existing configurations continue
-// to parse without error.
+// deprecated in place. It mutates the existing StringAttribute so all generated
+// metadata (description, validators, plan modifiers) is preserved and only the
+// deprecation message is added, keeping the attributes optional so existing
+// configurations continue to parse without error.
 func DeprecateSMSOTPTextAttrs(s *resourceschema.Schema) {
 	for _, name := range SMSOTPUnsupportedTextAttrs {
-		if _, ok := s.Attributes[name]; !ok {
+		attr, ok := s.Attributes[name].(resourceschema.StringAttribute)
+		if !ok {
 			continue
 		}
-		s.Attributes[name] = resourceschema.StringAttribute{
-			Optional:           true,
-			DeprecationMessage: smsOTPUnsupportedDeprecation,
-		}
+		attr.DeprecationMessage = smsOTPUnsupportedDeprecation
+		s.Attributes[name] = attr
 	}
 }
 
