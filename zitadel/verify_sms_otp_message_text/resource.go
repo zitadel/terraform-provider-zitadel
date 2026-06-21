@@ -41,6 +41,7 @@ func (r *verifySMSOTPMessageTextResource) Metadata(_ context.Context, req resour
 func (r *verifySMSOTPMessageTextResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	s, diags := text.GenSchemaMessageCustomText(ctx)
 	resp.Diagnostics.Append(diags...)
+	helper.DeprecateSMSOTPTextAttrs(&s)
 	s.MarkdownDescription = "Customizes the one-time password (OTP) verification SMS sent to users (org-scoped). " +
 		"Instance-level defaults are managed by `zitadel_default_verify_sms_otp_message_text`."
 	resp.Schema = s
@@ -128,7 +129,14 @@ func (r *verifySMSOTPMessageTextResource) Read(ctx context.Context, req resource
 	}
 
 	if !zResp.CustomText.IsDefault {
+		// The SMS OTP API only persists `text`; preserve the configured values
+		// for the unsupported fields so a Read does not introduce a perpetual diff.
+		prior := state
 		resp.Diagnostics.Append(text.CopyMessageCustomTextToTerraform(ctx, zResp.CustomText, &state)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		resp.Diagnostics.Append(helper.PreserveSMSOTPTextAttrs(ctx, prior, &state)...)
 		if resp.Diagnostics.HasError() {
 			return
 		}
