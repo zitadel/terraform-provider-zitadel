@@ -35,6 +35,35 @@ func TestAccVerifySMSOTPMessageText(t *testing.T) {
 	)
 }
 
+// TestAccVerifySMSOTPMessageText_DeprecatedFieldsConverge asserts that setting
+// the deprecated fields the SMS OTP API does not persist does not produce a
+// perpetual diff (regression test for #412). The plan-only step uses the
+// default ExpectNonEmptyPlan=false, so a non-empty plan after apply fails.
+func TestAccVerifySMSOTPMessageText_DeprecatedFieldsConverge(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_verify_sms_otp_message_text")
+	config := fmt.Sprintf(`%s
+%s
+resource "zitadel_verify_sms_otp_message_text" "default" {
+  org_id      = data.zitadel_org.default.id
+  language    = "en"
+  text        = "text example"
+  greeting    = "Greeting"
+  subject     = "Subject"
+  title       = "Title"
+  pre_header  = "Pre header"
+  button_text = "Button text"
+  footer_text = "Footer text"
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
+	resource.ParallelTest(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{Config: config},
+			{Config: config, PlanOnly: true},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame, lang string) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
