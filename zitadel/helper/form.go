@@ -98,16 +98,23 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 			return diag.Errorf("failed to create client: %v", err)
 		}
 	default:
-		return diag.Errorf("no authentication method available for asset upload")
+		return diag.Errorf("no authentication method available for asset upload; configure one of 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api'")
 	}
 
 	resp, err := client.Do(r)
 	if err != nil {
 		return diag.Errorf("failed to do asset request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		// Drain so the connection can be reused, then close.
+		_, _ = io.Copy(io.Discard, resp.Body)
+		_ = resp.Body.Close()
+	}()
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
+		body, readErr := io.ReadAll(resp.Body)
+		if readErr != nil {
+			return diag.Errorf("asset request returned %s (failed to read response body: %v)", resp.Status, readErr)
+		}
 		return diag.Errorf("asset request returned %s: %s", resp.Status, strings.TrimSpace(string(body)))
 	}
 	return nil

@@ -70,6 +70,8 @@ func writePNG(t *testing.T) string {
 	if _, err := f.Write(buf.Bytes()); err != nil {
 		t.Fatalf("write png: %v", err)
 	}
-	_ = f.Close()
+	if err := f.Close(); err != nil {
+		t.Fatalf("close png: %v", err)
+	}
 	return f.Name()
 }
