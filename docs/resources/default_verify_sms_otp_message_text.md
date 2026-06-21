@@ -28,13 +28,13 @@ resource "zitadel_default_verify_sms_otp_message_text" "default" {
 
 ### Optional
 
-- `button_text` (String)
-- `footer_text` (String)
-- `greeting` (String)
-- `pre_header` (String)
-- `subject` (String)
+- `button_text` (String, Deprecated)
+- `footer_text` (String, Deprecated)
+- `greeting` (String, Deprecated)
+- `pre_header` (String, Deprecated)
+- `subject` (String, Deprecated)
 - `text` (String)
-- `title` (String)
+- `title` (String, Deprecated)
 
 ### Read-Only
 
