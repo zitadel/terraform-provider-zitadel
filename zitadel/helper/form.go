@@ -74,13 +74,15 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 	if err != nil {
 		return diag.Errorf("failed to create asset request: %v", err)
 	}
-	for k, v := range additionalHeaders {
-		r.Header.Add(k, v)
-	}
 	// Asset uploads bypass the gRPC transport, so the provider's transport_headers
-	// have to be applied to the plain HTTP request here as well.
+	// have to be applied to the plain HTTP request here as well. Set them first so
+	// the per-request additionalHeaders (e.g. x-zitadel-orgid) always win, and use
+	// Set rather than Add so single-valued headers stay deterministic.
 	for k, v := range clientInfo.TransportHeaders {
-		r.Header.Add(k, v)
+		r.Header.Set(k, v)
+	}
+	for k, v := range additionalHeaders {
+		r.Header.Set(k, v)
 	}
 
 	switch {
