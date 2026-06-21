@@ -137,8 +137,12 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		if err != nil {
 			return nil, fmt.Errorf("failed to read JWT file: %v", err)
 		}
-		options = append(options, zitadel.WithJWTDirectTokenSource(string(jwt)))
-		assetTokenSource = oauth2.StaticTokenSource(&oauth2.Token{AccessToken: strings.TrimSpace(string(jwt)), TokenType: "Bearer"})
+		// Trim once so the gRPC and asset-upload paths use an identical token; a
+		// trailing newline (common in CLI-written files) is invalid in a bearer
+		// header and would otherwise only be stripped on the asset path.
+		presignedJWT := strings.TrimSpace(string(jwt))
+		options = append(options, zitadel.WithJWTDirectTokenSource(presignedJWT))
+		assetTokenSource = oauth2.StaticTokenSource(&oauth2.Token{AccessToken: presignedJWT, TokenType: "Bearer"})
 	case jwtProfileFile != "":
 		if _, err := os.Stat(jwtProfileFile); err != nil {
 			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
