@@ -68,6 +68,15 @@ type ClientInfo struct {
 	KeyPath string
 	Data    []byte
 	Options []zitadel.Option
+	// TokenSource carries the bearer credential for auth modes whose token is
+	// not derivable from KeyPath/Data (access_token, jwt_file, system_api). The
+	// asset-upload HTTP client in form.go uses it so those modes can upload
+	// logos, icons and fonts. It is nil for the JWT-profile file modes, which
+	// form.go builds from KeyPath/Data directly.
+	TokenSource oauth2.TokenSource
+	// TransportHeaders mirrors the provider's transport_headers onto the
+	// asset-upload requests, which bypass the gRPC transport.
+	TransportHeaders map[string]string
 }
 
 func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, systemAPIKeyFile string, systemAPIKey string, systemAPIPrivateKey string, systemAPIPublicKey string, systemAPIUser string, systemAPIAudience string, port string, insecureSkipVerifyTLS bool, transportHeaders map[string]string) (*ClientInfo, error) {
@@ -110,11 +119,13 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 
 	keyPath := ""
 	var keyData []byte
+	var assetTokenSource oauth2.TokenSource
 
 	switch {
 	case accessToken != "":
 		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken, TokenType: "Bearer"})
 		options = append(options, zitadel.WithTokenSource(tokenSource))
+		assetTokenSource = tokenSource
 	case token != "":
 		if _, err := os.Stat(token); err != nil {
 			return nil, fmt.Errorf("failed to read token file: %v", err)
@@ -127,6 +138,7 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 			return nil, fmt.Errorf("failed to read JWT file: %v", err)
 		}
 		options = append(options, zitadel.WithJWTDirectTokenSource(string(jwt)))
+		assetTokenSource = oauth2.StaticTokenSource(&oauth2.Token{AccessToken: strings.TrimSpace(string(jwt)), TokenType: "Bearer"})
 	case jwtProfileFile != "":
 		if _, err := os.Stat(jwtProfileFile); err != nil {
 			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
@@ -171,16 +183,19 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 			return nil, fmt.Errorf("failed to create system api token source: %w", err)
 		}
 		options = append(options, zitadel.WithTokenSource(ts))
+		assetTokenSource = ts
 	default:
 		return nil, fmt.Errorf("either 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api' (with 'key', 'key_file', or both 'private_key' and 'public_key') is required")
 	}
 
 	return &ClientInfo{
-		clientDomain,
-		issuer,
-		keyPath,
-		keyData,
-		options,
+		Domain:           clientDomain,
+		Issuer:           issuer,
+		KeyPath:          keyPath,
+		Data:             keyData,
+		Options:          options,
+		TokenSource:      assetTokenSource,
+		TransportHeaders: transportHeaders,
 	}, nil
 }
 

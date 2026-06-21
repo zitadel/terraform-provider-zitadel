@@ -77,24 +77,38 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 	for k, v := range additionalHeaders {
 		r.Header.Add(k, v)
 	}
+	// Asset uploads bypass the gRPC transport, so the provider's transport_headers
+	// have to be applied to the plain HTTP request here as well.
+	for k, v := range clientInfo.TransportHeaders {
+		r.Header.Add(k, v)
+	}
 
-	if clientInfo.KeyPath != "" {
+	switch {
+	case clientInfo.TokenSource != nil:
+		// access_token, jwt_file and system_api carry a ready bearer token source.
+		client = NewClientWithInterceptor(clientInfo.TokenSource)
+	case clientInfo.KeyPath != "":
 		client, err = NewClientWithInterceptorFromKeyFile(ctx, clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
 		if err != nil {
 			return diag.Errorf("failed to create client: %v", err)
 		}
-	} else if len(clientInfo.Data) > 0 {
+	case len(clientInfo.Data) > 0:
 		client, err = NewClientWithInterceptorFromKeyFileData(ctx, clientInfo.Issuer, clientInfo.Data, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
 		if err != nil {
 			return diag.Errorf("failed to create client: %v", err)
 		}
-	} else {
-		return diag.Errorf("either 'jwt_file', 'jwt_profile_file' or 'jwt_profile_json' is required")
+	default:
+		return diag.Errorf("no authentication method available for asset upload")
 	}
 
 	resp, err := client.Do(r)
-	if err != nil || resp.StatusCode != http.StatusOK {
+	if err != nil {
 		return diag.Errorf("failed to do asset request: %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return diag.Errorf("asset request returned %s: %s", resp.Status, strings.TrimSpace(string(body)))
 	}
 	return nil
 }
@@ -102,6 +116,15 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 type Interceptor struct {
 	tokenSource oauth2.TokenSource
 	core        http.RoundTripper
+}
+
+// NewClientWithInterceptor returns an HTTP client that authenticates requests
+// with the given token source, used for the access_token, jwt_file and
+// system_api auth modes where the bearer token is already available.
+func NewClientWithInterceptor(tokenSource oauth2.TokenSource) *http.Client {
+	return &http.Client{
+		Transport: Interceptor{core: http.DefaultTransport, tokenSource: tokenSource},
+	}
 }
 
 func NewClientWithInterceptorFromKeyFile(ctx context.Context, issuer, keyPath string, scopes []string) (*http.Client, error) {
