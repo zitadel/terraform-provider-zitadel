@@ -60,21 +60,38 @@ func createMultipartRequest(issuer, endpoint, path string) (*http.Request, error
 	return r, nil
 }
 
+// InstanceFormFilePost uploads an asset (logo, icon or font) to an instance-level
+// endpoint. Instance-scoped assets need no organization header.
 func InstanceFormFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path string) diag.Diagnostics {
 	return formFilePost(ctx, clientInfo, endpoint, path, map[string]string{})
 }
 
+// OrgFormFilePost uploads an asset to an org-level endpoint. The x-zitadel-orgid
+// header selects which organization the asset belongs to, mirroring the
+// per-request org context the gRPC client sets via helper.CtxSetOrgID.
 func OrgFormFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path, orgID string) diag.Diagnostics {
 	return formFilePost(ctx, clientInfo, endpoint, path, map[string]string{"x-zitadel-orgid": orgID})
 }
 
+// formFilePost performs the multipart asset upload. ZITADEL serves asset uploads
+// over a plain HTTP endpoint that sits outside the gRPC API, so this path builds
+// its own authenticated *http.Client instead of reusing the gRPC connection. It
+// must therefore reproduce, by hand, the two things the gRPC stack does
+// automatically: attach the provider's transport_headers and authenticate the
+// request with the configured credential.
 func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path string, additionalHeaders map[string]string) diag.Diagnostics {
 	var client *http.Client
+
+	// Build the multipart body (the asset file) and the base request.
 	r, err := createMultipartRequest(clientInfo.Issuer, endpoint, path)
 	if err != nil {
 		return diag.Errorf("failed to create asset request: %v", err)
 	}
-	// transport_headers first so per-request headers (x-zitadel-orgid) always win.
+
+	// Apply the provider's transport_headers first, then the per-request headers,
+	// so a caller-supplied header such as x-zitadel-orgid can never be overridden
+	// by a transport header of the same name. Set (not Add) keeps single-valued
+	// headers deterministic.
 	for k, v := range clientInfo.TransportHeaders {
 		r.Header.Set(k, v)
 	}
@@ -82,20 +99,27 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 		r.Header.Set(k, v)
 	}
 
+	// Pick an authenticated HTTP client that matches the provider's auth mode.
+	// The order mirrors how the credential is stored on ClientInfo.
 	switch {
 	case clientInfo.TokenSource != nil:
+		// access_token (PAT), jwt_file and system_api: a ready bearer token source.
 		client = NewClientWithInterceptor(clientInfo.TokenSource)
 	case clientInfo.KeyPath != "":
+		// jwt_profile_file / token: a JWT-profile key on disk, exchanged for a token.
 		client, err = NewClientWithInterceptorFromKeyFile(ctx, clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
 		if err != nil {
 			return diag.Errorf("failed to create client: %v", err)
 		}
 	case len(clientInfo.Data) > 0:
+		// jwt_profile_json: the same key provided inline as JSON.
 		client, err = NewClientWithInterceptorFromKeyFileData(ctx, clientInfo.Issuer, clientInfo.Data, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
 		if err != nil {
 			return diag.Errorf("failed to create client: %v", err)
 		}
 	default:
+		// Unreachable in practice (GetClientInfo rejects an unauthenticated
+		// provider), but kept as a guard with an actionable message.
 		return diag.Errorf("no authentication method available for asset upload; configure one of 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api'")
 	}
 
@@ -103,10 +127,14 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 	if err != nil {
 		return diag.Errorf("failed to do asset request: %v", err)
 	}
+	// Always drain the body before closing so the underlying connection can be
+	// reused by keep-alive, then close it.
 	defer func() {
 		_, _ = io.Copy(io.Discard, resp.Body)
 		_ = resp.Body.Close()
 	}()
+	// ZITADEL signals upload failures with a non-200 status; surface the status
+	// and response body so the cause (e.g. unsupported file type) is visible.
 	if resp.StatusCode != http.StatusOK {
 		body, readErr := io.ReadAll(resp.Body)
 		if readErr != nil {
@@ -117,17 +145,25 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 	return nil
 }
 
+// Interceptor is an http.RoundTripper that stamps a bearer token onto every
+// outgoing request, the HTTP equivalent of the gRPC auth interceptor.
 type Interceptor struct {
 	tokenSource oauth2.TokenSource
 	core        http.RoundTripper
 }
 
+// NewClientWithInterceptor builds a client for an already-resolved token source
+// (access_token, jwt_file, system_api). The source is wrapped in
+// oauth2.ReuseTokenSource once here so tokens are cached across requests rather
+// than re-fetched each round trip.
 func NewClientWithInterceptor(tokenSource oauth2.TokenSource) *http.Client {
 	return &http.Client{
 		Transport: Interceptor{core: http.DefaultTransport, tokenSource: oauth2.ReuseTokenSource(nil, tokenSource)},
 	}
 }
 
+// NewClientWithInterceptorFromKeyFile builds a client that authenticates with a
+// JWT-profile key read from keyPath, exchanging it for access tokens lazily.
 func NewClientWithInterceptorFromKeyFile(ctx context.Context, issuer, keyPath string, scopes []string) (*http.Client, error) {
 	ts, err := profile.NewJWTProfileTokenSourceFromKeyFile(ctx, issuer, keyPath, scopes)
 	if err != nil {
@@ -139,6 +175,8 @@ func NewClientWithInterceptorFromKeyFile(ctx context.Context, issuer, keyPath st
 	}, nil
 }
 
+// NewClientWithInterceptorFromKeyFileData is like NewClientWithInterceptorFromKeyFile
+// but takes the JWT-profile key as in-memory JSON instead of a file path.
 func NewClientWithInterceptorFromKeyFileData(ctx context.Context, issuer string, data []byte, scopes []string) (*http.Client, error) {
 	ts, err := profile.NewJWTProfileTokenSourceFromKeyFileData(ctx, issuer, data, scopes)
 	if err != nil {
@@ -150,12 +188,15 @@ func NewClientWithInterceptorFromKeyFileData(ctx context.Context, issuer string,
 	}, nil
 }
 
+// RoundTrip fetches a (cached) token and sets it as the Authorization header
+// before delegating to the underlying transport.
 func (i Interceptor) RoundTrip(r *http.Request) (*http.Response, error) {
 	defer func() {
 		_ = r.Body.Close()
 	}()
 
-	// tokenSource is wrapped in ReuseTokenSource at construction; do not re-wrap here.
+	// tokenSource is wrapped in ReuseTokenSource at construction, so this returns
+	// the cached token until it expires; do not re-wrap here.
 	token, err := i.tokenSource.Token()
 	if err != nil {
 		return nil, err

@@ -62,15 +62,25 @@ const (
 	SystemAPIAudienceDesc     = "Audience to set on the System API JWT. Defaults to the issuer derived from domain/port if omitted."
 )
 
+// ClientInfo holds everything the provider needs to talk to ZITADEL: the
+// connection target (Domain/Issuer), the gRPC dial Options, and the credential
+// material. The gRPC client authenticates purely from Options, but asset uploads
+// run over a separate plain-HTTP path (see form.go) that cannot read Options, so
+// the fields below expose the same credential and headers to that path.
 type ClientInfo struct {
 	Domain  string
 	Issuer  string
 	KeyPath string
 	Data    []byte
 	Options []zitadel.Option
-	// TokenSource is the bearer credential for the auth modes form.go's asset
-	// uploads cannot derive from KeyPath/Data (access_token, jwt_file, system_api).
-	TokenSource      oauth2.TokenSource
+	// TokenSource is the bearer credential for the auth modes whose token the
+	// asset-upload path cannot derive from KeyPath/Data: access_token (PAT),
+	// jwt_file and system_api. It is nil for the JWT-profile file modes, which
+	// form.go builds from KeyPath or Data instead.
+	TokenSource oauth2.TokenSource
+	// TransportHeaders is the provider's transport_headers. The gRPC client gets
+	// them via Options; the asset-upload path applies them from here so both
+	// transports send the same headers (e.g. proxy auth like GCP IAP).
 	TransportHeaders map[string]string
 }
 
@@ -112,40 +122,50 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		options = append(options, zitadel.WithTransportHeader(k, v))
 	}
 
+	// keyPath/keyData feed the asset-upload path for the JWT-profile file modes;
+	// assetTokenSource feeds it for the bearer-token modes (set in the branches
+	// below). Exactly one of them ends up populated.
 	keyPath := ""
 	var keyData []byte
 	var assetTokenSource oauth2.TokenSource
 
 	switch {
 	case accessToken != "":
+		// Personal Access Token: a static bearer token, reused for both transports.
 		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken, TokenType: "Bearer"})
 		options = append(options, zitadel.WithTokenSource(tokenSource))
 		assetTokenSource = tokenSource
 	case token != "":
+		// Deprecated 'token': path to a JWT-profile key. Asset uploads read it via keyPath.
 		if _, err := os.Stat(token); err != nil {
 			return nil, fmt.Errorf("failed to read token file: %v", err)
 		}
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
 		keyPath = token
 	case jwtFile != "":
+		// Presigned JWT used directly as a bearer token. Trim once so the gRPC
+		// option and the asset-upload bearer use an identical value; a trailing
+		// newline (common in CLI-written files) is invalid in an auth header.
 		jwt, err := os.ReadFile(jwtFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read JWT file: %v", err)
 		}
-		// Trim once so the gRPC and asset-upload paths use an identical token.
 		presignedJWT := strings.TrimSpace(string(jwt))
 		options = append(options, zitadel.WithJWTDirectTokenSource(presignedJWT))
 		assetTokenSource = oauth2.StaticTokenSource(&oauth2.Token{AccessToken: presignedJWT, TokenType: "Bearer"})
 	case jwtProfileFile != "":
+		// JWT-profile key on disk. Asset uploads exchange it for a token via keyPath.
 		if _, err := os.Stat(jwtProfileFile); err != nil {
 			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
 		}
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
 		keyPath = jwtProfileFile
 	case jwtProfileJSON != "":
+		// JWT-profile key inline. Asset uploads exchange it for a token via keyData.
 		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
 		keyData = []byte(jwtProfileJSON)
 	case systemAPIKeyFile != "" || systemAPIKey != "" || systemAPIPrivateKey != "" || systemAPIPublicKey != "":
+		// System API: a self-signed JWT token source, reused for both transports.
 		if systemAPIUser == "" {
 			return nil, fmt.Errorf("system_api.user is required when using System API authentication")
 		}
