@@ -141,15 +141,12 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 	if err != nil {
 		return diag.Errorf("failed to do asset request: %v", err)
 	}
-	// Always drain the body before closing so the underlying connection can be
-	// reused by keep-alive, then close it.
-	defer func() {
-		_, _ = io.Copy(io.Discard, resp.Body)
-		_ = resp.Body.Close()
-	}()
+	defer resp.Body.Close()
+
 	// ZITADEL signals upload failures with a non-200 status; surface the status
-	// and response body so the cause (e.g. unsupported file type) is visible. Cap
-	// the read so a large or hostile body cannot blow up memory or diagnostics.
+	// and response body so the cause (e.g. unsupported file type) is visible. Read
+	// only a capped amount and do not drain the rest, so a large or hostile error
+	// body cannot consume unbounded time, bandwidth or memory.
 	if resp.StatusCode != http.StatusOK {
 		const maxErrBody = 4 << 10 // 4 KiB is plenty for an API error message.
 		body, readErr := io.ReadAll(io.LimitReader(resp.Body, maxErrBody))
@@ -162,6 +159,10 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 		}
 		return diag.Errorf("asset request returned %s: %s", resp.Status, msg)
 	}
+
+	// On success drain the (small, usually empty) body so the connection can be
+	// reused by keep-alive before the deferred Close.
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return nil
 }
 
