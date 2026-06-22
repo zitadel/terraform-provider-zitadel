@@ -228,10 +228,6 @@ func NewClientWithInterceptorFromKeyFileData(ctx context.Context, issuer string,
 // RoundTrip fetches a (cached) token and sets it as the Authorization header
 // before delegating to the underlying transport.
 func (i Interceptor) RoundTrip(r *http.Request) (*http.Response, error) {
-	defer func() {
-		_ = r.Body.Close()
-	}()
-
 	// tokenSource is wrapped in ReuseTokenSource at construction, so this returns
 	// the cached token until it expires; do not re-wrap here.
 	token, err := i.tokenSource.Token()
@@ -239,5 +235,8 @@ func (i Interceptor) RoundTrip(r *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 	r.Header.Set("authorization", token.TokenType+" "+token.AccessToken)
+	// Delegate to the underlying transport, which owns closing the request body
+	// per the http.RoundTripper contract; closing it here would be redundant and
+	// would panic if a future caller sent a bodyless request.
 	return i.core.RoundTrip(r)
 }
