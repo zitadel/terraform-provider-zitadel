@@ -82,6 +82,10 @@ type ClientInfo struct {
 	// them via Options; the asset-upload path applies them from here so both
 	// transports send the same headers (e.g. proxy auth like GCP IAP).
 	TransportHeaders map[string]string
+	// InsecureSkipVerifyTLS mirrors the provider's insecure_skip_verify_tls. The
+	// gRPC client honors it via zitadel.WithInsecureSkipVerifyTLS(); the
+	// asset-upload path reads it from here to configure its own HTTP transport.
+	InsecureSkipVerifyTLS bool
 }
 
 func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToken string, token string, jwtFile string, jwtProfileFile string, jwtProfileJSON string, systemAPIKeyFile string, systemAPIKey string, systemAPIPrivateKey string, systemAPIPublicKey string, systemAPIUser string, systemAPIAudience string, port string, insecureSkipVerifyTLS bool, transportHeaders map[string]string) (*ClientInfo, error) {
@@ -151,6 +155,11 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 			return nil, fmt.Errorf("failed to read JWT file: %v", err)
 		}
 		presignedJWT := strings.TrimSpace(string(jwt))
+		// Reject an empty/whitespace-only file early; otherwise both transports
+		// would send an empty bearer token and fail later with an opaque error.
+		if presignedJWT == "" {
+			return nil, fmt.Errorf("jwt_file %q contains no token", jwtFile)
+		}
 		options = append(options, zitadel.WithJWTDirectTokenSource(presignedJWT))
 		assetTokenSource = oauth2.StaticTokenSource(&oauth2.Token{AccessToken: presignedJWT, TokenType: "Bearer"})
 	case jwtProfileFile != "":
@@ -206,13 +215,14 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 	}
 
 	return &ClientInfo{
-		Domain:           clientDomain,
-		Issuer:           issuer,
-		KeyPath:          keyPath,
-		Data:             keyData,
-		Options:          options,
-		TokenSource:      assetTokenSource,
-		TransportHeaders: transportHeaders,
+		Domain:                clientDomain,
+		Issuer:                issuer,
+		KeyPath:               keyPath,
+		Data:                  keyData,
+		Options:               options,
+		TokenSource:           assetTokenSource,
+		TransportHeaders:      transportHeaders,
+		InsecureSkipVerifyTLS: insecureSkipVerifyTLS,
 	}, nil
 }
 
