@@ -74,10 +74,7 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 	if err != nil {
 		return diag.Errorf("failed to create asset request: %v", err)
 	}
-	// Asset uploads bypass the gRPC transport, so the provider's transport_headers
-	// have to be applied to the plain HTTP request here as well. Set them first so
-	// the per-request additionalHeaders (e.g. x-zitadel-orgid) always win, and use
-	// Set rather than Add so single-valued headers stay deterministic.
+	// transport_headers first so per-request headers (x-zitadel-orgid) always win.
 	for k, v := range clientInfo.TransportHeaders {
 		r.Header.Set(k, v)
 	}
@@ -87,7 +84,6 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 
 	switch {
 	case clientInfo.TokenSource != nil:
-		// access_token, jwt_file and system_api carry a ready bearer token source.
 		client = NewClientWithInterceptor(clientInfo.TokenSource)
 	case clientInfo.KeyPath != "":
 		client, err = NewClientWithInterceptorFromKeyFile(ctx, clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()})
@@ -108,7 +104,6 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 		return diag.Errorf("failed to do asset request: %v", err)
 	}
 	defer func() {
-		// Drain so the connection can be reused, then close.
 		_, _ = io.Copy(io.Discard, resp.Body)
 		_ = resp.Body.Close()
 	}()
@@ -127,9 +122,6 @@ type Interceptor struct {
 	core        http.RoundTripper
 }
 
-// NewClientWithInterceptor returns an HTTP client that authenticates requests
-// with the given token source, used for the access_token, jwt_file and
-// system_api auth modes where the bearer token is already available.
 func NewClientWithInterceptor(tokenSource oauth2.TokenSource) *http.Client {
 	return &http.Client{
 		Transport: Interceptor{core: http.DefaultTransport, tokenSource: oauth2.ReuseTokenSource(nil, tokenSource)},
@@ -163,8 +155,7 @@ func (i Interceptor) RoundTrip(r *http.Request) (*http.Response, error) {
 		_ = r.Body.Close()
 	}()
 
-	// tokenSource is already wrapped in oauth2.ReuseTokenSource at construction,
-	// so tokens are cached and reused across requests for this client.
+	// tokenSource is wrapped in ReuseTokenSource at construction; do not re-wrap here.
 	token, err := i.tokenSource.Token()
 	if err != nil {
 		return nil, err

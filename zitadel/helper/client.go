@@ -68,14 +68,9 @@ type ClientInfo struct {
 	KeyPath string
 	Data    []byte
 	Options []zitadel.Option
-	// TokenSource carries the bearer credential for auth modes whose token is
-	// not derivable from KeyPath/Data (access_token, jwt_file, system_api). The
-	// asset-upload HTTP client in form.go uses it so those modes can upload
-	// logos, icons and fonts. It is nil for the JWT-profile file modes, which
-	// form.go builds from KeyPath/Data directly.
-	TokenSource oauth2.TokenSource
-	// TransportHeaders mirrors the provider's transport_headers onto the
-	// asset-upload requests, which bypass the gRPC transport.
+	// TokenSource is the bearer credential for the auth modes form.go's asset
+	// uploads cannot derive from KeyPath/Data (access_token, jwt_file, system_api).
+	TokenSource      oauth2.TokenSource
 	TransportHeaders map[string]string
 }
 
@@ -137,9 +132,7 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		if err != nil {
 			return nil, fmt.Errorf("failed to read JWT file: %v", err)
 		}
-		// Trim once so the gRPC and asset-upload paths use an identical token; a
-		// trailing newline (common in CLI-written files) is invalid in a bearer
-		// header and would otherwise only be stripped on the asset path.
+		// Trim once so the gRPC and asset-upload paths use an identical token.
 		presignedJWT := strings.TrimSpace(string(jwt))
 		options = append(options, zitadel.WithJWTDirectTokenSource(presignedJWT))
 		assetTokenSource = oauth2.StaticTokenSource(&oauth2.Token{AccessToken: presignedJWT, TokenType: "Bearer"})
