@@ -132,7 +132,7 @@ type Interceptor struct {
 // system_api auth modes where the bearer token is already available.
 func NewClientWithInterceptor(tokenSource oauth2.TokenSource) *http.Client {
 	return &http.Client{
-		Transport: Interceptor{core: http.DefaultTransport, tokenSource: tokenSource},
+		Transport: Interceptor{core: http.DefaultTransport, tokenSource: oauth2.ReuseTokenSource(nil, tokenSource)},
 	}
 }
 
@@ -143,7 +143,7 @@ func NewClientWithInterceptorFromKeyFile(ctx context.Context, issuer, keyPath st
 	}
 
 	return &http.Client{
-		Transport: Interceptor{core: http.DefaultTransport, tokenSource: ts},
+		Transport: Interceptor{core: http.DefaultTransport, tokenSource: oauth2.ReuseTokenSource(nil, ts)},
 	}, nil
 }
 
@@ -154,7 +154,7 @@ func NewClientWithInterceptorFromKeyFileData(ctx context.Context, issuer string,
 	}
 
 	return &http.Client{
-		Transport: Interceptor{core: http.DefaultTransport, tokenSource: ts},
+		Transport: Interceptor{core: http.DefaultTransport, tokenSource: oauth2.ReuseTokenSource(nil, ts)},
 	}, nil
 }
 
@@ -163,9 +163,9 @@ func (i Interceptor) RoundTrip(r *http.Request) (*http.Response, error) {
 		_ = r.Body.Close()
 	}()
 
-	ts := oauth2.ReuseTokenSource(nil, i.tokenSource)
-
-	token, err := ts.Token()
+	// tokenSource is already wrapped in oauth2.ReuseTokenSource at construction,
+	// so tokens are cached and reused across requests for this client.
+	token, err := i.tokenSource.Token()
 	if err != nil {
 		return nil, err
 	}
