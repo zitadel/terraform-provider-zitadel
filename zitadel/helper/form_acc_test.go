@@ -28,6 +28,8 @@ func TestAccPATAssetUpload(t *testing.T) {
 	}
 
 	ctx := context.Background()
+	// Use the instance-level test instance: its admin service account can manage
+	// the instance label policy, and instance-scoped uploads need no org header.
 	cfg := acceptance.GetConfig().InstanceLevel
 	const port = "8080"
 	issuer := "http://" + cfg.Domain + ":" + port
@@ -43,20 +45,27 @@ func TestAccPATAssetUpload(t *testing.T) {
 		t.Fatalf("fetch bearer token: %v", err)
 	}
 
-	// Configure the provider exactly as a PAT user would: access_token only.
+	// Configure the provider exactly as a PAT user would: only access_token is set
+	// (the empty strings are the other, unused auth modes: token, jwt_file,
+	// jwt_profile_file, jwt_profile_json and the system_api fields).
 	clientInfo, err := helper.GetClientInfo(ctx, true, cfg.Domain, tok.AccessToken, "", "", "", "", "", "", "", "", "", "", port, false, nil)
 	if err != nil {
 		t.Fatalf("GetClientInfo: %v", err)
 	}
 
+	// Upload a logo to the instance label policy; this is the request that #411
+	// reported failing under access_token auth.
 	diags := helper.InstanceFormFilePost(ctx, clientInfo, "/assets/v1/instance/policy/label/logo", writePNG(t))
 	if diags.HasError() {
 		t.Fatalf("asset upload with access_token failed: %v", diags)
 	}
 }
 
+// writePNG writes a tiny valid PNG to a temp file and returns its path. ZITADEL
+// validates the uploaded asset, so the bytes must be a real image, not a stub.
 func writePNG(t *testing.T) string {
 	t.Helper()
+	// A 2x2 image is the smallest thing that reliably encodes to a valid PNG.
 	img := image.NewRGBA(image.Rect(0, 0, 2, 2))
 	img.Set(0, 0, color.RGBA{R: 255, A: 255})
 	var buf bytes.Buffer
