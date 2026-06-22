@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/ephemeral"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	providerschema "github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -50,6 +51,14 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/email_provider_http"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/email_provider_smtp"
+	ephemeral_application_api_client_secret "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/application_api_client_secret"
+	ephemeral_application_key "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/application_key"
+	ephemeral_application_oidc_client_secret "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/application_oidc_client_secret"
+	ephemeral_application_v2_client_secret "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/application_v2_client_secret"
+	ephemeral_machine_key "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/machine_key"
+	ephemeral_machine_user_client_secret "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/machine_user_client_secret"
+	ephemeral_organization_domain_validation "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/organization_domain_validation"
+	ephemeral_personal_access_token "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/personal_access_token"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/human_user"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_apple"
@@ -126,7 +135,10 @@ import (
 	active_webkey "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/webkey/active"
 )
 
-var _ provider.Provider = (*providerPV6)(nil)
+var (
+	_ provider.Provider                       = (*providerPV6)(nil)
+	_ provider.ProviderWithEphemeralResources = (*providerPV6)(nil)
+)
 
 type providerPV6 struct {
 	customOptions []zitadelgo.Option
@@ -343,6 +355,9 @@ func (p *providerPV6) Configure(ctx context.Context, req provider.ConfigureReque
 
 	resp.DataSourceData = info
 	resp.ResourceData = info
+	// Ephemeral resources read provider data from a dedicated field; set it to
+	// the same *ClientInfo so the ephemeral secret resources can authenticate.
+	resp.EphemeralResourceData = info
 }
 
 func (p *providerPV6) DataSources(_ context.Context) []func() datasource.DataSource {
@@ -372,6 +387,24 @@ func (p *providerPV6) Resources(_ context.Context) []func() resource.Resource {
 		verify_email_otp_message_text.New,
 		verify_sms_otp_message_text.New,
 		default_invite_user_message_text.New,
+	}
+}
+
+// EphemeralResources registers the provider's ephemeral resources. Each one
+// mints or rotates a generated credential during apply and returns it without
+// ever writing it to Terraform state — the state-safe alternative to the
+// Computed `client_secret`/`token`/`key_details` attributes on the equivalent
+// managed resources (issue #413). Ephemeral resources require Terraform 1.10+.
+func (p *providerPV6) EphemeralResources(_ context.Context) []func() ephemeral.EphemeralResource {
+	return []func() ephemeral.EphemeralResource{
+		ephemeral_application_oidc_client_secret.New,
+		ephemeral_application_api_client_secret.New,
+		ephemeral_application_v2_client_secret.New,
+		ephemeral_machine_user_client_secret.New,
+		ephemeral_machine_key.New,
+		ephemeral_application_key.New,
+		ephemeral_personal_access_token.New,
+		ephemeral_organization_domain_validation.New,
 	}
 }
 
