@@ -106,7 +106,7 @@ func (r *resourceImpl) Open(ctx context.Context, req ephemeral.OpenRequest, resp
 		ProjectId:     data.ProjectID.ValueString(),
 	})
 	if err != nil {
-		resp.Diagnostics.AddError("failed to regenerate client secret", err.Error())
+		resp.Diagnostics.AddError("failed to generate client secret", err.Error())
 		return
 	}
 
