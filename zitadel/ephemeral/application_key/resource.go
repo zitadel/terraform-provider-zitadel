@@ -120,7 +120,16 @@ func (r *resourceImpl) Open(ctx context.Context, req ephemeral.OpenRequest, resp
 		return
 	}
 
+	// Guard against an empty payload: the whole point of this resource is to
+	// return key material, so a missing key_details is a hard error rather than
+	// a silently empty result that would break consumers expecting a JSON key.
+	keyDetails := zResp.GetKeyDetails()
+	if len(keyDetails) == 0 {
+		resp.Diagnostics.AddError("empty key material", "the server returned no key_details for the application key")
+		return
+	}
+
 	data.KeyID = types.StringValue(zResp.GetId())
-	data.KeyDetails = types.StringValue(string(zResp.GetKeyDetails()))
+	data.KeyDetails = types.StringValue(string(keyDetails))
 	resp.Diagnostics.Append(resp.Result.Set(ctx, &data)...)
 }

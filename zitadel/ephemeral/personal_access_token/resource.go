@@ -1,12 +1,12 @@
 // Package personal_access_token implements the zitadel_personal_access_token
 // ephemeral resource.
 //
-// It creates a new personal access token (PAT) for a machine (service) user and
-// returns the token for the duration of a single apply only, never writing it
-// to Terraform state (issue #413). Each evaluation mints a new token, so gate
-// it behind count/for_each to issue a token only on demand. Existing tokens
-// remain valid until removed via the managed zitadel_personal_access_token
-// resource or the API.
+// It creates a new personal access token (PAT) for a user and returns the token
+// for the duration of a single apply only, never writing it to Terraform state
+// (issue #413). Each evaluation mints a new token, so gate it behind
+// count/for_each to issue a token only on demand. Existing tokens remain valid
+// until removed via the managed zitadel_personal_access_token resource or the
+// API.
 package personal_access_token
 
 import (
@@ -49,16 +49,16 @@ func (r *resourceImpl) Metadata(_ context.Context, req ephemeral.MetadataRequest
 
 func (r *resourceImpl) Schema(_ context.Context, _ ephemeral.SchemaRequest, resp *ephemeral.SchemaResponse) {
 	resp.Schema = ephschema.Schema{
-		MarkdownDescription: "Creates a new personal access token for a machine (service) user and returns it without " +
+		MarkdownDescription: "Creates a new personal access token for a user and returns it without " +
 			"persisting it to Terraform state. Each evaluation mints a new token, so gate it behind `count`/`for_each`.",
 		Attributes: map[string]ephschema.Attribute{
 			"user_id": ephschema.StringAttribute{
 				Required:    true,
-				Description: "ID of the machine user the token is created for.",
+				Description: "ID of the user the token is created for.",
 			},
 			"org_id": ephschema.StringAttribute{
 				Optional:    true,
-				Description: "ID of the organization that owns the machine user. Defaults to the organization of the authenticated user.",
+				Description: "ID of the organization that owns the user. Defaults to the organization of the authenticated user.",
 			},
 			"expiration_date": ephschema.StringAttribute{
 				Optional:    true,
