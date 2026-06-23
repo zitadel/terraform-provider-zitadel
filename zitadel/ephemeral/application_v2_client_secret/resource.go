@@ -57,13 +57,13 @@ func (r *resourceImpl) Metadata(_ context.Context, req ephemeral.MetadataRequest
 
 func (r *resourceImpl) Schema(_ context.Context, _ ephemeral.SchemaRequest, resp *ephemeral.SchemaResponse) {
 	resp.Schema = ephschema.Schema{
-		MarkdownDescription: "Regenerates and returns the client secret of a `zitadel_application_v2` OIDC or API application " +
-			"without persisting it to Terraform state. Evaluating this ephemeral resource rotates the secret, so gate it " +
-			"behind `count`/`for_each` to rotate only on demand.",
+		MarkdownDescription: "Generates a new client secret for a `zitadel_application_v2` OIDC or API application and " +
+			"returns it without persisting it to Terraform state. Each evaluation generates a new secret (rotating any " +
+			"existing one), so gate it behind `count`/`for_each` to do so only on demand.",
 		Attributes: map[string]ephschema.Attribute{
 			"application_id": ephschema.StringAttribute{
 				Required:    true,
-				Description: "ID of the application whose client secret should be regenerated.",
+				Description: "ID of the application to generate a client secret for.",
 			},
 			"project_id": ephschema.StringAttribute{
 				Required:    true,
