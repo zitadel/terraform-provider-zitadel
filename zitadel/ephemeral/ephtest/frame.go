@@ -124,17 +124,18 @@ KEY
 	// provider upgraded to protocol v6 (which hosts the managed dependency
 	// resources such as zitadel_project / zitadel_application_v2).
 	factory := func() (tfprotov6.ProviderServer, error) {
+		// Upgrade the SDKv2 provider to protocol v6 up front so a failure
+		// surfaces as a real error instead of being swallowed into a nil
+		// provider inside the mux (which would later nil-dereference).
+		upgraded, err := tf5to6server.UpgradeServer(ctx, func() tfprotov5.ProviderServer {
+			return zitadel.Provider().GRPCProvider()
+		})
+		if err != nil {
+			return nil, err
+		}
 		muxServer, err := tf6muxserver.NewMuxServer(ctx,
 			providerserver.NewProtocol6(zitadel.NewProviderPV6()),
-			func() tfprotov6.ProviderServer {
-				upgraded, uerr := tf5to6server.UpgradeServer(ctx, func() tfprotov5.ProviderServer {
-					return zitadel.Provider().GRPCProvider()
-				})
-				if uerr != nil {
-					return nil
-				}
-				return upgraded
-			},
+			func() tfprotov6.ProviderServer { return upgraded },
 		)
 		if err != nil {
 			return nil, err
