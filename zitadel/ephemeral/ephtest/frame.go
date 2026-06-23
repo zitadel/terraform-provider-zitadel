@@ -111,7 +111,7 @@ data "zitadel_org" "default" {
 	providerSnippet := fmt.Sprintf(`
 provider "zitadel" {
   domain           = "%s"
-  insecure         = "%t"
+  insecure         = %t
   port             = "%s"
   jwt_profile_json = <<KEY
 %s
