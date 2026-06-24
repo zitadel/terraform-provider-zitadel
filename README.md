@@ -18,6 +18,9 @@ Importing existing resources to the Terraform state is supported.
 Note that you need to create an authorized service user to access the ZITADEL APIs through the provider, as noted in the
 prerequisites.
 
+For the resource and data source reference, see the
+[provider documentation on the Terraform Registry](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs).
+
 ## Contributing
 
 If you find a bug or want to request a new feature, please open
