@@ -31,6 +31,13 @@ func GetResource() *schema.Resource {
 				ValidateDiagFunc: helper.NonEmptyString(NameVar),
 				Description:      "Name of the project",
 			},
+			ProjectIDVar: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "Optionally set a custom unique ID for the project. If omitted, ZITADEL will generate one.",
+			},
 			stateVar: {
 				Type:        schema.TypeString,
 				Computed:    true,
