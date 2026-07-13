@@ -421,6 +421,16 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		},
 	})
 
+	if orgID, ok := d.GetOk(helper.OrgIDVar); ok {
+		queries = append(queries, &userv2.SearchQuery{
+			Query: &userv2.SearchQuery_OrganizationIdQuery{
+				OrganizationIdQuery: &userv2.OrganizationIdQuery{
+					OrganizationId: orgID.(string),
+				},
+			},
+		})
+	}
+
 	if userName, ok := d.GetOk(UserNameVar); ok {
 		userNameMethod := d.Get(userNameMethodVar).(string)
 		queries = append(queries, &userv2.SearchQuery{
