@@ -170,6 +170,46 @@ data "zitadel_machine_users" "default" {
 	)
 }
 
+func TestAccMachineUsersDatasource_ScopedByOrg(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_machine_users")
+	otherFrame := frame.AnotherOrg(t, "machine-users-scope-b-"+frame.UniqueResourcesID)
+
+	userName := "scopetest_" + frame.UniqueResourcesID
+
+	userA := fmt.Sprintf(`
+resource "zitadel_machine_user" "user_a" {
+  org_id    = "%s"
+  user_name = "a_%s@example.com"
+  name      = "Test Machine"
+}`, frame.OrgID, userName)
+
+	userB := fmt.Sprintf(`
+resource "zitadel_machine_user" "user_b" {
+  org_id    = "%s"
+  user_name = "b_%s@example.com"
+  name      = "Test Machine"
+}`, otherFrame.OrgID, userName)
+
+	config := fmt.Sprintf(`
+data "zitadel_machine_users" "default" {
+  org_id           = "%s"
+  user_name        = "%s"
+  user_name_method = "TEXT_QUERY_METHOD_CONTAINS"
+  depends_on       = [zitadel_machine_user.user_a, zitadel_machine_user.user_b]
+}`, frame.OrgID, userName)
+
+	test_utils.RunDatasourceTest(
+		t,
+		frame.BaseTestFrame,
+		config,
+		[]string{userA, userB},
+		nil,
+		map[string]string{
+			"user_ids.#": "1",
+		},
+	)
+}
+
 func checkUserExists(frame *test_utils.OrgTestFrame, expectedUsername string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		resp, err := frame.ListUsers(frame, &management.ListUsersRequest{})
