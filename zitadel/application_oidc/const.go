@@ -32,4 +32,10 @@ const (
 	LoginV1Var                  = "login_v1"
 	LoginV2Var                  = "login_v2"
 	BaseURIVar                  = "base_uri"
+	IOSVar                      = "ios"
+	IOSTeamIDVar                = "team_id"
+	IOSBundleIDVar              = "bundle_id"
+	AndroidVar                  = "android"
+	AndroidPackageNameVar       = "package_name"
+	AndroidFingerprintsVar      = "sha256_cert_fingerprints"
 )

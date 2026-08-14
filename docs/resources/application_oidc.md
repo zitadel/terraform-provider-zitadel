@@ -51,6 +51,7 @@ resource "zitadel_application_oidc" "default" {
 - `access_token_role_assertion` (Boolean) Access token role assertion
 - `access_token_type` (String) Access token type, supported values: OIDC_TOKEN_TYPE_BEARER, OIDC_TOKEN_TYPE_JWT
 - `additional_origins` (List of String) Additional origins
+- `android` (Block List, Max: 1) Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds. Remove the block to clear the configuration. (see [below for nested schema](#nestedblock--android))
 - `app_type` (String) App type, supported values: OIDC_APP_TYPE_WEB, OIDC_APP_TYPE_USER_AGENT, OIDC_APP_TYPE_NATIVE
 - `auth_method_type` (String) Auth method type, supported values: OIDC_AUTH_METHOD_TYPE_BASIC, OIDC_AUTH_METHOD_TYPE_POST, OIDC_AUTH_METHOD_TYPE_NONE, OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT
 - `back_channel_logout_uri` (String) ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout
@@ -58,6 +59,7 @@ resource "zitadel_application_oidc" "default" {
 - `dev_mode` (Boolean) Dev mode
 - `id_token_role_assertion` (Boolean) ID token role assertion
 - `id_token_userinfo_assertion` (Boolean) Token userinfo assertion
+- `ios` (Block List, Max: 1) iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry "{team_id}.{bundle_id}". Remove the block to clear the configuration. (see [below for nested schema](#nestedblock--ios))
 - `login_version` (Block List, Max: 1) Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default. (see [below for nested schema](#nestedblock--login_version))
 - `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 - `post_logout_redirect_uris` (List of String) Post logout redirect URIs
@@ -71,6 +73,27 @@ resource "zitadel_application_oidc" "default" {
 - `compliance_problems` (List of Object) lists the problems for non-compliancy (see [below for nested schema](#nestedatt--compliance_problems))
 - `id` (String) The ID of this resource.
 - `none_compliant` (Boolean) specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant
+
+<a id="nestedblock--android"></a>
+### Nested Schema for `android`
+
+Required:
+
+- `package_name` (String) Android package name (applicationId) from the app manifest, e.g. com.example.app.
+
+Optional:
+
+- `sha256_cert_fingerprints` (List of String) SHA-256 signing certificate fingerprints (64 hex characters, optionally colon-separated). Include debug and release fingerprints as needed.
+
+
+<a id="nestedblock--ios"></a>
+### Nested Schema for `ios`
+
+Required:
+
+- `bundle_id` (String) iOS Bundle ID (CFBundleIdentifier), e.g. com.example.app. Do not include the Team ID prefix.
+- `team_id` (String) Apple Team ID (App ID prefix), exactly 10 alphanumeric characters, e.g. ABCDE12345.
+
 
 <a id="nestedblock--login_version"></a>
 ### Nested Schema for `login_version`

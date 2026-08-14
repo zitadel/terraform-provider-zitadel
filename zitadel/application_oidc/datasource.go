@@ -182,6 +182,47 @@ func GetDatasource() *schema.Resource {
 					},
 				},
 			},
+			IOSVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\".",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						IOSTeamIDVar: {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Apple Team ID (App ID prefix).",
+						},
+						IOSBundleIDVar: {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "iOS Bundle ID (CFBundleIdentifier).",
+						},
+					},
+				},
+			},
+			AndroidVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						AndroidPackageNameVar: {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Android package name (applicationId).",
+						},
+						AndroidFingerprintsVar: {
+							Type: schema.TypeList,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+							Computed:    true,
+							Description: "SHA-256 signing certificate fingerprints.",
+						},
+					},
+				},
+			},
 		},
 		ReadContext: read,
 	}

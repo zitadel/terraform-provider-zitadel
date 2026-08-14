@@ -81,6 +81,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		skipNativeAppSuccessPageVar,
 		BackChannelLogoutURIVar,
 		LoginVersionVar,
+		IOSVar,
+		AndroidVar,
 	) {
 		respTypes := make([]app.OIDCResponseType, 0)
 		for _, respType := range d.Get(responseTypesVar).([]interface{}) {
@@ -114,6 +116,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			SkipNativeAppSuccessPage: d.Get(skipNativeAppSuccessPageVar).(bool),
 			BackChannelLogoutUri:     d.Get(BackChannelLogoutURIVar).(string),
 			LoginVersion:             getLoginVersion(d),
+			Ios:                      expandIOSAppLink(d),
+			Android:                  expandAndroidAppLink(d),
 		})
 		if err != nil {
 			return diag.Errorf("failed to update applicationOIDC: %v", err)
@@ -169,6 +173,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		SkipNativeAppSuccessPage: d.Get(skipNativeAppSuccessPageVar).(bool),
 		BackChannelLogoutUri:     d.Get(BackChannelLogoutURIVar).(string),
 		LoginVersion:             getLoginVersion(d),
+		Ios:                      expandIOSAppLink(d),
+		Android:                  expandAndroidAppLink(d),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create applicationOIDC: %v", err)
@@ -276,6 +282,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		NoneCompliantVar:            oidc.GetNoneCompliant(),
 		ComplianceProblemsVar:       complianceProblems,
 		BackChannelLogoutURIVar:     oidc.GetBackChannelLogoutUri(),
+		IOSVar:                      flattenIOSAppLink(oidc.GetIos()),
+		AndroidVar:                  flattenAndroidAppLink(oidc.GetAndroid()),
 	}
 
 	// Only set login_version if it has content
@@ -350,6 +358,56 @@ func getLoginVersion(d *schema.ResourceData) *app.LoginVersion {
 	}
 
 	return nil
+}
+
+// expandIOSAppLink builds the iOS app-link config from the resource data.
+// It returns a present-but-empty message when the block is absent so that
+// removing the block clears the config on the server. A nil message would be
+// interpreted as "no change" by the Management API and leave a stale value.
+func expandIOSAppLink(d *schema.ResourceData) *app.IOSAppLinkConfig {
+	cfg := &app.IOSAppLinkConfig{}
+	list, ok := d.Get(IOSVar).([]interface{})
+	if !ok || len(list) == 0 || list[0] == nil {
+		return cfg
+	}
+	item := list[0].(map[string]interface{})
+	cfg.TeamId = item[IOSTeamIDVar].(string)
+	cfg.BundleId = item[IOSBundleIDVar].(string)
+	return cfg
+}
+
+// expandAndroidAppLink builds the Android app-link config from the resource
+// data. See expandIOSAppLink for the empty-vs-nil clearing semantics.
+func expandAndroidAppLink(d *schema.ResourceData) *app.AndroidAppLinkConfig {
+	cfg := &app.AndroidAppLinkConfig{}
+	list, ok := d.Get(AndroidVar).([]interface{})
+	if !ok || len(list) == 0 || list[0] == nil {
+		return cfg
+	}
+	item := list[0].(map[string]interface{})
+	cfg.PackageName = item[AndroidPackageNameVar].(string)
+	cfg.Sha256CertFingerprints = interfaceToStringSlice(item[AndroidFingerprintsVar])
+	return cfg
+}
+
+func flattenIOSAppLink(cfg *app.IOSAppLinkConfig) []interface{} {
+	if cfg.GetTeamId() == "" && cfg.GetBundleId() == "" {
+		return nil
+	}
+	return []interface{}{map[string]interface{}{
+		IOSTeamIDVar:   cfg.GetTeamId(),
+		IOSBundleIDVar: cfg.GetBundleId(),
+	}}
+}
+
+func flattenAndroidAppLink(cfg *app.AndroidAppLinkConfig) []interface{} {
+	if cfg.GetPackageName() == "" && len(cfg.GetSha256CertFingerprints()) == 0 {
+		return nil
+	}
+	return []interface{}{map[string]interface{}{
+		AndroidPackageNameVar:  cfg.GetPackageName(),
+		AndroidFingerprintsVar: cfg.GetSha256CertFingerprints(),
+	}}
 }
 
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
