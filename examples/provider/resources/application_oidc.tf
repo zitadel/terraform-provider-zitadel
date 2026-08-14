@@ -18,14 +18,4 @@ resource "zitadel_application_oidc" "default" {
   id_token_userinfo_assertion  = false
   additional_origins = []
   skip_native_app_success_page = false
-
-  # Optional: native passkey trust files (served at /.well-known/*).
-  ios {
-    team_id   = "ABCDE12345"
-    bundle_id = "com.example.app"
-  }
-  android {
-    package_name             = "com.example.app"
-    sha256_cert_fingerprints = ["AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99"]
-  }
 }
