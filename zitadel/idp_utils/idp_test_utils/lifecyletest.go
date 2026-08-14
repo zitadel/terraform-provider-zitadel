@@ -11,7 +11,11 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
 )
 
-func RunInstanceIDPLifecyleTest(t *testing.T, resourceName, secretAttribute string) {
+// RunInstanceIDPLifecyleTest runs the standard IDP lifecycle test. secretOverride
+// optionally supplies the initial and updated secret values (exactly two entries:
+// create, update) instead of the example value and the generic "an_updated_secret".
+// Use it for IDPs whose secret is format-validated by the server (e.g. Apple keys).
+func RunInstanceIDPLifecyleTest(t *testing.T, resourceName, secretAttribute string, secretOverride ...string) {
 	frame := test_utils.NewInstanceTestFrame(t, resourceName)
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	nameProperty := test_utils.AttributeValue(t, idp_utils.NameVar, exampleAttributes).AsString()
@@ -30,13 +34,17 @@ func RunInstanceIDPLifecyleTest(t *testing.T, resourceName, secretAttribute stri
 		// companion hash attribute is likewise absent immediately after import.
 		importStateVerifyIgnore = []string{secretAttribute, secretAttribute + "_hash"}
 	}
+	createSecret, updatedSecret := exampleSecret, "an_updated_secret"
+	if len(secretOverride) == 2 {
+		createSecret, updatedSecret = secretOverride[0], secretOverride[1]
+	}
 	test_utils.RunLifecyleTest(
 		t,
 		frame.BaseTestFrame,
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, exampleSecret),
 		true, false,
-		secretAttribute, exampleSecret, "an_updated_secret",
+		secretAttribute, createSecret, updatedSecret,
 		false,
 		CheckCreationAllowed(*frame),
 		helper.ZitadelGeneratedIdOnlyRegex,

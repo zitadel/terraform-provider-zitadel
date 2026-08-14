@@ -8,5 +8,6 @@ import (
 )
 
 func TestAccInstanceIdPApple(t *testing.T) {
-	idp_test_utils.RunInstanceIDPLifecyleTest(t, "zitadel_idp_apple", idp_apple.PrivateKeyVar)
+	idp_test_utils.RunInstanceIDPLifecyleTest(t, "zitadel_idp_apple", idp_apple.PrivateKeyVar,
+		idp_test_utils.AppleTestPrivateKey, idp_test_utils.AppleTestPrivateKeyUpdated)
 }

@@ -34,3 +34,10 @@ SystemAPIUsers:
 DefaultInstance:
     Features:
         WebKey: true
+
+# Empty the HTTP client deny list so acceptance tests can configure notification
+# webhook endpoints (e.g. https://relay.example.com/...). Since v4.17.0 ZITADEL
+# validates these endpoints against the deny list, which by default blocks
+# localhost and private ranges. Mirrors zitadel's own integration test config.
+HTTPClient:
+    DenyList:
