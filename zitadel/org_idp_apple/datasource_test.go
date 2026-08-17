@@ -17,9 +17,7 @@ resource "zitadel_org_idp_apple" "default" {
   client_id           = "com.example.app"
   team_id             = "ABCDE12345"
   key_id              = "FGHIJ67890"
-  private_key         = <<-EOT
-%s
-EOT
+  private_key         = "%s"
   scopes              = ["name", "email"]
   is_linking_allowed  = false
   is_creation_allowed = true

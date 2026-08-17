@@ -22,7 +22,7 @@ func TestAccSMSHttpProvider(t *testing.T) {
 		frame.BaseTestFrame,
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
-		exampleProperty, "https://relay.example.com/test",
+		exampleProperty, "https://example.com/test",
 		"", "", "",
 		false,
 		checkRemoteProperty(frame),
@@ -41,7 +41,7 @@ func TestAccSMSHttpProviderActivation(t *testing.T) {
 	initialConfig := fmt.Sprintf(`
 %s
 resource "zitadel_sms_provider_http" "default" {
-  endpoint   = "https://relay.example.com/sms"
+  endpoint   = "https://example.com/sms"
   set_active = false
 }
 `, frame.ProviderSnippet)
@@ -49,7 +49,7 @@ resource "zitadel_sms_provider_http" "default" {
 	activatedConfig := fmt.Sprintf(`
 %s
 resource "zitadel_sms_provider_http" "default" {
-  endpoint   = "https://relay.example.com/sms"
+  endpoint   = "https://example.com/sms"
   set_active = true
 }
 `, frame.ProviderSnippet)
