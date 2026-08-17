@@ -29,7 +29,7 @@ func TestAccDefaultVerifyEmailOTPMessageText(t *testing.T) {
 		checkRemoteProperty(frame, exampleLanguage),
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// When deleted, the default should be returned
-		checkRemoteProperty(frame, exampleLanguage)("Verify One-Time Password"),
+		checkRemoteProperty(frame, exampleLanguage)("Verify OTP"),
 		nil,
 	)
 }

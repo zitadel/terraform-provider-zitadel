@@ -27,7 +27,7 @@ func TestAccSMSHttpProviderSigningKeyRotation(t *testing.T) {
 	initialConfig := fmt.Sprintf(`
 %s
 resource "zitadel_sms_provider_http" "default" {
-  endpoint = "https://relay.example.com/sms"
+  endpoint = "https://example.com/sms"
 }
 `, frame.ProviderSnippet)
 
@@ -36,7 +36,7 @@ resource "zitadel_sms_provider_http" "default" {
 	rotationConfig := fmt.Sprintf(`
 %s
 resource "zitadel_sms_provider_http" "default" {
-  endpoint               = "https://relay.example.com/sms-updated"
+  endpoint               = "https://example.com/sms-updated"
   expiration_signing_key = "0s"
 }
 `, frame.ProviderSnippet)

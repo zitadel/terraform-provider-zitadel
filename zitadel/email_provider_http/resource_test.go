@@ -22,7 +22,7 @@ func TestAccEmailHttpProvider(t *testing.T) {
 		frame.BaseTestFrame,
 		nil,
 		test_utils.ReplaceAll(resourceExample, exampleProperty, ""),
-		exampleProperty, "https://relay.example.com/test",
+		exampleProperty, "https://example.com/test",
 		"", "", "",
 		false,
 		checkRemoteProperty(frame),
@@ -41,7 +41,7 @@ func TestAccEmailHttpProviderDescriptionUpdate(t *testing.T) {
 	initialConfig := fmt.Sprintf(`
 %s
 resource "zitadel_email_provider_http" "default" {
-  endpoint    = "https://relay.example.com/emails"
+  endpoint    = "https://example.com/emails"
   description = "initial description"
 }
 `, frame.ProviderSnippet)
@@ -49,7 +49,7 @@ resource "zitadel_email_provider_http" "default" {
 	updatedConfig := fmt.Sprintf(`
 %s
 resource "zitadel_email_provider_http" "default" {
-  endpoint    = "https://relay.example.com/emails"
+  endpoint    = "https://example.com/emails"
   description = "updated description"
 }
 `, frame.ProviderSnippet)
@@ -61,14 +61,14 @@ resource "zitadel_email_provider_http" "default" {
 				Config: initialConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "description", "initial description"),
-					resource.TestCheckResourceAttr(frame.TerraformName, "endpoint", "https://relay.example.com/emails"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "endpoint", "https://example.com/emails"),
 				),
 			},
 			{
 				Config: updatedConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "description", "updated description"),
-					resource.TestCheckResourceAttr(frame.TerraformName, "endpoint", "https://relay.example.com/emails"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "endpoint", "https://example.com/emails"),
 				),
 			},
 		},
@@ -81,7 +81,7 @@ func TestAccEmailHttpProviderActivation(t *testing.T) {
 	initialConfig := fmt.Sprintf(`
 %s
 resource "zitadel_email_provider_http" "default" {
-  endpoint   = "https://relay.example.com/emails"
+  endpoint   = "https://example.com/emails"
   set_active = false
 }
 `, frame.ProviderSnippet)
@@ -89,7 +89,7 @@ resource "zitadel_email_provider_http" "default" {
 	activatedConfig := fmt.Sprintf(`
 %s
 resource "zitadel_email_provider_http" "default" {
-  endpoint   = "https://relay.example.com/emails"
+  endpoint   = "https://example.com/emails"
   set_active = true
 }
 `, frame.ProviderSnippet)
