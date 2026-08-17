@@ -36,6 +36,7 @@ data "zitadel_application_oidc" "default" {
 - `access_token_role_assertion` (Boolean) Access token role assertion
 - `access_token_type` (String) Access token type
 - `additional_origins` (List of String) Additional origins
+- `android` (List of Object) Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds. (see [below for nested schema](#nestedatt--android))
 - `app_type` (String) App type
 - `auth_method_type` (String) Auth method type
 - `back_channel_logout_uri` (String) ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout
@@ -47,6 +48,7 @@ data "zitadel_application_oidc" "default" {
 - `id` (String) The ID of this resource.
 - `id_token_role_assertion` (Boolean) ID token role assertion
 - `id_token_userinfo_assertion` (Boolean) Token userinfo assertion
+- `ios` (List of Object) iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry "{team_id}.{bundle_id}". (see [below for nested schema](#nestedatt--ios))
 - `login_version` (List of Object) Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default. (see [below for nested schema](#nestedatt--login_version))
 - `name` (String) Name of the application
 - `none_compliant` (Boolean) specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant
@@ -56,6 +58,15 @@ data "zitadel_application_oidc" "default" {
 - `skip_native_app_success_page` (Boolean) Skip the successful login page on native apps and directly redirect the user to the callback.
 - `version` (String) Version
 
+<a id="nestedatt--android"></a>
+### Nested Schema for `android`
+
+Read-Only:
+
+- `package_name` (String)
+- `sha256_cert_fingerprints` (List of String)
+
+
 <a id="nestedatt--compliance_problems"></a>
 ### Nested Schema for `compliance_problems`
 
@@ -63,6 +74,15 @@ Read-Only:
 
 - `key` (String)
 - `message` (String)
+
+
+<a id="nestedatt--ios"></a>
+### Nested Schema for `ios`
+
+Read-Only:
+
+- `bundle_id` (String)
+- `team_id` (String)
 
 
 <a id="nestedatt--login_version"></a>

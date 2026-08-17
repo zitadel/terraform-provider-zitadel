@@ -237,3 +237,97 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame, projectId string) func(
 		}
 	}
 }
+
+func TestAccAppOIDC_NativeAppLinks(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_application_oidc")
+	_, projectID := project_test_dep.Create(t, frame, frame.UniqueResourcesID)
+
+	const (
+		teamID      = "ABCDE12345"
+		bundleID    = "com.example.app"
+		packageName = "com.example.app"
+		fingerprint = "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99"
+	)
+
+	config := func(links string) string {
+		return fmt.Sprintf(`
+%s
+%s
+resource "zitadel_application_oidc" "default" {
+  org_id         = data.zitadel_org.default.id
+  project_id     = "%s"
+  name           = "%s"
+  redirect_uris  = ["https://localhost.com/callback"]
+  response_types = ["OIDC_RESPONSE_TYPE_CODE"]
+  grant_types    = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
+%s
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, projectID, frame.UniqueResourcesID, links)
+	}
+
+	withLinks := config(fmt.Sprintf(`
+  ios {
+    team_id   = %q
+    bundle_id = %q
+  }
+  android {
+    package_name             = %q
+    sha256_cert_fingerprints = [%q]
+  }
+`, teamID, bundleID, packageName, fingerprint))
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: withLinks,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "ios.0.team_id", teamID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "ios.0.bundle_id", bundleID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "android.0.package_name", packageName),
+					resource.TestCheckResourceAttr(frame.TerraformName, "android.0.sha256_cert_fingerprints.#", "1"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "android.0.sha256_cert_fingerprints.0", fingerprint),
+					checkRemoteAppLinks(frame, projectID, teamID, bundleID, packageName, []string{fingerprint}),
+				),
+			},
+			{
+				// removing the blocks must clear the config server-side, not leave it stale
+				Config: config(""),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "ios.#", "0"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "android.#", "0"),
+					checkRemoteAppLinks(frame, projectID, "", "", "", nil),
+				),
+			},
+		},
+	})
+}
+
+func checkRemoteAppLinks(frame *test_utils.OrgTestFrame, projectID, teamID, bundleID, packageName string, fingerprints []string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		remote, err := frame.GetAppByID(frame, &management.GetAppByIDRequest{AppId: frame.State(state).ID, ProjectId: projectID})
+		if err != nil {
+			return err
+		}
+		oidc := remote.GetApp().GetOidcConfig()
+		if got := oidc.GetIos().GetTeamId(); got != teamID {
+			return fmt.Errorf("expected ios team_id %q, but got %q", teamID, got)
+		}
+		if got := oidc.GetIos().GetBundleId(); got != bundleID {
+			return fmt.Errorf("expected ios bundle_id %q, but got %q", bundleID, got)
+		}
+		if got := oidc.GetAndroid().GetPackageName(); got != packageName {
+			return fmt.Errorf("expected android package_name %q, but got %q", packageName, got)
+		}
+		got := oidc.GetAndroid().GetSha256CertFingerprints()
+		if len(got) != len(fingerprints) {
+			return fmt.Errorf("expected %d android fingerprints, but got %d", len(fingerprints), len(got))
+		}
+		for i := range fingerprints {
+			if got[i] != fingerprints[i] {
+				return fmt.Errorf("expected android fingerprint %q, but got %q", fingerprints[i], got[i])
+			}
+		}
+		return nil
+	}
+}

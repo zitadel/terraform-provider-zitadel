@@ -206,6 +206,49 @@ func GetResource() *schema.Resource {
 					},
 				},
 			},
+			IOSVar: {
+				Type:        schema.TypeList,
+				Optional:    true,
+				MaxItems:    1,
+				Description: "iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\". Remove the block to clear the configuration.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						IOSTeamIDVar: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Apple Team ID (App ID prefix), exactly 10 alphanumeric characters, e.g. ABCDE12345.",
+						},
+						IOSBundleIDVar: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "iOS Bundle ID (CFBundleIdentifier), e.g. com.example.app. Do not include the Team ID prefix.",
+						},
+					},
+				},
+			},
+			AndroidVar: {
+				Type:        schema.TypeList,
+				Optional:    true,
+				MaxItems:    1,
+				Description: "Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds. Remove the block to clear the configuration.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						AndroidPackageNameVar: {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Android package name (applicationId) from the app manifest, e.g. com.example.app.",
+						},
+						AndroidFingerprintsVar: {
+							Type: schema.TypeList,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+							Optional:    true,
+							Description: "SHA-256 signing certificate fingerprints (64 hex characters, optionally colon-separated). Include debug and release fingerprints as needed.",
+						},
+					},
+				},
+			},
 		},
 		DeleteContext: delete,
 		CreateContext: create,
