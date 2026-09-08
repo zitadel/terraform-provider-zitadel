@@ -18,12 +18,18 @@ func TestAccUserGrantsDatasource_All(t *testing.T) {
 	userDep, userID := human_user_test_dep.Create(t, frame)
 
 	roleKey := "role_" + frame.UniqueResourcesID
-	projectIDs := make([]string, 3)
-	for i := range projectIDs {
-		_, projectID := project_test_dep.Create(t, frame, fmt.Sprintf("user_grants_datasource_%d_%s", i, frame.UniqueResourcesID))
+	projectNames := []string{"project1_" + frame.UniqueResourcesID, "project2_" + frame.UniqueResourcesID, "project3_" + frame.UniqueResourcesID}
+	for _, projectName := range projectNames {
+		_, projectID := project_test_dep.Create(t, frame, projectName)
 		project_role_test_dep.Create(t, frame, projectID, roleKey)
-		addUserGrant(t, frame, userID, projectID, roleKey)
-		projectIDs[i] = projectID
+		_, err := frame.AddUserGrant(frame, &management.AddUserGrantRequest{
+			UserId:    userID,
+			ProjectId: projectID,
+			RoleKeys:  []string{roleKey},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	config := fmt.Sprintf(`
@@ -52,11 +58,25 @@ func TestAccUserGrantsDatasource_FilterByProject(t *testing.T) {
 	roleKey := "role_" + frame.UniqueResourcesID
 	_, matchingProjectID := project_test_dep.Create(t, frame, "user_grants_datasource_matching_"+frame.UniqueResourcesID)
 	project_role_test_dep.Create(t, frame, matchingProjectID, roleKey)
-	matchingGrantID := addUserGrant(t, frame, userID, matchingProjectID, roleKey)
+	matchingGrant, err := frame.AddUserGrant(frame, &management.AddUserGrantRequest{
+		UserId:    userID,
+		ProjectId: matchingProjectID,
+		RoleKeys:  []string{roleKey},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	_, otherProjectID := project_test_dep.Create(t, frame, "user_grants_datasource_other_"+frame.UniqueResourcesID)
 	project_role_test_dep.Create(t, frame, otherProjectID, roleKey)
-	addUserGrant(t, frame, userID, otherProjectID, roleKey)
+	_, err = frame.AddUserGrant(frame, &management.AddUserGrantRequest{
+		UserId:    userID,
+		ProjectId: otherProjectID,
+		RoleKeys:  []string{roleKey},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_user_grants" "default" {
@@ -74,7 +94,7 @@ data "zitadel_user_grants" "default" {
 		nil,
 		map[string]string{
 			"user_grants.#":              "1",
-			"user_grants.0.id":           matchingGrantID,
+			"user_grants.0.id":           matchingGrant.GetUserGrantId(),
 			"user_grants.0.project_id":   matchingProjectID,
 			"user_grants.0.project_name": "user_grants_datasource_matching_" + frame.UniqueResourcesID,
 			"user_grants.0.role_keys.#":  "1",
@@ -92,11 +112,25 @@ func TestAccUserGrantsDatasource_FilterByRoleKey(t *testing.T) {
 	otherRoleKey := "viewer_" + frame.UniqueResourcesID
 	_, matchingProjectID := project_test_dep.Create(t, frame, "user_grants_datasource_matching_"+frame.UniqueResourcesID)
 	project_role_test_dep.Create(t, frame, matchingProjectID, matchingRoleKey)
-	matchingGrantID := addUserGrant(t, frame, userID, matchingProjectID, matchingRoleKey)
+	matchingGrant, err := frame.AddUserGrant(frame, &management.AddUserGrantRequest{
+		UserId:    userID,
+		ProjectId: matchingProjectID,
+		RoleKeys:  []string{matchingRoleKey},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	_, otherProjectID := project_test_dep.Create(t, frame, "user_grants_datasource_other_"+frame.UniqueResourcesID)
 	project_role_test_dep.Create(t, frame, otherProjectID, otherRoleKey)
-	addUserGrant(t, frame, userID, otherProjectID, otherRoleKey)
+	_, err = frame.AddUserGrant(frame, &management.AddUserGrantRequest{
+		UserId:    userID,
+		ProjectId: otherProjectID,
+		RoleKeys:  []string{otherRoleKey},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_user_grants" "default" {
@@ -114,7 +148,7 @@ data "zitadel_user_grants" "default" {
 		nil,
 		map[string]string{
 			"user_grants.#":             "1",
-			"user_grants.0.id":          matchingGrantID,
+			"user_grants.0.id":          matchingGrant.GetUserGrantId(),
 			"user_grants.0.project_id":  matchingProjectID,
 			"user_grants.0.role_keys.0": matchingRoleKey,
 		},
@@ -139,7 +173,7 @@ func TestAccUserGrantsDatasource_FilterByProjectGrant(t *testing.T) {
 	projectGrantID := projectGrant.GetGrantId()
 
 	_, userID := human_user_test_dep.Create(t, grantedFrame)
-	resp, err := grantedFrame.AddUserGrant(grantedFrame, &management.AddUserGrantRequest{
+	grant, err := grantedFrame.AddUserGrant(grantedFrame, &management.AddUserGrantRequest{
 		UserId:         userID,
 		ProjectId:      projectID,
 		ProjectGrantId: projectGrantID,
@@ -165,7 +199,7 @@ data "zitadel_user_grants" "default" {
 		nil,
 		map[string]string{
 			"user_grants.#":                  "1",
-			"user_grants.0.id":               resp.GetUserGrantId(),
+			"user_grants.0.id":               grant.GetUserGrantId(),
 			"user_grants.0.project_id":       projectID,
 			"user_grants.0.project_grant_id": projectGrantID,
 			"user_grants.0.granted_org_id":   grantedOrgID,
@@ -181,7 +215,14 @@ func TestAccUserGrantsDatasource_NoMatch(t *testing.T) {
 	roleKey := "role_" + frame.UniqueResourcesID
 	_, projectID := project_test_dep.Create(t, frame, "user_grants_datasource_"+frame.UniqueResourcesID)
 	project_role_test_dep.Create(t, frame, projectID, roleKey)
-	addUserGrant(t, frame, userID, projectID, roleKey)
+	_, err := frame.AddUserGrant(frame, &management.AddUserGrantRequest{
+		UserId:    userID,
+		ProjectId: projectID,
+		RoleKeys:  []string{roleKey},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_user_grants" "default" {
@@ -201,16 +242,4 @@ data "zitadel_user_grants" "default" {
 			"user_grants.#": "0",
 		},
 	)
-}
-
-func addUserGrant(t *testing.T, frame *test_utils.OrgTestFrame, userID, projectID, roleKey string) string {
-	resp, err := frame.AddUserGrant(frame, &management.AddUserGrantRequest{
-		UserId:    userID,
-		ProjectId: projectID,
-		RoleKeys:  []string{roleKey},
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	return resp.GetUserGrantId()
 }

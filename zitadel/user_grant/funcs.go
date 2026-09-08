@@ -168,16 +168,18 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		})
 	}
 
-	resp, err := client.ListUserGrants(helper.CtxWithOrgID(ctx, d), &management.ListUserGrantRequest{
+	req := &management.ListUserGrantRequest{
 		Queries: queries,
-	})
+	}
+
+	resp, err := client.ListUserGrants(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
 		return diag.Errorf("failed to list user grants: %v", err)
 	}
 
-	grants := make([]interface{}, len(resp.GetResult()))
-	for i, grant := range resp.GetResult() {
-		grants[i] = map[string]interface{}{
+	grantList := make([]interface{}, len(resp.Result))
+	for i, grant := range resp.Result {
+		grantMap := map[string]interface{}{
 			idVar:             grant.GetId(),
 			projectIDVar:      grant.GetProjectId(),
 			projectNameVar:    grant.GetProjectName(),
@@ -186,8 +188,9 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			RoleKeysVar:       grant.GetRoleKeys(),
 			stateVar:          grant.GetState().String(),
 		}
+		grantList[i] = grantMap
 	}
 
 	d.SetId(userID)
-	return diag.FromErr(d.Set(userGrantsVar, grants))
+	return diag.FromErr(d.Set(userGrantsVar, grantList))
 }
