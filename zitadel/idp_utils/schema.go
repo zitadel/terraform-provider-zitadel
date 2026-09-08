@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/idp"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -21,9 +22,78 @@ const (
 	IsAutoCreationVar    = "is_auto_creation"
 	IsAutoUpdateVar      = "is_auto_update"
 	AutoLinkingVar       = "auto_linking"
+	NameMethodVar        = "name_method"
+	TypeVar              = "type"
+	StateVar             = "state"
+	OwnerTypeVar         = "owner_type"
+	IdpsVar              = "idps"
 )
 
 var (
+	NameFilterDataSourceField = &schema.Schema{
+		Type:        schema.TypeString,
+		Optional:    true,
+		Description: "Name to filter identity providers by",
+	}
+	NameMethodDataSourceField = &schema.Schema{
+		Type:        schema.TypeString,
+		Optional:    true,
+		Description: "Method for querying identity providers by name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
+		ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+			return helper.EnumValueValidation(NameMethodVar, value, object.TextQueryMethod_value)
+		},
+		Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
+	}
+	TypeFilterDataSourceField = &schema.Schema{
+		Type:        schema.TypeString,
+		Optional:    true,
+		Description: "Type to filter identity providers by, PROVIDER_TYPE_UNSPECIFIED applies no filter" + helper.DescriptionEnumValuesList(idp.ProviderType_name),
+		ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+			return helper.EnumValueValidation(TypeVar, value, idp.ProviderType_value)
+		},
+	}
+	OwnerTypeFilterDataSourceField = &schema.Schema{
+		Type:        schema.TypeString,
+		Optional:    true,
+		Description: "Owner type to filter identity providers by, either the instance (system) or the organization, IDP_OWNER_TYPE_UNSPECIFIED applies no filter" + helper.DescriptionEnumValuesList(idp.IDPOwnerType_name),
+		ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
+			return helper.EnumValueValidation(OwnerTypeVar, value, idp.IDPOwnerType_value)
+		},
+	}
+	IdpsDataSourceField = &schema.Schema{
+		Type:        schema.TypeList,
+		Computed:    true,
+		Description: "List of identity providers",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				IdpIDVar: {
+					Type:        schema.TypeString,
+					Computed:    true,
+					Description: "ID of the identity provider",
+				},
+				NameVar: {
+					Type:        schema.TypeString,
+					Computed:    true,
+					Description: "Name of the identity provider",
+				},
+				TypeVar: {
+					Type:        schema.TypeString,
+					Computed:    true,
+					Description: "Type of the identity provider",
+				},
+				StateVar: {
+					Type:        schema.TypeString,
+					Computed:    true,
+					Description: "State of the identity provider",
+				},
+				OwnerTypeVar: {
+					Type:        schema.TypeString,
+					Computed:    true,
+					Description: "Owner type of the identity provider, either the instance (system) or an organization",
+				},
+			},
+		},
+	}
 	IdPIDDataSourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Required:    true,

@@ -1,14 +1,9 @@
 package org_idp
 
 import (
-	"github.com/hashicorp/go-cty/cty"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	idppb "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/idp"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
 )
 
@@ -16,43 +11,12 @@ func ListDatasources() *schema.Resource {
 	return &schema.Resource{
 		Description: "Datasource representing all identity providers available to an organization, optionally filtered by name, type and owner.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: helper.OrgIDDatasourceField,
-			idp_utils.NameVar: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Name to filter identity providers by",
-			},
-			idp.NameMethodVar: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Method for querying identity providers by name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
-				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(idp.NameMethodVar, value, object.TextQueryMethod_value)
-				},
-				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
-			},
-			idp.TypeVar: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Type to filter identity providers by, PROVIDER_TYPE_UNSPECIFIED applies no filter" + helper.DescriptionEnumValuesList(idppb.ProviderType_name),
-				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(idp.TypeVar, value, idppb.ProviderType_value)
-				},
-			},
-			ownerTypeVar: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Owner type to filter identity providers by, either the instance (system) or the organization, IDP_OWNER_TYPE_UNSPECIFIED applies no filter" + helper.DescriptionEnumValuesList(idppb.IDPOwnerType_name),
-				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation(ownerTypeVar, value, idppb.IDPOwnerType_value)
-				},
-			},
-			idpsVar: {
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "List of identity providers",
-				Elem:        idp.IdpElem(),
-			},
+			helper.OrgIDVar:         helper.OrgIDDatasourceField,
+			idp_utils.NameVar:       idp_utils.NameFilterDataSourceField,
+			idp_utils.NameMethodVar: idp_utils.NameMethodDataSourceField,
+			idp_utils.TypeVar:       idp_utils.TypeFilterDataSourceField,
+			idp_utils.OwnerTypeVar:  idp_utils.OwnerTypeFilterDataSourceField,
+			idp_utils.IdpsVar:       idp_utils.IdpsDataSourceField,
 		},
 		ReadContext: list,
 	}
