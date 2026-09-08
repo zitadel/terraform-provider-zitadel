@@ -41,13 +41,12 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.Errorf("error while getting idp list: %v", err)
 	}
-	// The API offers no type query, so the type is filtered client-side.
 	idpIDs := make([]string, 0, len(resp.Result))
-	for _, provider := range resp.Result {
-		if idpType != "" && provider.GetType().String() != idpType {
+	for _, idp := range resp.Result {
+		if idpType != "" && idp.Type.String() != idpType {
 			continue
 		}
-		idpIDs = append(idpIDs, provider.GetId())
+		idpIDs = append(idpIDs, idp.Id)
 	}
 	d.SetId("-")
 	return diag.FromErr(d.Set(idpIDsVar, idpIDs))

@@ -41,7 +41,7 @@ output "org_idp_names" {
 - `name` (String) Name of the identity provider.
 - `name_method` (String) Method for querying identity providers by name, supported values: TEXT_QUERY_METHOD_EQUALS, TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE, TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH, TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
 - `org_id` (String) ID of the organization
-- `owner_type` (String) Owner type of the identity provider, either the instance (system) or the organization, supported values: IDP_OWNER_TYPE_UNSPECIFIED, IDP_OWNER_TYPE_SYSTEM, IDP_OWNER_TYPE_ORG
+- `owner_type` (String) Owner type of the identity provider, supported values: IDP_OWNER_TYPE_UNSPECIFIED, IDP_OWNER_TYPE_SYSTEM, IDP_OWNER_TYPE_ORG
 - `type` (String) Type of the identity provider, supported values: PROVIDER_TYPE_UNSPECIFIED, PROVIDER_TYPE_OIDC, PROVIDER_TYPE_JWT, PROVIDER_TYPE_LDAP, PROVIDER_TYPE_OAUTH, PROVIDER_TYPE_AZURE_AD, PROVIDER_TYPE_GITHUB, PROVIDER_TYPE_GITHUB_ES, PROVIDER_TYPE_GITLAB, PROVIDER_TYPE_GITLAB_SELF_HOSTED, PROVIDER_TYPE_GOOGLE, PROVIDER_TYPE_APPLE, PROVIDER_TYPE_SAML, PROVIDER_TYPE_ZITADEL
 
 ### Read-Only

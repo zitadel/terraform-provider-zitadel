@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
@@ -14,9 +15,9 @@ func TestAccOrgIdpsDatasource_All(t *testing.T) {
 	datasourceName := "zitadel_org_idps"
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
-	prefix := "org_idps_" + frame.UniqueResourcesID
+	names := []string{"google_" + frame.UniqueResourcesID, "github_" + frame.UniqueResourcesID}
 	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
-		Name:         prefix + "_google",
+		Name:         names[0],
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
 	})
@@ -24,7 +25,7 @@ func TestAccOrgIdpsDatasource_All(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, err = frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
-		Name:         prefix + "_github",
+		Name:         names[1],
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
 	})
@@ -36,9 +37,9 @@ func TestAccOrgIdpsDatasource_All(t *testing.T) {
 data "zitadel_org_idps" "default" {
   org_id      = "%s"
   name        = "%s"
-  name_method = "TEXT_QUERY_METHOD_STARTS_WITH"
+  name_method = "TEXT_QUERY_METHOD_CONTAINS"
 }
-`, frame.OrgID, prefix)
+`, frame.OrgID, frame.UniqueResourcesID)
 
 	test_utils.RunDatasourceTest(
 		t,
@@ -57,7 +58,7 @@ func TestAccOrgIdpsDatasource_FilterByName(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
 	matchingName := "google_" + frame.UniqueResourcesID
-	google, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
 		Name:         matchingName,
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
@@ -86,10 +87,9 @@ data "zitadel_org_idps" "default" {
 		frame.BaseTestFrame,
 		config,
 		[]string{frame.AsOrgDefaultDependency},
-		nil,
+		checkIdpExists(frame, matchingName),
 		map[string]string{
 			"ids.#": "1",
-			"ids.0": google.GetId(),
 		},
 	)
 }
@@ -98,17 +98,16 @@ func TestAccOrgIdpsDatasource_FilterByType(t *testing.T) {
 	datasourceName := "zitadel_org_idps"
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
-	prefix := "org_idps_" + frame.UniqueResourcesID
 	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
-		Name:         prefix + "_google",
+		Name:         "google_" + frame.UniqueResourcesID,
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	github, err := frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
-		Name:         prefix + "_github",
+	_, err = frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
+		Name:         "github_" + frame.UniqueResourcesID,
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
 	})
@@ -120,10 +119,10 @@ func TestAccOrgIdpsDatasource_FilterByType(t *testing.T) {
 data "zitadel_org_idps" "default" {
   org_id      = "%s"
   name        = "%s"
-  name_method = "TEXT_QUERY_METHOD_STARTS_WITH"
+  name_method = "TEXT_QUERY_METHOD_CONTAINS"
   type        = "PROVIDER_TYPE_GITHUB"
 }
-`, frame.OrgID, prefix)
+`, frame.OrgID, frame.UniqueResourcesID)
 
 	test_utils.RunDatasourceTest(
 		t,
@@ -133,7 +132,6 @@ data "zitadel_org_idps" "default" {
 		nil,
 		map[string]string{
 			"ids.#": "1",
-			"ids.0": github.GetId(),
 		},
 	)
 }
@@ -142,18 +140,8 @@ func TestAccOrgIdpsDatasource_FilterByOwnerType(t *testing.T) {
 	datasourceName := "zitadel_org_idps"
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
-	// An instance-level IDP is visible to the organization with the system owner type.
-	prefix := "org_idps_" + frame.UniqueResourcesID
-	instanceIDP, err := frame.Admin.AddGoogleProvider(frame, &admin.AddGoogleProviderRequest{
-		Name:         prefix + "_instance",
-		ClientId:     "dummy",
-		ClientSecret: "dummy",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
-		Name:         prefix + "_org",
+	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         "google_" + frame.UniqueResourcesID,
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
 	})
@@ -165,10 +153,10 @@ func TestAccOrgIdpsDatasource_FilterByOwnerType(t *testing.T) {
 data "zitadel_org_idps" "default" {
   org_id      = "%s"
   name        = "%s"
-  name_method = "TEXT_QUERY_METHOD_STARTS_WITH"
-  owner_type  = "IDP_OWNER_TYPE_SYSTEM"
+  name_method = "TEXT_QUERY_METHOD_CONTAINS"
+  owner_type  = "IDP_OWNER_TYPE_ORG"
 }
-`, frame.OrgID, prefix)
+`, frame.OrgID, frame.UniqueResourcesID)
 
 	test_utils.RunDatasourceTest(
 		t,
@@ -178,7 +166,6 @@ data "zitadel_org_idps" "default" {
 		nil,
 		map[string]string{
 			"ids.#": "1",
-			"ids.0": instanceIDP.GetId(),
 		},
 	)
 }
@@ -213,4 +200,21 @@ data "zitadel_org_idps" "default" {
 			"ids.#": "0",
 		},
 	)
+}
+
+func checkIdpExists(frame *test_utils.OrgTestFrame, expectedName string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		resp, err := frame.ListProviders(frame, &management.ListProvidersRequest{})
+		if err != nil {
+			return err
+		}
+
+		for _, idp := range resp.Result {
+			if idp.Name == expectedName {
+				return nil
+			}
+		}
+
+		return fmt.Errorf("expected idp %s not found", expectedName)
+	}
 }

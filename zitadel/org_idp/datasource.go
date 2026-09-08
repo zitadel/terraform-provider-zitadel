@@ -46,7 +46,7 @@ func ListDatasources() *schema.Resource {
 			ownerTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Owner type of the identity provider, either the instance (system) or the organization" + helper.DescriptionEnumValuesList(idp.IDPOwnerType_name),
+				Description: "Owner type of the identity provider" + helper.DescriptionEnumValuesList(idp.IDPOwnerType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(ownerTypeVar, value, idp.IDPOwnerType_value)
 				},
