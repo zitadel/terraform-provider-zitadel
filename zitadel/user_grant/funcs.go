@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -168,23 +169,32 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		})
 	}
 
-	resp, err := client.ListUserGrants(helper.CtxWithOrgID(ctx, d), &management.ListUserGrantRequest{
-		Queries: queries,
-	})
-	if err != nil {
-		return diag.Errorf("failed to list user grants: %v", err)
-	}
-
-	grants := make([]interface{}, len(resp.GetResult()))
-	for i, grant := range resp.GetResult() {
-		grants[i] = map[string]interface{}{
-			idVar:             grant.GetId(),
-			projectIDVar:      grant.GetProjectId(),
-			projectNameVar:    grant.GetProjectName(),
-			projectGrantIDVar: grant.GetProjectGrantId(),
-			grantedOrgIDVar:   grant.GetGrantedOrgId(),
-			RoleKeysVar:       grant.GetRoleKeys(),
-			stateVar:          grant.GetState().String(),
+	grants := make([]interface{}, 0)
+	for offset := uint64(0); ; offset += uint64(listPageSize) {
+		resp, err := client.ListUserGrants(helper.CtxWithOrgID(ctx, d), &management.ListUserGrantRequest{
+			Query: &object.ListQuery{
+				Offset: offset,
+				Limit:  listPageSize,
+				Asc:    true,
+			},
+			Queries: queries,
+		})
+		if err != nil {
+			return diag.Errorf("failed to list user grants: %v", err)
+		}
+		for _, grant := range resp.GetResult() {
+			grants = append(grants, map[string]interface{}{
+				idVar:             grant.GetId(),
+				projectIDVar:      grant.GetProjectId(),
+				projectNameVar:    grant.GetProjectName(),
+				projectGrantIDVar: grant.GetProjectGrantId(),
+				grantedOrgIDVar:   grant.GetGrantedOrgId(),
+				RoleKeysVar:       grant.GetRoleKeys(),
+				stateVar:          grant.GetState().String(),
+			})
+		}
+		if len(resp.GetResult()) < int(listPageSize) {
+			break
 		}
 	}
 

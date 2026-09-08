@@ -174,6 +174,38 @@ data "zitadel_user_grants" "default" {
 	)
 }
 
+func TestAccUserGrantsDatasource_MoreThanOnePage(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_user_grants")
+	userDep, userID := human_user_test_dep.Create(t, frame)
+
+	// One more grant than a single ListUserGrants page holds, so the datasource must paginate.
+	grantCount := 101
+	roleKey := "role_" + frame.UniqueResourcesID
+	for i := 0; i < grantCount; i++ {
+		_, projectID := project_test_dep.Create(t, frame, fmt.Sprintf("user_grants_datasource_%d_%s", i, frame.UniqueResourcesID))
+		project_role_test_dep.Create(t, frame, projectID, roleKey)
+		addUserGrant(t, frame, userID, projectID, roleKey)
+	}
+
+	config := fmt.Sprintf(`
+data "zitadel_user_grants" "default" {
+  org_id  = "%s"
+  user_id = "%s"
+}
+`, frame.OrgID, userID)
+
+	test_utils.RunDatasourceTest(
+		t,
+		frame.BaseTestFrame,
+		config,
+		[]string{frame.AsOrgDefaultDependency, userDep},
+		nil,
+		map[string]string{
+			"user_grants.#": fmt.Sprint(grantCount),
+		},
+	)
+}
+
 func TestAccUserGrantsDatasource_NoMatch(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_user_grants")
 	userDep, userID := human_user_test_dep.Create(t, frame)

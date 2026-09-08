@@ -12,4 +12,7 @@ const (
 	projectNameVar    = "project_name"
 	grantedOrgIDVar   = "granted_org_id"
 	stateVar          = "state"
+
+	// listPageSize is the number of user grants requested per ListUserGrants call.
+	listPageSize uint32 = 100
 )
