@@ -30,18 +30,18 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			Query: &management.ProviderQuery_IdpNameQuery{IdpNameQuery: nameQuery},
 		})
 	}
-	if ownerType, ok := d.GetOk(ownerTypeVar); ok {
+	if ownerType := d.Get(ownerTypeVar).(string); ownerType != "" && ownerType != idppb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED.String() {
 		queries = append(queries, &management.ProviderQuery{
 			Query: &management.ProviderQuery_OwnerTypeQuery{
 				OwnerTypeQuery: &idppb.IDPOwnerTypeQuery{
-					OwnerType: idppb.IDPOwnerType(idppb.IDPOwnerType_value[ownerType.(string)]),
+					OwnerType: idppb.IDPOwnerType(idppb.IDPOwnerType_value[ownerType]),
 				},
 			},
 		})
 	}
 
 	providers := make([]*idppb.Provider, 0)
-	for offset := uint64(0); ; offset += uint64(idp.PageSize()) {
+	for offset := uint64(0); ; offset += uint64(idp.ListPageSize) {
 		resp, err := client.ListProviders(helper.CtxWithOrgID(ctx, d), &management.ListProvidersRequest{
 			Query:   idp.ListQuery(offset),
 			Queries: queries,
@@ -50,7 +50,7 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			return diag.Errorf("failed to list idps: %v", err)
 		}
 		providers = append(providers, resp.GetResult()...)
-		if len(resp.GetResult()) < idp.PageSize() {
+		if len(resp.GetResult()) < int(idp.ListPageSize) {
 			break
 		}
 	}

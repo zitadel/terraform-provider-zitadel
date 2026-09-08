@@ -1,14 +1,12 @@
 package idp
 
 const (
-	NameVar       = "name"
-	nameMethodVar = "name_method"
+	NameMethodVar = "name_method"
 	TypeVar       = "type"
 	idpsVar       = "idps"
-	idVar         = "id"
 	stateVar      = "state"
 	ownerTypeVar  = "owner_type"
 
-	// listPageSize is the number of identity providers requested per ListProviders call.
-	listPageSize uint32 = 100
+	// ListPageSize is the number of identity providers requested per ListProviders call.
+	ListPageSize uint32 = 100
 )

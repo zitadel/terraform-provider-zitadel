@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
 )
 
 func ListDatasources() *schema.Resource {
@@ -16,24 +17,24 @@ func ListDatasources() *schema.Resource {
 		Description: "Datasource representing all identity providers available to an organization, optionally filtered by name, type and owner.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDDatasourceField,
-			idp.NameVar: {
+			idp_utils.NameVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Name to filter identity providers by",
 			},
-			"name_method": {
+			idp.NameMethodVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Method for querying identity providers by name" + helper.DescriptionEnumValuesList(object.TextQueryMethod_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
-					return helper.EnumValueValidation("name_method", value, object.TextQueryMethod_value)
+					return helper.EnumValueValidation(idp.NameMethodVar, value, object.TextQueryMethod_value)
 				},
 				Default: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE.String(),
 			},
 			idp.TypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Type to filter identity providers by" + helper.DescriptionEnumValuesList(idppb.ProviderType_name),
+				Description: "Type to filter identity providers by, PROVIDER_TYPE_UNSPECIFIED applies no filter" + helper.DescriptionEnumValuesList(idppb.ProviderType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(idp.TypeVar, value, idppb.ProviderType_value)
 				},
@@ -41,7 +42,7 @@ func ListDatasources() *schema.Resource {
 			ownerTypeVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Owner type to filter identity providers by, either the instance (system) or the organization" + helper.DescriptionEnumValuesList(idppb.IDPOwnerType_name),
+				Description: "Owner type to filter identity providers by, either the instance (system) or the organization, IDP_OWNER_TYPE_UNSPECIFIED applies no filter" + helper.DescriptionEnumValuesList(idppb.IDPOwnerType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(ownerTypeVar, value, idppb.IDPOwnerType_value)
 				},
