@@ -2,7 +2,6 @@ package idp_test
 
 import (
 	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,16 +12,18 @@ import (
 )
 
 func TestAccIdpsDatasource_FilterByName(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_idps")
-	name := "google_" + frame.UniqueResourcesID
-	googleID := addGoogleProvider(t, frame, name)
+	datasourceName := "zitadel_idps"
+	frame := test_utils.NewInstanceTestFrame(t, datasourceName)
+
+	matchingName := "google_" + frame.UniqueResourcesID
+	googleID := addGoogleProvider(t, frame, matchingName)
 	addGitHubProvider(t, frame, "github_"+frame.UniqueResourcesID)
 
 	config := fmt.Sprintf(`
 data "zitadel_idps" "default" {
   name = "%s"
 }
-`, name)
+`, matchingName)
 
 	test_utils.RunDatasourceTest(
 		t,
@@ -31,18 +32,16 @@ data "zitadel_idps" "default" {
 		nil,
 		nil,
 		map[string]string{
-			"idps.#":            "1",
-			"idps.0.id":         googleID,
-			"idps.0.name":       name,
-			"idps.0.type":       "PROVIDER_TYPE_GOOGLE",
-			"idps.0.state":      "IDP_STATE_ACTIVE",
-			"idps.0.owner_type": "IDP_OWNER_TYPE_SYSTEM",
+			"ids.#": "1",
+			"ids.0": googleID,
 		},
 	)
 }
 
 func TestAccIdpsDatasource_FilterByNameAndType(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_idps")
+	datasourceName := "zitadel_idps"
+	frame := test_utils.NewInstanceTestFrame(t, datasourceName)
+
 	// Both providers share the name prefix, so only the type filter narrows the result down.
 	prefix := "idps_" + frame.UniqueResourcesID
 	addGoogleProvider(t, frame, prefix+"_google")
@@ -63,16 +62,17 @@ data "zitadel_idps" "default" {
 		nil,
 		nil,
 		map[string]string{
-			"idps.#":      "1",
-			"idps.0.id":   githubID,
-			"idps.0.type": "PROVIDER_TYPE_GITHUB",
+			"ids.#": "1",
+			"ids.0": githubID,
 		},
 	)
 }
 
-func TestAccIdpsDatasource_FilterByTypeOnly(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_idps")
-	addGoogleProvider(t, frame, "google_"+frame.UniqueResourcesID)
+func TestAccIdpsDatasource_FilterByType(t *testing.T) {
+	datasourceName := "zitadel_idps"
+	frame := test_utils.NewInstanceTestFrame(t, datasourceName)
+
+	googleID := addGoogleProvider(t, frame, "google_"+frame.UniqueResourcesID)
 	githubID := addGitHubProvider(t, frame, "github_"+frame.UniqueResourcesID)
 
 	config := `
@@ -81,20 +81,21 @@ data "zitadel_idps" "default" {
 }
 `
 
-	// Other tests create instance IDPs concurrently, so only assert the type of every
-	// element and that the GitHub IDP created here is included.
+	// Other tests create instance IDPs concurrently, so only check the presence of the IDs created here.
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
 		nil,
-		checkAllOfTypeAndContains(frame, "PROVIDER_TYPE_GITHUB", githubID),
+		checkIDsContain(frame, githubID, googleID),
 		nil,
 	)
 }
 
 func TestAccIdpsDatasource_NoMatch(t *testing.T) {
-	frame := test_utils.NewInstanceTestFrame(t, "zitadel_idps")
+	datasourceName := "zitadel_idps"
+	frame := test_utils.NewInstanceTestFrame(t, datasourceName)
+
 	addGoogleProvider(t, frame, "google_"+frame.UniqueResourcesID)
 
 	config := `
@@ -110,7 +111,7 @@ data "zitadel_idps" "default" {
 		nil,
 		nil,
 		map[string]string{
-			"idps.#": "0",
+			"ids.#": "0",
 		},
 	)
 }
@@ -139,19 +140,18 @@ func addGitHubProvider(t *testing.T, frame *test_utils.InstanceTestFrame, name s
 	return resp.GetId()
 }
 
-func checkAllOfTypeAndContains(frame *test_utils.InstanceTestFrame, expectedType, expectedID string) resource.TestCheckFunc {
+func checkIDsContain(frame *test_utils.InstanceTestFrame, expectedID, unexpectedID string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		attrs := frame.State(state).Attributes
-		count, err := strconv.Atoi(attrs["idps.#"])
-		if err != nil {
-			return fmt.Errorf("idps.# is not a number: %v", err)
-		}
 		found := false
-		for i := 0; i < count; i++ {
-			if actualType := attrs[fmt.Sprintf("idps.%d.type", i)]; actualType != expectedType {
-				return fmt.Errorf("expected only idps of type %s, but idps.%d has type %s", expectedType, i, actualType)
+		for key, value := range attrs {
+			if key == "ids.#" || len(key) < 4 || key[:4] != "ids." {
+				continue
 			}
-			if attrs[fmt.Sprintf("idps.%d.id", i)] == expectedID {
+			if value == unexpectedID {
+				return fmt.Errorf("expected idp %s not to be listed", unexpectedID)
+			}
+			if value == expectedID {
 				found = true
 			}
 		}

@@ -2,28 +2,34 @@
 page_title: "zitadel_org_idps Data Source - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Datasource representing all identity providers available to an organization, optionally filtered by name, type and owner.
+  Datasource representing all identity providers available to an organization, which can be looked up in detail with the type specific IdP datasources.
 ---
 
 # zitadel_org_idps (Data Source)
 
-Datasource representing all identity providers available to an organization, optionally filtered by name, type and owner.
+Datasource representing all identity providers available to an organization, which can be looked up in detail with the type specific IdP datasources.
 
 ## Example Usage
 
 ```terraform
 data "zitadel_org_idps" "default" {
-  org_id = data.zitadel_org.default.id
+  org_id      = data.zitadel_org.default.id
+  name        = "example-name"
+  name_method = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
+  type        = "PROVIDER_TYPE_GOOGLE"
+  owner_type  = "IDP_OWNER_TYPE_ORG"
 }
 
-data "zitadel_org_idps" "org_owned_google" {
-  org_id     = data.zitadel_org.default.id
-  type       = "PROVIDER_TYPE_GOOGLE"
-  owner_type = "IDP_OWNER_TYPE_ORG"
+data "zitadel_org_idp_google" "default" {
+  for_each = toset(data.zitadel_org_idps.default.ids)
+  org_id   = data.zitadel_org.default.id
+  id       = each.value
 }
 
-output "org_google_idp_ids" {
-  value = data.zitadel_org_idps.org_owned_google.idps[*].id
+output "org_idp_names" {
+  value = toset([
+    for idp in data.zitadel_org_idp_google.default : idp.name
+  ])
 }
 ```
 
@@ -32,24 +38,13 @@ output "org_google_idp_ids" {
 
 ### Optional
 
-- `name` (String) Name to filter identity providers by
+- `name` (String) Name of the identity provider.
 - `name_method` (String) Method for querying identity providers by name, supported values: TEXT_QUERY_METHOD_EQUALS, TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE, TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH, TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
 - `org_id` (String) ID of the organization
-- `owner_type` (String) Owner type to filter identity providers by, either the instance (system) or the organization, IDP_OWNER_TYPE_UNSPECIFIED applies no filter, supported values: IDP_OWNER_TYPE_UNSPECIFIED, IDP_OWNER_TYPE_SYSTEM, IDP_OWNER_TYPE_ORG
-- `type` (String) Type to filter identity providers by, PROVIDER_TYPE_UNSPECIFIED applies no filter, supported values: PROVIDER_TYPE_UNSPECIFIED, PROVIDER_TYPE_OIDC, PROVIDER_TYPE_JWT, PROVIDER_TYPE_LDAP, PROVIDER_TYPE_OAUTH, PROVIDER_TYPE_AZURE_AD, PROVIDER_TYPE_GITHUB, PROVIDER_TYPE_GITHUB_ES, PROVIDER_TYPE_GITLAB, PROVIDER_TYPE_GITLAB_SELF_HOSTED, PROVIDER_TYPE_GOOGLE, PROVIDER_TYPE_APPLE, PROVIDER_TYPE_SAML, PROVIDER_TYPE_ZITADEL
+- `owner_type` (String) Owner type of the identity provider, either the instance (system) or the organization, supported values: IDP_OWNER_TYPE_UNSPECIFIED, IDP_OWNER_TYPE_SYSTEM, IDP_OWNER_TYPE_ORG
+- `type` (String) Type of the identity provider, supported values: PROVIDER_TYPE_UNSPECIFIED, PROVIDER_TYPE_OIDC, PROVIDER_TYPE_JWT, PROVIDER_TYPE_LDAP, PROVIDER_TYPE_OAUTH, PROVIDER_TYPE_AZURE_AD, PROVIDER_TYPE_GITHUB, PROVIDER_TYPE_GITHUB_ES, PROVIDER_TYPE_GITLAB, PROVIDER_TYPE_GITLAB_SELF_HOSTED, PROVIDER_TYPE_GOOGLE, PROVIDER_TYPE_APPLE, PROVIDER_TYPE_SAML, PROVIDER_TYPE_ZITADEL
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `idps` (List of Object) List of identity providers (see [below for nested schema](#nestedatt--idps))
-
-<a id="nestedatt--idps"></a>
-### Nested Schema for `idps`
-
-Read-Only:
-
-- `id` (String)
-- `name` (String)
-- `owner_type` (String)
-- `state` (String)
-- `type` (String)
+- `ids` (List of String) A list of all identity provider IDs.

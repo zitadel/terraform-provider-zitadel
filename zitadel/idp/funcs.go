@@ -8,13 +8,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/idp"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/object"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
-	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_utils"
 )
 
 func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started list")
+	idpName := d.Get(NameVar).(string)
+	idpNameMethod := d.Get(nameMethodVar).(string)
+	idpType := d.Get(typeVar).(string)
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
@@ -23,29 +26,29 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	var queries []*admin.ProviderQuery
-	if nameQuery := idp_utils.NameQuery(d); nameQuery != nil {
-		queries = append(queries, &admin.ProviderQuery{
-			Query: &admin.ProviderQuery_IdpNameQuery{IdpNameQuery: nameQuery},
+	req := &admin.ListProvidersRequest{}
+	if idpName != "" {
+		req.Queries = append(req.Queries, &admin.ProviderQuery{
+			Query: &admin.ProviderQuery_IdpNameQuery{
+				IdpNameQuery: &idp.IDPNameQuery{
+					Name:   idpName,
+					Method: object.TextQueryMethod(object.TextQueryMethod_value[idpNameMethod]),
+				},
+			},
 		})
 	}
-
-	providers := make([]*idp.Provider, 0)
-	for offset := uint64(0); ; offset += uint64(idp_utils.ListPageSize) {
-		resp, err := client.ListProviders(ctx, &admin.ListProvidersRequest{
-			Query:   idp_utils.ListQuery(offset),
-			Queries: queries,
-		})
-		if err != nil {
-			return diag.Errorf("failed to list idps: %v", err)
-		}
-		providers = append(providers, resp.GetResult()...)
-		if len(resp.GetResult()) < int(idp_utils.ListPageSize) {
-			break
-		}
+	resp, err := client.ListProviders(ctx, req)
+	if err != nil {
+		return diag.Errorf("error while getting idp list: %v", err)
 	}
-
+	// The API offers no type query, so the type is filtered client-side.
+	idpIDs := make([]string, 0, len(resp.Result))
+	for _, provider := range resp.Result {
+		if idpType != "" && provider.GetType().String() != idpType {
+			continue
+		}
+		idpIDs = append(idpIDs, provider.GetId())
+	}
 	d.SetId("-")
-	return diag.FromErr(d.Set(idp_utils.IdpsVar, idp_utils.FlattenProviders(d, providers)))
+	return diag.FromErr(d.Set(idpIDsVar, idpIDs))
 }

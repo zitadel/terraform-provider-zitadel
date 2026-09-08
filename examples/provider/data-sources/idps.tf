@@ -1,14 +1,16 @@
-data "zitadel_idps" "default" {}
-
-data "zitadel_idps" "gitlab" {
-  type = "PROVIDER_TYPE_GITLAB"
-}
-
-data "zitadel_idps" "by_name" {
-  name        = "Corporate"
+data "zitadel_idps" "default" {
+  name        = "example-name"
   name_method = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
+  type        = "PROVIDER_TYPE_GITLAB"
 }
 
-output "gitlab_idp_ids" {
-  value = data.zitadel_idps.gitlab.idps[*].id
+data "zitadel_idp_gitlab" "default" {
+  for_each = toset(data.zitadel_idps.default.ids)
+  id       = each.value
+}
+
+output "idp_names" {
+  value = toset([
+    for idp in data.zitadel_idp_gitlab.default : idp.name
+  ])
 }

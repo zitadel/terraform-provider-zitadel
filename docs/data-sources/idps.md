@@ -2,29 +2,31 @@
 page_title: "zitadel_idps Data Source - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Datasource representing all identity providers on the instance, optionally filtered by name and type.
+  Datasource representing all identity providers on the instance, which can be looked up in detail with the type specific IDP datasources.
 ---
 
 # zitadel_idps (Data Source)
 
-Datasource representing all identity providers on the instance, optionally filtered by name and type.
+Datasource representing all identity providers on the instance, which can be looked up in detail with the type specific IDP datasources.
 
 ## Example Usage
 
 ```terraform
-data "zitadel_idps" "default" {}
-
-data "zitadel_idps" "gitlab" {
-  type = "PROVIDER_TYPE_GITLAB"
-}
-
-data "zitadel_idps" "by_name" {
-  name        = "Corporate"
+data "zitadel_idps" "default" {
+  name        = "example-name"
   name_method = "TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE"
+  type        = "PROVIDER_TYPE_GITLAB"
 }
 
-output "gitlab_idp_ids" {
-  value = data.zitadel_idps.gitlab.idps[*].id
+data "zitadel_idp_gitlab" "default" {
+  for_each = toset(data.zitadel_idps.default.ids)
+  id       = each.value
+}
+
+output "idp_names" {
+  value = toset([
+    for idp in data.zitadel_idp_gitlab.default : idp.name
+  ])
 }
 ```
 
@@ -33,22 +35,11 @@ output "gitlab_idp_ids" {
 
 ### Optional
 
-- `name` (String) Name to filter identity providers by
+- `name` (String) Name of the identity provider.
 - `name_method` (String) Method for querying identity providers by name, supported values: TEXT_QUERY_METHOD_EQUALS, TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE, TEXT_QUERY_METHOD_STARTS_WITH, TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE, TEXT_QUERY_METHOD_CONTAINS, TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE, TEXT_QUERY_METHOD_ENDS_WITH, TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
-- `type` (String) Type to filter identity providers by, PROVIDER_TYPE_UNSPECIFIED applies no filter, supported values: PROVIDER_TYPE_UNSPECIFIED, PROVIDER_TYPE_OIDC, PROVIDER_TYPE_JWT, PROVIDER_TYPE_LDAP, PROVIDER_TYPE_OAUTH, PROVIDER_TYPE_AZURE_AD, PROVIDER_TYPE_GITHUB, PROVIDER_TYPE_GITHUB_ES, PROVIDER_TYPE_GITLAB, PROVIDER_TYPE_GITLAB_SELF_HOSTED, PROVIDER_TYPE_GOOGLE, PROVIDER_TYPE_APPLE, PROVIDER_TYPE_SAML, PROVIDER_TYPE_ZITADEL
+- `type` (String) Type of the identity provider, supported values: PROVIDER_TYPE_UNSPECIFIED, PROVIDER_TYPE_OIDC, PROVIDER_TYPE_JWT, PROVIDER_TYPE_LDAP, PROVIDER_TYPE_OAUTH, PROVIDER_TYPE_AZURE_AD, PROVIDER_TYPE_GITHUB, PROVIDER_TYPE_GITHUB_ES, PROVIDER_TYPE_GITLAB, PROVIDER_TYPE_GITLAB_SELF_HOSTED, PROVIDER_TYPE_GOOGLE, PROVIDER_TYPE_APPLE, PROVIDER_TYPE_SAML, PROVIDER_TYPE_ZITADEL
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `idps` (List of Object) List of identity providers (see [below for nested schema](#nestedatt--idps))
-
-<a id="nestedatt--idps"></a>
-### Nested Schema for `idps`
-
-Read-Only:
-
-- `id` (String)
-- `name` (String)
-- `owner_type` (String)
-- `state` (String)
-- `type` (String)
+- `ids` (List of String) A list of all identity provider IDs.
