@@ -15,8 +15,22 @@ func TestAccOrgIdpsDatasource_All(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
 	prefix := "org_idps_" + frame.UniqueResourcesID
-	addGoogleProvider(t, frame, prefix+"_google")
-	addGitHubProvider(t, frame, prefix+"_github")
+	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         prefix + "_google",
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
+		Name:         prefix + "_github",
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
@@ -43,8 +57,22 @@ func TestAccOrgIdpsDatasource_FilterByName(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
 	matchingName := "google_" + frame.UniqueResourcesID
-	googleID := addGoogleProvider(t, frame, matchingName)
-	addGitHubProvider(t, frame, "github_"+frame.UniqueResourcesID)
+	google, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         matchingName,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
+		Name:         "github_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
@@ -61,7 +89,7 @@ data "zitadel_org_idps" "default" {
 		nil,
 		map[string]string{
 			"ids.#": "1",
-			"ids.0": googleID,
+			"ids.0": google.GetId(),
 		},
 	)
 }
@@ -71,8 +99,22 @@ func TestAccOrgIdpsDatasource_FilterByType(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
 	prefix := "org_idps_" + frame.UniqueResourcesID
-	addGoogleProvider(t, frame, prefix+"_google")
-	githubID := addGitHubProvider(t, frame, prefix+"_github")
+	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         prefix + "_google",
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	github, err := frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
+		Name:         prefix + "_github",
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
@@ -91,7 +133,7 @@ data "zitadel_org_idps" "default" {
 		nil,
 		map[string]string{
 			"ids.#": "1",
-			"ids.0": githubID,
+			"ids.0": github.GetId(),
 		},
 	)
 }
@@ -110,7 +152,14 @@ func TestAccOrgIdpsDatasource_FilterByOwnerType(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	addGoogleProvider(t, frame, prefix+"_org")
+	_, err = frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         prefix + "_org",
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
@@ -138,7 +187,14 @@ func TestAccOrgIdpsDatasource_NoMatch(t *testing.T) {
 	datasourceName := "zitadel_org_idps"
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
-	addGoogleProvider(t, frame, "google_"+frame.UniqueResourcesID)
+	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         "google_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
@@ -157,28 +213,4 @@ data "zitadel_org_idps" "default" {
 			"ids.#": "0",
 		},
 	)
-}
-
-func addGoogleProvider(t *testing.T, frame *test_utils.OrgTestFrame, name string) string {
-	resp, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
-		Name:         name,
-		ClientId:     "dummy",
-		ClientSecret: "dummy",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	return resp.GetId()
-}
-
-func addGitHubProvider(t *testing.T, frame *test_utils.OrgTestFrame, name string) string {
-	resp, err := frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
-		Name:         name,
-		ClientId:     "dummy",
-		ClientSecret: "dummy",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	return resp.GetId()
 }
