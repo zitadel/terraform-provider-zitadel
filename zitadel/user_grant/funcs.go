@@ -2,6 +2,7 @@ package user_grant
 
 import (
 	"context"
+	"sort"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -197,6 +198,10 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			break
 		}
 	}
+	// The API does not guarantee ordering, so sort by grant ID to keep list indexes stable across refreshes.
+	sort.Slice(grants, func(i, j int) bool {
+		return grants[i].(map[string]interface{})[idVar].(string) < grants[j].(map[string]interface{})[idVar].(string)
+	})
 
 	d.SetId(userID)
 	return diag.FromErr(d.Set(userGrantsVar, grants))
