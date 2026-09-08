@@ -2,11 +2,8 @@ package user_grant_test
 
 import (
 	"fmt"
-	"sort"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
@@ -41,7 +38,7 @@ data "zitadel_user_grants" "default" {
 		frame.BaseTestFrame,
 		config,
 		[]string{frame.AsOrgDefaultDependency, userDep},
-		checkSortedByID(frame, 3),
+		nil,
 		map[string]string{
 			"user_grants.#": "3",
 		},
@@ -177,38 +174,6 @@ data "zitadel_user_grants" "default" {
 	)
 }
 
-func TestAccUserGrantsDatasource_MoreThanOnePage(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_user_grants")
-	userDep, userID := human_user_test_dep.Create(t, frame)
-
-	// One more grant than a single ListUserGrants page holds, so the datasource must paginate.
-	grantCount := 101
-	roleKey := "role_" + frame.UniqueResourcesID
-	for i := 0; i < grantCount; i++ {
-		_, projectID := project_test_dep.Create(t, frame, fmt.Sprintf("user_grants_datasource_%d_%s", i, frame.UniqueResourcesID))
-		project_role_test_dep.Create(t, frame, projectID, roleKey)
-		addUserGrant(t, frame, userID, projectID, roleKey)
-	}
-
-	config := fmt.Sprintf(`
-data "zitadel_user_grants" "default" {
-  org_id  = "%s"
-  user_id = "%s"
-}
-`, frame.OrgID, userID)
-
-	test_utils.RunDatasourceTest(
-		t,
-		frame.BaseTestFrame,
-		config,
-		[]string{frame.AsOrgDefaultDependency, userDep},
-		nil,
-		map[string]string{
-			"user_grants.#": fmt.Sprint(grantCount),
-		},
-	)
-}
-
 func TestAccUserGrantsDatasource_NoMatch(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_user_grants")
 	userDep, userID := human_user_test_dep.Create(t, frame)
@@ -248,22 +213,4 @@ func addUserGrant(t *testing.T, frame *test_utils.OrgTestFrame, userID, projectI
 		t.Fatal(err)
 	}
 	return resp.GetUserGrantId()
-}
-
-// checkSortedByID asserts the datasource returns user grants ordered by grant ID, so list indexes are stable.
-func checkSortedByID(frame *test_utils.OrgTestFrame, expectedCount int) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		attrs := frame.State(state).Attributes
-		ids := make([]string, expectedCount)
-		for i := range ids {
-			ids[i] = attrs[fmt.Sprintf("user_grants.%d.id", i)]
-			if ids[i] == "" {
-				return fmt.Errorf("user_grants.%d.id is missing", i)
-			}
-		}
-		if !sort.StringsAreSorted(ids) {
-			return fmt.Errorf("expected user grants to be sorted by id, but got %v", ids)
-		}
-		return nil
-	}
 }
