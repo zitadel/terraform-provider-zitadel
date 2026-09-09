@@ -4,26 +4,46 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
 )
 
 func TestAccOrgIdpsDatasource_All(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_org_idps")
-	googleDep, githubDep := orgIdpDeps(frame)
+	datasourceName := "zitadel_org_idps"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
+
+	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         "google_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
+		Name:         "github_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
-  org_id      = data.zitadel_org.default.id
+  org_id      = "%s"
   name        = "%s"
   name_method = "TEXT_QUERY_METHOD_CONTAINS"
-  depends_on  = [zitadel_org_idp_google.default, zitadel_org_idp_github.default]
-}`, frame.UniqueResourcesID)
+}
+`, frame.OrgID, frame.UniqueResourcesID)
 
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
-		[]string{frame.AsOrgDefaultDependency, googleDep, githubDep},
+		[]string{frame.AsOrgDefaultDependency},
 		nil,
 		map[string]string{
 			"ids.#": "2",
@@ -32,21 +52,39 @@ data "zitadel_org_idps" "default" {
 }
 
 func TestAccOrgIdpsDatasource_FilterByName(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_org_idps")
-	googleDep, githubDep := orgIdpDeps(frame)
+	datasourceName := "zitadel_org_idps"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
-	config := `
+	matchingName := "google_" + frame.UniqueResourcesID
+	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         matchingName,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
+		Name:         "github_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
-  org_id     = data.zitadel_org.default.id
-  name       = zitadel_org_idp_google.default.name
-  depends_on = [zitadel_org_idp_github.default]
-}`
+  org_id = "%s"
+  name   = "%s"
+}
+`, frame.OrgID, matchingName)
 
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
-		[]string{frame.AsOrgDefaultDependency, googleDep, githubDep},
+		[]string{frame.AsOrgDefaultDependency},
 		nil,
 		map[string]string{
 			"ids.#": "1",
@@ -55,23 +93,40 @@ data "zitadel_org_idps" "default" {
 }
 
 func TestAccOrgIdpsDatasource_FilterByType(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_org_idps")
-	googleDep, githubDep := orgIdpDeps(frame)
+	datasourceName := "zitadel_org_idps"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
+
+	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         "google_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
+		Name:         "github_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
-  org_id      = data.zitadel_org.default.id
+  org_id      = "%s"
   name        = "%s"
   name_method = "TEXT_QUERY_METHOD_CONTAINS"
   type        = "PROVIDER_TYPE_GITHUB"
-  depends_on  = [zitadel_org_idp_google.default, zitadel_org_idp_github.default]
-}`, frame.UniqueResourcesID)
+}
+`, frame.OrgID, frame.UniqueResourcesID)
 
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
-		[]string{frame.AsOrgDefaultDependency, googleDep, githubDep},
+		[]string{frame.AsOrgDefaultDependency},
 		nil,
 		map[string]string{
 			"ids.#": "1",
@@ -80,35 +135,40 @@ data "zitadel_org_idps" "default" {
 }
 
 func TestAccOrgIdpsDatasource_FilterByOwnerType(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_org_idps")
-	googleDep, _ := orgIdpDeps(frame)
+	datasourceName := "zitadel_org_idps"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
-	instanceDep := fmt.Sprintf(`
-resource "zitadel_idp_google" "default" {
-  name                = "instance_google_%s"
-  client_id           = "dummy"
-  client_secret       = "dummy"
-  scopes              = ["openid", "profile", "email"]
-  is_linking_allowed  = false
-  is_creation_allowed = true
-  is_auto_creation    = false
-  is_auto_update      = true
-}`, frame.UniqueResourcesID)
+	_, err := frame.Admin.AddGoogleProvider(frame, &admin.AddGoogleProviderRequest{
+		Name:         "instance_google_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         "google_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
-  org_id      = data.zitadel_org.default.id
+  org_id      = "%s"
   name        = "%s"
   name_method = "TEXT_QUERY_METHOD_CONTAINS"
   owner_type  = "IDP_OWNER_TYPE_ORG"
-  depends_on  = [zitadel_org_idp_google.default, zitadel_idp_google.default]
-}`, frame.UniqueResourcesID)
+}
+`, frame.OrgID, frame.UniqueResourcesID)
 
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
-		[]string{frame.AsOrgDefaultDependency, googleDep, instanceDep},
+		[]string{frame.AsOrgDefaultDependency},
 		nil,
 		map[string]string{
 			"ids.#": "1",
@@ -117,54 +177,33 @@ data "zitadel_org_idps" "default" {
 }
 
 func TestAccOrgIdpsDatasource_NoMatch(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_org_idps")
-	googleDep, _ := orgIdpDeps(frame)
+	datasourceName := "zitadel_org_idps"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
-	config := `
+	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+		Name:         "google_" + frame.UniqueResourcesID,
+		ClientId:     "dummy",
+		ClientSecret: "dummy",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	config := fmt.Sprintf(`
 data "zitadel_org_idps" "default" {
-  org_id     = data.zitadel_org.default.id
-  name       = "nonexistent"
-  depends_on = [zitadel_org_idp_google.default]
-}`
+  org_id = "%s"
+  name   = "nonexistent"
+}
+`, frame.OrgID)
 
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
-		[]string{frame.AsOrgDefaultDependency, googleDep},
+		[]string{frame.AsOrgDefaultDependency},
 		nil,
 		map[string]string{
 			"ids.#": "0",
 		},
 	)
-}
-
-func orgIdpDeps(frame *test_utils.OrgTestFrame) (string, string) {
-	googleDep := fmt.Sprintf(`
-resource "zitadel_org_idp_google" "default" {
-  org_id              = data.zitadel_org.default.id
-  name                = "google_%s"
-  client_id           = "dummy"
-  client_secret       = "dummy"
-  scopes              = ["openid", "profile", "email"]
-  is_linking_allowed  = false
-  is_creation_allowed = true
-  is_auto_creation    = false
-  is_auto_update      = true
-}`, frame.UniqueResourcesID)
-
-	githubDep := fmt.Sprintf(`
-resource "zitadel_org_idp_github" "default" {
-  org_id              = data.zitadel_org.default.id
-  name                = "github_%s"
-  client_id           = "dummy"
-  client_secret       = "dummy"
-  scopes              = ["openid", "profile", "email"]
-  is_linking_allowed  = false
-  is_creation_allowed = true
-  is_auto_creation    = false
-  is_auto_update      = true
-}`, frame.UniqueResourcesID)
-
-	return googleDep, githubDep
 }
