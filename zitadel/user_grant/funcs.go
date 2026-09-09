@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -124,4 +125,106 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 	d.SetId(grant.GetId())
 	return nil
+}
+
+func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started get")
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+	client, err := helper.GetManagementClient(ctx, clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	grantID := helper.GetID(d, grantIDVar)
+	userID := helper.GetID(d, UserIDVar)
+
+	resp, err := client.GetUserGrantByID(helper.CtxWithOrgID(ctx, d), &management.GetUserGrantByIDRequest{GrantId: grantID, UserId: userID})
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+		d.SetId("")
+		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get user grant: %v", err)
+	}
+
+	grant := resp.GetUserGrant()
+	d.SetId(grant.GetId())
+	if err := d.Set(UserIDVar, grant.GetUserId()); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set(projectIDVar, grant.GetProjectId()); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set(projectGrantIDVar, grant.GetProjectGrantId()); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set(RoleKeysVar, grant.GetRoleKeys()); err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
+}
+
+func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started list")
+	userID := d.Get(UserIDVar).(string)
+	projectID := d.Get(projectIDVar).(string)
+	projectGrantID := d.Get(projectGrantIDVar).(string)
+	roleKey := d.Get(roleKeyVar).(string)
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+	client, err := helper.GetManagementClient(ctx, clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	req := &management.ListUserGrantRequest{}
+	req.Queries = append(req.Queries, &user.UserGrantQuery{
+		Query: &user.UserGrantQuery_UserIdQuery{
+			UserIdQuery: &user.UserGrantUserIDQuery{
+				UserId: userID,
+			},
+		},
+	})
+	if projectID != "" {
+		req.Queries = append(req.Queries, &user.UserGrantQuery{
+			Query: &user.UserGrantQuery_ProjectIdQuery{
+				ProjectIdQuery: &user.UserGrantProjectIDQuery{
+					ProjectId: projectID,
+				},
+			},
+		})
+	}
+	if projectGrantID != "" {
+		req.Queries = append(req.Queries, &user.UserGrantQuery{
+			Query: &user.UserGrantQuery_ProjectGrantIdQuery{
+				ProjectGrantIdQuery: &user.UserGrantProjectGrantIDQuery{
+					ProjectGrantId: projectGrantID,
+				},
+			},
+		})
+	}
+	if roleKey != "" {
+		req.Queries = append(req.Queries, &user.UserGrantQuery{
+			Query: &user.UserGrantQuery_RoleKeyQuery{
+				RoleKeyQuery: &user.UserGrantRoleKeyQuery{
+					RoleKey: roleKey,
+				},
+			},
+		})
+	}
+	resp, err := client.ListUserGrants(helper.CtxWithOrgID(ctx, d), req)
+	if err != nil {
+		return diag.Errorf("error while getting user grant list: %v", err)
+	}
+	grantIDs := make([]string, 0, len(resp.Result))
+	for _, grant := range resp.Result {
+		grantIDs = append(grantIDs, grant.Id)
+	}
+	d.SetId("-")
+	return diag.FromErr(d.Set(grantIDsVar, grantIDs))
 }
