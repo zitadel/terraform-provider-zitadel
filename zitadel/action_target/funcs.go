@@ -189,16 +189,24 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	resp, err := client.GetTarget(ctx, &actionv2.GetTargetRequest{
-		Id: helper.GetID(d, TargetIDVar),
+	var resp *actionv2.GetTargetResponse
+	// A target created moments ago may not be visible to the query API yet, so wait for it to appear.
+	found, err := helper.RetryUntilFound(ctx, func() (bool, error) {
+		var err error
+		resp, err = client.GetTarget(ctx, &actionv2.GetTargetRequest{
+			Id: helper.GetID(d, TargetIDVar),
+		})
+		if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+			return false, nil
+		}
+		return err == nil, err
 	})
-
-	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
-		d.SetId("")
-		return nil
-	}
 	if err != nil {
 		return diag.Errorf("failed to get target: %v", err)
+	}
+	if !found {
+		d.SetId("")
+		return nil
 	}
 
 	target := resp.GetTarget()

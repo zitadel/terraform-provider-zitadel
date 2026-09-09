@@ -118,33 +118,41 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 	}
 	orgID := helper.GetID(d, OrgIDVar)
 	tflog.Info(ctx, fmt.Sprintf("Reading org ID: %s", orgID))
-	resp, err := client.ListOrganizations(ctx, &org.ListOrganizationsRequest{
-		Queries: []*org.SearchQuery{
-			{
-				Query: &org.SearchQuery_IdQuery{
-					IdQuery: &org.OrganizationIDQuery{
-						Id: orgID,
+	var remoteOrg *org.Organization
+	// An organization created moments ago may not be visible to the query API yet, so wait for it to appear.
+	found, err := helper.RetryUntilFound(ctx, func() (bool, error) {
+		resp, err := client.ListOrganizations(ctx, &org.ListOrganizationsRequest{
+			Queries: []*org.SearchQuery{
+				{
+					Query: &org.SearchQuery_IdQuery{
+						IdQuery: &org.OrganizationIDQuery{
+							Id: orgID,
+						},
 					},
 				},
 			},
-		},
+		})
+		if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		if len(resp.Result) == 0 {
+			return false, nil
+		}
+		remoteOrg = resp.Result[0]
+		return true, nil
 	})
-	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
-		tflog.Info(ctx, "Org not found, clearing from state")
-		d.SetId("")
-		return nil
-	}
 	if err != nil {
 		tflog.Error(ctx, fmt.Sprintf("Error getting org: %v", err))
 		return diag.Errorf("error while getting org by id %s: %v", orgID, err)
 	}
-
-	if len(resp.Result) == 0 {
-		tflog.Info(ctx, "Org not found in list, clearing from state")
+	if !found {
+		tflog.Info(ctx, "Org not found, clearing from state")
 		d.SetId("")
 		return nil
 	}
-	remoteOrg := resp.Result[0]
 
 	tflog.Info(ctx, "Org found, updating state")
 	d.SetId(remoteOrg.Id)

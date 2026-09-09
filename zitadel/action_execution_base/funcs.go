@@ -43,11 +43,21 @@ func NewSetExecution(buildCondition BuildConditionFunc, idFromCondition IdFromCo
 			}
 		}
 
-		// Validate all targets exist
+		// Validate all targets exist. A target created moments ago may not be
+		// visible to the query API yet, so wait for it to appear.
 		for _, targetID := range targetIDs {
-			_, err := client.GetTarget(ctx, &action.GetTargetRequest{Id: targetID})
+			found, err := helper.RetryUntilFound(ctx, func() (bool, error) {
+				_, err := client.GetTarget(ctx, &action.GetTargetRequest{Id: targetID})
+				if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+					return false, nil
+				}
+				return err == nil, err
+			})
 			if err != nil {
 				return diag.Errorf("target %s does not exist: %v", targetID, err)
+			}
+			if !found {
+				return diag.Errorf("target %s does not exist", targetID)
 			}
 		}
 
