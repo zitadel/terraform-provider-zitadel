@@ -56,7 +56,7 @@ func TestAccOrgIdpsDatasource_FilterByName(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, datasourceName)
 
 	matchingName := "google_" + frame.UniqueResourcesID
-	_, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+	google, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
 		Name:         matchingName,
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
@@ -88,6 +88,7 @@ data "zitadel_org_idps" "default" {
 		nil,
 		map[string]string{
 			"ids.#": "1",
+			"ids.0": google.GetId(),
 		},
 	)
 }
@@ -104,7 +105,7 @@ func TestAccOrgIdpsDatasource_FilterByType(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
+	github, err := frame.AddGitHubProvider(frame, &management.AddGitHubProviderRequest{
 		Name:         "github_" + frame.UniqueResourcesID,
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
@@ -130,6 +131,7 @@ data "zitadel_org_idps" "default" {
 		nil,
 		map[string]string{
 			"ids.#": "1",
+			"ids.0": github.GetId(),
 		},
 	)
 }
@@ -146,7 +148,7 @@ func TestAccOrgIdpsDatasource_FilterByOwnerType(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
+	google, err := frame.AddGoogleProvider(frame, &management.AddGoogleProviderRequest{
 		Name:         "google_" + frame.UniqueResourcesID,
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
@@ -172,6 +174,7 @@ data "zitadel_org_idps" "default" {
 		nil,
 		map[string]string{
 			"ids.#": "1",
+			"ids.0": google.GetId(),
 		},
 	)
 }

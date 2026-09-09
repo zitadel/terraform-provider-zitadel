@@ -54,7 +54,7 @@ func TestAccIdpsDatasource_FilterByName(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, datasourceName)
 
 	matchingName := "google_" + frame.UniqueResourcesID
-	_, err := frame.AddGoogleProvider(frame, &admin.AddGoogleProviderRequest{
+	google, err := frame.AddGoogleProvider(frame, &admin.AddGoogleProviderRequest{
 		Name:         matchingName,
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
@@ -85,6 +85,7 @@ data "zitadel_idps" "default" {
 		nil,
 		map[string]string{
 			"ids.#": "1",
+			"ids.0": google.GetId(),
 		},
 	)
 }
@@ -101,7 +102,7 @@ func TestAccIdpsDatasource_FilterByType(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = frame.AddGitHubProvider(frame, &admin.AddGitHubProviderRequest{
+	github, err := frame.AddGitHubProvider(frame, &admin.AddGitHubProviderRequest{
 		Name:         "github_" + frame.UniqueResourcesID,
 		ClientId:     "dummy",
 		ClientSecret: "dummy",
@@ -126,6 +127,7 @@ data "zitadel_idps" "default" {
 		nil,
 		map[string]string{
 			"ids.#": "1",
+			"ids.0": github.GetId(),
 		},
 	)
 }
