@@ -426,6 +426,7 @@ func Provider() *schema.Provider {
 			"zitadel_machine_users":              machine_user.ListDatasources(),
 			"zitadel_user_metadata":              user_metadata.GetDatasource(),
 			"zitadel_user_metadatas":             user_metadata.ListDatasources(),
+			"zitadel_user_grant":                 user_grant.GetDatasource(),
 			"zitadel_user_grants":                user_grant.ListDatasources(),
 			"zitadel_project":                    project.GetDatasource(),
 			"zitadel_projects":                   project.ListDatasources(),

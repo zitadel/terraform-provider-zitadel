@@ -2,29 +2,34 @@
 page_title: "zitadel_user_grants Data Source - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Datasource representing the authorizations given to a user directly, including the given roles.
+  Datasource representing all authorizations given to a user directly, which can be looked up in detail with the user grant datasource.
 ---
 
 # zitadel_user_grants (Data Source)
 
-Datasource representing the authorizations given to a user directly, including the given roles.
+Datasource representing all authorizations given to a user directly, which can be looked up in detail with the user grant datasource.
 
 ## Example Usage
 
 ```terraform
 data "zitadel_user_grants" "default" {
-  org_id  = data.zitadel_org.default.id
-  user_id = "123456789012345678"
-}
-
-data "zitadel_user_grants" "filtered" {
   org_id     = data.zitadel_org.default.id
-  user_id    = "123456789012345678"
+  user_id    = data.zitadel_human_user.default.id
   project_id = data.zitadel_project.default.id
+  role_key   = "example-role"
 }
 
-output "all_user_grants" {
-  value = data.zitadel_user_grants.default.user_grants
+data "zitadel_user_grant" "default" {
+  for_each = toset(data.zitadel_user_grants.default.ids)
+  org_id   = data.zitadel_org.default.id
+  user_id  = data.zitadel_human_user.default.id
+  grant_id = each.value
+}
+
+output "user_grant_project_ids" {
+  value = toset([
+    for grant in data.zitadel_user_grant.default : grant.project_id
+  ])
 }
 ```
 
@@ -33,29 +38,16 @@ output "all_user_grants" {
 
 ### Required
 
-- `user_id` (String) ID of the user
+- `user_id` (String) ID of the user.
 
 ### Optional
 
 - `org_id` (String) ID of the organization
-- `project_grant_id` (String) ID of the granted project to filter user grants by
-- `project_id` (String) ID of the project to filter user grants by
-- `role_key` (String) Role key to filter user grants by
+- `project_grant_id` (String) ID of the granted project.
+- `project_id` (String) ID of the project.
+- `role_key` (String) Key of a granted role.
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `user_grants` (List of Object) List of user grants (see [below for nested schema](#nestedatt--user_grants))
-
-<a id="nestedatt--user_grants"></a>
-### Nested Schema for `user_grants`
-
-Read-Only:
-
-- `granted_org_id` (String)
-- `id` (String)
-- `project_grant_id` (String)
-- `project_id` (String)
-- `project_name` (String)
-- `role_keys` (List of String)
-- `state` (String)
+- `ids` (List of String) A list of all user grant IDs.

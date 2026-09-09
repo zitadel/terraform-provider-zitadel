@@ -6,10 +6,6 @@ const (
 	projectGrantIDVar = "project_grant_id"
 	UserIDVar         = "user_id"
 	RoleKeysVar       = "role_keys"
+	grantIDsVar       = "ids"
 	roleKeyVar        = "role_key"
-	idVar             = "id"
-	projectNameVar    = "project_name"
-	grantedOrgIDVar   = "granted_org_id"
-	stateVar          = "state"
-	userGrantsVar     = "user_grants"
 )

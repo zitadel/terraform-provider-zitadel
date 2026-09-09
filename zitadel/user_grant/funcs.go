@@ -127,8 +127,8 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	return nil
 }
 
-func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started list")
+func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started get")
 	clientinfo, ok := m.(*helper.ClientInfo)
 	if !ok {
 		return diag.Errorf("failed to get client")
@@ -138,59 +138,93 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
+	grantID := helper.GetID(d, grantIDVar)
+	userID := helper.GetID(d, UserIDVar)
+
+	resp, err := client.GetUserGrantByID(helper.CtxWithOrgID(ctx, d), &management.GetUserGrantByIDRequest{GrantId: grantID, UserId: userID})
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+		d.SetId("")
+		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get user grant: %v", err)
+	}
+
+	grant := resp.GetUserGrant()
+	d.SetId(grant.GetId())
+	if err := d.Set(UserIDVar, grant.GetUserId()); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set(projectIDVar, grant.GetProjectId()); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set(projectGrantIDVar, grant.GetProjectGrantId()); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set(RoleKeysVar, grant.GetRoleKeys()); err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
+}
+
+func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	tflog.Info(ctx, "started list")
 	userID := d.Get(UserIDVar).(string)
-	queries := []*user.UserGrantQuery{
-		{
-			Query: &user.UserGrantQuery_UserIdQuery{
-				UserIdQuery: &user.UserGrantUserIDQuery{UserId: userID},
+	projectID := d.Get(projectIDVar).(string)
+	projectGrantID := d.Get(projectGrantIDVar).(string)
+	roleKey := d.Get(roleKeyVar).(string)
+	clientinfo, ok := m.(*helper.ClientInfo)
+	if !ok {
+		return diag.Errorf("failed to get client")
+	}
+	client, err := helper.GetManagementClient(ctx, clientinfo)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	req := &management.ListUserGrantRequest{}
+	req.Queries = append(req.Queries, &user.UserGrantQuery{
+		Query: &user.UserGrantQuery_UserIdQuery{
+			UserIdQuery: &user.UserGrantUserIDQuery{
+				UserId: userID,
 			},
 		},
-	}
-	if projectID, ok := d.GetOk(projectIDVar); ok {
-		queries = append(queries, &user.UserGrantQuery{
+	})
+	if projectID != "" {
+		req.Queries = append(req.Queries, &user.UserGrantQuery{
 			Query: &user.UserGrantQuery_ProjectIdQuery{
-				ProjectIdQuery: &user.UserGrantProjectIDQuery{ProjectId: projectID.(string)},
+				ProjectIdQuery: &user.UserGrantProjectIDQuery{
+					ProjectId: projectID,
+				},
 			},
 		})
 	}
-	if projectGrantID, ok := d.GetOk(projectGrantIDVar); ok {
-		queries = append(queries, &user.UserGrantQuery{
+	if projectGrantID != "" {
+		req.Queries = append(req.Queries, &user.UserGrantQuery{
 			Query: &user.UserGrantQuery_ProjectGrantIdQuery{
-				ProjectGrantIdQuery: &user.UserGrantProjectGrantIDQuery{ProjectGrantId: projectGrantID.(string)},
+				ProjectGrantIdQuery: &user.UserGrantProjectGrantIDQuery{
+					ProjectGrantId: projectGrantID,
+				},
 			},
 		})
 	}
-	if roleKey, ok := d.GetOk(roleKeyVar); ok {
-		queries = append(queries, &user.UserGrantQuery{
+	if roleKey != "" {
+		req.Queries = append(req.Queries, &user.UserGrantQuery{
 			Query: &user.UserGrantQuery_RoleKeyQuery{
-				RoleKeyQuery: &user.UserGrantRoleKeyQuery{RoleKey: roleKey.(string)},
+				RoleKeyQuery: &user.UserGrantRoleKeyQuery{
+					RoleKey: roleKey,
+				},
 			},
 		})
 	}
-
-	req := &management.ListUserGrantRequest{
-		Queries: queries,
-	}
-
 	resp, err := client.ListUserGrants(helper.CtxWithOrgID(ctx, d), req)
 	if err != nil {
-		return diag.Errorf("failed to list user grants: %v", err)
+		return diag.Errorf("error while getting user grant list: %v", err)
 	}
-
-	grantList := make([]interface{}, len(resp.Result))
-	for i, grant := range resp.Result {
-		grantMap := map[string]interface{}{
-			idVar:             grant.GetId(),
-			projectIDVar:      grant.GetProjectId(),
-			projectNameVar:    grant.GetProjectName(),
-			projectGrantIDVar: grant.GetProjectGrantId(),
-			grantedOrgIDVar:   grant.GetGrantedOrgId(),
-			RoleKeysVar:       grant.GetRoleKeys(),
-			stateVar:          grant.GetState().String(),
-		}
-		grantList[i] = grantMap
+	grantIDs := make([]string, 0, len(resp.Result))
+	for _, grant := range resp.Result {
+		grantIDs = append(grantIDs, grant.Id)
 	}
-
-	d.SetId(userID)
-	return diag.FromErr(d.Set(userGrantsVar, grantList))
+	d.SetId("-")
+	return diag.FromErr(d.Set(grantIDsVar, grantIDs))
 }

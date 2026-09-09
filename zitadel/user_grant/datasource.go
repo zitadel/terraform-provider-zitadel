@@ -6,75 +6,72 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
 
-func ListDatasources() *schema.Resource {
+func GetDatasource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Datasource representing the authorizations given to a user directly, including the given roles.",
+		Description: "Datasource representing the authorization given to a user directly, including the given roles.",
 		Schema: map[string]*schema.Schema{
 			helper.OrgIDVar: helper.OrgIDDatasourceField,
+			grantIDVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "ID of the user grant.",
+			},
 			UserIDVar: {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "ID of the user",
+				Description: "ID of the user.",
+			},
+			projectIDVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "ID of the project.",
+			},
+			projectGrantIDVar: {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "ID of the granted project.",
+			},
+			RoleKeysVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "List of roles granted.",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
+		},
+		ReadContext: get,
+	}
+}
+
+func ListDatasources() *schema.Resource {
+	return &schema.Resource{
+		Description: "Datasource representing all authorizations given to a user directly, which can be looked up in detail with the user grant datasource.",
+		Schema: map[string]*schema.Schema{
+			helper.OrgIDVar: helper.OrgIDDatasourceField,
+			grantIDsVar: {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "A list of all user grant IDs.",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
+			UserIDVar: {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "ID of the user.",
 			},
 			projectIDVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "ID of the project to filter user grants by",
+				Description: "ID of the project.",
 			},
 			projectGrantIDVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "ID of the granted project to filter user grants by",
+				Description: "ID of the granted project.",
 			},
 			roleKeyVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Role key to filter user grants by",
-			},
-			userGrantsVar: {
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "List of user grants",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						idVar: {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "ID of the user grant",
-						},
-						projectIDVar: {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "ID of the project",
-						},
-						projectNameVar: {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "Name of the project",
-						},
-						projectGrantIDVar: {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "ID of the granted project",
-						},
-						grantedOrgIDVar: {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "ID of the organization the project is granted to",
-						},
-						RoleKeysVar: {
-							Type:        schema.TypeList,
-							Computed:    true,
-							Description: "List of roles granted",
-							Elem:        &schema.Schema{Type: schema.TypeString},
-						},
-						stateVar: {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "State of the user grant",
-						},
-					},
-				},
+				Description: "Key of a granted role.",
 			},
 		},
 		ReadContext: list,
