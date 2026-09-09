@@ -61,6 +61,7 @@ import (
 	ephemeral_personal_access_token "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/personal_access_token"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/human_user"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_apple"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_azure_ad"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_github"
@@ -90,6 +91,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/machine_user"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/notification_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_apple"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_azure_ad"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/org_idp_github"
@@ -449,6 +451,7 @@ func Provider() *schema.Provider {
 			"zitadel_application_saml":           application_saml.GetDatasource(),
 			"zitadel_application_samls":          application_saml.ListDatasources(),
 			"zitadel_trigger_actions":            trigger_actions.GetDatasource(),
+			"zitadel_idps":                       idp.ListDatasources(),
 			"zitadel_idp_github":                 idp_github.GetDatasource(),
 			"zitadel_idp_github_es":              idp_github_es.GetDatasource(),
 			"zitadel_idp_gitlab":                 idp_gitlab.GetDatasource(),
@@ -460,6 +463,7 @@ func Provider() *schema.Provider {
 			"zitadel_idp_saml":                   idp_saml.GetDatasource(),
 			"zitadel_idp_oauth":                  idp_oauth.GetDatasource(),
 			"zitadel_idp_oidc":                   idp_oidc.GetDatasource(),
+			"zitadel_org_idps":                   org_idp.ListDatasources(),
 			"zitadel_org_idp_apple":              org_idp_apple.GetDatasource(),
 			"zitadel_org_jwt_idp":                org_idp_jwt.GetDatasource(),
 			"zitadel_org_idp_jwt":                org_idp_jwt.GetDatasource(),
