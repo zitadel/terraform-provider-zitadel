@@ -228,6 +228,22 @@ func copyToTerraform(ctx context.Context, obj proto.Message, tf *types.Object, a
 		return diags
 	}
 
+	// ZITADEL returns every nested text message, even ones that were never
+	// customised, with all fields set to empty strings. Keep such a block null
+	// unless the prior state holds it, so a config that omits the block does not
+	// diff against state while a config that sets it to {} is preserved.
+	prior := tf.Attributes()
+	for name, value := range values {
+		obj, ok := value.(types.Object)
+		if !ok || obj.IsNull() || !allNull(obj.Attributes()) {
+			continue
+		}
+		if priorObj, ok := prior[name].(types.Object); ok && !priorObj.IsNull() && !priorObj.IsUnknown() {
+			continue
+		}
+		values[name] = types.ObjectNull(obj.AttributeTypes(ctx))
+	}
+
 	newObj, objDiags := types.ObjectValue(targetAttrTypes, values)
 	diags.Append(objDiags...)
 	if diags.HasError() {
@@ -319,4 +335,13 @@ func mapToAttrValues(ctx context.Context, data map[string]any, attrTypes map[str
 	}
 
 	return values, diags
+}
+
+func allNull(values map[string]attr.Value) bool {
+	for _, v := range values {
+		if !v.IsNull() {
+			return false
+		}
+	}
+	return true
 }
