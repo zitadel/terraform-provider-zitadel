@@ -25,18 +25,18 @@ func GetResource() *schema.Resource {
 				ValidateDiagFunc: helper.NonEmptyString(helper.OrgIDVar),
 				Description:      "ID of the organization the project belongs to. Required because the v2 CreateProject API takes the organization as an explicit request field.",
 			},
-			NameVar: {
-				Type:             schema.TypeString,
-				Required:         true,
-				ValidateDiagFunc: helper.NonEmptyString(NameVar),
-				Description:      "Name of the project",
-			},
 			ProjectIDVar: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				ForceNew:    true,
-				Description: "Optionally set a custom unique ID for the project. If omitted, ZITADEL will generate one.",
+				Description: "The ID of this resource. Optionally set a custom unique ID. If omitted, ZITADEL will generate one.",
+			},
+			NameVar: {
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: helper.NonEmptyString(NameVar),
+				Description:      "Name of the project",
 			},
 			stateVar: {
 				Type:        schema.TypeString,

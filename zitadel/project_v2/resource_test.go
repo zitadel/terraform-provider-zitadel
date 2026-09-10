@@ -44,15 +44,16 @@ func TestAccProjectV2CustomID(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_v2")
 
 	customID := frame.UniqueResourcesID
+	customName := frame.UniqueResourcesID + "_custom"
 
 	config := fmt.Sprintf(`%s
 %s
 resource "%s" "default" {
-  org_id     = data.zitadel_org.default.id
-  project_id = "%s"
-  name       = "%s_custom"
+	org_id     = data.zitadel_org.default.id
+	project_id = "%s"
+	name       = "%s"
 }
-`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.ResourceType, customID, frame.UniqueResourcesID)
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.ResourceType, customID, customName)
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
@@ -60,34 +61,12 @@ resource "%s" "default" {
 			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(frame.TerraformName, project_v2.ProjectIDVar, customID),
-					resource.TestCheckResourceAttr(frame.TerraformName, "id", customID),
-					checkRemoteProjectID(frame, customID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "project_id", customID),
+					checkRemoteProperty(frame)(customName),
 				),
 			},
 		},
 	})
-}
-
-func checkRemoteProjectID(frame *test_utils.OrgTestFrame, expect string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		ctx := helper.CtxSetOrgID(frame.Context, frame.OrgID)
-		client, err := helper.GetProjectV2Client(ctx, frame.ClientInfo)
-		if err != nil {
-			return fmt.Errorf("failed to get project v2 client: %w", err)
-		}
-		resp, err := client.GetProject(ctx, &projectpb.GetProjectRequest{
-			ProjectId: expect,
-		})
-		if err != nil {
-			return err
-		}
-		actual := resp.GetProject().GetProjectId()
-		if actual != expect {
-			return fmt.Errorf("expected project id %q, got %q", expect, actual)
-		}
-		return nil
-	}
 }
 
 // checkRemoteProperty verifies that the project's name in Zitadel matches the

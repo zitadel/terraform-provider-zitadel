@@ -102,20 +102,17 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ProjectAccessRequired:  d.Get(hasProjectCheckVar).(bool),
 		PrivateLabelingSetting: plSetting,
 	}
-	if v, ok := d.GetOk(ProjectIDVar); ok {
-		id := v.(string)
-		req.ProjectId = &id
+
+	if projectID, ok := d.GetOk(ProjectIDVar); ok {
+		pid := projectID.(string)
+		req.ProjectId = &pid
 	}
 
 	resp, err := client.CreateProject(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to create project: %v", err)
 	}
-	projectID := resp.GetProjectId()
-	d.SetId(projectID)
-	if err := d.Set(ProjectIDVar, projectID); err != nil {
-		return diag.Errorf("failed to set %s of project: %v", ProjectIDVar, err)
-	}
+	d.SetId(resp.GetProjectId())
 	return nil
 }
 
@@ -147,7 +144,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	p := resp.GetProject()
 	set := map[string]interface{}{
 		helper.OrgIDVar:           p.GetOrganizationId(),
-		ProjectIDVar:              p.GetProjectId(),
 		stateVar:                  p.GetState().String(),
 		NameVar:                   p.GetName(),
 		roleAssertionVar:          p.GetProjectRoleAssertion(),
