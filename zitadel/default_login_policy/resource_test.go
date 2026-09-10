@@ -39,6 +39,7 @@ func TestAccDefaultLoginPolicy(t *testing.T) {
 
 func TestAccDefaultLoginPolicyCreateZeroValues(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_login_policy")
+	_, googleID := idp_google_test_dep.Create(t, frame.BaseTestFrame, frame)
 
 	zeroValuesConfig := fmt.Sprintf(`
 %s
@@ -59,6 +60,7 @@ resource "zitadel_default_login_policy" "default" {
   default_redirect_uri          = "localhost:8080"
   second_factors                = []
   multi_factors                 = []
+  idps                          = []
   allow_domain_discovery        = true
   disable_login_with_email      = true
   disable_login_with_phone      = true
@@ -80,13 +82,20 @@ resource "zitadel_default_login_policy" "default" {
 					}); helper.IgnoreAlreadyExistsError(err) != nil {
 						t.Fatalf("adding remote multi factor failed: %v", err)
 					}
+					if _, err := frame.AddIDPToLoginPolicy(frame, &admin.AddIDPToLoginPolicyRequest{
+						IdpId: googleID,
+					}); helper.IgnoreAlreadyExistsError(err) != nil {
+						t.Fatalf("adding remote idp failed: %v", err)
+					}
 				},
 				Config: zeroValuesConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "second_factors.#", "0"),
 					resource.TestCheckResourceAttr(frame.TerraformName, "multi_factors.#", "0"),
+					resource.TestCheckResourceAttr(frame.TerraformName, "idps.#", "0"),
 					test_utils.CheckAMinute(checkRemoteSecondFactors(frame)(0)),
 					test_utils.CheckAMinute(checkRemoteMultiFactors(frame)(0)),
+					test_utils.CheckAMinute(checkRemoteIDPs(frame)(0)),
 				),
 			},
 		},
@@ -119,6 +128,22 @@ func checkRemoteMultiFactors(frame *test_utils.InstanceTestFrame) func(int) reso
 			actual := len(resp.GetResult())
 			if actual != expect {
 				return fmt.Errorf("expected %d multi factors, but got %d: %v", expect, actual, resp.GetResult())
+			}
+			return nil
+		}
+	}
+}
+
+func checkRemoteIDPs(frame *test_utils.InstanceTestFrame) func(int) resource.TestCheckFunc {
+	return func(expect int) resource.TestCheckFunc {
+		return func(state *terraform.State) error {
+			resp, err := frame.ListLoginPolicyIDPs(frame, &admin.ListLoginPolicyIDPsRequest{})
+			if err != nil {
+				return fmt.Errorf("listing idps failed: %w", err)
+			}
+			actual := len(resp.GetResult())
+			if actual != expect {
+				return fmt.Errorf("expected %d idps, but got %d: %v", expect, actual, resp.GetResult())
 			}
 			return nil
 		}
