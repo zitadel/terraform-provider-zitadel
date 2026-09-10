@@ -113,7 +113,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to create project: %v", err)
 	}
 	d.SetId(resp.GetProjectId())
-	return nil
+
+	return read(ctx, d, m)
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -144,6 +145,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	p := resp.GetProject()
 	set := map[string]interface{}{
 		helper.OrgIDVar:           p.GetOrganizationId(),
+		ProjectIDVar:              p.GetProjectId(),
 		stateVar:                  p.GetState().String(),
 		NameVar:                   p.GetName(),
 		roleAssertionVar:          p.GetProjectRoleAssertion(),
