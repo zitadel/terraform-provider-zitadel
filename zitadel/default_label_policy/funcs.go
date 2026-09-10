@@ -31,7 +31,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(
+	if d.IsNewResource() || d.HasChanges(
 		PrimaryColorVar,
 		hideLoginNameSuffixVar,
 		warnColorVar,
@@ -99,7 +99,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChanges(
+	if d.IsNewResource() || d.HasChanges(
 		PrimaryColorVar,
 		hideLoginNameSuffixVar,
 		warnColorVar,

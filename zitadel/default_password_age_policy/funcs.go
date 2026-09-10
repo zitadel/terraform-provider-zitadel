@@ -30,7 +30,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(maxAgeDays, expireWarnDays) {
+	if d.IsNewResource() || d.HasChanges(maxAgeDays, expireWarnDays) {
 		req := admin.UpdatePasswordAgePolicyRequest{
 			MaxAgeDays:     uint32(d.Get(maxAgeDays).(int)),
 			ExpireWarnDays: uint32(d.Get(expireWarnDays).(int)),

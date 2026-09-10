@@ -46,6 +46,41 @@ resource "zitadel_default_security_settings" "default" {
 	)
 }
 
+func TestAccDefaultSecuritySettingsCreateZeroValues(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_security_settings")
+
+	zeroValuesConfig := fmt.Sprintf(`
+%s
+resource "zitadel_default_security_settings" "default" {
+  enable_impersonation = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					client, err := helper.GetSecuritySettingsClient(context.Background(), frame.ClientInfo)
+					if err != nil {
+						t.Fatalf("failed to get client: %v", err)
+					}
+					if _, err := client.SetSecuritySettings(context.Background(), &settingsv2.SetSecuritySettingsRequest{
+						EnableImpersonation: true,
+					}); helper.IgnorePreconditionError(err) != nil {
+						t.Fatalf("setting remote security settings failed: %v", err)
+					}
+				},
+				Config: zeroValuesConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "enable_impersonation", "false"),
+					test_utils.CheckAMinute(checkRemoteProperty(frame)(false)),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {
 	return func(expect bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

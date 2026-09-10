@@ -30,7 +30,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(UserLoginMustBeDomainVar, validateOrgDomainVar, smtpSenderVar) {
+	if d.IsNewResource() || d.HasChanges(UserLoginMustBeDomainVar, validateOrgDomainVar, smtpSenderVar) {
 		resp, err := client.UpdateDomainPolicy(ctx, &admin.UpdateDomainPolicyRequest{
 			UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
 			ValidateOrgDomains:                     d.Get(validateOrgDomainVar).(bool),

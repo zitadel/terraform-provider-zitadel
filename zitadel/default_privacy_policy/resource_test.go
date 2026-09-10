@@ -32,6 +32,43 @@ func TestAccDefaultPrivacyPolicy(t *testing.T) {
 	)
 }
 
+func TestAccDefaultPrivacyPolicyCreateZeroValues(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_privacy_policy")
+
+	zeroValuesConfig := fmt.Sprintf(`
+%s
+resource "zitadel_default_privacy_policy" "default" {
+  tos_link      = ""
+  privacy_link  = ""
+  help_link     = ""
+  support_email = ""
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					if _, err := frame.UpdatePrivacyPolicy(frame, &admin.UpdatePrivacyPolicyRequest{
+						TosLink:      "https://example.com/tos",
+						PrivacyLink:  "https://example.com/privacy",
+						HelpLink:     "https://example.com/help",
+						SupportEmail: "support@example.com",
+					}); helper.IgnorePreconditionError(err) != nil {
+						t.Fatalf("setting remote policy failed: %v", err)
+					}
+				},
+				Config: zeroValuesConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "help_link", ""),
+					test_utils.CheckAMinute(checkRemoteProperty(frame)("")),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
