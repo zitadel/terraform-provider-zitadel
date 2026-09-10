@@ -94,19 +94,27 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 
 	plSetting := projectpb.PrivateLabelingSetting(projectpb.PrivateLabelingSetting_value[d.Get(privateLabelingSettingVar).(string)])
 
-	resp, err := client.CreateProject(ctx, &projectpb.CreateProjectRequest{
+	req := &projectpb.CreateProjectRequest{
 		OrganizationId:         d.Get(helper.OrgIDVar).(string),
 		Name:                   d.Get(NameVar).(string),
 		ProjectRoleAssertion:   d.Get(roleAssertionVar).(bool),
 		AuthorizationRequired:  d.Get(roleCheckVar).(bool),
 		ProjectAccessRequired:  d.Get(hasProjectCheckVar).(bool),
 		PrivateLabelingSetting: plSetting,
-	})
+	}
+
+	if projectID, ok := d.GetOk(ProjectIDVar); ok {
+		pid := projectID.(string)
+		req.ProjectId = &pid
+	}
+
+	resp, err := client.CreateProject(ctx, req)
 	if err != nil {
 		return diag.Errorf("failed to create project: %v", err)
 	}
 	d.SetId(resp.GetProjectId())
-	return nil
+
+	return read(ctx, d, m)
 }
 
 func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -137,6 +145,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	p := resp.GetProject()
 	set := map[string]interface{}{
 		helper.OrgIDVar:           p.GetOrganizationId(),
+		ProjectIDVar:              p.GetProjectId(),
 		stateVar:                  p.GetState().String(),
 		NameVar:                   p.GetName(),
 		roleAssertionVar:          p.GetProjectRoleAssertion(),

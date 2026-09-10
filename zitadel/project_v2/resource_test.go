@@ -40,6 +40,61 @@ func TestAccProjectV2(t *testing.T) {
 	)
 }
 
+func TestAccProjectV2CustomID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_v2")
+
+	customID := frame.UniqueResourcesID
+	customName := frame.UniqueResourcesID + "_custom"
+
+	config := fmt.Sprintf(`%s
+%s
+resource "%s" "default" {
+	org_id     = data.zitadel_org.default.id
+	project_id = "%s"
+	name       = "%s"
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.ResourceType, customID, customName)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "project_id", customID),
+					checkRemoteProperty(frame)(customName),
+				),
+			},
+		},
+	})
+}
+
+func TestAccProjectV2GeneratedID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_project_v2")
+
+	config := fmt.Sprintf(`%s
+%s
+resource "%s" "default" {
+	org_id = data.zitadel_org.default.id
+	name   = "%s"
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.ResourceType, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(frame.TerraformName, "project_id", helper.ZitadelGeneratedIdOnlyRegex),
+					resource.TestCheckResourceAttrPair(frame.TerraformName, "project_id", frame.TerraformName, "id"),
+					checkRemoteProperty(frame)(frame.UniqueResourcesID),
+				),
+			},
+		},
+	})
+}
+
 // checkRemoteProperty verifies that the project's name in Zitadel matches the
 // expected value by calling the v2 GetProject endpoint — the same endpoint
 // the resource itself uses. This ensures we're exercising the v2 wire format,
