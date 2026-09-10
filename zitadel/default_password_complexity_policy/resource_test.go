@@ -40,7 +40,7 @@ func TestAccDefaultPasswordComplexityPolicy(t *testing.T) {
 func TestAccDefaultPasswordComplexityPolicyCreateZeroValues(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_password_complexity_policy")
 
-	zeroValuesConfig := fmt.Sprintf(`
+	resourceConfig := fmt.Sprintf(`
 %s
 resource "zitadel_default_password_complexity_policy" "default" {
   min_length    = 0
@@ -62,11 +62,11 @@ resource "zitadel_default_password_complexity_policy" "default" {
 						HasLowercase: true,
 						HasNumber:    true,
 						HasSymbol:    true,
-					}); helper.IgnorePreconditionError(err) != nil {
+					}); err != nil && helper.IgnorePreconditionError(err) != nil {
 						t.Fatalf("setting remote policy failed: %v", err)
 					}
 				},
-				Config:      zeroValuesConfig,
+				Config:      resourceConfig,
 				ExpectError: regexp.MustCompile(`Given minimum length is not allowed`),
 			},
 		},

@@ -37,10 +37,6 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 
 		resp, err := client.UpdatePasswordAgePolicy(ctx, &req)
-		if err != nil {
-			return diag.Errorf("failed to update default password age policy: %v", err)
-		}
-
 		if helper.IgnorePreconditionError(err) != nil {
 			return diag.Errorf("failed to update default password age policy: %v", err)
 		}
@@ -53,7 +49,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if id == "" {
 		resp, err := client.GetPasswordAgePolicy(ctx, &admin.GetPasswordAgePolicyRequest{})
 		if err != nil {
-			return diag.Errorf("failed to get default password complexity policy: %v", err)
+			return diag.Errorf("failed to get default password age policy: %v", err)
 		}
 
 		id = resp.GetPolicy().GetDetails().GetResourceOwner()

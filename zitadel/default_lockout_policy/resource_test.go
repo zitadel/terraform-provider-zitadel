@@ -39,7 +39,7 @@ func TestAccDefaultLockoutPolicy(t *testing.T) {
 func TestAccDefaultLockoutPolicyCreateZeroValues(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_lockout_policy")
 
-	zeroValuesConfig := fmt.Sprintf(`
+	resourceConfig := fmt.Sprintf(`
 %s
 resource "zitadel_default_lockout_policy" "default" {
   max_password_attempts = 0
@@ -54,11 +54,11 @@ resource "zitadel_default_lockout_policy" "default" {
 					if _, err := frame.UpdateLockoutPolicy(frame, &admin.UpdateLockoutPolicyRequest{
 						MaxPasswordAttempts: 5,
 						MaxOtpAttempts:      5,
-					}); helper.IgnorePreconditionError(err) != nil {
+					}); err != nil && helper.IgnorePreconditionError(err) != nil {
 						t.Fatalf("setting remote policy failed: %v", err)
 					}
 				},
-				Config: zeroValuesConfig,
+				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "max_password_attempts", "0"),
 					test_utils.CheckAMinute(checkRemoteProperty(frame)(0)),

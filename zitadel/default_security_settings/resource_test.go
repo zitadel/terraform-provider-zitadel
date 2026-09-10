@@ -49,7 +49,7 @@ resource "zitadel_default_security_settings" "default" {
 func TestAccDefaultSecuritySettingsCreateZeroValues(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_security_settings")
 
-	zeroValuesConfig := fmt.Sprintf(`
+	resourceConfig := fmt.Sprintf(`
 %s
 resource "zitadel_default_security_settings" "default" {
   enable_impersonation = false
@@ -67,11 +67,11 @@ resource "zitadel_default_security_settings" "default" {
 					}
 					if _, err := client.SetSecuritySettings(context.Background(), &settingsv2.SetSecuritySettingsRequest{
 						EnableImpersonation: true,
-					}); helper.IgnorePreconditionError(err) != nil {
+					}); err != nil && helper.IgnorePreconditionError(err) != nil {
 						t.Fatalf("setting remote security settings failed: %v", err)
 					}
 				},
-				Config: zeroValuesConfig,
+				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "enable_impersonation", "false"),
 					test_utils.CheckAMinute(checkRemoteProperty(frame)(false)),

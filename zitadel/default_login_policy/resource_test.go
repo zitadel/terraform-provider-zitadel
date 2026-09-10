@@ -41,7 +41,7 @@ func TestAccDefaultLoginPolicyCreateZeroValues(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_login_policy")
 	_, googleID := idp_google_test_dep.Create(t, frame.BaseTestFrame, frame)
 
-	zeroValuesConfig := fmt.Sprintf(`
+	resourceConfig := fmt.Sprintf(`
 %s
 resource "zitadel_default_login_policy" "default" {
   user_login                    = true
@@ -50,7 +50,7 @@ resource "zitadel_default_login_policy" "default" {
   force_mfa                     = false
   force_mfa_local_only          = false
   passwordless_type             = "PASSWORDLESS_TYPE_ALLOWED"
-  hide_password_reset           = "false"
+  hide_password_reset           = false
   password_check_lifetime       = "240h0m0s"
   external_login_check_lifetime = "240h0m0s"
   multi_factor_check_lifetime   = "24h0m0s"
@@ -74,21 +74,21 @@ resource "zitadel_default_login_policy" "default" {
 				PreConfig: func() {
 					if _, err := frame.AddSecondFactorToLoginPolicy(frame, &admin.AddSecondFactorToLoginPolicyRequest{
 						Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
-					}); helper.IgnoreAlreadyExistsError(err) != nil {
+					}); err != nil && helper.IgnoreAlreadyExistsError(err) != nil {
 						t.Fatalf("adding remote second factor failed: %v", err)
 					}
 					if _, err := frame.AddMultiFactorToLoginPolicy(frame, &admin.AddMultiFactorToLoginPolicyRequest{
 						Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
-					}); helper.IgnoreAlreadyExistsError(err) != nil {
+					}); err != nil && helper.IgnoreAlreadyExistsError(err) != nil {
 						t.Fatalf("adding remote multi factor failed: %v", err)
 					}
 					if _, err := frame.AddIDPToLoginPolicy(frame, &admin.AddIDPToLoginPolicyRequest{
 						IdpId: googleID,
-					}); helper.IgnoreAlreadyExistsError(err) != nil {
+					}); err != nil && helper.IgnoreAlreadyExistsError(err) != nil {
 						t.Fatalf("adding remote idp failed: %v", err)
 					}
 				},
-				Config: zeroValuesConfig,
+				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "second_factors.#", "0"),
 					resource.TestCheckResourceAttr(frame.TerraformName, "multi_factors.#", "0"),
@@ -102,6 +102,22 @@ resource "zitadel_default_login_policy" "default" {
 	})
 }
 
+func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
+		return func(state *terraform.State) error {
+			resp, err := frame.GetLoginPolicy(frame, &admin.GetLoginPolicyRequest{})
+			if err != nil {
+				return fmt.Errorf("getting policy failed: %w", err)
+			}
+			actual := resp.GetPolicy().GetDefaultRedirectUri()
+			if actual != expect {
+				return fmt.Errorf("expected %s, but got %s", expect, actual)
+			}
+			return nil
+		}
+	}
+}
+
 func checkRemoteSecondFactors(frame *test_utils.InstanceTestFrame) func(int) resource.TestCheckFunc {
 	return func(expect int) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
@@ -111,7 +127,7 @@ func checkRemoteSecondFactors(frame *test_utils.InstanceTestFrame) func(int) res
 			}
 			actual := len(resp.GetResult())
 			if actual != expect {
-				return fmt.Errorf("expected %d second factors, but got %d: %v", expect, actual, resp.GetResult())
+				return fmt.Errorf("expected %d, but got %d", expect, actual)
 			}
 			return nil
 		}
@@ -127,7 +143,7 @@ func checkRemoteMultiFactors(frame *test_utils.InstanceTestFrame) func(int) reso
 			}
 			actual := len(resp.GetResult())
 			if actual != expect {
-				return fmt.Errorf("expected %d multi factors, but got %d: %v", expect, actual, resp.GetResult())
+				return fmt.Errorf("expected %d, but got %d", expect, actual)
 			}
 			return nil
 		}
@@ -143,23 +159,7 @@ func checkRemoteIDPs(frame *test_utils.InstanceTestFrame) func(int) resource.Tes
 			}
 			actual := len(resp.GetResult())
 			if actual != expect {
-				return fmt.Errorf("expected %d idps, but got %d: %v", expect, actual, resp.GetResult())
-			}
-			return nil
-		}
-	}
-}
-
-func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resource.TestCheckFunc {
-	return func(expect string) resource.TestCheckFunc {
-		return func(state *terraform.State) error {
-			resp, err := frame.GetLoginPolicy(frame, &admin.GetLoginPolicyRequest{})
-			if err != nil {
-				return fmt.Errorf("getting policy failed: %w", err)
-			}
-			actual := resp.GetPolicy().GetDefaultRedirectUri()
-			if actual != expect {
-				return fmt.Errorf("expected %s, but got %s", expect, actual)
+				return fmt.Errorf("expected %d, but got %d", expect, actual)
 			}
 			return nil
 		}

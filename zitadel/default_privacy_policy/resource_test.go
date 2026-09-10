@@ -35,7 +35,7 @@ func TestAccDefaultPrivacyPolicy(t *testing.T) {
 func TestAccDefaultPrivacyPolicyCreateZeroValues(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_privacy_policy")
 
-	zeroValuesConfig := fmt.Sprintf(`
+	resourceConfig := fmt.Sprintf(`
 %s
 resource "zitadel_default_privacy_policy" "default" {
   tos_link      = ""
@@ -55,11 +55,11 @@ resource "zitadel_default_privacy_policy" "default" {
 						PrivacyLink:  "https://example.com/privacy",
 						HelpLink:     "https://example.com/help",
 						SupportEmail: "support@example.com",
-					}); helper.IgnorePreconditionError(err) != nil {
+					}); err != nil && helper.IgnorePreconditionError(err) != nil {
 						t.Fatalf("setting remote policy failed: %v", err)
 					}
 				},
-				Config: zeroValuesConfig,
+				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "help_link", ""),
 					test_utils.CheckAMinute(checkRemoteProperty(frame)("")),

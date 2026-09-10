@@ -36,7 +36,7 @@ func TestAccDefaultNotificationPolicy(t *testing.T) {
 func TestAccDefaultNotificationPolicyCreateZeroValues(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_notification_policy")
 
-	zeroValuesConfig := fmt.Sprintf(`
+	resourceConfig := fmt.Sprintf(`
 %s
 resource "zitadel_default_notification_policy" "default" {
   password_change = false
@@ -50,11 +50,11 @@ resource "zitadel_default_notification_policy" "default" {
 				PreConfig: func() {
 					if _, err := frame.UpdateNotificationPolicy(frame, &admin.UpdateNotificationPolicyRequest{
 						PasswordChange: true,
-					}); helper.IgnorePreconditionError(err) != nil {
+					}); err != nil && helper.IgnorePreconditionError(err) != nil {
 						t.Fatalf("setting remote policy failed: %v", err)
 					}
 				},
-				Config: zeroValuesConfig,
+				Config: resourceConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "password_change", "false"),
 					test_utils.CheckAMinute(checkRemoteProperty(frame)(false)),
