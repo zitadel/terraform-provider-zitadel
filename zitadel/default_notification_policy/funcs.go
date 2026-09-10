@@ -29,7 +29,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(passwordChangeVar) {
+	if d.IsNewResource() || d.HasChanges(passwordChangeVar) {
 		resp, err := client.UpdateNotificationPolicy(ctx, &admin.UpdateNotificationPolicyRequest{
 			PasswordChange: d.Get(passwordChangeVar).(bool),
 		})

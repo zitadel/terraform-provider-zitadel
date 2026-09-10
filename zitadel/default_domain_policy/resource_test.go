@@ -37,6 +37,39 @@ func TestAccDefaultDomainPolicy(t *testing.T) {
 	)
 }
 
+func TestAccDefaultDomainPolicyCreateZeroValues(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_domain_policy")
+
+	resourceConfig := fmt.Sprintf(`
+%s
+resource "zitadel_default_domain_policy" "default" {
+  user_login_must_be_domain                   = false
+  validate_org_domains                        = false
+  smtp_sender_address_matches_instance_domain = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					if _, err := frame.UpdateDomainPolicy(frame, &admin.UpdateDomainPolicyRequest{
+						UserLoginMustBeDomain: true,
+					}); err != nil && helper.IgnorePreconditionError(err) != nil {
+						t.Fatalf("setting remote policy failed: %v", err)
+					}
+				},
+				Config: resourceConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "user_login_must_be_domain", "false"),
+					test_utils.CheckAMinute(checkRemoteProperty(frame)(false)),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(bool) resource.TestCheckFunc {
 	return func(expect bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

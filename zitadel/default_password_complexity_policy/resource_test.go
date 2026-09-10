@@ -2,6 +2,7 @@ package default_password_complexity_policy_test
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"testing"
 
@@ -34,6 +35,42 @@ func TestAccDefaultPasswordComplexityPolicy(t *testing.T) {
 		test_utils.CheckNothing,
 		test_utils.ImportNothing,
 	)
+}
+
+func TestAccDefaultPasswordComplexityPolicyCreateZeroValues(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_default_password_complexity_policy")
+
+	resourceConfig := fmt.Sprintf(`
+%s
+resource "zitadel_default_password_complexity_policy" "default" {
+  min_length    = 0
+  has_uppercase = false
+  has_lowercase = false
+  has_number    = false
+  has_symbol    = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					if _, err := frame.UpdatePasswordComplexityPolicy(frame, &admin.UpdatePasswordComplexityPolicyRequest{
+						MinLength:    8,
+						HasUppercase: true,
+						HasLowercase: true,
+						HasNumber:    true,
+						HasSymbol:    true,
+					}); err != nil && helper.IgnorePreconditionError(err) != nil {
+						t.Fatalf("setting remote policy failed: %v", err)
+					}
+				},
+				Config:      resourceConfig,
+				ExpectError: regexp.MustCompile(`Given minimum length is not allowed`),
+			},
+		},
+	})
 }
 
 func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(uint64) resource.TestCheckFunc {

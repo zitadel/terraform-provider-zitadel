@@ -39,6 +39,39 @@ func TestDefaultPasswordAgePolicy(t *testing.T) {
 	)
 }
 
+func TestAccDefaultPasswordAgePolicyCreateZeroValues(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_default_password_age_policy")
+
+	resourceConfig := fmt.Sprintf(`
+%s
+resource "zitadel_default_password_age_policy" "default" {
+  max_age_days     = 0
+  expire_warn_days = 0
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					if _, err := frame.Admin.UpdatePasswordAgePolicy(frame, &admin.UpdatePasswordAgePolicyRequest{
+						MaxAgeDays:     30,
+						ExpireWarnDays: 5,
+					}); err != nil && helper.IgnorePreconditionError(err) != nil {
+						t.Fatalf("setting remote policy failed: %v", err)
+					}
+				},
+				Config: resourceConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "max_age_days", "0"),
+					test_utils.CheckAMinute(checkRemoteProperty(frame)(0)),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
 	return func(expect uint64) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

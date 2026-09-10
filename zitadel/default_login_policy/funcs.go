@@ -33,7 +33,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(passwordCheckLifetimeVar,
+	if d.IsNewResource() || d.HasChanges(passwordCheckLifetimeVar,
 		externalLoginCheckLifetimeVar,
 		mfaInitSkipLifetimeVar,
 		secondFactorCheckLifetimeVar,
@@ -107,7 +107,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	d.SetId(id)
 
-	if d.HasChange(secondFactorsVar) {
+	if d.IsNewResource() || d.HasChange(secondFactorsVar) {
 		o, err := client.ListLoginPolicySecondFactors(ctx, &admin.ListLoginPolicySecondFactorsRequest{})
 		if err != nil {
 			return diag.Errorf("failed to get default login policy second factors: %v", err)
@@ -134,7 +134,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(multiFactorsVar) {
+	if d.IsNewResource() || d.HasChange(multiFactorsVar) {
 		o, err := client.ListLoginPolicyMultiFactors(ctx, &admin.ListLoginPolicyMultiFactorsRequest{})
 		if err != nil {
 			return diag.Errorf("failed to get default login policy multi factors: %v", err)
@@ -161,7 +161,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(idpsVar) {
+	if d.IsNewResource() || d.HasChange(idpsVar) {
 		o, err := client.ListLoginPolicyIDPs(ctx, &admin.ListLoginPolicyIDPsRequest{})
 		if err != nil {
 			return diag.Errorf("failed to get default login policy idps: %v", err)

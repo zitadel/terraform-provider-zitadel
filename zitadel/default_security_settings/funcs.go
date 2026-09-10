@@ -29,7 +29,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChanges(enableImpersonationVar, embeddedIframeEnabledVar, embeddedIframeAllowedOriginsVar) {
+	if d.IsNewResource() || d.HasChanges(enableImpersonationVar, embeddedIframeEnabledVar, embeddedIframeAllowedOriginsVar) {
 		req := &settingsv2.SetSecuritySettingsRequest{
 			EnableImpersonation: d.Get(enableImpersonationVar).(bool),
 			EmbeddedIframe: &settingsv2.EmbeddedIframeSettings{

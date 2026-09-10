@@ -30,7 +30,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(MinLengthVar, hasUppercaseVar, hasLowercaseVar, hasNumberVar, hasSymbolVar) {
+	if d.IsNewResource() || d.HasChanges(MinLengthVar, hasUppercaseVar, hasLowercaseVar, hasNumberVar, hasSymbolVar) {
 		resp, err := client.UpdatePasswordComplexityPolicy(ctx, &admin.UpdatePasswordComplexityPolicyRequest{
 			MinLength:    uint32(d.Get(MinLengthVar).(int)),
 			HasUppercase: d.Get(hasUppercaseVar).(bool),

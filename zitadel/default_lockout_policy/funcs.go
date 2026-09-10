@@ -31,8 +31,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	// Check if either property has changes to avoid unnecessary API calls
-	if d.HasChanges(MaxPasswordAttemptsVar, MaxOTPAttemptsVar) {
+	// Always call the API on create, otherwise only if either property has changes to avoid unnecessary API calls
+	if d.IsNewResource() || d.HasChanges(MaxPasswordAttemptsVar, MaxOTPAttemptsVar) {
 		resp, err := client.UpdateLockoutPolicy(ctx, &admin.UpdateLockoutPolicyRequest{
 			MaxPasswordAttempts: uint32(d.Get(MaxPasswordAttemptsVar).(int)),
 			MaxOtpAttempts:      uint32(d.Get(MaxOTPAttemptsVar).(int)),

@@ -30,7 +30,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	id := ""
-	if d.HasChanges(tosLinkVar, privacyLinkVar, HelpLinkVar, supportEmailVar, DocsLinkVar, CustomLinkVar, CustomLinkTextVar) {
+	if d.IsNewResource() || d.HasChanges(tosLinkVar, privacyLinkVar, HelpLinkVar, supportEmailVar, DocsLinkVar, CustomLinkVar, CustomLinkTextVar) {
 		resp, err := client.UpdatePrivacyPolicy(ctx, &admin.UpdatePrivacyPolicyRequest{
 			TosLink:        d.Get(tosLinkVar).(string),
 			PrivacyLink:    d.Get(privacyLinkVar).(string),
