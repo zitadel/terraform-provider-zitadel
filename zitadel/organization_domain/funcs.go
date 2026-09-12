@@ -3,7 +3,6 @@ package organization_domain
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -11,8 +10,6 @@ import (
 	orgV2 "github.com/zitadel/zitadel-go/v3/pkg/client/org/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	org "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org/v2"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -61,7 +58,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// without leaving a domain behind.
 	requiresValidation, err := domainValidationRequired(ctx, clientinfo, orgID)
 	if err != nil {
-		return diag.Errorf("failed to get domain policy of organization %s: %v", orgID, err)
+		return diag.Errorf("failed to get domain policy: %v", err)
 	}
 
 	// ZITADEL verifies a domain by checking a published challenge, so asking to
@@ -93,18 +90,14 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			Domain:         domain,
 			Type:           org.DomainValidationType(org.DomainValidationType_value[validationType]),
 		})
-		switch {
-		case isAlreadyVerifiedError(err):
-			verified = true
-		case err != nil:
+		if err != nil {
 			return diag.FromErr(err)
-		default:
-			if err := d.Set(ValidationTokenVar, validationResp.GetToken()); err != nil {
-				return diag.Errorf("failed to set validation_token: %v", err)
-			}
-			if err := d.Set(ValidationURLVar, validationResp.GetUrl()); err != nil {
-				return diag.Errorf("failed to set validation_url: %v", err)
-			}
+		}
+		if err := d.Set(ValidationTokenVar, validationResp.GetToken()); err != nil {
+			return diag.Errorf("failed to set validation_token: %v", err)
+		}
+		if err := d.Set(ValidationURLVar, validationResp.GetUrl()); err != nil {
+			return diag.Errorf("failed to set validation_url: %v", err)
 		}
 	}
 
@@ -130,80 +123,6 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	return nil
 }
 
-// verifyNeedsValidationTypeError reports that verify cannot be honoured without
-// a validation_type, which ZITADEL would otherwise answer with an opaque
-// failure about a challenge that was never generated.
-func verifyNeedsValidationTypeError(orgID string) diag.Diagnostics {
-	return diag.Errorf(
-		"%s needs %s when the domain policy of organization %s has validate_org_domains enabled, "+
-			"because ZITADEL verifies a domain against a published validation challenge",
-		VerifyVar, ValidationTypeVar, orgID)
-}
-
-// domainValidationRequired reports whether the organizations effective domain
-// policy makes ZITADEL require ownership validation for added org domains. When
-// it does not - the default - a domain is verified as part of being added.
-func domainValidationRequired(ctx context.Context, clientinfo *helper.ClientInfo, orgID string) (bool, error) {
-	client, err := helper.GetManagementClient(ctx, clientinfo)
-	if err != nil {
-		return false, err
-	}
-	resp, err := client.GetDomainPolicy(helper.CtxSetOrgID(ctx, orgID), &management.GetDomainPolicyRequest{})
-	if err != nil {
-		return false, err
-	}
-	return resp.GetPolicy().GetValidateOrgDomains(), nil
-}
-
-// hasValidationType reports whether the configuration asks for a validation
-// challenge. validation_type is optional, and the unspecified enum member is
-// rejected by the API, so both are treated as "no challenge wanted".
-func hasValidationType(d *schema.ResourceData) bool {
-	validationType := d.Get(ValidationTypeVar).(string)
-	return validationType != "" &&
-		validationType != org.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED.String()
-}
-
-// alreadyVerifiedErrorID is the ZITADEL error ID for generating a validation
-// challenge for a domain that is already verified.
-const alreadyVerifiedErrorID = "ORG-HGw21"
-
-// isAlreadyVerifiedError reports whether err is that rejection. create decides
-// whether to generate a challenge from a projection that can lag behind the
-// command that added the domain, so the error is handled as well as avoided.
-// The ID is matched rather than the bare FailedPrecondition code, which the API
-// also uses to reject requests that genuinely have to fail the apply.
-func isAlreadyVerifiedError(err error) bool {
-	if status.Code(err) != codes.FailedPrecondition {
-		return false
-	}
-	return strings.Contains(status.Convert(err).Message(), alreadyVerifiedErrorID)
-}
-
-// fetchDomain returns the named domain of an organization, or nil when it is
-// not (yet) listed.
-func fetchDomain(ctx context.Context, client *orgV2.Client, orgID, domain string) (*org.Domain, error) {
-	resp, err := client.ListOrganizationDomains(ctx, &org.ListOrganizationDomainsRequest{
-		OrganizationId: orgID,
-		Filters: []*org.DomainSearchFilter{
-			{
-				Filter: &org.DomainSearchFilter_DomainFilter{
-					DomainFilter: &org.OrganizationDomainQuery{
-						Domain: domain,
-					},
-				},
-			},
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	if len(resp.Domains) == 0 {
-		return nil, nil
-	}
-	return resp.Domains[0], nil
-}
-
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	tflog.Info(ctx, "started update")
 	clientinfo, ok := m.(*helper.ClientInfo)
@@ -220,7 +139,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		if !hasValidationType(d) {
 			requiresValidation, err := domainValidationRequired(ctx, clientinfo, orgID)
 			if err != nil {
-				return diag.Errorf("failed to get domain policy of organization %s: %v", orgID, err)
+				return diag.Errorf("failed to get domain policy: %v", err)
 			}
 			if requiresValidation {
 				return verifyNeedsValidationTypeError(orgID)
@@ -380,4 +299,62 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	d.SetId(fmt.Sprintf("%s", orgID))
 	return diag.FromErr(d.Set(domainsVar, domains))
+}
+
+// hasValidationType reports whether the configuration asks for a validation
+// challenge. validation_type is optional, and the unspecified enum member is
+// rejected by the API, so both are treated as "no challenge wanted".
+func hasValidationType(d *schema.ResourceData) bool {
+	validationType := d.Get(ValidationTypeVar).(string)
+	return validationType != "" &&
+		validationType != org.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED.String()
+}
+
+// verifyNeedsValidationTypeError reports that verify cannot be honoured without
+// a validation_type, which ZITADEL would otherwise answer with an opaque
+// failure about a challenge that was never generated.
+func verifyNeedsValidationTypeError(orgID string) diag.Diagnostics {
+	return diag.Errorf(
+		"%s needs %s when the domain policy of organization %s has validate_org_domains enabled, "+
+			"because ZITADEL verifies a domain against a published validation challenge",
+		VerifyVar, ValidationTypeVar, orgID)
+}
+
+// domainValidationRequired reports whether the organizations effective domain
+// policy makes ZITADEL require ownership validation for added org domains. When
+// it does not - the default - a domain is verified as part of being added.
+func domainValidationRequired(ctx context.Context, clientinfo *helper.ClientInfo, orgID string) (bool, error) {
+	client, err := helper.GetManagementClient(ctx, clientinfo)
+	if err != nil {
+		return false, err
+	}
+	resp, err := client.GetDomainPolicy(helper.CtxSetOrgID(ctx, orgID), &management.GetDomainPolicyRequest{})
+	if err != nil {
+		return false, err
+	}
+	return resp.GetPolicy().GetValidateOrgDomains(), nil
+}
+
+// fetchDomain returns the named domain of an organization, or nil when it is
+// not (yet) listed.
+func fetchDomain(ctx context.Context, client *orgV2.Client, orgID, domain string) (*org.Domain, error) {
+	resp, err := client.ListOrganizationDomains(ctx, &org.ListOrganizationDomainsRequest{
+		OrganizationId: orgID,
+		Filters: []*org.DomainSearchFilter{
+			{
+				Filter: &org.DomainSearchFilter_DomainFilter{
+					DomainFilter: &org.OrganizationDomainQuery{
+						Domain: domain,
+					},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(resp.Domains) == 0 {
+		return nil, nil
+	}
+	return resp.Domains[0], nil
 }
