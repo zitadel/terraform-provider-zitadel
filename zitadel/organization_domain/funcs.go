@@ -54,6 +54,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get domain policy: %v", err)
 	}
 
+	// A domain that is being added cannot have a challenge yet, so verifying it
+	// without generating one can only fail. An existing domain can have one from
+	// zitadel_organization_domain_validation, which is why update does not check.
 	verify := d.Get(VerifyVar).(bool)
 	if requiresValidation && verify && !hasValidationType(d) {
 		return verifyNeedsValidationTypeError(orgID)
@@ -115,24 +118,13 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChange(VerifyVar) && d.Get(VerifyVar).(bool) {
-		orgID := d.Get(OrganizationIDVar).(string)
-		if !hasValidationType(d) {
-			requiresValidation, err := domainValidationRequired(ctx, clientinfo, orgID)
-			if err != nil {
-				return diag.Errorf("failed to get domain policy: %v", err)
-			}
-			if requiresValidation {
-				return verifyNeedsValidationTypeError(orgID)
-			}
-		}
-
 		client, err := helper.GetOrgClient(ctx, clientinfo)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 
 		_, err = client.VerifyOrganizationDomain(ctx, &org.VerifyOrganizationDomainRequest{
-			OrganizationId: orgID,
+			OrganizationId: d.Get(OrganizationIDVar).(string),
 			Domain:         d.Get(DomainVar).(string),
 		})
 		if err != nil {
