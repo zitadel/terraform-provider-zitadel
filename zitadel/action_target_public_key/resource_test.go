@@ -3,7 +3,9 @@ package action_target_public_key_test
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -205,7 +207,7 @@ EOT
 //     deactivated when terraform applies a config that omits the `active` field.
 //   - Removing `active` from config must NOT change the remote activation state.
 //   - Adding `active = true` to config when the server is already active must be a
-//     plan/apply no-op (FailedPrecondition idempotency).
+//     plan/apply no-op.
 func TestAccActionTargetPublicKeyNoAccidentalToggle(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_public_key")
 
@@ -263,7 +265,7 @@ EOT
 		if _, err := client.ActivatePublicKey(context.Background(), &actionv2.ActivatePublicKeyRequest{
 			TargetId: captured.targetID,
 			KeyId:    captured.keyID,
-		}); err != nil && helper.IgnorePreconditionError(err) != nil {
+		}); err != nil {
 			t.Fatalf("external activation failed: %v", err)
 		}
 	}
@@ -303,7 +305,7 @@ EOT
 				PlanOnly: true,
 			},
 			// Adding `active = true` to config when the server already matches must be a
-			// no-op (idempotent activate; FailedPrecondition is swallowed).
+			// no-op.
 			{
 				Config: configActiveTrue,
 				Check: resource.ComposeTestCheckFunc(
@@ -318,6 +320,87 @@ EOT
 				Check: resource.ComposeTestCheckFunc(
 					test_utils.CheckAMinute(checkRemoteProperty(frame, true)),
 				),
+			},
+		},
+	})
+}
+
+// TestAccActionTargetPublicKeyActivateExpired verifies that activating a key
+// ZITADEL refuses because it is expired fails the apply with the server's error
+// and leaves the key inactive on the server.
+func TestAccActionTargetPublicKeyActivateExpired(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target_public_key")
+
+	// Terraform takes the expiry right before it adds the key, so a slow setup
+	// cannot push the creation past it, and ignores the recomputed timestamp
+	// afterwards so it does not force a replacement.
+	config := func(active bool) string {
+		activeAttribute := ""
+		if active {
+			activeAttribute = "  active          = true\n"
+		}
+		return fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_ASYNC"
+  timeout            = "10s"
+  interrupt_on_error = false
+  payload_type       = "PAYLOAD_TYPE_JWE"
+}
+
+resource "zitadel_action_target_public_key" "default" {
+  target_id       = zitadel_action_target.default.id
+  expiration_date = timeadd(timestamp(), "20s")
+%s  public_key      = <<-EOT
+%s
+EOT
+
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID, activeAttribute, testPublicKey)
+	}
+
+	// The expiry the server stored, taken from state after the create.
+	var expiry time.Time
+	captureExpiry := func(state *terraform.State) error {
+		rs, ok := state.RootModule().Resources[frame.TerraformName]
+		if !ok {
+			return fmt.Errorf("not found: %s", frame.TerraformName)
+		}
+		parsed, err := time.Parse(time.RFC3339, rs.Primary.Attributes["expiration_date"])
+		if err != nil {
+			return fmt.Errorf("parsing expiration_date failed: %w", err)
+		}
+		expiry = parsed
+		return nil
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config(false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "active", "false"),
+					captureExpiry,
+					test_utils.CheckAMinute(checkRemoteProperty(frame, false)),
+				),
+			},
+			{
+				PreConfig: func() {
+					time.Sleep(time.Until(expiry) + 5*time.Second)
+				},
+				Config:      config(true),
+				ExpectError: regexp.MustCompile(`Target public key is expired`),
+			},
+			{
+				// The rejected activation must not have changed the server.
+				Config: config(false),
+				Check:  test_utils.CheckAMinute(checkRemoteProperty(frame, false)),
 			},
 		},
 	})

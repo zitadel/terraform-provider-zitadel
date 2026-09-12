@@ -51,8 +51,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			}
 		}
 
+		// Unlike the default policy updates, SetRestrictions uses FailedPrecondition
+		// to reject a request, not to report that nothing changed.
 		_, err := client.SetRestrictions(ctx, req)
-		if helper.IgnorePreconditionError(err) != nil {
+		if err != nil {
 			return diag.Errorf("failed to update instance restrictions: %v", err)
 		}
 	}

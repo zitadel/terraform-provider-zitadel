@@ -533,6 +533,10 @@ func IgnoreIfNotFoundError(err error) error {
 	return err
 }
 
+// IgnorePreconditionError treats a FailedPrecondition status as success. ZITADEL
+// returns that code when an update changed nothing, which the zitadel_default_*
+// policy resources rely on, but also to reject a request, and the client cannot
+// tell the two apart. Only use it on calls that never reject with that code.
 func IgnorePreconditionError(err error) error {
 	if code := status.Code(err); code == codes.FailedPrecondition {
 		return nil

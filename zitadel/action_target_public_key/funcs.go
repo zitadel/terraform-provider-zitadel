@@ -52,7 +52,8 @@ func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	targetID := d.Get(targetIDVar).(string)
 	keyID := d.Id()
 
-	// ZITADEL requires deactivating a key before it can be removed.
+	// ZITADEL requires deactivating a key before it can be removed. A missing key
+	// or target fails this with FailedPrecondition, which means the delete is done.
 	_, err = client.DeactivatePublicKey(ctx, &actionv2.DeactivatePublicKeyRequest{
 		TargetId: targetID,
 		KeyId:    keyID,
@@ -111,8 +112,8 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// An unset active leaves the key in ZITADEL's default (inactive) state to preserve
 	// pre-existing behavior for configs that don't set the field.
 	// d.SetId above ensures the key is tracked in state even if activation fails;
-	// the next apply will retry via the Update path rather than orphan or duplicate it.
-	// FailedPrecondition (key already active) is treated as idempotent success.
+	// it is then replaced on the next apply rather than orphaned or duplicated.
+	// Activating an already active key succeeds, so every error is returned.
 	//
 	// Inspect the raw config (not d.Get/d.GetOkExists, which blend state and
 	// config) so this stays correct on Optional+Computed attributes where state
@@ -134,7 +135,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		if _, err := client.ActivatePublicKey(ctx, &actionv2.ActivatePublicKeyRequest{
 			TargetId: req.TargetId,
 			KeyId:    resp.GetKeyId(),
-		}); err != nil && helper.IgnorePreconditionError(err) != nil {
+		}); err != nil {
 			return diag.Errorf("failed to activate public key: %v", err)
 		}
 		if err := d.Set(activeVar, true); err != nil {
@@ -180,18 +181,20 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	targetID := d.Get(targetIDVar).(string)
 	keyID := d.Id()
 
+	// Both calls succeed when the key already is in the requested state, so every
+	// error is returned.
 	if wantActive {
 		if _, err := client.ActivatePublicKey(ctx, &actionv2.ActivatePublicKeyRequest{
 			TargetId: targetID,
 			KeyId:    keyID,
-		}); err != nil && helper.IgnorePreconditionError(err) != nil {
+		}); err != nil {
 			return diag.Errorf("failed to activate public key: %v", err)
 		}
 	} else {
 		if _, err := client.DeactivatePublicKey(ctx, &actionv2.DeactivatePublicKeyRequest{
 			TargetId: targetID,
 			KeyId:    keyID,
-		}); err != nil && helper.IgnorePreconditionError(err) != nil {
+		}); err != nil {
 			return diag.Errorf("failed to deactivate public key: %v", err)
 		}
 	}
