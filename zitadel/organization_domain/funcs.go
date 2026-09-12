@@ -51,6 +51,26 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	orgID := d.Get(OrganizationIDVar).(string)
 	domain := d.Get(DomainVar).(string)
 
+	// Unless the organization's effective domain policy requires org domains to
+	// be validated, ZITADEL verifies the domain while adding it, so there is
+	// nothing left to challenge and asking for a validation anyway is rejected
+	// with ORG-HGw21. The policy is asked rather than the domain itself because
+	// the projection a domain read goes through can still report a freshly
+	// added and auto-verified domain as unverified. It is also asked before the
+	// domain is added so the check below can reject a doomed configuration
+	// without leaving a domain behind.
+	requiresValidation, err := domainValidationRequired(ctx, clientinfo, orgID)
+	if err != nil {
+		return diag.Errorf("failed to get domain policy of organization %s: %v", orgID, err)
+	}
+
+	// ZITADEL verifies a domain by checking a published challenge, so asking to
+	// verify without asking for a challenge can never succeed under this policy.
+	// validation_type is optional, which makes that combination expressible.
+	if requiresValidation && d.Get(VerifyVar).(bool) && !hasValidationType(d) {
+		return verifyNeedsValidationTypeError(orgID)
+	}
+
 	_, err = client.AddOrganizationDomain(ctx, &org.AddOrganizationDomainRequest{
 		OrganizationId: orgID,
 		Domain:         domain,
@@ -64,16 +84,6 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	// by hand in the console.
 	d.SetId(domain)
 
-	// Unless the organizations effective domain policy requires org domains to
-	// be validated, ZITADEL verifies the domain while adding it, so there is
-	// nothing left to challenge and asking for a validation anyway is rejected
-	// with ORG-HGw21. The policy is asked rather than the domain itself because
-	// the projection a domain read goes through can still report a freshly
-	// added and auto-verified domain as unverified.
-	requiresValidation, err := domainValidationRequired(ctx, clientinfo, orgID)
-	if err != nil {
-		return diag.Errorf("failed to get domain policy of organization %s: %v", orgID, err)
-	}
 	verified := !requiresValidation
 
 	if !verified && hasValidationType(d) {
@@ -118,6 +128,16 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to set %s: %v", IsPrimaryVar, err)
 	}
 	return nil
+}
+
+// verifyNeedsValidationTypeError reports that verify cannot be honoured without
+// a validation_type, which ZITADEL would otherwise answer with an opaque
+// failure about a challenge that was never generated.
+func verifyNeedsValidationTypeError(orgID string) diag.Diagnostics {
+	return diag.Errorf(
+		"%s needs %s when the domain policy of organization %s has validate_org_domains enabled, "+
+			"because ZITADEL verifies a domain against a published validation challenge",
+		VerifyVar, ValidationTypeVar, orgID)
 }
 
 // domainValidationRequired reports whether the organizations effective domain
@@ -192,13 +212,28 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 
 	if d.HasChange(VerifyVar) && d.Get(VerifyVar).(bool) {
+		orgID := d.Get(OrganizationIDVar).(string)
+
+		// Turning verify on without a challenge to check fails the same way it
+		// does on create, so it is rejected the same way. The policy is only
+		// looked up for that combination to keep the common update a single call.
+		if !hasValidationType(d) {
+			requiresValidation, err := domainValidationRequired(ctx, clientinfo, orgID)
+			if err != nil {
+				return diag.Errorf("failed to get domain policy of organization %s: %v", orgID, err)
+			}
+			if requiresValidation {
+				return verifyNeedsValidationTypeError(orgID)
+			}
+		}
+
 		client, err := helper.GetOrgClient(ctx, clientinfo)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 
 		_, err = client.VerifyOrganizationDomain(ctx, &org.VerifyOrganizationDomainRequest{
-			OrganizationId: d.Get(OrganizationIDVar).(string),
+			OrganizationId: orgID,
 			Domain:         d.Get(DomainVar).(string),
 		})
 		if err != nil {

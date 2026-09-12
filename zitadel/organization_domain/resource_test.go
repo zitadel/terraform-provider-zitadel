@@ -3,6 +3,7 @@ package organization_domain_test
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -139,6 +140,41 @@ resource "zitadel_organization_domain" "default" {
 					resource.TestCheckResourceAttrSet(frame.TerraformName, "validation_token"),
 					checkDomainExists(frame, domainName),
 				),
+			},
+		},
+	})
+}
+
+// TestAccOrganizationDomainVerifyWithoutValidationType covers the combination
+// that making validation_type optional newly allows to be expressed but that
+// can never succeed: under a policy that requires validation there is no
+// challenge for ZITADEL to check, so verify is rejected with an actionable
+// error before the domain is added.
+func TestAccOrganizationDomainVerifyWithoutValidationType(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_organization_domain")
+	domainName := frame.UniqueResourcesID + ".example.com"
+
+	resourceConfig := fmt.Sprintf(`
+%s
+resource "zitadel_organization" "default" {
+  name = "%s"
+}
+%s
+
+resource "zitadel_organization_domain" "default" {
+  organization_id = zitadel_organization.default.id
+  domain          = "%s"
+  verify          = true
+  depends_on      = [zitadel_domain_policy.default]
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID, domainPolicy(true), domainName)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config:      resourceConfig,
+				ExpectError: regexp.MustCompile(`verify needs validation_type when the domain policy`),
 			},
 		},
 	})
