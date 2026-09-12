@@ -15,11 +15,16 @@ Domain of an organization, using the org/v2 API. **Requires ZITADEL 4.x.** For 3
 resource "zitadel_organization_domain" "default" {
   organization_id = zitadel_organization.default.id
   domain          = "example.com"
+}
+
+resource "zitadel_organization_domain" "validated" {
+  organization_id = zitadel_organization.default.id
+  domain          = "validated.example.com"
   validation_type = "DOMAIN_VALIDATION_TYPE_DNS"
 }
 
 output "dns_validation_token" {
-  value     = zitadel_organization_domain.default.validation_token
+  value     = zitadel_organization_domain.validated.validation_token
   sensitive = true
 }
 
@@ -38,10 +43,10 @@ resource "zitadel_organization_domain" "verified" {
 
 - `domain` (String) Domain name to be added to the organization
 - `organization_id` (String) ID of the organization
-- `validation_type` (String) Type of domain validation, supported values: DOMAIN_VALIDATION_TYPE_UNSPECIFIED, DOMAIN_VALIDATION_TYPE_HTTP, DOMAIN_VALIDATION_TYPE_DNS
 
 ### Optional
 
+- `validation_type` (String) Type of domain validation. Leave unset when the organization's domain policy has `validate_org_domains` disabled (the default), as ZITADEL then verifies the domain while adding it and there is no challenge to generate, supported values: DOMAIN_VALIDATION_TYPE_UNSPECIFIED, DOMAIN_VALIDATION_TYPE_HTTP, DOMAIN_VALIDATION_TYPE_DNS
 - `verify` (Boolean) Trigger domain verification. Set to true after adding DNS/HTTP validation.
 
 ### Read-Only

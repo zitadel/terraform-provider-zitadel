@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	org "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org/v2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -46,6 +47,21 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	orgID := d.Get(OrganizationIDVar).(string)
 	domain := d.Get(DomainVar).(string)
 
+	// Without validate_org_domains ZITADEL verifies the domain while adding it,
+	// leaving no challenge to generate.
+	requiresValidation, err := domainValidationRequired(ctx, clientinfo, orgID)
+	if err != nil {
+		return diag.Errorf("failed to get domain policy: %v", err)
+	}
+
+	// A domain that is being added cannot have a challenge yet, so verifying it
+	// without generating one can only fail. An existing domain can have one from
+	// zitadel_organization_domain_validation, which is why update does not check.
+	verify := d.Get(VerifyVar).(bool)
+	if requiresValidation && verify && !hasValidationType(d) {
+		return verifyNeedsValidationTypeError(orgID)
+	}
+
 	_, err = client.AddOrganizationDomain(ctx, &org.AddOrganizationDomainRequest{
 		OrganizationId: orgID,
 		Domain:         domain,
@@ -53,27 +69,28 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	validationType := d.Get(ValidationTypeVar).(string)
-	validationResp, err := client.GenerateOrganizationDomainValidation(ctx, &org.GenerateOrganizationDomainValidationRequest{
-		OrganizationId: orgID,
-		Domain:         domain,
-		Type:           org.DomainValidationType(org.DomainValidationType_value[validationType]),
-	})
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	d.SetId(domain)
-	if err := d.Set(ValidationTokenVar, validationResp.GetToken()); err != nil {
-		return diag.Errorf("failed to set validation_token: %v", err)
-	}
-	if err := d.Set(ValidationURLVar, validationResp.GetUrl()); err != nil {
-		return diag.Errorf("failed to set validation_url: %v", err)
+
+	verified := !requiresValidation
+	if !verified && hasValidationType(d) {
+		validationType := d.Get(ValidationTypeVar).(string)
+		validationResp, err := client.GenerateOrganizationDomainValidation(ctx, &org.GenerateOrganizationDomainValidationRequest{
+			OrganizationId: orgID,
+			Domain:         domain,
+			Type:           org.DomainValidationType(org.DomainValidationType_value[validationType]),
+		})
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		if err := d.Set(ValidationTokenVar, validationResp.GetToken()); err != nil {
+			return diag.Errorf("failed to set validation_token: %v", err)
+		}
+		if err := d.Set(ValidationURLVar, validationResp.GetUrl()); err != nil {
+			return diag.Errorf("failed to set validation_url: %v", err)
+		}
 	}
 
-	verify := d.Get(VerifyVar).(bool)
-	if verify {
+	if !verified && verify {
 		_, err = client.VerifyOrganizationDomain(ctx, &org.VerifyOrganizationDomainRequest{
 			OrganizationId: orgID,
 			Domain:         domain,
@@ -81,9 +98,10 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		if err != nil {
 			return diag.FromErr(err)
 		}
+		verified = true
 	}
 
-	if err := d.Set(IsVerifiedVar, verify); err != nil {
+	if err := d.Set(IsVerifiedVar, verified); err != nil {
 		return diag.Errorf("failed to set %s: %v", IsVerifiedVar, err)
 	}
 	if err := d.Set(IsPrimaryVar, false); err != nil {
@@ -279,4 +297,38 @@ func list(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 
 	d.SetId(fmt.Sprintf("%s", orgID))
 	return diag.FromErr(d.Set(domainsVar, domains))
+}
+
+// hasValidationType reports whether the configuration asks for a validation
+// challenge. The unspecified enum member is rejected by the API.
+func hasValidationType(d *schema.ResourceData) bool {
+	validationType := d.Get(ValidationTypeVar).(string)
+	return validationType != "" &&
+		validationType != org.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED.String()
+}
+
+// verifyNeedsValidationTypeError reports that verify cannot be honoured because
+// there is no validation challenge for ZITADEL to check.
+func verifyNeedsValidationTypeError(orgID string) diag.Diagnostics {
+	return diag.Errorf(
+		"%s needs %s when the domain policy of organization %s has validate_org_domains enabled, "+
+			"because ZITADEL verifies a domain against a published validation challenge",
+		VerifyVar, ValidationTypeVar, orgID)
+}
+
+// domainValidationRequired reports whether the organization's domain policy
+// requires org domains to be validated. It reads the policy through the v1
+// management API because settings/v2 GetDomainSettings requires the policy.read
+// permission while GetDomainPolicy only requires authenticated, and adding a
+// domain itself only needs org.write.
+func domainValidationRequired(ctx context.Context, clientinfo *helper.ClientInfo, orgID string) (bool, error) {
+	client, err := helper.GetManagementClient(ctx, clientinfo)
+	if err != nil {
+		return false, err
+	}
+	resp, err := client.GetDomainPolicy(helper.CtxSetOrgID(ctx, orgID), &management.GetDomainPolicyRequest{})
+	if err != nil {
+		return false, err
+	}
+	return resp.GetPolicy().GetValidateOrgDomains(), nil
 }

@@ -27,9 +27,9 @@ func GetResource() *schema.Resource {
 			},
 			ValidationTypeVar: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				ForceNew:    true,
-				Description: "Type of domain validation" + helper.DescriptionEnumValuesList(org.DomainValidationType_name),
+				Description: "Type of domain validation. Leave unset when the organization's domain policy has `validate_org_domains` disabled (the default), as ZITADEL then verifies the domain while adding it and there is no challenge to generate" + helper.DescriptionEnumValuesList(org.DomainValidationType_name),
 				ValidateDiagFunc: func(value interface{}, path cty.Path) diag.Diagnostics {
 					return helper.EnumValueValidation(ValidationTypeVar, value, org.DomainValidationType_value)
 				},
