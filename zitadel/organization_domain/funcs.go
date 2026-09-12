@@ -177,7 +177,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	orgID := d.Get(OrganizationIDVar).(string)
 	domain := d.Id()
 
-	remoteDomain, err := fetchDomain(ctx, client, orgID, domain)
+	remoteDomain, err := getDomain(ctx, client, orgID, domain)
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -218,7 +218,7 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 	orgID := helper.GetID(d, OrganizationIDVar)
 	domain := helper.GetID(d, DomainVar)
 
-	remoteDomain, err := fetchDomain(ctx, client, orgID, domain)
+	remoteDomain, err := getDomain(ctx, client, orgID, domain)
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -335,9 +335,9 @@ func domainValidationRequired(ctx context.Context, clientinfo *helper.ClientInfo
 	return resp.GetPolicy().GetValidateOrgDomains(), nil
 }
 
-// fetchDomain returns the named domain of an organization, or nil when it is
+// getDomain returns the named domain of an organization, or nil when it is
 // not (yet) listed.
-func fetchDomain(ctx context.Context, client *orgV2.Client, orgID, domain string) (*org.Domain, error) {
+func getDomain(ctx context.Context, client *orgV2.Client, orgID, domain string) (*org.Domain, error) {
 	resp, err := client.ListOrganizationDomains(ctx, &org.ListOrganizationDomainsRequest{
 		OrganizationId: orgID,
 		Filters: []*org.DomainSearchFilter{
