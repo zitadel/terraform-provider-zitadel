@@ -3,11 +3,16 @@ package organization_domain
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	orgV2 "github.com/zitadel/zitadel-go/v3/pkg/client/org/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	org "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/org/v2"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -53,27 +58,47 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	validationType := d.Get(ValidationTypeVar).(string)
-	validationResp, err := client.GenerateOrganizationDomainValidation(ctx, &org.GenerateOrganizationDomainValidationRequest{
-		OrganizationId: orgID,
-		Domain:         domain,
-		Type:           org.DomainValidationType(org.DomainValidationType_value[validationType]),
-	})
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
+	// The domain exists from here on, so claim the ID before anything else can
+	// fail. Otherwise an error in one of the calls below leaves a domain that
+	// ZITADEL knows about and Terraform does not, which can only be cleaned up
+	// by hand in the console.
 	d.SetId(domain)
-	if err := d.Set(ValidationTokenVar, validationResp.GetToken()); err != nil {
-		return diag.Errorf("failed to set validation_token: %v", err)
+
+	// Unless the organizations effective domain policy requires org domains to
+	// be validated, ZITADEL verifies the domain while adding it, so there is
+	// nothing left to challenge and asking for a validation anyway is rejected
+	// with ORG-HGw21. The policy is asked rather than the domain itself because
+	// the projection a domain read goes through can still report a freshly
+	// added and auto-verified domain as unverified.
+	requiresValidation, err := domainValidationRequired(ctx, clientinfo, orgID)
+	if err != nil {
+		return diag.Errorf("failed to get domain policy of organization %s: %v", orgID, err)
 	}
-	if err := d.Set(ValidationURLVar, validationResp.GetUrl()); err != nil {
-		return diag.Errorf("failed to set validation_url: %v", err)
+	verified := !requiresValidation
+
+	if !verified && hasValidationType(d) {
+		validationType := d.Get(ValidationTypeVar).(string)
+		validationResp, err := client.GenerateOrganizationDomainValidation(ctx, &org.GenerateOrganizationDomainValidationRequest{
+			OrganizationId: orgID,
+			Domain:         domain,
+			Type:           org.DomainValidationType(org.DomainValidationType_value[validationType]),
+		})
+		switch {
+		case isAlreadyVerifiedError(err):
+			verified = true
+		case err != nil:
+			return diag.FromErr(err)
+		default:
+			if err := d.Set(ValidationTokenVar, validationResp.GetToken()); err != nil {
+				return diag.Errorf("failed to set validation_token: %v", err)
+			}
+			if err := d.Set(ValidationURLVar, validationResp.GetUrl()); err != nil {
+				return diag.Errorf("failed to set validation_url: %v", err)
+			}
+		}
 	}
 
-	verify := d.Get(VerifyVar).(bool)
-	if verify {
+	if !verified && d.Get(VerifyVar).(bool) {
 		_, err = client.VerifyOrganizationDomain(ctx, &org.VerifyOrganizationDomainRequest{
 			OrganizationId: orgID,
 			Domain:         domain,
@@ -81,15 +106,82 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		if err != nil {
 			return diag.FromErr(err)
 		}
+		verified = true
 	}
 
-	if err := d.Set(IsVerifiedVar, verify); err != nil {
+	if err := d.Set(IsVerifiedVar, verified); err != nil {
 		return diag.Errorf("failed to set %s: %v", IsVerifiedVar, err)
 	}
+	// A newly added domain is never the primary one; a later read picks up the
+	// change if it is promoted afterwards.
 	if err := d.Set(IsPrimaryVar, false); err != nil {
 		return diag.Errorf("failed to set %s: %v", IsPrimaryVar, err)
 	}
 	return nil
+}
+
+// domainValidationRequired reports whether the organizations effective domain
+// policy makes ZITADEL require ownership validation for added org domains. When
+// it does not - the default - a domain is verified as part of being added.
+func domainValidationRequired(ctx context.Context, clientinfo *helper.ClientInfo, orgID string) (bool, error) {
+	client, err := helper.GetManagementClient(ctx, clientinfo)
+	if err != nil {
+		return false, err
+	}
+	resp, err := client.GetDomainPolicy(helper.CtxSetOrgID(ctx, orgID), &management.GetDomainPolicyRequest{})
+	if err != nil {
+		return false, err
+	}
+	return resp.GetPolicy().GetValidateOrgDomains(), nil
+}
+
+// hasValidationType reports whether the configuration asks for a validation
+// challenge. validation_type is optional, and the unspecified enum member is
+// rejected by the API, so both are treated as "no challenge wanted".
+func hasValidationType(d *schema.ResourceData) bool {
+	validationType := d.Get(ValidationTypeVar).(string)
+	return validationType != "" &&
+		validationType != org.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED.String()
+}
+
+// alreadyVerifiedErrorID is the ZITADEL error ID for generating a validation
+// challenge for a domain that is already verified.
+const alreadyVerifiedErrorID = "ORG-HGw21"
+
+// isAlreadyVerifiedError reports whether err is that rejection. create decides
+// whether to generate a challenge from a projection that can lag behind the
+// command that added the domain, so the error is handled as well as avoided.
+// The ID is matched rather than the bare FailedPrecondition code, which the API
+// also uses to reject requests that genuinely have to fail the apply.
+func isAlreadyVerifiedError(err error) bool {
+	if status.Code(err) != codes.FailedPrecondition {
+		return false
+	}
+	return strings.Contains(status.Convert(err).Message(), alreadyVerifiedErrorID)
+}
+
+// fetchDomain returns the named domain of an organization, or nil when it is
+// not (yet) listed.
+func fetchDomain(ctx context.Context, client *orgV2.Client, orgID, domain string) (*org.Domain, error) {
+	resp, err := client.ListOrganizationDomains(ctx, &org.ListOrganizationDomainsRequest{
+		OrganizationId: orgID,
+		Filters: []*org.DomainSearchFilter{
+			{
+				Filter: &org.DomainSearchFilter_DomainFilter{
+					DomainFilter: &org.OrganizationDomainQuery{
+						Domain: domain,
+					},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(resp.Domains) == 0 {
+		return nil, nil
+	}
+	return resp.Domains[0], nil
 }
 
 func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -131,18 +223,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	orgID := d.Get(OrganizationIDVar).(string)
 	domain := d.Id()
 
-	resp, err := client.ListOrganizationDomains(ctx, &org.ListOrganizationDomainsRequest{
-		OrganizationId: orgID,
-		Filters: []*org.DomainSearchFilter{
-			{
-				Filter: &org.DomainSearchFilter_DomainFilter{
-					DomainFilter: &org.OrganizationDomainQuery{
-						Domain: domain,
-					},
-				},
-			},
-		},
-	})
+	remoteDomain, err := fetchDomain(ctx, client, orgID, domain)
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -151,12 +232,10 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get domain: %v", err)
 	}
 
-	if len(resp.Domains) == 0 {
+	if remoteDomain == nil {
 		d.SetId("")
 		return nil
 	}
-
-	remoteDomain := resp.Domains[0]
 
 	if err := d.Set(DomainVar, remoteDomain.Domain); err != nil {
 		return diag.Errorf("failed to set domain: %v", err)
@@ -185,18 +264,7 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 	orgID := helper.GetID(d, OrganizationIDVar)
 	domain := helper.GetID(d, DomainVar)
 
-	resp, err := client.ListOrganizationDomains(ctx, &org.ListOrganizationDomainsRequest{
-		OrganizationId: orgID,
-		Filters: []*org.DomainSearchFilter{
-			{
-				Filter: &org.DomainSearchFilter_DomainFilter{
-					DomainFilter: &org.OrganizationDomainQuery{
-						Domain: domain,
-					},
-				},
-			},
-		},
-	})
+	remoteDomain, err := fetchDomain(ctx, client, orgID, domain)
 	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
 		d.SetId("")
 		return nil
@@ -205,12 +273,10 @@ func get(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagno
 		return diag.Errorf("failed to get domain: %v", err)
 	}
 
-	if len(resp.Domains) == 0 {
+	if remoteDomain == nil {
 		d.SetId("")
 		return nil
 	}
-
-	remoteDomain := resp.Domains[0]
 
 	d.SetId(remoteDomain.Domain)
 	if err := d.Set(DomainVar, remoteDomain.Domain); err != nil {
