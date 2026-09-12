@@ -118,7 +118,15 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 			}},
 		},
 	})
-	if err != nil || resp.Result == nil || len(resp.Result) == 0 {
+	if err != nil && helper.IgnoreIfNotFoundError(err) == nil {
+		d.SetId("")
+		return nil
+	}
+	if err != nil {
+		return diag.Errorf("failed to get project role: %v", err)
+	}
+
+	if len(resp.Result) == 0 {
 		d.SetId("")
 		return nil
 	}
