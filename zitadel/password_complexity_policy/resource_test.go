@@ -36,35 +36,11 @@ func TestAccPasswordComplexityPolicy(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
-	return func(expect uint64) resource.TestCheckFunc {
-		return func(state *terraform.State) error {
-			resp, err := frame.GetPasswordComplexityPolicy(frame, &management.GetPasswordComplexityPolicyRequest{})
-			if err != nil {
-				return fmt.Errorf("getting policy failed: %w", err)
-			}
-			actual := resp.GetPolicy().GetMinLength()
-			if actual != expect {
-				return fmt.Errorf("expected %d, but got %d", expect, actual)
-			}
-			return nil
-		}
-	}
-}
-
-// TestAccPasswordComplexityPolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
-// org_id must record the organization of the authenticated service account
-// instead of leaving the resource out of state.
+// TestAccPasswordComplexityPolicyWithoutOrgID covers the report in issue 436:
+// creating the policy without org_id has to record the organization of the
+// authenticated service account instead of leaving the policy out of state.
 func TestAccPasswordComplexityPolicyWithoutOrgID(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_password_complexity_policy")
-
-	resetToDefault := func() {
-		if _, err := frame.ResetPasswordComplexityPolicyToDefault(frame, &management.ResetPasswordComplexityPolicyToDefaultRequest{}); err != nil {
-			t.Logf("resetting policy to default: %v", err)
-		}
-	}
-	resetToDefault()
-	t.Cleanup(resetToDefault)
 
 	config := fmt.Sprintf(`
 %s
@@ -82,7 +58,7 @@ resource "zitadel_password_complexity_policy" "default" {
 		Steps: []resource.TestStep{
 			{
 				Config: config,
-				Check: resource.ComposeAggregateTestCheckFunc(
+				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
 					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
 					checkRemoteProperty(frame)(11),
@@ -94,4 +70,20 @@ resource "zitadel_password_complexity_policy" "default" {
 			},
 		},
 	})
+}
+
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
+	return func(expect uint64) resource.TestCheckFunc {
+		return func(state *terraform.State) error {
+			resp, err := frame.GetPasswordComplexityPolicy(frame, &management.GetPasswordComplexityPolicyRequest{})
+			if err != nil {
+				return fmt.Errorf("getting policy failed: %w", err)
+			}
+			actual := resp.GetPolicy().GetMinLength()
+			if actual != expect {
+				return fmt.Errorf("expected %d, but got %d", expect, actual)
+			}
+			return nil
+		}
+	}
 }

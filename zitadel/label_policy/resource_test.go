@@ -118,6 +118,47 @@ resource "zitadel_label_policy" "default" {
 	})
 }
 
+// TestAccLabelPolicyWithoutOrgID covers the report in issue 436: creating the
+// policy without org_id has to record the organization of the authenticated
+// service account instead of leaving the policy out of state.
+func TestAccLabelPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_label_policy")
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_label_policy" "default" {
+  primary_color          = "#5469d4"
+  hide_login_name_suffix = false
+  warn_color             = "#cd3d56"
+  background_color       = "#ffffff"
+  font_color             = "#000000"
+  primary_color_dark     = "#2073c4"
+  background_color_dark  = "#111827"
+  warn_color_dark        = "#ff3b5b"
+  font_color_dark        = "#ffffff"
+  disable_watermark      = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)("#5469d4"),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
@@ -162,52 +203,3 @@ vP1EKAJsAAIABgAAAh0CkAACAAoAABMzAwETMxMjJyMHrcRj/vjaYN1ZPu9CAQsBQP21ApD9cMjI
 AA==
 `
 )
-
-// TestAccLabelPolicyWithoutOrgID reproduces #436: creating the policy without
-// org_id must record the organization of the authenticated service account
-// instead of leaving the resource out of state.
-func TestAccLabelPolicyWithoutOrgID(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_label_policy")
-
-	resetToDefault := func() {
-		if _, err := frame.ResetLabelPolicyToDefault(frame, &management.ResetLabelPolicyToDefaultRequest{}); err != nil {
-			t.Logf("resetting label policy to default: %v", err)
-		}
-	}
-	resetToDefault()
-	t.Cleanup(resetToDefault)
-
-	config := fmt.Sprintf(`
-%s
-resource "zitadel_label_policy" "default" {
-  primary_color          = "#5469d4"
-  hide_login_name_suffix = false
-  warn_color             = "#cd3d56"
-  background_color       = "#ffffff"
-  font_color             = "#000000"
-  primary_color_dark     = "#2073c4"
-  background_color_dark  = "#111827"
-  warn_color_dark        = "#ff3b5b"
-  font_color_dark        = "#ffffff"
-  disable_watermark      = false
-}
-`, frame.ProviderSnippet)
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
-		Steps: []resource.TestStep{
-			{
-				Config: config,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
-					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
-					checkRemoteProperty(frame)("#5469d4"),
-				),
-			},
-			{
-				Config:   config,
-				PlanOnly: true,
-			},
-		},
-	})
-}

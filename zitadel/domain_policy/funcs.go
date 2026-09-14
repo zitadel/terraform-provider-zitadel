@@ -75,13 +75,13 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	}
 	org := helper.GetID(d, helper.OrgIDVar)
 	if org == "" {
-		mgmtClient, err := helper.GetManagementClient(ctx, clientinfo)
+		managementClient, err := helper.GetManagementClient(ctx, clientinfo)
 		if err != nil {
 			return diag.FromErr(err)
 		}
-		resp, err := mgmtClient.GetMyOrg(ctx, &management.GetMyOrgRequest{})
+		resp, err := managementClient.GetMyOrg(ctx, &management.GetMyOrgRequest{})
 		if err != nil {
-			return diag.Errorf("failed to get organization: %v", err)
+			return diag.Errorf("failed to get org: %v", err)
 		}
 		org = resp.GetOrg().GetId()
 	}

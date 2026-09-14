@@ -40,35 +40,11 @@ func TestPasswordAgePolicy(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
-	return func(expect uint64) resource.TestCheckFunc {
-		return func(state *terraform.State) error {
-			resp, err := frame.GetPasswordAgePolicy(frame, &management.GetPasswordAgePolicyRequest{})
-			if err != nil {
-				return fmt.Errorf("getting policy failed: %w", err)
-			}
-			actual := resp.GetPolicy().GetMaxAgeDays()
-			if actual != expect {
-				return fmt.Errorf("expected %d, but got %d", expect, actual)
-			}
-			return nil
-		}
-	}
-}
-
-// TestAccPasswordAgePolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
-// org_id must record the organization of the authenticated service account
-// instead of leaving the resource out of state.
+// TestAccPasswordAgePolicyWithoutOrgID covers the report in issue 436: creating
+// the policy without org_id has to record the organization of the authenticated
+// service account instead of leaving the policy out of state.
 func TestAccPasswordAgePolicyWithoutOrgID(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_password_age_policy")
-
-	resetToDefault := func() {
-		if _, err := frame.ResetPasswordAgePolicyToDefault(frame, &management.ResetPasswordAgePolicyToDefaultRequest{}); err != nil {
-			t.Logf("resetting policy to default: %v", err)
-		}
-	}
-	resetToDefault()
-	t.Cleanup(resetToDefault)
 
 	config := fmt.Sprintf(`
 %s
@@ -83,7 +59,7 @@ resource "zitadel_password_age_policy" "default" {
 		Steps: []resource.TestStep{
 			{
 				Config: config,
-				Check: resource.ComposeAggregateTestCheckFunc(
+				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
 					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
 					checkRemoteProperty(frame)(30),
@@ -95,4 +71,20 @@ resource "zitadel_password_age_policy" "default" {
 			},
 		},
 	})
+}
+
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
+	return func(expect uint64) resource.TestCheckFunc {
+		return func(state *terraform.State) error {
+			resp, err := frame.GetPasswordAgePolicy(frame, &management.GetPasswordAgePolicyRequest{})
+			if err != nil {
+				return fmt.Errorf("getting policy failed: %w", err)
+			}
+			actual := resp.GetPolicy().GetMaxAgeDays()
+			if actual != expect {
+				return fmt.Errorf("expected %d, but got %d", expect, actual)
+			}
+			return nil
+		}
+	}
 }

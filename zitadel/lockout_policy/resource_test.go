@@ -40,6 +40,38 @@ func TestAccLockoutPolicy(t *testing.T) {
 	)
 }
 
+// TestAccLockoutPolicyWithoutOrgID covers the report in issue 436: creating the
+// policy without org_id has to record the organization of the authenticated
+// service account instead of leaving the policy out of state.
+func TestAccLockoutPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_lockout_policy")
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_lockout_policy" "default" {
+  max_password_attempts = 7
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)(7),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
 	return func(expect uint64) resource.TestCheckFunc {
 		return func(state *terraform.State) error {
@@ -55,44 +87,4 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.T
 			return nil
 		}
 	}
-}
-
-// TestAccLockoutPolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
-// org_id must record the organization of the authenticated service account
-// instead of leaving the resource out of state.
-func TestAccLockoutPolicyWithoutOrgID(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_lockout_policy")
-
-	resetToDefault := func() {
-		if _, err := frame.ResetLockoutPolicyToDefault(frame, &management.ResetLockoutPolicyToDefaultRequest{}); err != nil {
-			t.Logf("resetting policy to default: %v", err)
-		}
-	}
-	resetToDefault()
-	t.Cleanup(resetToDefault)
-
-	config := fmt.Sprintf(`
-%s
-resource "zitadel_lockout_policy" "default" {
-  max_password_attempts = 7
-}
-`, frame.ProviderSnippet)
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
-		Steps: []resource.TestStep{
-			{
-				Config: config,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
-					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
-					checkRemoteProperty(frame)(7),
-				),
-			},
-			{
-				Config:   config,
-				PlanOnly: true,
-			},
-		},
-	})
 }

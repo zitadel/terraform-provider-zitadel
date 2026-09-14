@@ -161,35 +161,11 @@ resource "zitadel_login_policy" "default" {
 	})
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
-	return func(expect string) resource.TestCheckFunc {
-		return func(state *terraform.State) error {
-			resp, err := frame.GetLoginPolicy(frame, &management.GetLoginPolicyRequest{})
-			if err != nil {
-				return fmt.Errorf("getting policy failed: %w", err)
-			}
-			actual := resp.GetPolicy().GetDefaultRedirectUri()
-			if actual != expect {
-				return fmt.Errorf("expected %s, but got %s", expect, actual)
-			}
-			return nil
-		}
-	}
-}
-
-// TestAccLoginPolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
-// org_id must record the organization of the authenticated service account
-// instead of leaving the resource out of state.
+// TestAccLoginPolicyWithoutOrgID covers the report in issue 436: creating the
+// policy without org_id has to record the organization of the authenticated
+// service account instead of leaving the policy out of state.
 func TestAccLoginPolicyWithoutOrgID(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_login_policy")
-
-	resetToDefault := func() {
-		if _, err := frame.ResetLoginPolicyToDefault(frame, &management.ResetLoginPolicyToDefaultRequest{}); err != nil {
-			t.Logf("resetting policy to default: %v", err)
-		}
-	}
-	resetToDefault()
-	t.Cleanup(resetToDefault)
 
 	config := fmt.Sprintf(`
 %s
@@ -216,7 +192,7 @@ resource "zitadel_login_policy" "default" {
 		Steps: []resource.TestStep{
 			{
 				Config: config,
-				Check: resource.ComposeAggregateTestCheckFunc(
+				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
 					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
 					checkRemoteProperty(frame)("localhost:8080"),
@@ -228,4 +204,20 @@ resource "zitadel_login_policy" "default" {
 			},
 		},
 	})
+}
+
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
+	return func(expect string) resource.TestCheckFunc {
+		return func(state *terraform.State) error {
+			resp, err := frame.GetLoginPolicy(frame, &management.GetLoginPolicyRequest{})
+			if err != nil {
+				return fmt.Errorf("getting policy failed: %w", err)
+			}
+			actual := resp.GetPolicy().GetDefaultRedirectUri()
+			if actual != expect {
+				return fmt.Errorf("expected %s, but got %s", expect, actual)
+			}
+			return nil
+		}
+	}
 }

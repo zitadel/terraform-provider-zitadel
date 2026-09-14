@@ -8,7 +8,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain_policy"
@@ -39,35 +38,11 @@ func TestAccDomainPolicy(t *testing.T) {
 	)
 }
 
-func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(bool) resource.TestCheckFunc {
-	return func(expect bool) resource.TestCheckFunc {
-		return func(state *terraform.State) error {
-			resp, err := frame.GetDomainPolicy(frame, &management.GetDomainPolicyRequest{})
-			if err != nil {
-				return fmt.Errorf("getting policy failed: %w", err)
-			}
-			actual := resp.GetPolicy().GetUserLoginMustBeDomain()
-			if actual != expect {
-				return fmt.Errorf("expected %t, but got %t", expect, actual)
-			}
-			return nil
-		}
-	}
-}
-
-// TestAccDomainPolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
-// org_id must record the organization of the authenticated service account
-// instead of leaving the resource out of state.
+// TestAccDomainPolicyWithoutOrgID creates the policy without org_id. The admin
+// API needs an explicit organization, so the organization of the authenticated
+// service account has to be resolved and recorded in state.
 func TestAccDomainPolicyWithoutOrgID(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_domain_policy")
-
-	resetToDefault := func() {
-		if _, err := frame.Admin.ResetCustomDomainPolicyToDefault(frame, &admin.ResetCustomDomainPolicyToDefaultRequest{OrgId: frame.OrgID}); err != nil {
-			t.Logf("resetting policy to default: %v", err)
-		}
-	}
-	resetToDefault()
-	t.Cleanup(resetToDefault)
 
 	config := fmt.Sprintf(`
 %s
@@ -83,7 +58,7 @@ resource "zitadel_domain_policy" "default" {
 		Steps: []resource.TestStep{
 			{
 				Config: config,
-				Check: resource.ComposeAggregateTestCheckFunc(
+				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
 					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
 					checkRemoteProperty(frame)(true),
@@ -95,4 +70,20 @@ resource "zitadel_domain_policy" "default" {
 			},
 		},
 	})
+}
+
+func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(bool) resource.TestCheckFunc {
+	return func(expect bool) resource.TestCheckFunc {
+		return func(state *terraform.State) error {
+			resp, err := frame.GetDomainPolicy(frame, &management.GetDomainPolicyRequest{})
+			if err != nil {
+				return fmt.Errorf("getting policy failed: %w", err)
+			}
+			actual := resp.GetPolicy().GetUserLoginMustBeDomain()
+			if actual != expect {
+				return fmt.Errorf("expected %t, but got %t", expect, actual)
+			}
+			return nil
+		}
+	}
 }
