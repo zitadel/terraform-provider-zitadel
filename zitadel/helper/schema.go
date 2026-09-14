@@ -28,6 +28,14 @@ var (
 		ForceNew:    true,
 	}
 
+	OrgIDComputedResourceField = &schema.Schema{
+		Type:        schema.TypeString,
+		Optional:    true,
+		Computed:    true,
+		Description: "ID of the organization. If not provided, the organization of the authenticated user/service account is used.",
+		ForceNew:    true,
+	}
+
 	ResourceIDDatasourceField = &schema.Schema{
 		Type:        schema.TypeString,
 		Required:    true,

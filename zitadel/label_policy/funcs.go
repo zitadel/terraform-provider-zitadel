@@ -139,13 +139,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.AddCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.AddCustomLabelPolicyRequest{
+	resp, err := client.AddCustomLabelPolicy(helper.CtxWithID(ctx, d), &management.AddCustomLabelPolicyRequest{
 		PrimaryColor:        d.Get(primaryColorVar).(string),
 		HideLoginNameSuffix: d.Get(hideLoginNameSuffixVar).(bool),
 		WarnColor:           d.Get(warnColorVar).(string),
@@ -161,7 +160,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to create label policy: %v", err)
 	}
+	org := resp.GetDetails().GetResourceOwner()
 	d.SetId(org)
+	if err := d.Set(helper.OrgIDVar, org); err != nil {
+		return diag.FromErr(err)
+	}
 
 	if d.Get(LogoHashVar) != "" && d.Get(LogoPathVar) != "" {
 		if err := helper.OrgFormFilePost(ctx, clientinfo, logoURL, d.Get(LogoPathVar).(string), org); err != nil {

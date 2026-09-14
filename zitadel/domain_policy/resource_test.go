@@ -8,6 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/domain_policy"
@@ -52,4 +53,46 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(bool) resource.Tes
 			return nil
 		}
 	}
+}
+
+// TestAccDomainPolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
+// org_id must record the organization of the authenticated service account
+// instead of leaving the resource out of state.
+func TestAccDomainPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_domain_policy")
+
+	resetToDefault := func() {
+		if _, err := frame.Admin.ResetCustomDomainPolicyToDefault(frame, &admin.ResetCustomDomainPolicyToDefaultRequest{OrgId: frame.OrgID}); err != nil {
+			t.Logf("resetting policy to default: %v", err)
+		}
+	}
+	resetToDefault()
+	t.Cleanup(resetToDefault)
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_domain_policy" "default" {
+  user_login_must_be_domain                   = true
+  validate_org_domains                        = false
+  smtp_sender_address_matches_instance_domain = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)(true),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
 }

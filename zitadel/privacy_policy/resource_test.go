@@ -47,3 +47,43 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.T
 		}
 	}
 }
+
+// TestAccPrivacyPolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
+// org_id must record the organization of the authenticated service account
+// instead of leaving the resource out of state.
+func TestAccPrivacyPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_privacy_policy")
+
+	resetToDefault := func() {
+		if _, err := frame.ResetPrivacyPolicyToDefault(frame, &management.ResetPrivacyPolicyToDefaultRequest{}); err != nil {
+			t.Logf("resetting policy to default: %v", err)
+		}
+	}
+	resetToDefault()
+	t.Cleanup(resetToDefault)
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_privacy_policy" "default" {
+  help_link = "https://example.com/help"
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)("https://example.com/help"),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}

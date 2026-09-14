@@ -176,3 +176,56 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.T
 		}
 	}
 }
+
+// TestAccLoginPolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
+// org_id must record the organization of the authenticated service account
+// instead of leaving the resource out of state.
+func TestAccLoginPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_login_policy")
+
+	resetToDefault := func() {
+		if _, err := frame.ResetLoginPolicyToDefault(frame, &management.ResetLoginPolicyToDefaultRequest{}); err != nil {
+			t.Logf("resetting policy to default: %v", err)
+		}
+	}
+	resetToDefault()
+	t.Cleanup(resetToDefault)
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_login_policy" "default" {
+  user_login                    = true
+  allow_register                = false
+  allow_external_idp            = false
+  force_mfa                     = false
+  force_mfa_local_only          = false
+  passwordless_type             = "PASSWORDLESS_TYPE_ALLOWED"
+  hide_password_reset           = false
+  password_check_lifetime       = "240h0m0s"
+  external_login_check_lifetime = "240h0m0s"
+  multi_factor_check_lifetime   = "24h0m0s"
+  mfa_init_skip_lifetime        = "720h0m0s"
+  second_factor_check_lifetime  = "24h0m0s"
+  ignore_unknown_usernames      = false
+  default_redirect_uri          = "localhost:8080"
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)("localhost:8080"),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}

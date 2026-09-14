@@ -61,14 +61,17 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	org := d.Get(helper.OrgIDVar).(string)
-	_, err = client.AddCustomNotificationPolicy(helper.CtxWithID(ctx, d), &management.AddCustomNotificationPolicyRequest{
+	resp, err := client.AddCustomNotificationPolicy(helper.CtxWithID(ctx, d), &management.AddCustomNotificationPolicyRequest{
 		PasswordChange: d.Get(passwordChangeVar).(bool),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create notification policy: %v", err)
 	}
+	org := resp.GetDetails().GetResourceOwner()
 	d.SetId(org)
+	if err := d.Set(helper.OrgIDVar, org); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 

@@ -51,3 +51,47 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.T
 		}
 	}
 }
+
+// TestAccPasswordComplexityPolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
+// org_id must record the organization of the authenticated service account
+// instead of leaving the resource out of state.
+func TestAccPasswordComplexityPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_password_complexity_policy")
+
+	resetToDefault := func() {
+		if _, err := frame.ResetPasswordComplexityPolicyToDefault(frame, &management.ResetPasswordComplexityPolicyToDefaultRequest{}); err != nil {
+			t.Logf("resetting policy to default: %v", err)
+		}
+	}
+	resetToDefault()
+	t.Cleanup(resetToDefault)
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_password_complexity_policy" "default" {
+  min_length    = 11
+  has_uppercase = true
+  has_lowercase = true
+  has_number    = true
+  has_symbol    = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)(11),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}

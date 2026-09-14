@@ -71,7 +71,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
-	_, err = client.AddCustomPasswordAgePolicy(helper.CtxWithID(ctx, d), &management.AddCustomPasswordAgePolicyRequest{
+	resp, err := client.AddCustomPasswordAgePolicy(helper.CtxWithID(ctx, d), &management.AddCustomPasswordAgePolicyRequest{
 		MaxAgeDays:     uint32(d.Get(maxAgeDays).(int)),
 		ExpireWarnDays: uint32(d.Get(expireWarnDays).(int)),
 	})
@@ -80,8 +80,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to create password age policy: %v", err)
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
+	org := resp.GetDetails().GetResourceOwner()
 	d.SetId(org)
+	if err := d.Set(helper.OrgIDVar, org); err != nil {
+		return diag.FromErr(err)
+	}
 
 	return nil
 }

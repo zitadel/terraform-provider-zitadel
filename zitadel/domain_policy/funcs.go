@@ -74,6 +74,17 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 	org := helper.GetID(d, helper.OrgIDVar)
+	if org == "" {
+		mgmtClient, err := helper.GetManagementClient(ctx, clientinfo)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		resp, err := mgmtClient.GetMyOrg(ctx, &management.GetMyOrgRequest{})
+		if err != nil {
+			return diag.Errorf("failed to get organization: %v", err)
+		}
+		org = resp.GetOrg().GetId()
+	}
 	_, err = client.AddCustomDomainPolicy(ctx, &admin.AddCustomDomainPolicyRequest{
 		OrgId:                                  org,
 		UserLoginMustBeDomain:                  d.Get(UserLoginMustBeDomainVar).(bool),
@@ -84,6 +95,9 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to create domain policy: %v", err)
 	}
 	d.SetId(org)
+	if err := d.Set(helper.OrgIDVar, org); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 

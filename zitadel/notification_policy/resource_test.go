@@ -48,3 +48,43 @@ func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(bool) resource.Tes
 		}
 	}
 }
+
+// TestAccNotificationPolicyWithoutOrgID reproduces #436 for this resource: creating the policy without
+// org_id must record the organization of the authenticated service account
+// instead of leaving the resource out of state.
+func TestAccNotificationPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_notification_policy")
+
+	resetToDefault := func() {
+		if _, err := frame.ResetNotificationPolicyToDefault(frame, &management.ResetNotificationPolicyToDefaultRequest{}); err != nil {
+			t.Logf("resetting policy to default: %v", err)
+		}
+	}
+	resetToDefault()
+	t.Cleanup(resetToDefault)
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_notification_policy" "default" {
+  password_change = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)(false),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}
