@@ -62,6 +62,15 @@ resource "zitadel_organization_domain" "default" {
 					test_utils.CheckAMinute(checkDomainExists(frame, domainName)),
 				),
 			},
+			{
+				ResourceName:      frame.TerraformName,
+				ImportState:       true,
+				ImportStateIdFunc: test_utils.ChainImportStateIdFuncs(
+					test_utils.ImportStateAttribute(frame.BaseTestFrame, "organization_id"),
+					test_utils.ImportStateAttribute(frame.BaseTestFrame, "domain"),
+				),
+				ImportStateVerify: true,
+			},
 		},
 	})
 }

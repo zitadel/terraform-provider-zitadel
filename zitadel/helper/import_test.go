@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func TestImportWithAttributes(t *testing.T) {
@@ -345,3 +347,66 @@ func TestOrgIDPResourcesImportWithCustomOrgID(t *testing.T) {
 		})
 	}
 }
+
+func TestImportWithOrgIDAndAttribute(t *testing.T) {
+	importer := ImportWithOrgIDAndAttribute("organization_id", "domain", ConvertNonEmpty)
+
+	t.Run("valid import id organization_id:domain", func(t *testing.T) {
+		d := schema.TestResourceDataRaw(t, map[string]*schema.Schema{
+			"organization_id": {Type: schema.TypeString, Optional: true},
+			"domain":          {Type: schema.TypeString, Optional: true},
+		}, map[string]interface{}{})
+		d.SetId("241734106767949827:zitadel.sso.tfmm.co")
+
+		res, err := importer.StateContext(nil, d, nil)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(res) != 1 {
+			t.Fatalf("expected 1 resource data, got %d", len(res))
+		}
+
+		if got := res[0].Id(); got != "zitadel.sso.tfmm.co" {
+			t.Errorf("expected id to be %q, got %q", "zitadel.sso.tfmm.co", got)
+		}
+		if got := res[0].Get("organization_id").(string); got != "241734106767949827" {
+			t.Errorf("expected organization_id to be %q, got %q", "241734106767949827", got)
+		}
+		if got := res[0].Get("domain").(string); got != "zitadel.sso.tfmm.co" {
+			t.Errorf("expected domain to be %q, got %q", "zitadel.sso.tfmm.co", got)
+		}
+	})
+
+	t.Run("invalid single part format", func(t *testing.T) {
+		d := schema.TestResourceDataRaw(t, map[string]*schema.Schema{
+			"organization_id": {Type: schema.TypeString, Optional: true},
+			"domain":          {Type: schema.TypeString, Optional: true},
+		}, map[string]interface{}{})
+		d.SetId("zitadel.sso.tfmm.co")
+
+		_, err := importer.StateContext(nil, d, nil)
+		if err == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "<organization_id:domain>") {
+			t.Errorf("expected error to contain '<organization_id:domain>', got: %v", err)
+		}
+	})
+
+	t.Run("empty organization_id", func(t *testing.T) {
+		d := schema.TestResourceDataRaw(t, map[string]*schema.Schema{
+			"organization_id": {Type: schema.TypeString, Optional: true},
+			"domain":          {Type: schema.TypeString, Optional: true},
+		}, map[string]interface{}{})
+		d.SetId(":zitadel.sso.tfmm.co")
+
+		_, err := importer.StateContext(nil, d, nil)
+		if err == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "value must not be empty") {
+			t.Errorf("expected error to contain 'value must not be empty', got: %v", err)
+		}
+	})
+}
+

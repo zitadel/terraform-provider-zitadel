@@ -62,6 +62,49 @@ func ImportWithEmptyID(attributes ...importAttribute) *schema.ResourceImporter {
 	return ImportWithAttributes(append([]importAttribute{emptyIDAttribute}, attributes...)...)
 }
 
+// ImportWithOrgIDAndAttribute returns a ResourceImporter for resources that expect an organization ID
+// followed by an attribute (e.g. domain or key) where the second attribute is used as the resource ID.
+// Format: <organization_id:attr_name>
+func ImportWithOrgIDAndAttribute(idVar string, attrKey string, attrFunc ConvertStringFunc) *schema.ResourceImporter {
+	return &schema.ResourceImporter{
+		StateContext: func(_ context.Context, d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
+			id := d.Id()
+			csvReader := csv.NewReader(strings.NewReader(id))
+			csvReader.Comma = ':'
+			csvReader.LazyQuotes = true
+			parts, err := csvReader.Read()
+			if err != nil && err != io.EOF {
+				return nil, ImportIDValidationError(id, []string{idVar, attrKey}, nil, fmt.Errorf("failed to parse id: %w", err))
+			}
+			for i := range parts {
+				parts[i] = strings.ReplaceAll(parts[i], SemicolonPlaceholder, ":")
+			}
+			if len(parts) != 2 {
+				return nil, ImportIDValidationError(id, []string{idVar, attrKey}, nil,
+					fmt.Errorf(`expected the number of semicolon separated parts to be 2, but got %d parts: "%s"`, len(parts), strings.Join(parts, `", "`)))
+			}
+			orgID := parts[0]
+			attrVal := parts[1]
+			if orgID == "" {
+				return nil, ImportIDValidationError(id, []string{idVar, attrKey}, nil, fmt.Errorf("invalid value for %s: value must not be empty", idVar))
+			}
+			val, err := attrFunc(attrVal)
+			if err != nil {
+				return nil, ImportIDValidationError(id, []string{idVar, attrKey}, nil, fmt.Errorf("invalid value for %s: %w", attrKey, err))
+			}
+			if err := d.Set(idVar, orgID); err != nil {
+				return nil, fmt.Errorf("failed to set %s=%s: %w", idVar, orgID, err)
+			}
+			if err := d.Set(attrKey, val); err != nil {
+				return nil, fmt.Errorf("failed to set %s=%v: %w", attrKey, val, err)
+			}
+			d.SetId(val.(string))
+			return []*schema.ResourceData{d}, nil
+		},
+	}
+}
+
+
 type ConvertStringFunc func(string) (interface{}, error)
 
 type importAttribute struct {
