@@ -38,6 +38,40 @@ func TestAccDomainPolicy(t *testing.T) {
 	)
 }
 
+// TestAccDomainPolicyWithoutOrgID creates the policy without org_id. The admin
+// API needs an explicit organization, so the organization of the authenticated
+// service account has to be resolved and recorded in state.
+func TestAccDomainPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_domain_policy")
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_domain_policy" "default" {
+  user_login_must_be_domain                   = true
+  validate_org_domains                        = false
+  smtp_sender_address_matches_instance_domain = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)(true),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(bool) resource.TestCheckFunc {
 	return func(expect bool) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

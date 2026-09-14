@@ -10,7 +10,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the custom notification policy of an organization.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: helper.OrgIDResourceField,
+			helper.OrgIDVar: helper.OrgIDComputedResourceField,
 			passwordChangeVar: {
 				Type:        schema.TypeBool,
 				Required:    true,

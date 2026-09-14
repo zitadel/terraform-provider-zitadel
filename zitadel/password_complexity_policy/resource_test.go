@@ -36,6 +36,42 @@ func TestAccPasswordComplexityPolicy(t *testing.T) {
 	)
 }
 
+// TestAccPasswordComplexityPolicyWithoutOrgID covers the report in issue 436:
+// creating the policy without org_id has to record the organization of the
+// authenticated service account instead of leaving the policy out of state.
+func TestAccPasswordComplexityPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_password_complexity_policy")
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_password_complexity_policy" "default" {
+  min_length    = 11
+  has_uppercase = true
+  has_lowercase = true
+  has_number    = true
+  has_symbol    = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)(11),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(uint64) resource.TestCheckFunc {
 	return func(expect uint64) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

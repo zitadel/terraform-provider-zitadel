@@ -32,6 +32,38 @@ func TestAccPrivacyPolicy(t *testing.T) {
 	)
 }
 
+// TestAccPrivacyPolicyWithoutOrgID covers the report in issue 436: creating the
+// policy without org_id has to record the organization of the authenticated
+// service account instead of leaving the policy out of state.
+func TestAccPrivacyPolicyWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_privacy_policy")
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_privacy_policy" "default" {
+  help_link = "https://example.com/help"
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame)("https://example.com/help"),
+				),
+			},
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

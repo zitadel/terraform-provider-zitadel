@@ -54,19 +54,22 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.AddCustomLockoutPolicy(helper.CtxWithID(ctx, d), &management.AddCustomLockoutPolicyRequest{
+	resp, err := client.AddCustomLockoutPolicy(helper.CtxWithID(ctx, d), &management.AddCustomLockoutPolicyRequest{
 		MaxPasswordAttempts: uint32(d.Get(maxPasswordAttemptsVar).(int)),
 		MaxOtpAttempts:      uint32(d.Get(maxOTPAttemptsVar).(int)),
 	})
 	if err != nil {
 		return diag.Errorf("failed to create lockout policy: %v", err)
 	}
+	org := resp.GetDetails().GetResourceOwner()
 	d.SetId(org)
+	if err := d.Set(helper.OrgIDVar, org); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 

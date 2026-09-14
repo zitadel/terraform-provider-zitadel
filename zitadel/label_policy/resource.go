@@ -13,7 +13,7 @@ func GetResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "Resource representing the custom label policy of an organization.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: helper.OrgIDResourceField,
+			helper.OrgIDVar: helper.OrgIDComputedResourceField,
 			primaryColorVar: {
 				Type:        schema.TypeString,
 				Required:    true,

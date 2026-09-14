@@ -178,7 +178,6 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
@@ -218,7 +217,7 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	_, err = client.AddCustomLoginPolicy(helper.CtxWithOrgID(ctx, d), &management.AddCustomLoginPolicyRequest{
+	resp, err := client.AddCustomLoginPolicy(helper.CtxWithOrgID(ctx, d), &management.AddCustomLoginPolicyRequest{
 		AllowUsernamePassword:      d.Get(allowUsernamePasswordVar).(bool),
 		AllowRegister:              d.Get(allowRegisterVar).(bool),
 		AllowExternalIdp:           d.Get(allowExternalIDPVar).(bool),
@@ -242,7 +241,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to create login policy: %v", err)
 	}
+	org := resp.GetDetails().GetResourceOwner()
 	d.SetId(org)
+	if err := d.Set(helper.OrgIDVar, org); err != nil {
+		return diag.FromErr(err)
+	}
 
 	idps := helper.GetOkSetToStringSlice(d, idpsVar)
 	for _, addIdp := range idps {

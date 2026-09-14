@@ -57,12 +57,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if !ok {
 		return diag.Errorf("failed to get client")
 	}
-	org := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_, err = client.AddCustomPasswordComplexityPolicy(helper.CtxWithID(ctx, d), &management.AddCustomPasswordComplexityPolicyRequest{
+	resp, err := client.AddCustomPasswordComplexityPolicy(helper.CtxWithID(ctx, d), &management.AddCustomPasswordComplexityPolicyRequest{
 		MinLength:    uint64(d.Get(minLengthVar).(int)),
 		HasUppercase: d.Get(hasUppercaseVar).(bool),
 		HasLowercase: d.Get(hasLowercaseVar).(bool),
@@ -72,7 +71,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to create password complexity policy: %v", err)
 	}
+	org := resp.GetDetails().GetResourceOwner()
 	d.SetId(org)
+	if err := d.Set(helper.OrgIDVar, org); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 

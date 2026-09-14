@@ -67,13 +67,12 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.Errorf("failed to get client")
 	}
 
-	org := d.Get(helper.OrgIDVar).(string)
 	client, err := helper.GetManagementClient(ctx, clientinfo)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = client.AddCustomPrivacyPolicy(helper.CtxWithID(ctx, d), &management.AddCustomPrivacyPolicyRequest{
+	resp, err := client.AddCustomPrivacyPolicy(helper.CtxWithID(ctx, d), &management.AddCustomPrivacyPolicyRequest{
 		TosLink:        d.Get(tosLinkVar).(string),
 		PrivacyLink:    d.Get(privacyLinkVar).(string),
 		HelpLink:       d.Get(HelpLinkVar).(string),
@@ -85,7 +84,11 @@ func create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 	if err != nil {
 		return diag.Errorf("failed to create privacy policy: %v", err)
 	}
+	org := resp.GetDetails().GetResourceOwner()
 	d.SetId(org)
+	if err := d.Set(helper.OrgIDVar, org); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 
