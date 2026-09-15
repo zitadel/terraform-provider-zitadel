@@ -12,6 +12,7 @@ import (
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/organization_domain"
 )
 
 // domainPolicy returns an org level domain policy that either requires org
@@ -61,6 +62,17 @@ resource "zitadel_organization_domain" "default" {
 					resource.TestCheckResourceAttr(frame.TerraformName, "is_primary", "false"),
 					test_utils.CheckAMinute(checkDomainExists(frame, domainName)),
 				),
+			},
+			{
+				// The import ID is <organization_id:domain> (issue #452).
+				ResourceName: frame.TerraformName,
+				ImportState:  true,
+				ImportStateIdFunc: test_utils.ChainImportStateIdFuncs(
+					test_utils.ImportStateAttribute(frame.BaseTestFrame, organization_domain.OrganizationIDVar),
+					test_utils.ImportStateAttribute(frame.BaseTestFrame, organization_domain.DomainVar),
+				),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"verify"},
 			},
 		},
 	})

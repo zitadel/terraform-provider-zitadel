@@ -1,10 +1,13 @@
 package helper
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func TestImportWithAttributes(t *testing.T) {
@@ -341,6 +344,68 @@ func TestOrgIDPResourcesImportWithCustomOrgID(t *testing.T) {
 			}
 			if state[OrgIDVar] != customOrgID {
 				t.Errorf("%s: expected org_id=%s, got %s", resource, customOrgID, state[OrgIDVar])
+			}
+		})
+	}
+}
+
+// TestImportWithOrganizationID is a regression test for https://github.com/zitadel/terraform-provider-zitadel/issues/452
+func TestImportWithOrganizationID(t *testing.T) {
+	validOrgID := "123456789012345678"
+	res := &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"organization_id": {Type: schema.TypeString, Required: true},
+			"domain":          {Type: schema.TypeString, Required: true},
+		},
+		Importer: ImportWithOrganizationID("organization_id", "domain"),
+	}
+	tests := []struct {
+		name      string
+		id        string
+		wantID    string
+		wantOrgID string
+		wantErr   string
+	}{{
+		name:      "organization id and domain",
+		id:        concat(validOrgID, "example.com"),
+		wantID:    "example.com",
+		wantOrgID: validOrgID,
+	}, {
+		name:      "custom organization id",
+		id:        concat("my-custom-org-id", "example.com"),
+		wantID:    "example.com",
+		wantOrgID: "my-custom-org-id",
+	}, {
+		name:    "missing domain",
+		id:      validOrgID,
+		wantErr: "<organization_id:domain>",
+	}, {
+		name:    "empty organization id",
+		id:      concat("", "example.com"),
+		wantErr: "invalid value for organization_id",
+	}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data := res.TestResourceData()
+			data.SetId(tt.id)
+			_, err := res.Importer.StateContext(context.Background(), data, nil)
+			if tt.wantErr != "" {
+				if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
+					t.Fatalf("expected error containing %q, got %v", tt.wantErr, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if data.Id() != tt.wantID {
+				t.Errorf("expected id=%s, got %s", tt.wantID, data.Id())
+			}
+			if got := data.Get("organization_id"); got != tt.wantOrgID {
+				t.Errorf("expected organization_id=%s, got %v", tt.wantOrgID, got)
+			}
+			if got := data.Get("domain"); got != tt.wantID {
+				t.Errorf("expected domain=%s, got %v", tt.wantID, got)
 			}
 		})
 	}
