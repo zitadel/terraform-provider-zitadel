@@ -34,6 +34,6 @@ func GetResource() *schema.Resource {
 		CreateContext: update,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer:      helper.ImportWithAttributes(helper.NewImportAttribute(LanguageVar, helper.ConvertNonEmpty, false)),
+		Importer:      helper.ImportWithEmptyID(helper.NewImportAttribute(LanguageVar, helper.ConvertNonEmpty, false)),
 	}
 }

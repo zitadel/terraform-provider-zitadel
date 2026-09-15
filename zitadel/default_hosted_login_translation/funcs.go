@@ -72,7 +72,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	language := d.Id()
+	language := d.Get(LanguageVar).(string)
 	resp, err := client.GetHostedLoginTranslation(ctx, &settingsv2.GetHostedLoginTranslationRequest{
 		Level:             &settingsv2.GetHostedLoginTranslationRequest_Instance{Instance: true},
 		Locale:            language,
@@ -104,5 +104,6 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 	}
 
+	d.SetId(language)
 	return nil
 }

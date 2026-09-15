@@ -33,7 +33,7 @@ func TestAccDefaultHostedLoginTranslation(t *testing.T) {
 		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
 		// ZITADEL has no API to remove translations, so nothing changes remotely on destroy
 		test_utils.CheckNothing,
-		test_utils.ImportResourceId(frame.BaseTestFrame),
+		test_utils.ImportStateAttribute(frame.BaseTestFrame, default_hosted_login_translation.LanguageVar),
 	)
 }
 

@@ -2,11 +2,13 @@ package hosted_login_translation
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/structure"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/management"
 	settingsv2 "github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/settings/v2"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -31,6 +33,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	org, err := getOrgID(ctx, clientinfo, d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	language := d.Get(LanguageVar).(string)
 	if d.IsNewResource() || d.HasChange(translationsVar) {
 		translations, err := structure.ExpandJsonFromString(d.Get(translationsVar).(string))
@@ -42,8 +48,8 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			return diag.Errorf("failed to convert translations: %v", err)
 		}
 
-		_, err = client.SetHostedLoginTranslation(helper.CtxWithOrgID(ctx, d), &settingsv2.SetHostedLoginTranslationRequest{
-			Level:        &settingsv2.SetHostedLoginTranslationRequest_OrganizationId{OrganizationId: d.Get(helper.OrgIDVar).(string)},
+		_, err = client.SetHostedLoginTranslation(helper.CtxSetOrgID(ctx, org), &settingsv2.SetHostedLoginTranslationRequest{
+			Level:        &settingsv2.SetHostedLoginTranslationRequest_OrganizationId{OrganizationId: org},
 			Locale:       language,
 			Translations: translationsStruct,
 		})
@@ -55,7 +61,10 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	d.SetId(language)
+	d.SetId(getHostedLoginTranslationID(org, language))
+	if err := d.Set(helper.OrgIDVar, org); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 
@@ -72,10 +81,13 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	language := d.Id()
-	orgID := d.Get(helper.OrgIDVar).(string)
-	resp, err := client.GetHostedLoginTranslation(helper.CtxSetOrgID(ctx, orgID), &settingsv2.GetHostedLoginTranslationRequest{
-		Level:             &settingsv2.GetHostedLoginTranslationRequest_OrganizationId{OrganizationId: orgID},
+	org, err := getOrgID(ctx, clientinfo, d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	language := d.Get(LanguageVar).(string)
+	resp, err := client.GetHostedLoginTranslation(helper.CtxSetOrgID(ctx, org), &settingsv2.GetHostedLoginTranslationRequest{
+		Level:             &settingsv2.GetHostedLoginTranslationRequest_OrganizationId{OrganizationId: org},
 		Locale:            language,
 		IgnoreInheritance: true,
 	})
@@ -96,6 +108,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	}
 
 	set := map[string]interface{}{
+		helper.OrgIDVar: org,
 		LanguageVar:     language,
 		translationsVar: translations,
 	}
@@ -105,5 +118,29 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		}
 	}
 
+	d.SetId(getHostedLoginTranslationID(org, language))
 	return nil
+}
+
+// getOrgID returns the configured organization or, if org_id is not set, the
+// organization of the authenticated user/service account, because the
+// settings/v2 API takes the organization as an explicit request field.
+func getOrgID(ctx context.Context, clientinfo *helper.ClientInfo, d *schema.ResourceData) (string, error) {
+	org := d.Get(helper.OrgIDVar).(string)
+	if org != "" {
+		return org, nil
+	}
+	managementClient, err := helper.GetManagementClient(ctx, clientinfo)
+	if err != nil {
+		return "", err
+	}
+	resp, err := managementClient.GetMyOrg(ctx, &management.GetMyOrgRequest{})
+	if err != nil {
+		return "", fmt.Errorf("failed to get org: %v", err)
+	}
+	return resp.GetOrg().GetId(), nil
+}
+
+func getHostedLoginTranslationID(org string, language string) string {
+	return org + "_" + language
 }

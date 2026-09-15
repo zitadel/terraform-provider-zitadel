@@ -30,11 +30,11 @@ func TestAccHostedLoginTranslation(t *testing.T) {
 		"", "", "",
 		false,
 		checkRemoteProperty(frame, exampleLanguage),
-		regexp.MustCompile(fmt.Sprintf(`^%s$`, exampleLanguage)),
+		regexp.MustCompile(fmt.Sprintf(`^%s_%s$`, helper.ZitadelGeneratedIdPattern, exampleLanguage)),
 		// ZITADEL has no API to remove translations, so nothing changes remotely on destroy
 		test_utils.CheckNothing,
 		test_utils.ChainImportStateIdFuncs(
-			test_utils.ImportResourceId(frame.BaseTestFrame),
+			test_utils.ImportStateAttribute(frame.BaseTestFrame, hosted_login_translation.LanguageVar),
 			test_utils.ImportOrgId(frame),
 		),
 	)
@@ -95,6 +95,45 @@ resource "zitadel_hosted_login_translation" "default" {
 			},
 			{
 				Config:   resourceConfig,
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
+// TestAccHostedLoginTranslationWithoutOrgID creates the translation without org_id.
+// The settings/v2 API needs an explicit organization, so the organization of the
+// authenticated service account has to be resolved and recorded in state.
+func TestAccHostedLoginTranslationWithoutOrgID(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_hosted_login_translation")
+	exampleLanguage := "en"
+	title := "title " + frame.UniqueResourcesID
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_hosted_login_translation" "default" {
+  language = "%s"
+  translations = jsonencode({
+    loginname = {
+      title = "%s"
+    }
+  })
+}
+`, frame.ProviderSnippet, exampleLanguage, title)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", fmt.Sprintf("%s_%s", frame.OrgID, exampleLanguage)),
+					resource.TestCheckResourceAttr(frame.TerraformName, "org_id", frame.OrgID),
+					checkRemoteProperty(frame, exampleLanguage)(title),
+				),
+			},
+			{
+				Config:   config,
 				PlanOnly: true,
 			},
 		},

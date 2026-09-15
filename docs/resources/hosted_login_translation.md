@@ -30,8 +30,11 @@ resource "zitadel_hosted_login_translation" "default" {
 ### Required
 
 - `language` (String) BCP 47 language tag of the translations, e.g. `en`, `de` or `fr-CH`
-- `org_id` (String) ID of the organization the translations belong to
 - `translations` (String) Translations as a JSON object with at least one key, for example built with `jsonencode`. The keys follow the structure of the [hosted login locale files](https://github.com/zitadel/zitadel/tree/main/apps/login/locales), e.g. `loginname.title`. Replaces all translations previously set for this language on the organization.
+
+### Optional
+
+- `org_id` (String) ID of the organization. If not provided, the organization of the authenticated user/service account is used.
 
 ### Read-Only
 
@@ -40,6 +43,6 @@ resource "zitadel_hosted_login_translation" "default" {
 ## Import
 
 ```bash
-# The resource can be imported using the ID format `<language:org_id>`, e.g.
+# The resource can be imported using the ID format `<language[:org_id]>`, e.g.
 terraform import zitadel_hosted_login_translation.imported 'en:123456789012345678'
 ```

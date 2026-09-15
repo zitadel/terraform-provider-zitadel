@@ -15,13 +15,7 @@ func GetResource() *schema.Resource {
 			"Instance-level defaults are managed by `zitadel_default_hosted_login_translation`. " +
 			"The legacy login UI (v1) is customized with `zitadel_login_texts`.",
 		Schema: map[string]*schema.Schema{
-			helper.OrgIDVar: {
-				Type:             schema.TypeString,
-				Required:         true,
-				ForceNew:         true,
-				ValidateDiagFunc: helper.NonEmptyString(helper.OrgIDVar),
-				Description:      "ID of the organization the translations belong to",
-			},
+			helper.OrgIDVar: helper.OrgIDComputedResourceField,
 			LanguageVar: {
 				Type:             schema.TypeString,
 				Required:         true,
@@ -41,9 +35,9 @@ func GetResource() *schema.Resource {
 		CreateContext: update,
 		DeleteContext: delete,
 		UpdateContext: update,
-		Importer: helper.ImportWithAttributes(
+		Importer: helper.ImportWithEmptyID(
 			helper.NewImportAttribute(LanguageVar, helper.ConvertNonEmpty, false),
-			helper.NewImportAttribute(helper.OrgIDVar, helper.ConvertID, false),
+			helper.ImportOptionalOrgAttribute,
 		),
 	}
 }
