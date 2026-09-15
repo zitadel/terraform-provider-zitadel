@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/settings"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -102,9 +103,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(SetActiveVar) && d.Get(SetActiveVar).(bool) {
-		if _, err := client.ActivateSMTPConfig(ctx, &admin.ActivateSMTPConfigRequest{Id: d.Id()}); err != nil {
-			return diag.Errorf("failed to activate smtp config: %v", err)
+	if d.HasChange(SetActiveVar) {
+		if d.Get(SetActiveVar).(bool) {
+			if _, err := client.ActivateSMTPConfig(ctx, &admin.ActivateSMTPConfigRequest{Id: d.Id()}); err != nil {
+				return diag.Errorf("failed to activate smtp config: %v", err)
+			}
+		} else {
+			if _, err := client.DeactivateSMTPConfig(ctx, &admin.DeactivateSMTPConfigRequest{Id: d.Id()}); err != nil {
+				return diag.Errorf("failed to deactivate smtp config: %v", err)
+			}
 		}
 	}
 
@@ -143,7 +150,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		userVar:           resp.GetSmtpConfig().GetUser(),
 		replyToAddressVar: resp.GetSmtpConfig().GetReplyToAddress(),
 		DescriptionVar:    resp.GetSmtpConfig().GetDescription(),
-		SetActiveVar:      d.Get(SetActiveVar).(bool),
+		SetActiveVar:      resp.GetSmtpConfig().GetState() == settings.SMTPConfigState_SMTP_CONFIG_ACTIVE,
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {
