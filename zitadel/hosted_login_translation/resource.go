@@ -3,7 +3,6 @@ package hosted_login_translation
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/structure"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -33,9 +32,9 @@ func GetResource() *schema.Resource {
 			translationsVar: {
 				Type:             schema.TypeString,
 				Required:         true,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringIsJSON),
+				ValidateDiagFunc: helper.NonEmptyJSONObject(translationsVar),
 				DiffSuppressFunc: structure.SuppressJsonDiff,
-				Description:      "Translations as a JSON object, for example built with `jsonencode`. The keys follow the structure of the [hosted login locale files](https://github.com/zitadel/zitadel/tree/main/apps/login/locales), e.g. `loginname.title`. Replaces all translations previously set for this language on the organization.",
+				Description:      "Translations as a JSON object with at least one key, for example built with `jsonencode`. The keys follow the structure of the [hosted login locale files](https://github.com/zitadel/zitadel/tree/main/apps/login/locales), e.g. `loginname.title`. Replaces all translations previously set for this language on the organization.",
 			},
 		},
 		ReadContext:   read,

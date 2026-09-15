@@ -29,7 +29,7 @@ resource "zitadel_default_hosted_login_translation" "default" {
 ### Required
 
 - `language` (String) BCP 47 language tag of the translations, e.g. `en`, `de` or `fr-CH`
-- `translations` (String) Translations as a JSON object, for example built with `jsonencode`. The keys follow the structure of the [hosted login locale files](https://github.com/zitadel/zitadel/tree/main/apps/login/locales), e.g. `loginname.title`. Replaces all translations previously set for this language on the instance.
+- `translations` (String) Translations as a JSON object with at least one key, for example built with `jsonencode`. The keys follow the structure of the [hosted login locale files](https://github.com/zitadel/zitadel/tree/main/apps/login/locales), e.g. `loginname.title`. Replaces all translations previously set for this language on the instance.
 
 ### Read-Only
 
