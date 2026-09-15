@@ -2,4 +2,5 @@
 # When importing with a public key, make sure to base64 encode it
 # terraform import zitadel_machine_key.imported '123456789012345678:123456789012345678:123456789012345678::Ii0tLS0tQkVHSU4gUF...
 
-terraform import zitadel_machine_key.imported '123456789012345678:123456789012345678:123456789012345678:{"type":"serviceaccount","keyId":"123456789012345678","key":"-----BEGIN RSA PRIVATE KEY-----\nMIIEpQ...-----END RSA PRIVATE KEY-----\n","userId":"123456789012345678"}'
+# The key details contain :, which you can escape with __SEMICOLON__, e.g.
+terraform import zitadel_machine_key.imported "123456789012345678:123456789012345678:123456789012345678:$(cat ~/Downloads/123456789012345678.json | sed -e 's/:/__SEMICOLON__/g')"

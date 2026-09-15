@@ -44,6 +44,31 @@ func ImportWithIDAndOptionalOrg(idVar string, attributes ...importAttribute) *sc
 	return ImportWithID(idVar, append(attributes, ImportOptionalOrgAttribute)...)
 }
 
+// ImportWithOrganizationID returns a ResourceImporter for resources that are identified by a key within an
+// organization, like org/v2 domains and metadata. It expects the format <organization_id:key>, stores the
+// organization ID at orgIDVar and uses the key as the resources ID.
+// The organization ID is required, as these resources address the organization explicitly instead of
+// falling back to the organization of the provider.
+func ImportWithOrganizationID(orgIDVar, keyVar string) *schema.ResourceImporter {
+	attrs := []importAttribute{
+		NewImportAttribute(orgIDVar, ConvertNonEmpty, false),
+		NewImportAttribute(keyVar, ConvertNonEmpty, false),
+	}
+	return &schema.ResourceImporter{
+		StateContext: func(_ context.Context, data *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
+			if err := importWithAttributes(data, attrs...); err != nil {
+				return nil, err
+			}
+			// importWithAttributes uses the first part as the ID, so move it to the organization attribute
+			if err := data.Set(orgIDVar, data.Id()); err != nil {
+				return nil, fmt.Errorf("failed to set %s=%v: %w", orgIDVar, data.Id(), err)
+			}
+			data.SetId(data.Get(keyVar).(string))
+			return []*schema.ResourceData{data}, nil
+		},
+	}
+}
+
 // ImportWithIDAndOptionalSecret is a convenience function that calls ImportWithID
 // and passes an optional attribute for the secret var at secretKey.
 func ImportWithIDAndOptionalSecret(idVar, secretKey string) *schema.ResourceImporter {
