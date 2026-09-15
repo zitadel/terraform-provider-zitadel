@@ -2,12 +2,12 @@
 page_title: "zitadel_hosted_login_translation Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Organization-level translations for the hosted login v2 (/ui/v2/login) in one language, using the settings/v2 API. Requires ZITADEL 4.x. Keys that are not set fall back to the instance-level translations and then to the built-in translations of the hosted login. ZITADEL has no API to remove translations, so destroying this resource only removes it from the Terraform state and leaves the last applied translations in place. Instance-level defaults are managed by zitadel_default_hosted_login_translation. The legacy login UI (v1) is customized with zitadel_login_texts.
+  Organization-level translations for the hosted login v2 (/ui/v2/login) in one language, using the settings/v2 API. Requires ZITADEL 4.x. ZITADEL checks the instance-level iam.policy.read and iam.policy.write permissions for these translations, so the service account needs an instance role such as IAM_OWNER; ORG_OWNER is not sufficient. Keys that are not set fall back to the instance-level translations and then to the built-in translations of the hosted login. ZITADEL has no API to remove translations, so destroying this resource only removes it from the Terraform state and leaves the last applied translations in place. Instance-level defaults are managed by zitadel_default_hosted_login_translation. The legacy login UI (v1) is customized with zitadel_login_texts.
 ---
 
 # zitadel_hosted_login_translation (Resource)
 
-Organization-level translations for the **hosted login v2** (`/ui/v2/login`) in one language, using the settings/v2 API. **Requires ZITADEL 4.x.** Keys that are not set fall back to the instance-level translations and then to the built-in translations of the hosted login. ZITADEL has no API to remove translations, so destroying this resource only removes it from the Terraform state and leaves the last applied translations in place. Instance-level defaults are managed by `zitadel_default_hosted_login_translation`. The legacy login UI (v1) is customized with `zitadel_login_texts`.
+Organization-level translations for the **hosted login v2** (`/ui/v2/login`) in one language, using the settings/v2 API. **Requires ZITADEL 4.x.** ZITADEL checks the instance-level `iam.policy.read` and `iam.policy.write` permissions for these translations, so the service account needs an instance role such as `IAM_OWNER`; `ORG_OWNER` is not sufficient. Keys that are not set fall back to the instance-level translations and then to the built-in translations of the hosted login. ZITADEL has no API to remove translations, so destroying this resource only removes it from the Terraform state and leaves the last applied translations in place. Instance-level defaults are managed by `zitadel_default_hosted_login_translation`. The legacy login UI (v1) is customized with `zitadel_login_texts`.
 
 ## Example Usage
 
