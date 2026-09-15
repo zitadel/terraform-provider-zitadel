@@ -43,6 +43,7 @@ func (r *defaultLoginTextsResource) Schema(ctx context.Context, _ resource.Schem
 	delete(s.Attributes, "org_id")
 	s.MarkdownDescription = "Instance-level default text customizations for the **legacy login UI (v1)** at `/ui/login`. " +
 		"These settings have **no effect on the new hosted login v2** (`/ui/v2/login`). " +
+		"Hosted login v2 translations are managed by `zitadel_default_hosted_login_translation`. " +
 		"Org-level overrides are managed by `zitadel_login_texts`."
 	resp.Schema = s
 }

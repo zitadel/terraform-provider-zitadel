@@ -27,6 +27,7 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_v2"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_policy"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_hosted_login_translation"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_init_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_invite_user_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_label_policy"
@@ -60,6 +61,7 @@ import (
 	ephemeral_organization_domain_validation "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/organization_domain_validation"
 	ephemeral_personal_access_token "github.com/zitadel/terraform-provider-zitadel/v2/zitadel/ephemeral/personal_access_token"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/hosted_login_translation"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/human_user"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/idp_apple"
@@ -712,6 +714,8 @@ func Provider() *schema.Provider {
 			"zitadel_email_provider_smtp":                email_provider_smtp.GetResource(),
 			"zitadel_email_provider_http":                email_provider_http.GetResource(),
 			"zitadel_default_security_settings":          default_security_settings.GetResource(),
+			"zitadel_default_hosted_login_translation":   default_hosted_login_translation.GetResource(),
+			"zitadel_hosted_login_translation":           hosted_login_translation.GetResource(),
 			"zitadel_instance_features":                  instance_features.GetResource(),
 			"zitadel_instance_restrictions":              instance_restrictions.GetResource(),
 			"zitadel_instance_secret_generator":          instance_secret_generator.GetResource(),
