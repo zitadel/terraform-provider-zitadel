@@ -11,9 +11,9 @@ func GetResource() *schema.Resource {
 		Description: "Resource representing a custom domain on a ZITADEL instance. " +
 			"Custom domains are used to route requests to the instance and must be unique across all instances. " +
 			"This resource requires system-level permissions (system.domain.write). " +
-			"These cannot be granted to regular machine users or through instance/org memberships such as IAM_OWNER; " +
+			"These cannot be granted to regular machine users or through instance/org memberships such as `IAM_OWNER`; " +
 			"they are only available to System API users defined in ZITADEL's runtime configuration (SystemAPIUsers). " +
-			"Configure the provider with the system_api block to authenticate as such a user. " +
+			"Configure the provider with the `system_api` block to authenticate as such a user. " +
 			"See https://zitadel.com/docs/guides/integrate/zitadel-apis/access-zitadel-system-api for details.",
 		Schema: map[string]*schema.Schema{
 			InstanceIDVar: {
