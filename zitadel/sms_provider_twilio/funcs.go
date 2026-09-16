@@ -133,6 +133,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get sms provider twilio: %v", err)
 	}
 
+	if resp.GetConfig().GetTwilio() == nil {
+		d.SetId("")
+		return nil
+	}
+
 	set := map[string]interface{}{
 		sidVar:              resp.GetConfig().GetTwilio().GetSid(),
 		SenderNumberVar:     resp.GetConfig().GetTwilio().GetSenderNumber(),
