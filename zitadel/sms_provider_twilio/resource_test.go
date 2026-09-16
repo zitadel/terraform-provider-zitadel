@@ -2,6 +2,7 @@ package sms_provider_twilio_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -190,4 +191,46 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resou
 			return nil
 		}
 	}
+}
+
+func TestAccSMSProviderTwilioImportWrongType(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
+
+	created, err := frame.AddSMSProviderHTTP(frame, &admin.AddSMSProviderHTTPRequest{
+		Endpoint:    "https://example.com/wrong-type",
+		Description: "wrong type",
+	})
+	if err != nil {
+		t.Fatalf("creating http provider failed: %v", err)
+	}
+	t.Cleanup(func() {
+		if _, err := frame.RemoveSMSProvider(frame, &admin.RemoveSMSProviderRequest{Id: created.GetId()}); err != nil {
+			t.Logf("removing http provider failed: %v", err)
+		}
+	})
+
+	config := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid           = "test_sid"
+  token         = "test_token"
+  sender_number = "123456789"
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+			},
+			{
+				Config:        config,
+				ResourceName:  frame.TerraformName,
+				ImportState:   true,
+				ImportStateId: created.GetId(),
+				ExpectError:   regexp.MustCompile("Cannot import non-existent remote object"),
+			},
+		},
+	})
 }
