@@ -1,6 +1,8 @@
 package machine_user
 
 import (
+	"context"
+
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -90,6 +92,20 @@ func GetResource() *schema.Resource {
 		CreateContext: create,
 		DeleteContext: delete,
 		UpdateContext: update,
+		// Toggling with_secret issues (or removes) the client credentials at apply time. Without
+		// this, the plan carries the prior client_id/client_secret as known values, and anything
+		// that depends on them (for example a Secret Manager version mirroring the secret) is
+		// planned with the stale value and fails at apply with "Provider produced inconsistent
+		// final plan". Marking them unknown lets dependents defer to the applied value.
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			if !d.HasChange(WithSecretVar) {
+				return nil
+			}
+			if err := d.SetNewComputed(clientIDVar); err != nil {
+				return err
+			}
+			return d.SetNewComputed(clientSecretVar)
+		},
 		Importer: helper.ImportWithIDAndOptionalOrg(
 			UserIDVar,
 			helper.NewImportAttribute(WithSecretVar, helper.ConvertBool, false),
