@@ -256,44 +256,48 @@ data "zitadel_human_users" "default" {
 }
 
 func TestAccHumanUsersDatasource_ScopedByOrg(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_human_users")
-	otherFrame := frame.AnotherOrg(t, "human-users-scope-b-"+frame.UniqueResourcesID)
+	datasourceName := "zitadel_human_users"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
+	otherFrame := frame.AnotherOrg(t, "human-users-scope-"+frame.UniqueResourcesID)
 
-	userName := "scopetest_" + frame.UniqueResourcesID
+	username := "scopetest_" + frame.UniqueResourcesID
 
-	userA := fmt.Sprintf(`
-resource "zitadel_human_user" "user_a" {
+	userInOrg := fmt.Sprintf(`
+resource "zitadel_human_user" "in_org" {
   org_id            = "%s"
   user_name         = "a_%s@example.com"
   first_name        = "Test"
   last_name         = "User"
   email             = "a_%s@example.com"
   is_email_verified = true
-}`, frame.OrgID, userName, userName)
+}
+`, frame.OrgID, username, username)
 
-	userB := fmt.Sprintf(`
-resource "zitadel_human_user" "user_b" {
+	userInOtherOrg := fmt.Sprintf(`
+resource "zitadel_human_user" "in_other_org" {
   org_id            = "%s"
   user_name         = "b_%s@example.com"
   first_name        = "Test"
   last_name         = "User"
   email             = "b_%s@example.com"
   is_email_verified = true
-}`, otherFrame.OrgID, userName, userName)
+}
+`, otherFrame.OrgID, username, username)
 
 	config := fmt.Sprintf(`
 data "zitadel_human_users" "default" {
   org_id           = "%s"
   user_name        = "%s"
   user_name_method = "TEXT_QUERY_METHOD_CONTAINS"
-  depends_on       = [zitadel_human_user.user_a, zitadel_human_user.user_b]
-}`, frame.OrgID, userName)
+  depends_on       = [zitadel_human_user.in_org, zitadel_human_user.in_other_org]
+}
+`, frame.OrgID, username)
 
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
-		[]string{userA, userB},
+		[]string{userInOrg, userInOtherOrg},
 		nil,
 		map[string]string{
 			"user_ids.#": "1",

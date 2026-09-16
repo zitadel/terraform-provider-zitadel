@@ -171,38 +171,42 @@ data "zitadel_machine_users" "default" {
 }
 
 func TestAccMachineUsersDatasource_ScopedByOrg(t *testing.T) {
-	frame := test_utils.NewOrgTestFrame(t, "zitadel_machine_users")
-	otherFrame := frame.AnotherOrg(t, "machine-users-scope-b-"+frame.UniqueResourcesID)
+	datasourceName := "zitadel_machine_users"
+	frame := test_utils.NewOrgTestFrame(t, datasourceName)
+	otherFrame := frame.AnotherOrg(t, "machine-users-scope-"+frame.UniqueResourcesID)
 
-	userName := "scopetest_" + frame.UniqueResourcesID
+	username := "scopetest_" + frame.UniqueResourcesID
 
-	userA := fmt.Sprintf(`
-resource "zitadel_machine_user" "user_a" {
+	userInOrg := fmt.Sprintf(`
+resource "zitadel_machine_user" "in_org" {
   org_id    = "%s"
   user_name = "a_%s@example.com"
   name      = "Test Machine"
-}`, frame.OrgID, userName)
+}
+`, frame.OrgID, username)
 
-	userB := fmt.Sprintf(`
-resource "zitadel_machine_user" "user_b" {
+	userInOtherOrg := fmt.Sprintf(`
+resource "zitadel_machine_user" "in_other_org" {
   org_id    = "%s"
   user_name = "b_%s@example.com"
   name      = "Test Machine"
-}`, otherFrame.OrgID, userName)
+}
+`, otherFrame.OrgID, username)
 
 	config := fmt.Sprintf(`
 data "zitadel_machine_users" "default" {
   org_id           = "%s"
   user_name        = "%s"
   user_name_method = "TEXT_QUERY_METHOD_CONTAINS"
-  depends_on       = [zitadel_machine_user.user_a, zitadel_machine_user.user_b]
-}`, frame.OrgID, userName)
+  depends_on       = [zitadel_machine_user.in_org, zitadel_machine_user.in_other_org]
+}
+`, frame.OrgID, username)
 
 	test_utils.RunDatasourceTest(
 		t,
 		frame.BaseTestFrame,
 		config,
-		[]string{userA, userB},
+		[]string{userInOrg, userInOtherOrg},
 		nil,
 		map[string]string{
 			"user_ids.#": "1",
