@@ -143,6 +143,11 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		return diag.Errorf("failed to get sms http provider: %v", err)
 	}
 
+	if resp.GetConfig().GetHttp() == nil {
+		d.SetId("")
+		return nil
+	}
+
 	set := map[string]interface{}{
 		EndPointVar:    resp.GetConfig().GetHttp().GetEndpoint(),
 		DescriptionVar: resp.GetConfig().GetDescription(),
