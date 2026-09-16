@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/settings"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -97,9 +98,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(setActiveVar) && d.Get(setActiveVar).(bool) {
-		if _, err = client.ActivateEmailProvider(ctx, &admin.ActivateEmailProviderRequest{Id: d.Id()}); err != nil {
-			return diag.Errorf("failed to activate email provider smtp: %v", err)
+	if d.HasChange(setActiveVar) {
+		if d.Get(setActiveVar).(bool) {
+			if _, err = client.ActivateEmailProvider(ctx, &admin.ActivateEmailProviderRequest{Id: d.Id()}); err != nil {
+				return diag.Errorf("failed to activate email provider smtp: %v", err)
+			}
+		} else {
+			if _, err = client.DeactivateEmailProvider(ctx, &admin.DeactivateEmailProviderRequest{Id: d.Id()}); err != nil {
+				return diag.Errorf("failed to deactivate email provider smtp: %v", err)
+			}
 		}
 	}
 	return nil
@@ -142,7 +149,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		userVar:           resp.GetConfig().GetSmtp().GetUser(),
 		replyToAddressVar: resp.GetConfig().GetSmtp().GetReplyToAddress(),
 		DescriptionVar:    resp.GetConfig().GetDescription(),
-		setActiveVar:      d.Get(setActiveVar).(bool),
+		setActiveVar:      resp.GetConfig().GetState() == settings.EmailProviderState_EMAIL_PROVIDER_ACTIVE,
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

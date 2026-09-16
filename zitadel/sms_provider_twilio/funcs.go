@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/settings"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -101,9 +102,15 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		}
 	}
 
-	if d.HasChange(setActiveVar) && d.Get(setActiveVar).(bool) {
-		if _, err = client.ActivateSMSProvider(ctx, &admin.ActivateSMSProviderRequest{Id: d.Id()}); err != nil {
-			return diag.Errorf("failed to activate sms provider twilio: %v", err)
+	if d.HasChange(setActiveVar) {
+		if d.Get(setActiveVar).(bool) {
+			if _, err = client.ActivateSMSProvider(ctx, &admin.ActivateSMSProviderRequest{Id: d.Id()}); err != nil {
+				return diag.Errorf("failed to activate sms provider twilio: %v", err)
+			}
+		} else {
+			if _, err = client.DeactivateSMSProvider(ctx, &admin.DeactivateSMSProviderRequest{Id: d.Id()}); err != nil {
+				return diag.Errorf("failed to deactivate sms provider twilio: %v", err)
+			}
 		}
 	}
 	return nil
@@ -143,7 +150,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 		SenderNumberVar:     resp.GetConfig().GetTwilio().GetSenderNumber(),
 		VerifyServiceSidVar: resp.GetConfig().GetTwilio().GetVerifyServiceSid(),
 		DescriptionVar:      resp.GetConfig().GetDescription(),
-		setActiveVar:        d.Get(setActiveVar).(bool),
+		setActiveVar:        resp.GetConfig().GetState() == settings.SMSProviderConfigState_SMS_PROVIDER_CONFIG_ACTIVE,
 	}
 	for k, v := range set {
 		if err := d.Set(k, v); err != nil {

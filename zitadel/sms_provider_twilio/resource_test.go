@@ -2,12 +2,12 @@ package sms_provider_twilio_test
 
 import (
 	"fmt"
-	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/settings"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
@@ -193,23 +193,50 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resou
 	}
 }
 
-func TestAccSMSProviderTwilioImportWrongType(t *testing.T) {
+func TestAccSMSProviderTwilioActivationDrift(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
 
-	created, err := frame.AddSMSProviderHTTP(frame, &admin.AddSMSProviderHTTPRequest{
-		Endpoint:    "https://example.com/wrong-type",
-		Description: "wrong type",
-	})
-	if err != nil {
-		t.Fatalf("creating http provider failed: %v", err)
-	}
-	t.Cleanup(func() {
-		if _, err := frame.RemoveSMSProvider(frame, &admin.RemoveSMSProviderRequest{Id: created.GetId()}); err != nil {
-			t.Logf("removing http provider failed: %v", err)
-		}
-	})
+	activatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid           = "test_sid"
+  token         = "test_token"
+  sender_number = "123456789"
+  set_active    = true
+}
+`, frame.ProviderSnippet)
 
-	config := fmt.Sprintf(`
+	var providerID string
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					rememberID(frame, &providerID),
+					checkRemoteActive(frame, true),
+				),
+			},
+			{
+				PreConfig: func() {
+					if _, err := frame.DeactivateSMSProvider(frame, &admin.DeactivateSMSProviderRequest{Id: providerID}); err != nil {
+						t.Fatalf("deactivating sms provider out of band failed: %v", err)
+					}
+				},
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+					checkRemoteActive(frame, true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSMSProviderTwilioActivationUnmanaged(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
+
+	unmanagedConfig := fmt.Sprintf(`
 %s
 resource "zitadel_sms_provider_twilio" "default" {
   sid           = "test_sid"
@@ -218,19 +245,90 @@ resource "zitadel_sms_provider_twilio" "default" {
 }
 `, frame.ProviderSnippet)
 
+	var providerID string
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
 		Steps: []resource.TestStep{
 			{
-				Config: config,
+				Config: unmanagedConfig,
+				Check:  rememberID(frame, &providerID),
 			},
 			{
-				Config:        config,
-				ResourceName:  frame.TerraformName,
-				ImportState:   true,
-				ImportStateId: created.GetId(),
-				ExpectError:   regexp.MustCompile("Cannot import non-existent remote object"),
+				PreConfig: func() {
+					if _, err := frame.ActivateSMSProvider(frame, &admin.ActivateSMSProviderRequest{Id: providerID}); err != nil {
+						t.Fatalf("activating sms provider out of band failed: %v", err)
+					}
+				},
+				Config: unmanagedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+					checkRemoteActive(frame, true),
+				),
 			},
 		},
 	})
+}
+
+func TestAccSMSProviderTwilioDeactivation(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
+
+	activatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid           = "test_sid"
+  token         = "test_token"
+  sender_number = "123456789"
+  set_active    = true
+}
+`, frame.ProviderSnippet)
+
+	deactivatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid           = "test_sid"
+  token         = "test_token"
+  sender_number = "123456789"
+  set_active    = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+					checkRemoteActive(frame, true),
+				),
+			},
+			{
+				Config: deactivatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "false"),
+					checkRemoteActive(frame, false),
+				),
+			},
+		},
+	})
+}
+func rememberID(frame *test_utils.InstanceTestFrame, id *string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		*id = frame.State(state).ID
+		return nil
+	}
+}
+
+func checkRemoteActive(frame *test_utils.InstanceTestFrame, expect bool) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		resp, err := frame.GetSMSProvider(frame, &admin.GetSMSProviderRequest{Id: frame.State(state).ID})
+		if err != nil {
+			return fmt.Errorf("getting sms provider failed: %w", err)
+		}
+		actual := resp.GetConfig().GetState() == settings.SMSProviderConfigState_SMS_PROVIDER_CONFIG_ACTIVE
+		if actual != expect {
+			return fmt.Errorf("expected active %t, but got %t", expect, actual)
+		}
+		return nil
+	}
 }

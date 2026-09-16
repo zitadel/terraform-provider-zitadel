@@ -35,7 +35,8 @@ func GetResource() *schema.Resource {
 			setActiveVar: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Set the email provider as active after creating/updating.",
+				Computed:    true,
+				Description: "Set the email provider as active after creating/updating. If not configured, the state in ZITADEL is kept.",
 			},
 		},
 		CreateContext: create,
