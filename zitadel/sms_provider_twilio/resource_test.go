@@ -289,3 +289,47 @@ func checkRemoteActive(frame *test_utils.InstanceTestFrame, expect bool) resourc
 		return nil
 	}
 }
+
+func TestAccSMSProviderTwilioDeactivation(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
+
+	activatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid           = "test_sid"
+  token         = "test_token"
+  sender_number = "123456789"
+  set_active    = true
+}
+`, frame.ProviderSnippet)
+
+	deactivatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_twilio" "default" {
+  sid           = "test_sid"
+  token         = "test_token"
+  sender_number = "123456789"
+  set_active    = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+					checkRemoteActive(frame, true),
+				),
+			},
+			{
+				Config: deactivatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "false"),
+					checkRemoteActive(frame, false),
+				),
+			},
+		},
+	})
+}

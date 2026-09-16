@@ -222,3 +222,43 @@ func checkRemoteActive(frame *test_utils.InstanceTestFrame, expect bool) resourc
 		return nil
 	}
 }
+
+func TestAccEmailHttpProviderDeactivation(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_email_provider_http")
+
+	activatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_email_provider_http" "default" {
+  endpoint   = "https://example.com/emails"
+  set_active = true
+}
+`, frame.ProviderSnippet)
+
+	deactivatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_email_provider_http" "default" {
+  endpoint   = "https://example.com/emails"
+  set_active = false
+}
+`, frame.ProviderSnippet)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+					checkRemoteActive(frame, true),
+				),
+			},
+			{
+				Config: deactivatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "false"),
+					checkRemoteActive(frame, false),
+				),
+			},
+		},
+	})
+}
