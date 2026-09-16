@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/admin"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/settings"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/test_utils"
@@ -61,5 +62,188 @@ func checkRemoteProperty(frame *test_utils.InstanceTestFrame) func(string) resou
 			}
 			return nil
 		}
+	}
+}
+
+func TestAccSMTPConfigActivation(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_smtp_config")
+
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_smtp_config" "default" {
+  sender_address = "zitadel@%s"
+  sender_name    = "ZITADEL"
+  host           = "localhost:25"
+  set_active     = false
+}
+`, frame.ProviderSnippet, frame.InstanceDomain)
+
+	activatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_smtp_config" "default" {
+  sender_address = "zitadel@%s"
+  sender_name    = "ZITADEL"
+  host           = "localhost:25"
+  set_active     = true
+}
+`, frame.ProviderSnippet, frame.InstanceDomain)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "false"),
+				),
+			},
+			{
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSMTPConfigActivationDrift(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_smtp_config")
+
+	activatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_smtp_config" "default" {
+  sender_address = "zitadel@%s"
+  sender_name    = "ZITADEL"
+  host           = "localhost:25"
+  set_active     = true
+}
+`, frame.ProviderSnippet, frame.InstanceDomain)
+
+	var providerID string
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					rememberID(frame, &providerID),
+					checkRemoteActive(frame, true),
+				),
+			},
+			{
+				PreConfig: func() {
+					if _, err := frame.DeactivateSMTPConfig(frame, &admin.DeactivateSMTPConfigRequest{Id: providerID}); err != nil {
+						t.Fatalf("deactivating smtp config out of band failed: %v", err)
+					}
+				},
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+					checkRemoteActive(frame, true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSMTPConfigActivationUnmanaged(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_smtp_config")
+
+	unmanagedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_smtp_config" "default" {
+  sender_address = "zitadel@%s"
+  sender_name    = "ZITADEL"
+  host           = "localhost:25"
+}
+`, frame.ProviderSnippet, frame.InstanceDomain)
+
+	var providerID string
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: unmanagedConfig,
+				Check:  rememberID(frame, &providerID),
+			},
+			{
+				PreConfig: func() {
+					if _, err := frame.ActivateSMTPConfig(frame, &admin.ActivateSMTPConfigRequest{Id: providerID}); err != nil {
+						t.Fatalf("activating smtp config out of band failed: %v", err)
+					}
+				},
+				Config: unmanagedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+					checkRemoteActive(frame, true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSMTPConfigDeactivation(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_smtp_config")
+
+	activatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_smtp_config" "default" {
+  sender_address = "zitadel@%s"
+  sender_name    = "ZITADEL"
+  host           = "localhost:25"
+  set_active     = true
+}
+`, frame.ProviderSnippet, frame.InstanceDomain)
+
+	deactivatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_smtp_config" "default" {
+  sender_address = "zitadel@%s"
+  sender_name    = "ZITADEL"
+  host           = "localhost:25"
+  set_active     = false
+}
+`, frame.ProviderSnippet, frame.InstanceDomain)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: activatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "true"),
+					checkRemoteActive(frame, true),
+				),
+			},
+			{
+				Config: deactivatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "set_active", "false"),
+					checkRemoteActive(frame, false),
+				),
+			},
+		},
+	})
+}
+
+func rememberID(frame *test_utils.InstanceTestFrame, id *string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		*id = frame.State(state).ID
+		return nil
+	}
+}
+
+func checkRemoteActive(frame *test_utils.InstanceTestFrame, expect bool) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		resp, err := frame.GetSMTPConfigById(frame, &admin.GetSMTPConfigByIdRequest{Id: frame.State(state).ID})
+		if err != nil {
+			return fmt.Errorf("getting smtp config failed: %w", err)
+		}
+		actual := resp.GetSmtpConfig().GetState() == settings.SMTPConfigState_SMTP_CONFIG_ACTIVE
+		if actual != expect {
+			return fmt.Errorf("expected active %t, but got %t", expect, actual)
+		}
+		return nil
 	}
 }

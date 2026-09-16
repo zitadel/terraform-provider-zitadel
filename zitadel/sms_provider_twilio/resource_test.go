@@ -269,27 +269,6 @@ resource "zitadel_sms_provider_twilio" "default" {
 	})
 }
 
-func rememberID(frame *test_utils.InstanceTestFrame, id *string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		*id = frame.State(state).ID
-		return nil
-	}
-}
-
-func checkRemoteActive(frame *test_utils.InstanceTestFrame, expect bool) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		resp, err := frame.GetSMSProvider(frame, &admin.GetSMSProviderRequest{Id: frame.State(state).ID})
-		if err != nil {
-			return fmt.Errorf("getting sms provider failed: %w", err)
-		}
-		actual := resp.GetConfig().GetState() == settings.SMSProviderConfigState_SMS_PROVIDER_CONFIG_ACTIVE
-		if actual != expect {
-			return fmt.Errorf("expected active %t, but got %t", expect, actual)
-		}
-		return nil
-	}
-}
-
 func TestAccSMSProviderTwilioDeactivation(t *testing.T) {
 	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_twilio")
 
@@ -332,4 +311,24 @@ resource "zitadel_sms_provider_twilio" "default" {
 			},
 		},
 	})
+}
+func rememberID(frame *test_utils.InstanceTestFrame, id *string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		*id = frame.State(state).ID
+		return nil
+	}
+}
+
+func checkRemoteActive(frame *test_utils.InstanceTestFrame, expect bool) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		resp, err := frame.GetSMSProvider(frame, &admin.GetSMSProviderRequest{Id: frame.State(state).ID})
+		if err != nil {
+			return fmt.Errorf("getting sms provider failed: %w", err)
+		}
+		actual := resp.GetConfig().GetState() == settings.SMSProviderConfigState_SMS_PROVIDER_CONFIG_ACTIVE
+		if actual != expect {
+			return fmt.Errorf("expected active %t, but got %t", expect, actual)
+		}
+		return nil
+	}
 }
