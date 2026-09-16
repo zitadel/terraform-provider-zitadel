@@ -34,7 +34,7 @@ resource "zitadel_sms_provider_twilio" "default" {
 ### Optional
 
 - `description` (String) Description of the SMS provider.
-- `set_active` (Boolean) Set the SMS provider as active after creating/updating.
+- `set_active` (Boolean) Set the SMS provider as active after creating/updating. If not configured, the state in ZITADEL is kept.
 - `verify_service_sid` (String) Twilio Verify Service SID used for phone verification.
 
 ### Read-Only

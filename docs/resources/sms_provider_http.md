@@ -30,7 +30,7 @@ resource "zitadel_sms_provider_http" "default" {
 
 - `description` (String) Description of the SMS provider.
 - `expiration_signing_key` (String) Expiration duration for the signing key. When set during update, the old signing key will remain valid for the specified duration to allow for a graceful key rotation.
-- `set_active` (Boolean) Set the SMS provider as active after creating/updating.
+- `set_active` (Boolean) Set the SMS provider as active after creating/updating. If not configured, the state in ZITADEL is kept.
 
 ### Read-Only
 

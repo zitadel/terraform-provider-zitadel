@@ -37,7 +37,7 @@ resource "zitadel_smtp_config" "default" {
 - `description` (String) Description of the SMTP configuration.
 - `password` (String, Sensitive) Password used to communicate with your SMTP server. This value is write-only and is never stored in Terraform state; it cannot be read back.
 - `reply_to_address` (String) Address to reply to.
-- `set_active` (Boolean) Set the SMTP configuration active after creating/updating.
+- `set_active` (Boolean) Set the SMTP configuration as active after creating/updating. If not configured, the state in ZITADEL is kept.
 - `tls` (Boolean) TLS used to communicate with your SMTP server.
 - `user` (String) User used to communicate with your SMTP server.
 
