@@ -87,12 +87,14 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 			Endpoint:    d.Get(EndpointVar).(string),
 			Description: d.Get(DescriptionVar).(string),
 		}
-		if v, ok := d.GetOk(ExpirationSigningKeyVar); ok && v.(string) != "" {
-			dur, err := time.ParseDuration(v.(string))
-			if err != nil {
-				return diag.Errorf("failed to parse expiration_signing_key duration: %v", err)
+		if d.HasChange(ExpirationSigningKeyVar) {
+			if v, ok := d.GetOk(ExpirationSigningKeyVar); ok && v.(string) != "" {
+				dur, err := time.ParseDuration(v.(string))
+				if err != nil {
+					return diag.Errorf("failed to parse expiration_signing_key duration: %v", err)
+				}
+				req.ExpirationSigningKey = durationpb.New(dur)
 			}
-			req.ExpirationSigningKey = durationpb.New(dur)
 		}
 		resp, err := client.UpdateEmailProviderHTTP(ctx, req)
 		if err != nil {

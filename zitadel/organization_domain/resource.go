@@ -1,6 +1,8 @@
 package organization_domain
 
 import (
+	"context"
+
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -66,6 +68,16 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithOrganizationID(OrganizationIDVar, DomainVar),
+		// Verifying the domain flips is_verified at apply time. Without this,
+		// the plan carries the prior value as known, and anything that depends
+		// on it is planned with the stale value. Marking it unknown lets
+		// dependents defer to the applied value.
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			if !d.HasChange(VerifyVar) || !d.Get(VerifyVar).(bool) {
+				return nil
+			}
+			return d.SetNewComputed(IsVerifiedVar)
+		},
+		Importer: helper.ImportWithOrganizationID(OrganizationIDVar, DomainVar),
 	}
 }

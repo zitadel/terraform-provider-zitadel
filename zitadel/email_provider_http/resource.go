@@ -1,6 +1,8 @@
 package email_provider_http
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
@@ -43,6 +45,9 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithIDAndOptionalSecret(IDVar, SigningKeyVar),
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			return helper.SigningKeyRotationDiff(d, ExpirationSigningKeyVar, SigningKeyVar)
+		},
+		Importer: helper.ImportWithIDAndOptionalSecret(IDVar, SigningKeyVar),
 	}
 }
