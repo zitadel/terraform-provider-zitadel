@@ -75,44 +75,7 @@ func read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagn
 	return nil
 }
 
-func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started update")
-	return create(ctx, d, m)
-}
-
 func delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	tflog.Info(ctx, "started delete: reverting to initial key")
-
-	clientinfo, ok := m.(*helper.ClientInfo)
-	if !ok {
-		return diag.Errorf("failed to get client")
-	}
-
-	client, err := helper.GetWebKeyClient(ctx, clientinfo)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	resp, err := client.ListWebKeys(helper.CtxWithOrgID(ctx, d), &webkey.ListWebKeysRequest{})
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	for _, key := range resp.GetWebKeys() {
-		if key.GetState() == webkey.State_STATE_INITIAL {
-			tflog.Info(ctx, fmt.Sprintf("activating initial key with id %s", key.GetId()))
-			_, err = client.ActivateWebKey(helper.CtxWithOrgID(ctx, d), &webkey.ActivateWebKeyRequest{Id: key.GetId()})
-			if err != nil {
-				st, ok := status.FromError(err)
-				if ok && st.Code() == codes.FailedPrecondition {
-					return nil
-				}
-				return diag.FromErr(err)
-			}
-			return nil
-		}
-	}
-
-	tflog.Info(ctx, "no initial key found, leaving current active key unchanged")
+	tflog.Info(ctx, "the active web key cannot be deactivated, leaving it unchanged")
 	return nil
 }
