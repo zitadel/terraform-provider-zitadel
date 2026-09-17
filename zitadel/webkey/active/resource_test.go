@@ -16,6 +16,18 @@ import (
 
 func TestAccActiveWebKey(t *testing.T) {
 	frame := test_utils.NewOrgTestFrame(t, "zitadel_active_webkey")
+	client, err := helper.GetWebKeyClient(frame, frame.ClientInfo)
+	if err != nil {
+		t.Fatalf("failed to get client: %v", err)
+	}
+	// The active key can neither be deleted nor deactivated, so the test hands
+	// activation over to a key it does not manage before its keys are destroyed.
+	unmanaged, err := client.CreateWebKey(frame, &webkey.CreateWebKeyRequest{})
+	if err != nil {
+		t.Fatalf("failed to create unmanaged web key: %v", err)
+	}
+	unmanagedKeyID := unmanaged.GetId()
+
 	configInitial := fmt.Sprintf(`
 %s
 %s
@@ -33,6 +45,10 @@ resource "zitadel_webkey" "key_v2" {
 resource "zitadel_active_webkey" "default" {
   org_id = data.zitadel_org.default.id
   key_id = zitadel_webkey.key_v1.id
+}
+
+resource "terraform_data" "active_id" {
+  input = zitadel_active_webkey.default.id
 }
 `, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
 
@@ -54,7 +70,35 @@ resource "zitadel_active_webkey" "default" {
   org_id = data.zitadel_org.default.id
   key_id = zitadel_webkey.key_v2.id
 }
+
+resource "terraform_data" "active_id" {
+  input = zitadel_active_webkey.default.id
+}
 `, frame.ProviderSnippet, frame.AsOrgDefaultDependency)
+
+	configUnmanaged := fmt.Sprintf(`
+%s
+%s
+
+resource "zitadel_webkey" "key_v1" {
+  org_id = data.zitadel_org.default.id
+  rsa {}
+}
+
+resource "zitadel_webkey" "key_v2" {
+  org_id = data.zitadel_org.default.id
+  ecdsa {}
+}
+
+resource "zitadel_active_webkey" "default" {
+  org_id = data.zitadel_org.default.id
+  key_id = "%s"
+}
+
+resource "terraform_data" "active_id" {
+  input = zitadel_active_webkey.default.id
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, unmanagedKeyID)
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
@@ -64,12 +108,21 @@ resource "zitadel_active_webkey" "default" {
 				Config: configInitial,
 				Check: resource.ComposeTestCheckFunc(
 					checkRemoteProperty(frame, "key_v1")(""),
+					resource.TestCheckResourceAttrPair("terraform_data.active_id", "output", frame.TerraformName, "id"),
 				),
 			},
 			{
 				Config: configRotated,
 				Check: resource.ComposeTestCheckFunc(
 					checkRemoteProperty(frame, "key_v2")(""),
+					resource.TestCheckResourceAttrPair("terraform_data.active_id", "output", frame.TerraformName, "id"),
+				),
+			},
+			{
+				Config: configUnmanaged,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "id", frame.OrgID+":"+unmanagedKeyID),
+					resource.TestCheckResourceAttrPair("terraform_data.active_id", "output", frame.TerraformName, "id"),
 				),
 			},
 		},

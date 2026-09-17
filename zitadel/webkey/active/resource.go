@@ -19,11 +19,11 @@ func GetResource() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of the webkey to be active.",
+				ForceNew:    true,
 			},
 		},
 		CreateContext: create,
 		ReadContext:   read,
-		UpdateContext: update,
 		DeleteContext: delete,
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, i interface{}) ([]*schema.ResourceData, error) {
