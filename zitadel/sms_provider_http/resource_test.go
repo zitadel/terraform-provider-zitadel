@@ -201,6 +201,66 @@ resource "zitadel_sms_provider_http" "default" {
 		},
 	})
 }
+func TestAccSMSHttpProviderSigningKeyDependent(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_sms_provider_http")
+
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_http" "default" {
+  endpoint               = "https://example.com/sms"
+  description            = "initial description"
+  expiration_signing_key = "0s"
+}
+
+resource "terraform_data" "signing_key" {
+  input = zitadel_sms_provider_http.default.signing_key
+}
+`, frame.ProviderSnippet)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_sms_provider_http" "default" {
+  endpoint               = "https://example.com/sms"
+  description            = "updated description"
+  expiration_signing_key = "0s"
+}
+
+resource "terraform_data" "signing_key" {
+  input = zitadel_sms_provider_http.default.signing_key
+}
+`, frame.ProviderSnippet)
+
+	var signingKey string
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair("terraform_data.signing_key", "output", frame.TerraformName, sms_provider_http.SigningKeyVar),
+					func(state *terraform.State) error {
+						signingKey = frame.State(state).Attributes[sms_provider_http.SigningKeyVar]
+						return nil
+					},
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair("terraform_data.signing_key", "output", frame.TerraformName, sms_provider_http.SigningKeyVar),
+					func(state *terraform.State) error {
+						if frame.State(state).Attributes[sms_provider_http.SigningKeyVar] != signingKey {
+							return fmt.Errorf("signing_key changed without a rotation")
+						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 func rememberID(frame *test_utils.InstanceTestFrame, id *string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		*id = frame.State(state).ID

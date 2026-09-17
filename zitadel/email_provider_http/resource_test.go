@@ -241,6 +241,92 @@ resource "zitadel_email_provider_http" "default" {
 		},
 	})
 }
+func TestAccEmailHttpProviderSigningKeyRotationDependent(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_email_provider_http")
+
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_email_provider_http" "default" {
+  endpoint    = "https://example.com/emails"
+  description = "initial description"
+}
+
+resource "terraform_data" "signing_key" {
+  input = zitadel_email_provider_http.default.signing_key
+}
+`, frame.ProviderSnippet)
+
+	rotationConfig := fmt.Sprintf(`
+%s
+resource "zitadel_email_provider_http" "default" {
+  endpoint               = "https://example.com/emails"
+  description            = "initial description"
+  expiration_signing_key = "0s"
+}
+
+resource "terraform_data" "signing_key" {
+  input = zitadel_email_provider_http.default.signing_key
+}
+`, frame.ProviderSnippet)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_email_provider_http" "default" {
+  endpoint               = "https://example.com/emails"
+  description            = "updated description"
+  expiration_signing_key = "0s"
+}
+
+resource "terraform_data" "signing_key" {
+  input = zitadel_email_provider_http.default.signing_key
+}
+`, frame.ProviderSnippet)
+
+	var signingKey string
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair("terraform_data.signing_key", "output", frame.TerraformName, email_provider_http.SigningKeyVar),
+					func(state *terraform.State) error {
+						signingKey = frame.State(state).Attributes[email_provider_http.SigningKeyVar]
+						return nil
+					},
+				),
+			},
+			{
+				Config: rotationConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair("terraform_data.signing_key", "output", frame.TerraformName, email_provider_http.SigningKeyVar),
+					func(state *terraform.State) error {
+						newKey := frame.State(state).Attributes[email_provider_http.SigningKeyVar]
+						if newKey == signingKey {
+							return fmt.Errorf("signing_key did not change after rotation")
+						}
+						signingKey = newKey
+						return nil
+					},
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair("terraform_data.signing_key", "output", frame.TerraformName, email_provider_http.SigningKeyVar),
+					func(state *terraform.State) error {
+						if frame.State(state).Attributes[email_provider_http.SigningKeyVar] != signingKey {
+							return fmt.Errorf("signing_key changed without a rotation")
+						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 func rememberID(frame *test_utils.InstanceTestFrame, id *string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		*id = frame.State(state).ID

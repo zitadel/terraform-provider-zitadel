@@ -1,6 +1,7 @@
 package action_target
 
 import (
+	"context"
 	"strings"
 
 	"github.com/hashicorp/go-cty/cty"
@@ -77,6 +78,9 @@ func GetResource() *schema.Resource {
 		DeleteContext: delete,
 		ReadContext:   read,
 		UpdateContext: update,
-		Importer:      helper.ImportWithIDAndOptionalSecret(TargetIDVar, SigningKeyVar),
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			return helper.SigningKeyRotationDiff(d, ExpirationSigningKeyVar, SigningKeyVar)
+		},
+		Importer: helper.ImportWithIDAndOptionalSecret(TargetIDVar, SigningKeyVar),
 	}
 }

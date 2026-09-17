@@ -185,6 +185,66 @@ resource "zitadel_machine_user" "default" {
 	})
 }
 
+func TestAccMachineUserToggleSecretDependent(t *testing.T) {
+	frame := test_utils.NewOrgTestFrame(t, "zitadel_machine_user")
+
+	configWithoutSecret := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_machine_user" "default" {
+  org_id      = data.zitadel_org.default.id
+  user_name   = "%s"
+  name        = "%s"
+  description = "toggle secret dependent test"
+  with_secret = false
+}
+
+resource "terraform_data" "client_secret" {
+  input = zitadel_machine_user.default.client_secret
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.UniqueResourcesID, frame.UniqueResourcesID)
+
+	configWithSecret := fmt.Sprintf(`
+%s
+%s
+resource "zitadel_machine_user" "default" {
+  org_id      = data.zitadel_org.default.id
+  user_name   = "%s"
+  name        = "%s"
+  description = "toggle secret dependent test"
+  with_secret = true
+}
+
+resource "terraform_data" "client_secret" {
+  input = zitadel_machine_user.default.client_secret
+}
+`, frame.ProviderSnippet, frame.AsOrgDefaultDependency, frame.UniqueResourcesID, frame.UniqueResourcesID)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: configWithoutSecret,
+				Check:  resource.TestCheckResourceAttrPair("terraform_data.client_secret", "output", frame.TerraformName, "client_secret"),
+			},
+			{
+				Config: configWithSecret,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet(frame.TerraformName, "client_secret"),
+					resource.TestCheckResourceAttrPair("terraform_data.client_secret", "output", frame.TerraformName, "client_secret"),
+				),
+			},
+			{
+				Config: configWithoutSecret,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(frame.TerraformName, "client_secret", ""),
+					resource.TestCheckResourceAttrPair("terraform_data.client_secret", "output", frame.TerraformName, "client_secret"),
+				),
+			},
+		},
+	})
+}
+
 func checkRemoteProperty(frame *test_utils.OrgTestFrame) func(string) resource.TestCheckFunc {
 	return func(expect string) resource.TestCheckFunc {
 		return func(state *terraform.State) error {

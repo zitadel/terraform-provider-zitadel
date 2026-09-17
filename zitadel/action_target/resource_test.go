@@ -359,6 +359,101 @@ resource "zitadel_action_target" "default" {
 	})
 }
 
+func TestAccActionTargetSigningKeyRotationDependent(t *testing.T) {
+	frame := test_utils.NewInstanceTestFrame(t, "zitadel_action_target")
+
+	initialConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name               = "%s"
+  endpoint           = "https://example.com/test"
+  target_type        = "REST_WEBHOOK"
+  timeout            = "10s"
+  interrupt_on_error = false
+}
+
+resource "terraform_data" "signing_key" {
+  input = zitadel_action_target.default.signing_key
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
+
+	rotationConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name                   = "%s"
+  endpoint               = "https://example.com/test"
+  target_type            = "REST_WEBHOOK"
+  timeout                = "10s"
+  interrupt_on_error     = false
+  expiration_signing_key = "0s"
+}
+
+resource "terraform_data" "signing_key" {
+  input = zitadel_action_target.default.signing_key
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
+
+	updatedConfig := fmt.Sprintf(`
+%s
+resource "zitadel_action_target" "default" {
+  name                   = "%s"
+  endpoint               = "https://example.com/test-updated"
+  target_type            = "REST_WEBHOOK"
+  timeout                = "10s"
+  interrupt_on_error     = false
+  expiration_signing_key = "0s"
+}
+
+resource "terraform_data" "signing_key" {
+  input = zitadel_action_target.default.signing_key
+}
+`, frame.ProviderSnippet, frame.UniqueResourcesID)
+
+	var signingKey string
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: frame.V6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: initialConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair("terraform_data.signing_key", "output", frame.TerraformName, action_target.SigningKeyVar),
+					func(state *terraform.State) error {
+						signingKey = frame.State(state).Attributes[action_target.SigningKeyVar]
+						return nil
+					},
+				),
+			},
+			{
+				Config: rotationConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair("terraform_data.signing_key", "output", frame.TerraformName, action_target.SigningKeyVar),
+					func(state *terraform.State) error {
+						newKey := frame.State(state).Attributes[action_target.SigningKeyVar]
+						if newKey == signingKey {
+							return fmt.Errorf("signing_key did not change after rotation")
+						}
+						signingKey = newKey
+						return nil
+					},
+				),
+			},
+			{
+				Config: updatedConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair("terraform_data.signing_key", "output", frame.TerraformName, action_target.SigningKeyVar),
+					func(state *terraform.State) error {
+						if frame.State(state).Attributes[action_target.SigningKeyVar] != signingKey {
+							return fmt.Errorf("signing_key changed without a rotation")
+						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 func checkTargetType(frame *test_utils.InstanceTestFrame, expectedTargetType string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		rs, ok := state.RootModule().Resources[frame.TerraformName]
