@@ -1,1 +1,1 @@
-terraform import zitadel_instance_restrictions.default ""
+terraform import zitadel_instance_restrictions.default 'default'

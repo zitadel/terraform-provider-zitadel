@@ -135,15 +135,29 @@ func TestImportWithAttributes(t *testing.T) {
 			},
 		},
 	}, {
-		name: `<> with '123...' fails`,
+		// Terraform rejects empty import IDs, so a singleton resource is imported with a
+		// throwaway placeholder that ZITADEL ignores.
+		// https://github.com/zitadel/terraform-provider-zitadel/issues/467
+		name: `<> with a placeholder works`,
+		args: args{
+			attrs: []importAttribute{emptyIDAttribute},
+			id:    "default",
+		},
+		want: want{
+			attributes: map[string]interface{}{
+				"id": "imported",
+			},
+		},
+	}, {
+		name: `<> with '123...' works`,
 		args: args{
 			attrs: []importAttribute{emptyIDAttribute},
 			id:    validID,
 		},
 		want: want{
-			expectErrorWithIDFormat: "<>",
-			expectErrorWithMinParts: -1,
-			expectErrorWithMaxParts: -1,
+			attributes: map[string]interface{}{
+				"id": "imported",
+			},
 		},
 	}, {
 		name: `<[org_id]> with '123...' works`,

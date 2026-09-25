@@ -17,7 +17,7 @@ import (
 
 var (
 	ImportOptionalOrgAttribute = NewImportAttribute(OrgIDVar, ConvertNonEmpty, true)
-	emptyIDAttribute           = NewImportAttribute(`""`, ConvertEmpty, false)
+	emptyIDAttribute           = NewImportAttribute(`""`, ConvertPlaceholder, false)
 	SemicolonPlaceholder       = "__SEMICOLON__"
 )
 
@@ -162,8 +162,19 @@ func importWithAttributes(state importState, attrs ...importAttribute) (err erro
 	if err != nil && err != io.EOF {
 		return fmt.Errorf("failed to parse id: %w", err)
 	}
-	// if we expect an empty id and have more than just the emptyIDAttribute, we prepend an empty part to the ID
-	if len(attrs) > 0 && attrs[0].key == emptyIDAttribute.key || attrs[0].optional && len(parts) == 0 {
+	// The first attribute may be a synthetic emptyIDAttribute whose value never
+	// identifies the remote resource. We prepend an empty part to fill that slot when
+	// the user does not supply one:
+	//   - Resources that combine an empty id with further attributes (e.g. an org id)
+	//     always synthesize the slot, since the user only provides the trailing parts.
+	//   - Singleton resources have the emptyIDAttribute as their only attribute. Terraform
+	//     rejects empty import IDs, so those are imported with a throwaway placeholder such
+	//     as "default" that occupies the slot directly; we only synthesize it when the id is
+	//     empty, preserving backwards compatibility. See
+	//     https://github.com/zitadel/terraform-provider-zitadel/issues/467
+	emptyIDFirst := len(attrs) > 0 && attrs[0].key == emptyIDAttribute.key
+	singleton := emptyIDFirst && len(attrs) == 1
+	if (emptyIDFirst && !singleton) || (singleton && len(parts) == 0) || (attrs[0].optional && len(parts) == 0) {
 		parts = append([]string{""}, parts...)
 		internalMinParts++
 	}
@@ -224,12 +235,13 @@ func ConvertBase64(importValue string) (interface{}, error) {
 	return string(importValueDecoded), nil
 }
 
-var _ ConvertStringFunc = ConvertEmpty
+var _ ConvertStringFunc = ConvertPlaceholder
 
-func ConvertEmpty(importValue string) (interface{}, error) {
-	if len(importValue) > 0 {
-		return nil, fmt.Errorf(`value must be empty, but got "%s"`, importValue)
-	}
+// ConvertPlaceholder accepts any value for an import position whose value is not used to
+// identify the remote resource, always mapping it to the dummy id "imported". Singleton
+// resources have no meaningful id, but Terraform rejects empty import IDs, so they are
+// imported with a throwaway placeholder such as "default" that this function ignores.
+func ConvertPlaceholder(string) (interface{}, error) {
 	return "imported", nil
 }
 

@@ -1,2 +1,3 @@
-# The resource can be imported using the ID format `<>`, e.g.
-terraform import zitadel_default_password_complexity_policy.imported ''
+# Terraform rejects empty import IDs, so the resource is imported with the placeholder id
+# `default`, which ZITADEL ignores, e.g.
+terraform import zitadel_default_password_complexity_policy.imported 'default'
