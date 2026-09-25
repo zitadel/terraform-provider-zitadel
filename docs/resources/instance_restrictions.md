@@ -33,5 +33,5 @@ resource "zitadel_instance_restrictions" "default" {
 ## Import
 
 ```bash
-terraform import zitadel_instance_restrictions.default ""
+terraform import zitadel_instance_restrictions.default 'default'
 ```

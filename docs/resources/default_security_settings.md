@@ -36,5 +36,5 @@ resource "zitadel_default_security_settings" "default" {
 ## Import
 
 ```bash
-terraform import zitadel_default_security_settings.default ""
+terraform import zitadel_default_security_settings.default 'default'
 ```
