@@ -57,7 +57,8 @@ func RunInstanceIDPLifecyleTest(t *testing.T, resourceName, secretAttribute stri
 // RunInstanceIDPUnchangedSecretTest checks that updating an IDP without
 // changing its secret does not send the secret to ZITADEL, while changing the
 // secret still does. secretField is the secret's key in the eventType payload.
-func RunInstanceIDPUnchangedSecretTest(t *testing.T, resourceName, eventType, secretAttribute, secretField string) {
+// secretOverride works as in RunInstanceIDPLifecyleTest.
+func RunInstanceIDPUnchangedSecretTest(t *testing.T, resourceName, eventType, secretAttribute, secretField string, secretOverride ...string) {
 	frame := test_utils.NewInstanceTestFrame(t, resourceName)
 	resourceExample, exampleAttributes := test_utils.ReadExample(t, test_utils.Resources, frame.ResourceType)
 	nameProperty := test_utils.AttributeValue(t, idp_utils.NameVar, exampleAttributes).AsString()
@@ -67,18 +68,22 @@ func RunInstanceIDPUnchangedSecretTest(t *testing.T, resourceName, eventType, se
 		cfg = strings.Replace(cfg, exampleSecret, secret, 1)
 		return frame.ProviderSnippet + "\n" + cfg
 	}
+	createSecret, updatedSecret := exampleSecret, "an_updated_secret"
+	if len(secretOverride) == 2 {
+		createSecret, updatedSecret = secretOverride[0], secretOverride[1]
+	}
 	checkSecretSent := CheckLatestChangedEventSecret(*frame, eventType, secretField)
 	renamed := frame.UniqueResourcesID + "_renamed"
 	resource.ParallelTest(t, resource.TestCase{
 		CheckDestroy: test_utils.CheckAMinute(CheckDestroy(*frame)),
 		Steps: []resource.TestStep{
 			{ // Create the IDP
-				Config: config(frame.UniqueResourcesID, exampleSecret),
+				Config: config(frame.UniqueResourcesID, createSecret),
 			}, { // Renaming must not re-send the unchanged secret
-				Config: config(renamed, exampleSecret),
+				Config: config(renamed, createSecret),
 				Check:  test_utils.CheckAMinute(checkSecretSent(false)),
 			}, { // Changing the secret must send it
-				Config: config(renamed, "an_updated_secret"),
+				Config: config(renamed, updatedSecret),
 				Check:  test_utils.CheckAMinute(checkSecretSent(true)),
 			},
 		},
