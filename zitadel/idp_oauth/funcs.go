@@ -52,7 +52,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		Id:                    d.Id(),
 		Name:                  idp_utils.StringValue(d, idp_utils.NameVar),
 		ClientId:              idp_utils.StringValue(d, idp_utils.ClientIDVar),
-		ClientSecret:          idp_utils.WriteOnlyStringValue(d, idp_utils.ClientSecretVar),
+		ClientSecret:          idp_utils.ChangedClientSecretValue(d),
 		AuthorizationEndpoint: idp_utils.StringValue(d, AuthorizationEndpointVar),
 		TokenEndpoint:         idp_utils.StringValue(d, TokenEndpointVar),
 		UserEndpoint:          idp_utils.StringValue(d, UserEndpointVar),
