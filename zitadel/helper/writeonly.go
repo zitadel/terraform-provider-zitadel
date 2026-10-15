@@ -23,6 +23,18 @@ func WriteOnlyStringValue(d *schema.ResourceData, attributeVar string) string {
 	return v.AsString()
 }
 
+// ChangedWriteOnlyStringValue reads a write-only attribute for an update
+// request. It returns the configured value only if the companion hash
+// attribute changed, and "" otherwise. ZITADEL's update APIs keep the stored
+// secret when it is omitted, so sending an unchanged secret on every update
+// would only record a needless secret change event.
+func ChangedWriteOnlyStringValue(d *schema.ResourceData, attributeVar, hashVar string) string {
+	if !d.HasChange(hashVar) {
+		return ""
+	}
+	return WriteOnlyStringValue(d, attributeVar)
+}
+
 // WriteOnlyHashDiff keeps a computed hash attribute in sync with a write-only
 // secret attribute. Because the secret itself is never stored in state,
 // Terraform cannot detect when it changes; hashing the configured value into a
