@@ -81,7 +81,7 @@ func (s *administratorServer) ListAdministrators(_ context.Context, r *permissio
 	case "project":
 		a.Resource = &permission.Administrator_Project{Project: &permission.Project{Id: s.target.project}}
 	case "project_grant":
-		a.Resource = &permission.Administrator_ProjectGrant{ProjectGrant: &permission.ProjectGrant{ProjectId: s.target.project, OrganizationId: s.target.org}}
+		a.Resource = &permission.Administrator_ProjectGrant{ProjectGrant: &permission.ProjectGrant{ProjectId: s.target.project, OrganizationId: "project-owner", GrantedOrganizationId: s.target.org}}
 	}
 	if s.wrongResult {
 		a.User.Id = "another-user"

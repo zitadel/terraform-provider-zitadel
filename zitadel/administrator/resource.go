@@ -264,7 +264,7 @@ func (t target) matches(a *permission.Administrator) bool {
 	case "project":
 		return a.GetProject().GetId() == t.project
 	case "project_grant":
-		return a.GetProjectGrant().GetProjectId() == t.project && a.GetProjectGrant().GetOrganizationId() == t.org
+		return a.GetProjectGrant().GetProjectId() == t.project && a.GetProjectGrant().GetGrantedOrganizationId() == t.org
 	}
 	return false
 }
