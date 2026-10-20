@@ -14,8 +14,10 @@ import (
 	actionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/action/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/admin"
 	appv2 "github.com/zitadel/zitadel-go/v3/pkg/client/application/v2"
+	authorizationV2 "github.com/zitadel/zitadel-go/v3/pkg/client/authorization/v2"
 	featurev2 "github.com/zitadel/zitadel-go/v3/pkg/client/feature/v2"
 	instanceV2 "github.com/zitadel/zitadel-go/v3/pkg/client/instance/v2"
+	permissionV2 "github.com/zitadel/zitadel-go/v3/pkg/client/internal_permission/v2"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/middleware"
 	orgV2 "github.com/zitadel/zitadel-go/v3/pkg/client/org/v2"
@@ -68,11 +70,14 @@ const (
 // run over a separate plain-HTTP path (see form.go) that cannot read Options, so
 // the fields below expose the same credential and headers to that path.
 type ClientInfo struct {
-	Domain  string
-	Issuer  string
-	KeyPath string
-	Data    []byte
-	Options []zitadel.Option
+	bindingClientMu          sync.Mutex
+	authorizationClient      *authorizationV2.Client
+	internalPermissionClient *permissionV2.Client
+	Domain                   string
+	Issuer                   string
+	KeyPath                  string
+	Data                     []byte
+	Options                  []zitadel.Option
 	// TokenSource is the bearer credential for the auth modes whose token the
 	// asset-upload path cannot derive from KeyPath/Data: access_token (PAT),
 	// jwt_file and system_api. It is nil for the JWT-profile file modes, which

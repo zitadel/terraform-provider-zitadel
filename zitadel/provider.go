@@ -20,11 +20,13 @@ import (
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_execution_response"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/action_target_public_key"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/administrator"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_api"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_key"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_oidc"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_saml"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/application_v2"
+	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/authorization"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_claimed_message_text"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_domain_policy"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/default_hosted_login_translation"
@@ -631,6 +633,8 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"zitadel_authorization":                      authorization.GetResource(),
+			"zitadel_administrator":                      administrator.GetResource(),
 			"zitadel_organization":                       organization.GetResource(),
 			"zitadel_organization_domain":                organization_domain.GetResource(),
 			"zitadel_organization_metadata":              organization_metadata.GetResource(),

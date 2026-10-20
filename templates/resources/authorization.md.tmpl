@@ -1,0 +1,38 @@
+---
+page_title: "{{.Name}} {{.Type}} - {{.ProviderName}}"
+subcategory: ""
+description: |-
+{{ .Description | plainmarkdown | trimspace | prefixlines "  " }}
+---
+
+# {{.Name}} ({{.Type}})
+
+{{ .Description | trimspace }}
+
+## Example Usage
+
+{{ tffile "examples/provider/resources/authorization.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
+
+## Import
+
+```shell
+terraform import zitadel_authorization.imported 'existing-authorization-id'
+```
+
+Import uses only the existing authorization ID. Read populates the user,
+project, organization and roles through Authorization v2. The organization is
+where the authorization is granted; it need not be the user's home organization.
+
+Use one owner for the complete role set of each assignment. Updating roles
+revokes any previously assigned roles omitted from the configuration. Before
+adopting an assignment managed by another Terraform or Crossplane resource,
+retain it while removing its previous owner, then import it into this resource.
+The new and old owners must never reconcile the same assignment concurrently.
+
+These resources call stable v2 RPCs and do not fall back to legacy APIs. The
+caller needs read, write and delete permissions for its selected target. Read
+uses a narrowly filtered list because the API has no Get method. A successful
+empty list means the assignment is absent **from the caller's visible result**;
+keep the provider's read permissions stable to avoid incorrect disappearance.
