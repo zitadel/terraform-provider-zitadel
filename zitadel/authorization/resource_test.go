@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper/bindingtest"
@@ -22,6 +23,8 @@ type authorizationServer struct {
 	writeErr    error
 	deleteErr   error
 	createCount int
+	readCount   int
+	emptyReads  int
 }
 
 func (s *authorizationServer) CreateAuthorization(_ context.Context, r *authz.CreateAuthorizationRequest) (*authz.CreateAuthorizationResponse, error) {
@@ -51,6 +54,7 @@ func (s *authorizationServer) UpdateAuthorization(_ context.Context, r *authz.Up
 }
 
 func (s *authorizationServer) ListAuthorizations(_ context.Context, r *authz.ListAuthorizationsRequest) (*authz.ListAuthorizationsResponse, error) {
+	s.readCount++
 	if len(r.Filters) != 1 || len(r.Filters[0].GetAuthorizationIds().GetIds()) != 1 || r.Filters[0].GetAuthorizationIds().GetIds()[0] != "existing-authorization" || r.GetPagination().GetLimit() != 2 {
 		s.t.Errorf("read must select exact authorization ID: %v", r)
 	}
@@ -58,6 +62,9 @@ func (s *authorizationServer) ListAuthorizations(_ context.Context, r *authz.Lis
 		return nil, s.readErr
 	}
 	resp := &authz.ListAuthorizationsResponse{}
+	if s.readCount <= s.emptyReads {
+		return resp, nil
+	}
 	if s.assignment != nil {
 		resp.Authorizations = []*authz.Authorization{s.assignment}
 	}
@@ -95,6 +102,9 @@ func TestAuthorizationV2LifecycleAndImport(t *testing.T) {
 	}
 	if d.Id() != "existing-authorization" {
 		t.Fatalf("wrong ID: %s", d.Id())
+	}
+	if got := d.Get("state"); got != "STATE_ACTIVE" {
+		t.Fatalf("state immediately after create = %v, want STATE_ACTIVE", got)
 	}
 	if s.assignment.GetOrganization().GetId() != "grantee" {
 		t.Fatal("authorization organization was not explicit")
@@ -173,5 +183,47 @@ func TestAuthorizationV2AmbiguousReadAndCreateErrors(t *testing.T) {
 	}
 	if _, err := r.Importer.StateContext(context.Background(), d, nil); err == nil {
 		t.Fatal("empty import ID accepted")
+	}
+}
+
+func TestAuthorizationV2CreateRefresh(t *testing.T) {
+	for _, tc := range []struct {
+		name       string
+		emptyReads int
+		readErr    error
+		timeout    time.Duration
+		wantError  bool
+	}{
+		{name: "delayed visibility", emptyReads: 2},
+		{name: "permission denied", readErr: status.Error(codes.PermissionDenied, "read denied"), wantError: true},
+		{name: "unavailable", readErr: status.Error(codes.Unavailable, "read unavailable"), wantError: true},
+		{name: "visibility deadline", emptyReads: 100, timeout: 100 * time.Millisecond, wantError: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			s := &authorizationServer{emptyReads: tc.emptyReads, readErr: tc.readErr}
+			r := testResource(t, s)
+			d := schema.TestResourceDataRaw(t, r.Schema, map[string]interface{}{"user_id": "user", "project_id": "project", "org_id": "org", "role_keys": []interface{}{"reader"}})
+			ctx := context.Background()
+			if tc.timeout > 0 {
+				var cancel context.CancelFunc
+				ctx, cancel = context.WithTimeout(ctx, tc.timeout)
+				defer cancel()
+			}
+			diags := r.CreateContext(ctx, d, nil)
+			if diags.HasError() != tc.wantError {
+				t.Fatalf("create diagnostics = %v, want error %v", diags, tc.wantError)
+			}
+			if d.Id() != "existing-authorization" || s.createCount != 1 {
+				t.Fatalf("refresh lost or recreated authorization: ID=%q, creates=%d", d.Id(), s.createCount)
+			}
+			if !tc.wantError {
+				if d.Get("state") != "STATE_ACTIVE" || s.readCount != tc.emptyReads+1 {
+					t.Fatalf("state=%v after %d reads", d.Get("state"), s.readCount)
+				}
+				if !reflect.DeepEqual(d.Get(RoleKeysVar).(*schema.Set).List(), []interface{}{"reader"}) {
+					t.Fatal("create did not hydrate role keys")
+				}
+			}
+		})
 	}
 }
