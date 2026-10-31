@@ -41,7 +41,6 @@ func TestCustomizeDiffForcesReplacementWhenPasswordIsRemoved(t *testing.T) {
 		requiresNew bool
 	}{
 		{name: "non-empty to empty", oldHash: "existing-hash", requiresNew: true},
-		// covers state from older provider versions and imports, where password_hash is not set yet
 		{name: "empty to non-empty", newPassword: "password"},
 		{name: "non-empty to non-empty", oldHash: "existing-hash", newPassword: "new-password"},
 		{name: "empty to empty"},
@@ -93,8 +92,6 @@ func smtpDiff(t *testing.T, stateAttributes map[string]string, config map[string
 	return diff
 }
 
-// rawConfig builds the cty config that the SDK exposes through GetRawConfig,
-// which write-only attributes are read from.
 func rawConfig(ty cty.Type, config map[string]interface{}) cty.Value {
 	attrs := map[string]cty.Value{}
 	for name, attrType := range ty.AttributeTypes() {

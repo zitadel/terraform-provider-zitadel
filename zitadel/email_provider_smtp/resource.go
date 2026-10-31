@@ -84,9 +84,6 @@ func GetResource() *schema.Resource {
 	}
 }
 
-// forceNewOnRemoval forces replacement when key changes from non-empty to empty.
-// ZITADEL's update API cannot remove stored SMTP credentials, so dropping them
-// requires recreating the provider. Adding or changing credentials is updated in place.
 func forceNewOnRemoval(d *schema.ResourceDiff, key string) error {
 	oldValue, newValue := d.GetChange(key)
 	if oldValue.(string) != "" && newValue.(string) == "" {
