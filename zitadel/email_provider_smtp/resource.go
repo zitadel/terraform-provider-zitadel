@@ -72,8 +72,47 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		UpdateContext: update,
 		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
-			return helper.WriteOnlyHashDiff(d, PasswordVar, "password_hash")
+			if err := forceNewOnEmptyChange(d, userVar); err != nil {
+				return err
+			}
+			if err := forceNewOnWriteOnlyEmptyChange(d, PasswordVar, "password_hash"); err != nil {
+				return err
+			}
+			if err := helper.WriteOnlyHashDiff(d, PasswordVar, "password_hash"); err != nil {
+				return err
+			}
+			return forceNewOnWriteOnlyRemoval(d, "password_hash")
 		},
 		Importer: helper.ImportWithIDAndOptionalSecret(IDVar, PasswordVar),
 	}
+}
+
+func forceNewOnEmptyChange(d *schema.ResourceDiff, key string) error {
+	if !d.HasChange(key) {
+		return nil
+	}
+
+	oldValue, newValue := d.GetChange(key)
+	if (oldValue.(string) == "") != (newValue.(string) == "") {
+		return d.ForceNew(key)
+	}
+	return nil
+}
+
+func forceNewOnWriteOnlyEmptyChange(d *schema.ResourceDiff, secretKey, hashKey string) error {
+	oldHash, _ := d.GetChange(hashKey)
+	oldConfigured := oldHash.(string) != ""
+	newConfigured := d.Get(secretKey).(string) != ""
+	if !oldConfigured && newConfigured {
+		return d.ForceNew(secretKey)
+	}
+	return nil
+}
+
+func forceNewOnWriteOnlyRemoval(d *schema.ResourceDiff, hashKey string) error {
+	oldHash, newHash := d.GetChange(hashKey)
+	if oldHash.(string) != "" && newHash.(string) == "" {
+		return d.ForceNew(hashKey)
+	}
+	return nil
 }
