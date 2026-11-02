@@ -14,6 +14,9 @@ Resource representing the default security settings.
 ```terraform
 resource "zitadel_default_security_settings" "default" {
   enable_impersonation = true
+
+  dynamic_client_registration_enabled               = true
+  dynamic_client_registration_allow_unauthenticated = false
 }
 ```
 
@@ -26,6 +29,8 @@ resource "zitadel_default_security_settings" "default" {
 
 ### Optional
 
+- `dynamic_client_registration_allow_unauthenticated` (Boolean) Allow clients to register dynamically without a bearer token, as the Model Context Protocol (MCP) authorization flow requires. Such clients are created in the instance's default organization. Only has an effect if `dynamic_client_registration_enabled` is true. If false, registration requires an access token of a user with the `project.app.register_dynamic` permission. If not set, the value configured in ZITADEL is kept.
+- `dynamic_client_registration_enabled` (Boolean) Serve the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) and advertise it as `registration_endpoint` in the discovery document. If not set, the value configured in ZITADEL is kept.
 - `embedded_iframe_allowed_origins` (Set of String) Origins allowed to embed ZITADEL in an iframe
 - `embedded_iframe_enabled` (Boolean) Enable embedding in iframes
 

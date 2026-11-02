@@ -28,6 +28,23 @@ func GetResource() *schema.Resource {
 				Optional:    true,
 				Description: "Origins allowed to embed ZITADEL in an iframe",
 			},
+			dynamicClientRegistrationEnabledVar: {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+				Description: "Serve the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) and advertise it as " +
+					"`registration_endpoint` in the discovery document. If not set, the value configured in ZITADEL is kept.",
+			},
+			dynamicClientRegistrationAllowUnauthenticatedVar: {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+				Description: "Allow clients to register dynamically without a bearer token, as the Model Context Protocol (MCP) " +
+					"authorization flow requires. Such clients are created in the instance's default organization. Only has an " +
+					"effect if `" + dynamicClientRegistrationEnabledVar + "` is true. If false, registration requires an access " +
+					"token of a user with the `project.app.register_dynamic` permission. If not set, the value configured in " +
+					"ZITADEL is kept.",
+			},
 		},
 		ReadContext:   read,
 		CreateContext: update,
