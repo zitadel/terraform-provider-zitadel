@@ -2,8 +2,10 @@ package helper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -70,14 +72,14 @@ const (
 type ClientInfo struct {
 	Domain  string
 	Issuer  string
-	KeyPath string
-	Data    []byte
 	Options []zitadel.Option
-	// TokenSource is the bearer credential for the auth modes whose token the
-	// asset-upload path cannot derive from KeyPath/Data: access_token (PAT),
-	// jwt_file and system_api. It is nil for the JWT-profile file modes, which
-	// form.go builds from KeyPath or Data instead.
+	// TokenSource is the bearer credential for the auth modes that need no
+	// OIDC exchange: access_token (PAT), jwt_file and system_api. It is nil for
+	// the JWT-profile modes, which use JWTProfile instead.
 	TokenSource oauth2.TokenSource
+	// JWTProfile creates the token source of the JWT-profile modes (token,
+	// jwt_profile_file, jwt_profile_json). It is nil for the other modes.
+	JWTProfile middleware.JWTProfileTokenSourceContext
 	// TransportHeaders is the provider's transport_headers. The gRPC client gets
 	// them via Options; the asset-upload path applies them from here so both
 	// transports send the same headers (e.g. proxy auth like GCP IAP).
@@ -126,11 +128,11 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		options = append(options, zitadel.WithTransportHeader(k, v))
 	}
 
-	// keyPath/keyData feed the asset-upload path for the JWT-profile file modes;
-	// assetTokenSource feeds it for the bearer-token modes (set in the branches
-	// below). Exactly one of them ends up populated.
-	keyPath := ""
-	var keyData []byte
+	// jwtProfile feeds the asset-upload path and the session token data source
+	// for the JWT-profile modes; assetTokenSource feeds the asset-upload path
+	// for the bearer-token modes (set in the branches below). At most one of them
+	// ends up populated.
+	var jwtProfile middleware.JWTProfileTokenSourceContext
 	var assetTokenSource oauth2.TokenSource
 
 	switch {
@@ -140,12 +142,12 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		options = append(options, zitadel.WithTokenSource(tokenSource))
 		assetTokenSource = tokenSource
 	case token != "":
-		// Deprecated 'token': path to a JWT-profile key. Asset uploads read it via keyPath.
+		// Deprecated 'token': path to a JWT-profile key.
 		if _, err := os.Stat(token); err != nil {
 			return nil, fmt.Errorf("failed to read token file: %v", err)
 		}
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), token)))
-		keyPath = token
+		jwtProfile = middleware.JWTProfileFromPathContext(token)
+		options = append(options, zitadel.WithJWTProfileTokenSourceContext(jwtProfile))
 	case jwtFile != "":
 		// Presigned JWT used directly as a bearer token. Trim once so the gRPC
 		// option and the asset-upload bearer use an identical value; a trailing
@@ -163,16 +165,16 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 		options = append(options, zitadel.WithJWTDirectTokenSource(presignedJWT))
 		assetTokenSource = oauth2.StaticTokenSource(&oauth2.Token{AccessToken: presignedJWT, TokenType: "Bearer"})
 	case jwtProfileFile != "":
-		// JWT-profile key on disk. Asset uploads exchange it for a token via keyPath.
+		// JWT-profile key on disk.
 		if _, err := os.Stat(jwtProfileFile); err != nil {
 			return nil, fmt.Errorf("failed to read jwt_profile_file: %v", err)
 		}
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromPath(context.Background(), jwtProfileFile)))
-		keyPath = jwtProfileFile
+		jwtProfile = middleware.JWTProfileFromPathContext(jwtProfileFile)
+		options = append(options, zitadel.WithJWTProfileTokenSourceContext(jwtProfile))
 	case jwtProfileJSON != "":
-		// JWT-profile key inline. Asset uploads exchange it for a token via keyData.
-		options = append(options, zitadel.WithJWTProfileTokenSource(middleware.JWTProfileFromFileData(context.Background(), []byte(jwtProfileJSON))))
-		keyData = []byte(jwtProfileJSON)
+		// JWT-profile key inline.
+		jwtProfile = middleware.JWTProfileFromFileDataContext([]byte(jwtProfileJSON))
+		options = append(options, zitadel.WithJWTProfileTokenSourceContext(jwtProfile))
 	case systemAPIKeyFile != "" || systemAPIKey != "" || systemAPIPrivateKey != "" || systemAPIPublicKey != "":
 		// System API: a self-signed JWT token source, reused for both transports.
 		if systemAPIUser == "" {
@@ -217,14 +219,41 @@ func GetClientInfo(ctx context.Context, insecure bool, domain string, accessToke
 	return &ClientInfo{
 		Domain:                clientDomain,
 		Issuer:                issuer,
-		KeyPath:               keyPath,
-		Data:                  keyData,
 		Options:               options,
 		TokenSource:           assetTokenSource,
+		JWTProfile:            jwtProfile,
 		TransportHeaders:      transportHeaders,
 		InsecureSkipVerifyTLS: insecureSkipVerifyTLS,
 	}, nil
 }
+
+// JWTProfileTokenSource returns the token source of the JWT-profile modes, for the
+// requests outside the gRPC client: the asset uploads and the session token data
+// source. It is created the way the gRPC client creates its own, so it follows the
+// same transport_headers and insecure_skip_verify_tls, including a Host header,
+// for the OIDC discovery and token requests. It returns ErrNoJWTProfile in the
+// other modes.
+func (c *ClientInfo) JWTProfileTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
+	if c.JWTProfile == nil {
+		return nil, ErrNoJWTProfile
+	}
+	var source oauth2.TokenSource
+	capture := zitadel.WithJWTProfileTokenSourceContext(func(ctx context.Context, issuer string, scopes []string) (oauth2.TokenSource, error) {
+		var err error
+		source, err = c.JWTProfile(ctx, issuer, scopes)
+		return source, err
+	})
+	conn, err := zitadel.NewConnection(ctx, c.Issuer, c.Domain, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()}, append(slices.Clone(c.Options), capture)...)
+	if err != nil {
+		return nil, err
+	}
+	_ = conn.Close()
+	return source, nil
+}
+
+// ErrNoJWTProfile is returned by ClientInfo.JWTProfileTokenSource if the provider
+// is not configured with a JWT-profile key.
+var ErrNoJWTProfile = errors.New("the provider is not configured with a JWT-profile key")
 
 var securitySettingsClientLock = &sync.Mutex{}
 var securitySettingsClient *settingsv2.Client

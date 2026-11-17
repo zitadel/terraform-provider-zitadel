@@ -16,10 +16,10 @@ require (
 	github.com/hashicorp/terraform-plugin-testing v1.14.0
 	github.com/zclconf/go-cty v1.17.0
 	github.com/zitadel/oidc/v3 v3.49.2
-	github.com/zitadel/zitadel-go/v3 v3.29.3
+	github.com/zitadel/zitadel-go/v3 v3.30.1
 	golang.org/x/oauth2 v0.36.0
 	google.golang.org/grpc v1.83.2
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12
 )
 
 require (

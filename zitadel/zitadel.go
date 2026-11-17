@@ -2,14 +2,11 @@ package zitadel
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/zitadel/oidc/v3/pkg/client/profile"
-	"github.com/zitadel/oidc/v3/pkg/oidc"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
-	"golang.org/x/oauth2"
 
 	"github.com/zitadel/terraform-provider-zitadel/v2/zitadel/helper"
 )
@@ -31,18 +28,10 @@ func GetZitadelDatasource() *schema.Resource {
 				return diag.Errorf("failed to get client info")
 			}
 
-			scopes := []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()}
-			var tokenSource oauth2.TokenSource
-			var err error
-
-			if clientInfo.KeyPath != "" {
-				tokenSource, err = profile.NewJWTProfileTokenSourceFromKeyFile(ctx, clientInfo.Issuer, clientInfo.KeyPath, scopes)
-			} else if len(clientInfo.Data) > 0 {
-				tokenSource, err = profile.NewJWTProfileTokenSourceFromKeyFileData(ctx, clientInfo.Issuer, clientInfo.Data, scopes)
-			} else {
+			tokenSource, err := clientInfo.JWTProfileTokenSource(ctx)
+			if errors.Is(err, helper.ErrNoJWTProfile) {
 				return diag.Errorf("Session token generation is only supported when using 'jwt_profile_file', 'jwt_profile_json' or 'token' (service account key file path) in the provider configuration.")
 			}
-
 			if err != nil {
 				return diag.FromErr(err)
 			}

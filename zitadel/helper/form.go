@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -15,9 +16,6 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/zitadel/oidc/v3/pkg/client/profile"
-	"github.com/zitadel/oidc/v3/pkg/oidc"
-	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 	"golang.org/x/oauth2"
 )
 
@@ -102,6 +100,11 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 	// by a transport header of the same name. Set (not Add) keeps single-valued
 	// headers deterministic.
 	for k, v := range clientInfo.TransportHeaders {
+		if strings.EqualFold(k, "Host") {
+			// net/http ignores a Host header; the request host selects the instance.
+			r.Host = v
+			continue
+		}
 		r.Header.Set(k, v)
 	}
 	for k, v := range additionalHeaders {
@@ -115,27 +118,20 @@ func formFilePost(ctx context.Context, clientInfo *ClientInfo, endpoint, path st
 
 	// Pick an authenticated HTTP client that matches the provider's auth mode.
 	// The order mirrors how the credential is stored on ClientInfo.
-	switch {
-	case clientInfo.TokenSource != nil:
-		// access_token (PAT), jwt_file and system_api: a ready bearer token source.
-		client = NewClientWithInterceptor(clientInfo.TokenSource, core)
-	case clientInfo.KeyPath != "":
-		// jwt_profile_file / token: a JWT-profile key on disk, exchanged for a token.
-		client, err = NewClientWithInterceptorFromKeyFile(ctx, clientInfo.Issuer, clientInfo.KeyPath, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()}, core)
+	tokenSource := clientInfo.TokenSource
+	if tokenSource == nil {
+		// jwt_profile_file / jwt_profile_json / token: a JWT-profile key, exchanged for a token.
+		tokenSource, err = clientInfo.JWTProfileTokenSource(ctx)
+		if errors.Is(err, ErrNoJWTProfile) {
+			// Unreachable in practice (GetClientInfo rejects an unauthenticated
+			// provider), but kept as a guard with an actionable message.
+			return diag.Errorf("no authentication method available for asset upload; configure one of 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api'")
+		}
 		if err != nil {
 			return diag.Errorf("failed to create client: %v", err)
 		}
-	case len(clientInfo.Data) > 0:
-		// jwt_profile_json: the same key provided inline as JSON.
-		client, err = NewClientWithInterceptorFromKeyFileData(ctx, clientInfo.Issuer, clientInfo.Data, []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()}, core)
-		if err != nil {
-			return diag.Errorf("failed to create client: %v", err)
-		}
-	default:
-		// Unreachable in practice (GetClientInfo rejects an unauthenticated
-		// provider), but kept as a guard with an actionable message.
-		return diag.Errorf("no authentication method available for asset upload; configure one of 'access_token', 'jwt_file', 'jwt_profile_file', 'jwt_profile_json' or 'system_api'")
 	}
+	client = NewClientWithInterceptor(tokenSource, core)
 
 	resp, err := client.Do(r)
 	if err != nil {
@@ -197,33 +193,6 @@ func NewClientWithInterceptor(tokenSource oauth2.TokenSource, core http.RoundTri
 	return &http.Client{
 		Transport: Interceptor{core: core, tokenSource: oauth2.ReuseTokenSource(nil, tokenSource)},
 	}
-}
-
-// NewClientWithInterceptorFromKeyFile builds a client that authenticates with a
-// JWT-profile key read from keyPath, exchanging it for access tokens lazily. core
-// is the base transport (see assetTransport).
-func NewClientWithInterceptorFromKeyFile(ctx context.Context, issuer, keyPath string, scopes []string, core http.RoundTripper) (*http.Client, error) {
-	ts, err := profile.NewJWTProfileTokenSourceFromKeyFile(ctx, issuer, keyPath, scopes)
-	if err != nil {
-		return nil, err
-	}
-
-	return &http.Client{
-		Transport: Interceptor{core: core, tokenSource: oauth2.ReuseTokenSource(nil, ts)},
-	}, nil
-}
-
-// NewClientWithInterceptorFromKeyFileData is like NewClientWithInterceptorFromKeyFile
-// but takes the JWT-profile key as in-memory JSON instead of a file path.
-func NewClientWithInterceptorFromKeyFileData(ctx context.Context, issuer string, data []byte, scopes []string, core http.RoundTripper) (*http.Client, error) {
-	ts, err := profile.NewJWTProfileTokenSourceFromKeyFileData(ctx, issuer, data, scopes)
-	if err != nil {
-		return nil, err
-	}
-
-	return &http.Client{
-		Transport: Interceptor{core: core, tokenSource: oauth2.ReuseTokenSource(nil, ts)},
-	}, nil
 }
 
 // RoundTrip fetches a (cached) token and sets it as the Authorization header
