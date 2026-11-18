@@ -10,3 +10,7 @@ import (
 func TestAccInstanceIdPLDAP(t *testing.T) {
 	idp_test_utils.RunInstanceIDPLifecyleTest(t, "zitadel_idp_ldap", idp_ldap.BindPasswordVar)
 }
+
+func TestAccInstanceIdPLDAPUpdateKeepsUnchangedSecret(t *testing.T) {
+	idp_test_utils.RunInstanceIDPUnchangedSecretTest(t, "zitadel_idp_ldap", "instance.idp.ldap.v2.changed", idp_ldap.BindPasswordVar, "bindPassword")
+}

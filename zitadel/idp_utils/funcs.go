@@ -37,6 +37,12 @@ func WriteOnlyStringValue(d *schema.ResourceData, attributeVar string) string {
 	return helper.WriteOnlyStringValue(d, attributeVar)
 }
 
+// ChangedClientSecretValue reads the write-only client_secret for an update
+// request. See helper.ChangedWriteOnlyStringValue.
+func ChangedClientSecretValue(d *schema.ResourceData) string {
+	return helper.ChangedWriteOnlyStringValue(d, ClientSecretVar, ClientSecretHashVar)
+}
+
 // ClientSecretHashDiff keeps the computed client_secret_hash attribute in sync
 // with the write-only client_secret, so that rotating the secret is detected as
 // a normal diff without the practitioner having to manage a version field.

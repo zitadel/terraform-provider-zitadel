@@ -10,3 +10,7 @@ import (
 func TestAccInstanceIdPGitHub(t *testing.T) {
 	idp_test_utils.RunInstanceIDPLifecyleTest(t, "zitadel_idp_github", idp_utils.ClientSecretVar)
 }
+
+func TestAccInstanceIdPGitHubUpdateKeepsUnchangedSecret(t *testing.T) {
+	idp_test_utils.RunInstanceIDPUnchangedSecretTest(t, "zitadel_idp_github", "instance.idp.github.changed", idp_utils.ClientSecretVar, "clientSecret")
+}

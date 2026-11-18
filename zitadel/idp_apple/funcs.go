@@ -51,7 +51,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		ClientId:        idp_utils.StringValue(d, idp_utils.ClientIDVar),
 		TeamId:          idp_utils.StringValue(d, TeamIDVar),
 		KeyId:           idp_utils.StringValue(d, KeyIDVar),
-		PrivateKey:      []byte(helper.WriteOnlyStringValue(d, PrivateKeyVar)),
+		PrivateKey:      []byte(helper.ChangedWriteOnlyStringValue(d, PrivateKeyVar, PrivateKeyHashVar)),
 		Scopes:          idp_utils.ScopesValue(d),
 		ProviderOptions: idp_utils.ProviderOptionsValue(d),
 	})

@@ -88,7 +88,7 @@ func update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Dia
 		StartTls:          idp_utils.BoolValue(d, StartTLSVar),
 		BaseDn:            idp_utils.StringValue(d, BaseDNVar),
 		BindDn:            idp_utils.StringValue(d, BindDNVar),
-		BindPassword:      helper.WriteOnlyStringValue(d, BindPasswordVar),
+		BindPassword:      helper.ChangedWriteOnlyStringValue(d, BindPasswordVar, BindPasswordHashVar),
 		UserBase:          idp_utils.StringValue(d, UserBaseVar),
 		UserObjectClasses: helper.GetOkSetToStringSlice(d, UserObjectClassesVar),
 		UserFilters:       helper.GetOkSetToStringSlice(d, UserFiltersVar),
