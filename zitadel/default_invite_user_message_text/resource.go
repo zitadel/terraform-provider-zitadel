@@ -42,7 +42,7 @@ func (r *defaultInviteUserMessageTextResource) Schema(ctx context.Context, _ res
 	resp.Diagnostics.Append(diags...)
 	delete(s.Attributes, "org_id")
 	s.MarkdownDescription = "Instance-level default template for the user invitation email. " +
-		"There is no org-level override for this message type."
+		"Org-level overrides are managed by `zitadel_invite_user_message_text`."
 	resp.Schema = s
 }
 
