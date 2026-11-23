@@ -2,12 +2,12 @@
 page_title: "zitadel_default_invite_user_message_text Resource - terraform-provider-zitadel"
 subcategory: ""
 description: |-
-  Instance-level default template for the user invitation email. There is no org-level override for this message type.
+  Instance-level default template for the user invitation email. Org-level overrides are managed by zitadel_invite_user_message_text.
 ---
 
 # zitadel_default_invite_user_message_text (Resource)
 
-Instance-level default template for the user invitation email. There is no org-level override for this message type.
+Instance-level default template for the user invitation email. Org-level overrides are managed by `zitadel_invite_user_message_text`.
 
 ## Example Usage
 
