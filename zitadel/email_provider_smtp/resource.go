@@ -72,8 +72,22 @@ func GetResource() *schema.Resource {
 		ReadContext:   read,
 		UpdateContext: update,
 		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
-			return helper.WriteOnlyHashDiff(d, PasswordVar, "password_hash")
+			if err := forceNewOnRemoval(d, userVar); err != nil {
+				return err
+			}
+			if err := helper.WriteOnlyHashDiff(d, PasswordVar, "password_hash"); err != nil {
+				return err
+			}
+			return forceNewOnRemoval(d, "password_hash")
 		},
 		Importer: helper.ImportWithIDAndOptionalSecret(IDVar, PasswordVar),
 	}
+}
+
+func forceNewOnRemoval(d *schema.ResourceDiff, key string) error {
+	oldValue, newValue := d.GetChange(key)
+	if oldValue.(string) != "" && newValue.(string) == "" {
+		return d.ForceNew(key)
+	}
+	return nil
 }
